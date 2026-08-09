@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/init.php';
 require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/membership.php';
 require_once __DIR__ . '/includes/resource-functions.php';
 
 $slug = trim((string)($_GET['slug'] ?? ''));
@@ -13,6 +14,7 @@ if (!$resource) {
 }
 
 $isLoggedIn = is_logged_in();
+$canDownload = $resource['is_free'] || isMemberActive();
 $previewUrl = !empty($resource['preview_image']) ? UPLOAD_PREVIEW_URL . '/' . rawurlencode($resource['preview_image']) : null;
 $thumbUrl = !empty($resource['thumbnail']) ? UPLOAD_THUMBNAIL_URL . '/' . rawurlencode($resource['thumbnail']) : null;
 $displayImage = $previewUrl ?? $thumbUrl;
@@ -81,7 +83,7 @@ require_once __DIR__ . '/includes/header.php';
             </dl>
 
             <div class="mt-4">
-                <?php if ($resource['is_free']): ?>
+                <?php if ($canDownload): ?>
                     <a href="<?= e(base_url('member/download.php?id=' . (int)$resource['id'])) ?>" class="btn btn-primary btn-lg px-4">
                         <i class="fa-solid fa-download me-2"></i>Download
                     </a>

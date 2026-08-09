@@ -248,6 +248,76 @@ function attempt_login(string $email, string $password): array
 }
 
 // -----------------------------------------------------------------------
+// PROFILE / ACCOUNT MANAGEMENT
+// -----------------------------------------------------------------------
+
+/** Returns ['success' => bool, 'errors' => array<string,string>] */
+function update_user_profile(int $userId, array $input): array
+{
+    $errors = [];
+
+    $firstName = clean_input($input['first_name'] ?? '');
+    $lastName  = clean_input($input['last_name'] ?? '');
+    $school    = clean_input($input['school_name'] ?? '');
+    $country   = clean_input($input['country'] ?? '');
+    $phone     = clean_input($input['phone'] ?? '');
+
+    if ($firstName === '' || mb_strlen($firstName) > 100) {
+        $errors['first_name'] = 'Please enter your first name.';
+    }
+    if ($lastName === '' || mb_strlen($lastName) > 100) {
+        $errors['last_name'] = 'Please enter your last name.';
+    }
+    if ($school === '' || mb_strlen($school) > 150) {
+        $errors['school_name'] = 'Please enter your school name.';
+    }
+    if ($country === '' || mb_strlen($country) > 100) {
+        $errors['country'] = 'Please enter your country.';
+    }
+    if ($phone !== '' && mb_strlen($phone) > 30) {
+        $errors['phone'] = 'Phone number is too long.';
+    }
+
+    if (!empty($errors)) {
+        return ['success' => false, 'errors' => $errors];
+    }
+
+    getDB()->prepare('UPDATE users SET first_name = ?, last_name = ?, school_name = ?, country = ?, phone = ? WHERE id = ?')
+        ->execute([$firstName, $lastName, $school, $country, $phone !== '' ? $phone : null, $userId]);
+
+    return ['success' => true, 'errors' => []];
+}
+
+/** Returns ['success' => bool, 'errors' => array<string,string>] */
+function change_user_password(int $userId, string $currentPassword, string $newPassword, string $confirmPassword): array
+{
+    $errors = [];
+
+    $stmt = getDB()->prepare('SELECT password_hash FROM users WHERE id = ? LIMIT 1');
+    $stmt->execute([$userId]);
+    $row = $stmt->fetch();
+
+    if (!$row || !password_verify($currentPassword, $row['password_hash'])) {
+        $errors['current_password'] = 'Current password is incorrect.';
+    }
+    if (strlen($newPassword) < PASSWORD_MIN_LENGTH || !preg_match('/[a-zA-Z]/', $newPassword) || !preg_match('/[0-9]/', $newPassword)) {
+        $errors['new_password'] = 'Password must be at least ' . PASSWORD_MIN_LENGTH . ' characters, with a letter and a number.';
+    }
+    if ($newPassword !== $confirmPassword) {
+        $errors['confirm_password'] = 'Passwords do not match.';
+    }
+
+    if (!empty($errors)) {
+        return ['success' => false, 'errors' => $errors];
+    }
+
+    getDB()->prepare('UPDATE users SET password_hash = ? WHERE id = ?')
+        ->execute([password_hash($newPassword, PASSWORD_DEFAULT), $userId]);
+
+    return ['success' => true, 'errors' => []];
+}
+
+// -----------------------------------------------------------------------
 // PASSWORD RESET
 // -----------------------------------------------------------------------
 

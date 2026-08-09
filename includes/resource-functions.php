@@ -126,6 +126,11 @@ function get_resource_by_slug(string $slug): ?array
     return $stmt->fetch() ?: null;
 }
 
+function get_published_resource_count(): int
+{
+    return (int)getDB()->query('SELECT COUNT(*) FROM resources WHERE is_published = 1')->fetchColumn();
+}
+
 function get_featured_resources(int $limit = 6): array
 {
     $stmt = getDB()->prepare(
