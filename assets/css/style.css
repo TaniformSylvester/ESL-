@@ -1,0 +1,74 @@
+/* ESL Teacher Hub — base styles. Colors are CSS variables so the brand
+   palette can be changed in one place. */
+
+:root {
+    --brand-primary: #2563eb;
+    --brand-primary-dark: #1d4ed8;
+    --brand-secondary: #f59e0b;
+    --brand-success: #16a34a;
+    --brand-bg-soft: #f8fafc;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    color: #1f2937;
+    background-color: #ffffff;
+}
+
+a {
+    color: var(--brand-primary);
+}
+
+.btn-primary {
+    background-color: var(--brand-primary);
+    border-color: var(--brand-primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--brand-primary-dark);
+    border-color: var(--brand-primary-dark);
+}
+
+.navbar-brand {
+    color: var(--brand-primary) !important;
+}
+
+.badge-free {
+    background-color: var(--brand-success);
+}
+
+.badge-members {
+    background-color: var(--brand-secondary);
+    color: #1f2937;
+}
+
+.resource-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    height: 100%;
+}
+
+.resource-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+}
+
+.resource-card .card-img-top {
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+}
+
+.section-soft {
+    background-color: var(--brand-bg-soft);
+}
+
+.hero {
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%);
+    color: #fff;
+}
+
+footer a:hover {
+    color: #fff !important;
+}

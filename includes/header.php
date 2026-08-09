@@ -1,0 +1,90 @@
+<?php
+/**
+ * Public-site header. Expects init.php to already be loaded.
+ * Pages may set $pageTitle and $pageDescription before including this file.
+ */
+
+$pageTitle = $pageTitle ?? SITE_NAME;
+$pageDescription = $pageDescription ?? SITE_DESCRIPTION;
+$isLoggedIn = isset($_SESSION['user_id']);
+$userRole = $_SESSION['user_role'] ?? null;
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= e($pageTitle) ?> | <?= e(SITE_NAME) ?></title>
+    <meta name="description" content="<?= e($pageDescription) ?>">
+    <meta property="og:title" content="<?= e($pageTitle) ?>">
+    <meta property="og:description" content="<?= e($pageDescription) ?>">
+    <meta property="og:site_name" content="<?= e(SITE_NAME) ?>">
+    <meta property="og:type" content="website">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="<?= e(asset_url('css/style.css')) ?>">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="<?= e(base_url()) ?>">
+            <i class="fa-solid fa-graduation-cap text-primary me-1"></i> <?= e(SITE_NAME) ?>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="<?= e(base_url()) ?>">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= e(base_url('resources.php')) ?>">Resources</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= e(base_url('pricing.php')) ?>">Pricing</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= e(base_url('about.php')) ?>">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= e(base_url('contact.php')) ?>">Contact</a></li>
+            </ul>
+
+            <ul class="navbar-nav align-items-lg-center gap-lg-2">
+                <?php if ($isLoggedIn): ?>
+                    <li class="nav-item"><a class="nav-link" href="<?= e(base_url('dashboard.php')) ?>">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= e(base_url('member/favorites.php')) ?>">Favorites</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= e(base_url('member/downloads.php')) ?>">Downloads</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= e(base_url('member/subscription.php')) ?>">Subscription</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= e(base_url('member/profile.php')) ?>">Profile</a></li>
+                    <?php if ($userRole === 'admin'): ?>
+                        <li class="nav-item"><a class="nav-link" href="<?= e(base_url('admin/index.php')) ?>">Admin Panel</a></li>
+                    <?php endif; ?>
+                    <li class="nav-item"><a class="nav-link" href="<?= e(base_url('member/logout.php')) ?>">Logout</a></li>
+                <?php else: ?>
+                    <li class="nav-item"><a class="nav-link" href="<?= e(base_url('login.php')) ?>">Login</a></li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary btn-sm px-3" href="<?= e(base_url('register.php')) ?>">Join Now</a>
+                    </li>
+                <?php endif; ?>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<?php $flashMessages = flash_get(); ?>
+<?php if (!empty($flashMessages)): ?>
+    <div class="container mt-3">
+        <?php foreach ($flashMessages as $flash): ?>
+            <?php
+                $alertClass = match ($flash['type']) {
+                    'success' => 'alert-success',
+                    'error'   => 'alert-danger',
+                    'warning' => 'alert-warning',
+                    default   => 'alert-info',
+                };
+            ?>
+            <div class="alert <?= e($alertClass) ?> alert-dismissible fade show" role="alert">
+                <?= e($flash['message']) ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+
+<main>

@@ -1,0 +1,26 @@
+# ESL Teacher Hub — root .htaccess (Apache, Hostinger-compatible)
+
+# Disable directory browsing
+Options -Indexes -MultiViews
+
+# Friendly error pages
+ErrorDocument 404 /404.php
+ErrorDocument 403 /403.php
+ErrorDocument 500 /500.php
+
+# Block direct access to sensitive file types anywhere in the site
+<FilesMatch "\.(sql|log|md|env|ini)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Force HTTPS — uncomment AFTER SSL is active in Hostinger hPanel,
+# otherwise you may get a redirect loop before the certificate is issued.
+# RewriteEngine On
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
