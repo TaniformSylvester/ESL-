@@ -11,6 +11,11 @@ function is_logged_in(): bool
     return isset($_SESSION['user_id']);
 }
 
+function is_admin(): bool
+{
+    return is_logged_in() && ($_SESSION['user_role'] ?? null) === 'admin';
+}
+
 /** Returns the fresh logged-in user row (without password_hash), or null. */
 function current_user(): ?array
 {
@@ -55,10 +60,18 @@ function require_guest(): void
     }
 }
 
-/** Requires an active admin session; otherwise 403s. */
+/**
+ * Requires an active admin session. Unlike require_login(), this sends
+ * guests to the dedicated admin login page rather than the member one —
+ * the admin area has its own entry point even though it shares the same
+ * users table and session mechanism.
+ */
 function require_admin(): void
 {
-    require_login();
+    if (!is_logged_in()) {
+        redirect('admin/login.php');
+    }
+
     $user = current_user();
 
     if (!$user || $user['role'] !== 'admin') {

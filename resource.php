@@ -14,7 +14,7 @@ if (!$resource) {
 }
 
 $isLoggedIn = is_logged_in();
-$canDownload = $resource['is_free'] || isMemberActive();
+$canDownload = $resource['is_free'] || isMemberActive() || is_admin();
 $previewUrl = !empty($resource['preview_image']) ? UPLOAD_PREVIEW_URL . '/' . rawurlencode($resource['preview_image']) : null;
 $thumbUrl = !empty($resource['thumbnail']) ? UPLOAD_THUMBNAIL_URL . '/' . rawurlencode($resource['thumbnail']) : null;
 $displayImage = $previewUrl ?? $thumbUrl;

@@ -1,7 +1,7 @@
 <?php
 /**
- * Read-side resource/category queries used by the public site.
- * Admin CRUD (create/edit/delete) is added in a later stage.
+ * Resource/category queries. Public read-side queries plus category CRUD
+ * (used by /admin/categories.php). Resource CRUD is added in a later stage.
  */
 
 function get_categories(): array
@@ -26,6 +26,93 @@ function get_categories_grouped(): array
     }
 
     return $grouped;
+}
+
+function get_category_by_id(int $id): ?array
+{
+    $stmt = getDB()->prepare('SELECT * FROM categories WHERE id = ? LIMIT 1');
+    $stmt->execute([$id]);
+
+    return $stmt->fetch() ?: null;
+}
+
+function category_slug_exists(string $slug, ?int $excludeId = null): bool
+{
+    if ($excludeId !== null) {
+        $stmt = getDB()->prepare('SELECT id FROM categories WHERE slug = ? AND id != ? LIMIT 1');
+        $stmt->execute([$slug, $excludeId]);
+    } else {
+        $stmt = getDB()->prepare('SELECT id FROM categories WHERE slug = ? LIMIT 1');
+        $stmt->execute([$slug]);
+    }
+
+    return (bool)$stmt->fetch();
+}
+
+/** Returns ['success' => bool, 'errors' => array<string,string>] */
+function create_category(array $input): array
+{
+    $errors = validate_category_input($input);
+
+    if (!empty($errors)) {
+        return ['success' => false, 'errors' => $errors];
+    }
+
+    $name = clean_input($input['name']);
+    $slug = slugify($input['name']);
+    $groupName = clean_input($input['group_name']);
+    $sortOrder = (int)($input['sort_order'] ?? 0);
+
+    getDB()->prepare('INSERT INTO categories (name, slug, group_name, sort_order) VALUES (?, ?, ?, ?)')
+        ->execute([$name, $slug, $groupName, $sortOrder]);
+
+    return ['success' => true, 'errors' => []];
+}
+
+/** Returns ['success' => bool, 'errors' => array<string,string>] */
+function update_category(int $id, array $input): array
+{
+    $errors = validate_category_input($input, $id);
+
+    if (!empty($errors)) {
+        return ['success' => false, 'errors' => $errors];
+    }
+
+    $name = clean_input($input['name']);
+    $slug = slugify($input['name']);
+    $groupName = clean_input($input['group_name']);
+    $sortOrder = (int)($input['sort_order'] ?? 0);
+
+    getDB()->prepare('UPDATE categories SET name = ?, slug = ?, group_name = ?, sort_order = ? WHERE id = ?')
+        ->execute([$name, $slug, $groupName, $sortOrder, $id]);
+
+    return ['success' => true, 'errors' => []];
+}
+
+function validate_category_input(array $input, ?int $excludeId = null): array
+{
+    $errors = [];
+
+    $name = clean_input($input['name'] ?? '');
+    $groupName = clean_input($input['group_name'] ?? '');
+
+    if ($name === '' || mb_strlen($name) > 100) {
+        $errors['name'] = 'Please enter a category name.';
+    } elseif (category_slug_exists(slugify($name), $excludeId)) {
+        $errors['name'] = 'A category with this name already exists.';
+    }
+
+    if ($groupName === '' || mb_strlen($groupName) > 50) {
+        $errors['group_name'] = 'Please enter a group name.';
+    }
+
+    return $errors;
+}
+
+/** Resources referencing this category simply lose their category (ON DELETE SET NULL) — they are not deleted. */
+function delete_category(int $id): void
+{
+    getDB()->prepare('DELETE FROM categories WHERE id = ?')->execute([$id]);
 }
 
 function resource_type_icon(string $resourceType): string
