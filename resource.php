@@ -3,6 +3,8 @@ require_once __DIR__ . '/includes/init.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/membership.php';
 require_once __DIR__ . '/includes/resource-functions.php';
+require_once __DIR__ . '/includes/download-functions.php';
+require_once __DIR__ . '/includes/favorites-functions.php';
 
 $slug = trim((string)($_GET['slug'] ?? ''));
 $resource = $slug !== '' ? get_resource_by_slug($slug) : null;
@@ -14,7 +16,8 @@ if (!$resource) {
 }
 
 $isLoggedIn = is_logged_in();
-$canDownload = $resource['is_free'] || isMemberActive() || is_admin();
+$canDownload = can_download_resource($resource);
+$isFavorited = $isLoggedIn && is_favorited((int)$_SESSION['user_id'], (int)$resource['id']);
 $previewUrl = !empty($resource['preview_image']) ? UPLOAD_PREVIEW_URL . '/' . rawurlencode($resource['preview_image']) : null;
 $thumbUrl = !empty($resource['thumbnail']) ? UPLOAD_THUMBNAIL_URL . '/' . rawurlencode($resource['thumbnail']) : null;
 $displayImage = $previewUrl ?? $thumbUrl;
@@ -56,7 +59,17 @@ require_once __DIR__ . '/includes/header.php';
                 <?php endif; ?>
             </div>
 
-            <h1 class="fw-bold mb-3"><?= e($resource['title']) ?></h1>
+            <div class="d-flex align-items-start justify-content-between gap-2">
+                <h1 class="fw-bold mb-3"><?= e($resource['title']) ?></h1>
+                <?php if ($isLoggedIn): ?>
+                    <button type="button" class="btn btn-outline-secondary favorite-btn flex-shrink-0 <?= $isFavorited ? 'active' : '' ?>"
+                            data-resource-id="<?= (int)$resource['id'] ?>" data-csrf="<?= e(generate_csrf_token()) ?>"
+                            aria-pressed="<?= $isFavorited ? 'true' : 'false' ?>"
+                            title="<?= $isFavorited ? 'Remove from favorites' : 'Add to favorites' ?>">
+                        <i class="fa-<?= $isFavorited ? 'solid' : 'regular' ?> fa-heart <?= $isFavorited ? 'text-danger' : '' ?>"></i>
+                    </button>
+                <?php endif; ?>
+            </div>
 
             <?php if (!empty($resource['description'])): ?>
                 <p class="text-secondary"><?= nl2br(e($resource['description'])) ?></p>

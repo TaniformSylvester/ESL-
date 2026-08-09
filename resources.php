@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/includes/init.php';
+require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/resource-functions.php';
+require_once __DIR__ . '/includes/favorites-functions.php';
 
 $filters = [
     'search'        => trim((string)($_GET['search'] ?? '')),

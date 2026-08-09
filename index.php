@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/includes/init.php';
+require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/resource-functions.php';
+require_once __DIR__ . '/includes/favorites-functions.php';
 
 $featuredResources = get_featured_resources(6);
 $freeResources = get_free_resources(6);

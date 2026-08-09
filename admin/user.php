@@ -3,6 +3,7 @@ require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/admin-functions.php';
 require_once __DIR__ . '/../includes/membership.php';
+require_once __DIR__ . '/../includes/download-functions.php';
 
 require_admin();
 $admin = current_user();
@@ -71,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $membership = ['status' => $user['membership_status'] ?? 'inactive', 'expiry_date' => $user['membership_expiry'] ?? null];
+$downloadHistory = get_user_downloads($userId, 1, 10);
 
 $pageTitle = 'User: ' . $user['first_name'] . ' ' . $user['last_name'];
 require_once __DIR__ . '/../includes/admin-header.php';
@@ -202,7 +204,21 @@ require_once __DIR__ . '/../includes/admin-header.php';
         <div class="card shadow-sm border-0 mt-4">
             <div class="card-body">
                 <h2 class="h5 fw-bold mb-3">Download History</h2>
-                <p class="text-secondary small mb-0">Download tracking is added in a later stage.</p>
+                <?php if (empty($downloadHistory['items'])): ?>
+                    <p class="text-secondary small mb-0">No downloads yet.</p>
+                <?php else: ?>
+                    <ul class="list-unstyled small mb-0">
+                        <?php foreach ($downloadHistory['items'] as $download): ?>
+                            <li class="mb-1 d-flex justify-content-between border-bottom pb-1">
+                                <span><?= e($download['title']) ?></span>
+                                <span class="text-secondary"><?= e(format_date($download['downloaded_at'], 'd M Y, g:i a')) ?></span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                    <?php if ($downloadHistory['total'] > 10): ?>
+                        <p class="text-secondary small mt-2 mb-0">Showing the 10 most recent of <?= (int)$downloadHistory['total'] ?> downloads.</p>
+                    <?php endif; ?>
+                <?php endif; ?>
             </div>
         </div>
     </div>

@@ -2,22 +2,35 @@
 /**
  * Renders one resource card. Expects $resource (assoc array from the
  * resources table, optionally joined with category_name) to be set
- * before this file is included.
+ * before this file is included. Requires auth.php and favorites-functions.php
+ * to already be loaded by the including page.
  */
 $cardIcon = resource_type_icon($resource['resource_type']);
 $cardThumbUrl = !empty($resource['thumbnail']) ? UPLOAD_THUMBNAIL_URL . '/' . rawurlencode($resource['thumbnail']) : null;
+$cardIsLoggedIn = is_logged_in();
+$cardIsFavorited = $cardIsLoggedIn && is_favorited((int)$_SESSION['user_id'], (int)$resource['id']);
 ?>
 <div class="col">
     <div class="card resource-card shadow-sm">
-        <a href="<?= e(base_url('resource.php?slug=' . urlencode($resource['slug']))) ?>" class="text-decoration-none text-reset">
-            <?php if ($cardThumbUrl): ?>
-                <img src="<?= e($cardThumbUrl) ?>" class="card-img-top" alt="<?= e($resource['title']) ?>" loading="lazy">
-            <?php else: ?>
-                <div class="card-img-top d-flex align-items-center justify-content-center bg-light text-primary">
-                    <i class="fa-solid <?= e($cardIcon) ?> fa-3x"></i>
-                </div>
+        <div class="position-relative">
+            <a href="<?= e(base_url('resource.php?slug=' . urlencode($resource['slug']))) ?>" class="text-decoration-none text-reset">
+                <?php if ($cardThumbUrl): ?>
+                    <img src="<?= e($cardThumbUrl) ?>" class="card-img-top" alt="<?= e($resource['title']) ?>" loading="lazy">
+                <?php else: ?>
+                    <div class="card-img-top d-flex align-items-center justify-content-center bg-light text-primary">
+                        <i class="fa-solid <?= e($cardIcon) ?> fa-3x"></i>
+                    </div>
+                <?php endif; ?>
+            </a>
+            <?php if ($cardIsLoggedIn): ?>
+                <button type="button" class="btn btn-sm btn-light favorite-btn position-absolute top-0 end-0 m-2 <?= $cardIsFavorited ? 'active' : '' ?>"
+                        data-resource-id="<?= (int)$resource['id'] ?>" data-csrf="<?= e(generate_csrf_token()) ?>"
+                        aria-pressed="<?= $cardIsFavorited ? 'true' : 'false' ?>"
+                        title="<?= $cardIsFavorited ? 'Remove from favorites' : 'Add to favorites' ?>">
+                    <i class="fa-<?= $cardIsFavorited ? 'solid' : 'regular' ?> fa-heart <?= $cardIsFavorited ? 'text-danger' : '' ?>"></i>
+                </button>
             <?php endif; ?>
-        </a>
+        </div>
         <div class="card-body d-flex flex-column">
             <div class="d-flex justify-content-between align-items-start mb-2">
                 <span class="badge <?= $resource['is_free'] ? 'badge-free' : 'badge-members' ?>">
