@@ -19,6 +19,12 @@ ErrorDocument 500 /500.php
     </IfModule>
 </FilesMatch>
 
+# Serve a clean /sitemap.xml URL from the dynamic sitemap.php generator
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^sitemap\.xml$ sitemap.php [L]
+</IfModule>
+
 # Force HTTPS — uncomment AFTER SSL is active in Hostinger hPanel,
 # otherwise you may get a redirect loop before the certificate is issued.
 # RewriteEngine On
