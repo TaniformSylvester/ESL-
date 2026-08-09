@@ -49,7 +49,7 @@ define('TIMEZONE', 'Asia/Bangkok');
 date_default_timezone_set(TIMEZONE);
 
 define('CURRENCY', 'THB');
-define('CURRENCY_SYMBOL', '฿');
+define('SITE_CURRENCY_SYMBOL', '฿');
 define('SUBSCRIPTION_PRICE', 200);       // amount per billing period
 define('SUBSCRIPTION_PERIOD_LABEL', 'month');
 
@@ -112,6 +112,14 @@ define('RESOURCE_TYPES', [
 // -----------------------------------------------------------------------
 define('RESOURCES_PER_PAGE', 12);
 define('ADMIN_ROWS_PER_PAGE', 20);
+
+// -----------------------------------------------------------------------
+// AUTHENTICATION / ACCOUNT SECURITY
+// -----------------------------------------------------------------------
+define('PASSWORD_MIN_LENGTH', 8);
+define('LOGIN_MAX_ATTEMPTS', 5);
+define('LOGIN_LOCKOUT_MINUTES', 15);
+define('PASSWORD_RESET_TTL_MINUTES', 60);
 
 // -----------------------------------------------------------------------
 // EMAIL / SMTP

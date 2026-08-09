@@ -24,6 +24,23 @@ function redirect(string $path): void
     exit;
 }
 
+/**
+ * Validates a user-supplied "redirect back to" path, rejecting anything
+ * that isn't a safe same-site relative path (prevents open-redirect attacks).
+ */
+function safe_internal_path(?string $path, string $default = ''): string
+{
+    if (empty($path)) {
+        return $default;
+    }
+
+    if (str_starts_with($path, '/') && !str_starts_with($path, '//') && !preg_match('#^https?://#i', $path)) {
+        return ltrim($path, '/');
+    }
+
+    return $default;
+}
+
 // -----------------------------------------------------------------------
 // FLASH MESSAGES
 // -----------------------------------------------------------------------
@@ -54,7 +71,7 @@ function slugify(string $text): string
 
 function format_currency($amount): string
 {
-    return CURRENCY_SYMBOL . number_format((float)$amount, 0);
+    return SITE_CURRENCY_SYMBOL . number_format((float)$amount, 0);
 }
 
 function format_date($date, string $format = 'd M Y'): string
