@@ -73,7 +73,7 @@ function get_users_paginated(array $filters, int $page, int $perPage): array
     $offset = ($page - 1) * $perPage;
 
     $sql = "SELECT u.id, u.first_name, u.last_name, u.email, u.role, u.school_name, u.country, u.is_active, u.created_at,
-                   m.status AS membership_status, m.expiry_date
+                   m.status AS membership_status, m.start_date, m.expiry_date
             FROM users u
             LEFT JOIN memberships m ON m.user_id = u.id
             {$whereSql}

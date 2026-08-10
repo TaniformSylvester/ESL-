@@ -5,6 +5,7 @@ require_once __DIR__ . '/../includes/membership.php';
 require_once __DIR__ . '/../includes/settings-functions.php';
 require_once __DIR__ . '/../includes/upload-functions.php';
 require_once __DIR__ . '/../includes/payment-functions.php';
+require_once __DIR__ . '/../includes/email.php';
 
 require_login();
 $user = current_user();
@@ -17,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = submit_payment($user['id'], $_POST, $_FILES['screenshot'] ?? []);
 
     if ($result['success']) {
+        send_payment_submitted_email($user, ['amount' => (float)($_POST['amount'] ?? 0)]);
         flash_set('success', 'Thanks! Your payment has been submitted and is awaiting approval.');
         redirect('member/subscription.php');
     }

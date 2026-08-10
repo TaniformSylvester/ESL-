@@ -1,10 +1,9 @@
 <?php
 /**
- * Manual payment submission (teacher-facing). Admin approve/reject
- * workflow is added alongside /admin/payments.php in a later stage —
- * that code will operate on the same `payments` row shape, so swapping
- * in an automatic payment gateway later only means writing a new
- * "create an approved payment" path, not touching membership logic.
+ * Payment submission (teacher-facing) and the admin approve/reject
+ * workflow. Swapping in an automatic payment gateway later only means
+ * writing a new "create an approved payment" path elsewhere — the
+ * approve/reject functions here don't care how a payment was created.
  */
 
 const PAYMENT_METHODS = [
@@ -94,4 +93,117 @@ function payment_status_badge_class(string $status): string
         'rejected' => 'bg-danger',
         default    => 'bg-warning text-dark',
     };
+}
+
+// -----------------------------------------------------------------------
+// ADMIN: APPROVE / REJECT
+// -----------------------------------------------------------------------
+
+function get_payment_by_id(int $id): ?array
+{
+    $stmt = getDB()->prepare(
+        'SELECT p.*, u.first_name, u.last_name, u.email
+         FROM payments p
+         INNER JOIN users u ON u.id = p.user_id
+         WHERE p.id = ? LIMIT 1'
+    );
+    $stmt->execute([$id]);
+
+    return $stmt->fetch() ?: null;
+}
+
+/** $filters may contain: status ('pending'|'approved'|'rejected'|''), search. */
+function get_all_payments_paginated(array $filters, int $page, int $perPage): array
+{
+    $where = [];
+    $params = [];
+
+    $status = trim((string)($filters['status'] ?? ''));
+    if (in_array($status, ['pending', 'approved', 'rejected'], true)) {
+        $where[] = 'p.status = ?';
+        $params[] = $status;
+    }
+
+    $search = trim((string)($filters['search'] ?? ''));
+    if ($search !== '') {
+        $where[] = '(u.first_name LIKE ? OR u.last_name LIKE ? OR u.email LIKE ? OR p.reference_number LIKE ?)';
+        $like = '%' . $search . '%';
+        array_push($params, $like, $like, $like, $like);
+    }
+
+    $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
+    $db = getDB();
+
+    $countStmt = $db->prepare("SELECT COUNT(*) FROM payments p INNER JOIN users u ON u.id = p.user_id {$whereSql}");
+    $countStmt->execute($params);
+    $total = (int)$countStmt->fetchColumn();
+
+    $totalPages = $perPage > 0 ? max(1, (int)ceil($total / $perPage)) : 1;
+    $page = max(1, min($page, $totalPages));
+    $offset = ($page - 1) * $perPage;
+
+    $sql = "SELECT p.*, u.first_name, u.last_name, u.email
+            FROM payments p
+            INNER JOIN users u ON u.id = p.user_id
+            {$whereSql}
+            ORDER BY p.created_at DESC
+            LIMIT {$perPage} OFFSET {$offset}";
+
+    $stmt = $db->prepare($sql);
+    $stmt->execute($params);
+
+    return ['items' => $stmt->fetchAll(), 'total' => $total, 'total_pages' => $totalPages, 'page' => $page];
+}
+
+/**
+ * Approves a pending payment and extends the member's subscription by one
+ * month via extend_membership() (includes/admin-functions.php, must already
+ * be loaded by the caller) — the same date math used for manual admin
+ * extensions, so membership dates are only ever computed in one place.
+ * Returns the payment row (with user info) on success, or null if the
+ * payment doesn't exist or was already processed.
+ */
+function approve_payment(int $paymentId, int $adminId): ?array
+{
+    $payment = get_payment_by_id($paymentId);
+
+    if (!$payment || $payment['status'] !== 'pending') {
+        return null;
+    }
+
+    $db = getDB();
+    $db->prepare("UPDATE payments SET status = 'approved', reviewed_by = ?, reviewed_at = NOW() WHERE id = ?")
+        ->execute([$adminId, $paymentId]);
+
+    extend_membership((int)$payment['user_id'], 1);
+
+    $db->prepare('UPDATE memberships SET last_payment_id = ? WHERE user_id = ?')
+        ->execute([$paymentId, $payment['user_id']]);
+
+    return $payment;
+}
+
+/**
+ * Rejects a pending payment. Only downgrades the membership to 'inactive'
+ * if it's still 'pending' — a renewal payment rejected while the member is
+ * still currently active must not interrupt their existing access.
+ * Returns the payment row (with user info) on success, or null if the
+ * payment doesn't exist or was already processed.
+ */
+function reject_payment(int $paymentId, int $adminId, string $note): ?array
+{
+    $payment = get_payment_by_id($paymentId);
+
+    if (!$payment || $payment['status'] !== 'pending') {
+        return null;
+    }
+
+    $db = getDB();
+    $db->prepare("UPDATE payments SET status = 'rejected', reviewed_by = ?, reviewed_at = NOW(), admin_note = ? WHERE id = ?")
+        ->execute([$adminId, $note !== '' ? $note : null, $paymentId]);
+
+    $db->prepare("UPDATE memberships SET status = 'inactive' WHERE user_id = ? AND status = 'pending'")
+        ->execute([$payment['user_id']]);
+
+    return $payment;
 }
