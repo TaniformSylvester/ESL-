@@ -122,6 +122,15 @@ define('LOGIN_LOCKOUT_MINUTES', 15);
 define('PASSWORD_RESET_TTL_MINUTES', 60);
 
 // -----------------------------------------------------------------------
+// CRON
+// cron/expire-memberships.php runs fine unauthenticated from the CLI
+// (php cron/expire-memberships.php). If your host only offers URL-based
+// cron jobs, set a random secret here and call the URL with ?token=...
+// so the endpoint isn't publicly triggerable by anyone who finds it.
+// -----------------------------------------------------------------------
+define('CRON_SECRET', '');
+
+// -----------------------------------------------------------------------
 // EMAIL / SMTP
 // Leave SMTP_ENABLED false to use PHP's built-in mail() function.
 // Fill these in later if your host requires SMTP for reliable delivery.

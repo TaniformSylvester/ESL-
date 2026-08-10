@@ -262,14 +262,22 @@ INSERT INTO settings (setting_key, setting_value) VALUES
     ('footer_text', 'Helping ESL teachers save time with ready-to-use classroom resources.');
 
 -- ----------------------------------------------------------------------------
+-- SAMPLE / DEMO RESOURCES
+-- A few demo resources so the site isn't empty on first install. These
+-- have no file attached yet (file_path is NULL) — visiting one shows a
+-- "not currently available" message until you edit it in Admin > Resources
+-- and upload a real file. Feel free to delete these once you add your own.
+-- ----------------------------------------------------------------------------
+INSERT INTO resources (title, slug, description, resource_type, category_id, grade_level, subject, topic, is_free, is_published) VALUES
+    ('Numbers 1-10 Worksheet', 'numbers-1-10-worksheet', 'A simple worksheet practicing numbers one through ten.', 'Worksheet', (SELECT id FROM categories WHERE slug = 'vocabulary'), 'Grade 1', 'Vocabulary', 'Numbers', 1, 1),
+    ('Classroom Objects Lesson Plan', 'classroom-objects-lesson-plan', 'A full lesson plan teaching classroom object vocabulary.', 'Lesson Plan', (SELECT id FROM categories WHERE slug = 'lesson-plans'), 'Grade 1', 'Vocabulary', 'Classroom Objects', 0, 1),
+    ('Animals PowerPoint', 'animals-powerpoint', 'An engaging slideshow introducing animal vocabulary.', 'PowerPoint', (SELECT id FROM categories WHERE slug = 'powerpoints'), 'Grade 2', 'Vocabulary', 'Animals', 0, 1),
+    ('Present Simple Worksheet', 'present-simple-worksheet', 'Practice exercises for the present simple tense.', 'Worksheet', (SELECT id FROM categories WHERE slug = 'grammar'), 'Grade 3', 'Grammar', 'Present Simple', 0, 1);
+
+-- ----------------------------------------------------------------------------
 -- FIRST ADMIN ACCOUNT
 -- Do NOT insert a default admin with a known password into a live database.
--- A dedicated one-time setup script for creating the first admin account
--- securely will be provided in a later build stage. For manual reference,
--- an admin row can be created like this once you have a real bcrypt hash
--- (generate one with PHP's password_hash('YourStrongPassword', PASSWORD_DEFAULT)):
---
--- INSERT INTO users (first_name, last_name, email, password_hash, role)
--- VALUES ('Admin', 'User', 'admin@example.com', '<paste-bcrypt-hash-here>', 'admin');
--- INSERT INTO memberships (user_id, status) VALUES (LAST_INSERT_ID(), 'active');
+-- Instead, after importing this file, visit /install/create-admin.php on
+-- your site to create your admin account through a form (it refuses to
+-- run again once an admin exists) — then delete the /install/ folder.
 -- ----------------------------------------------------------------------------

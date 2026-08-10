@@ -72,3 +72,15 @@ function send_payment_rejected_email(array $user, string $note): bool
 
     return send_email($user['email'], $subject, $body);
 }
+
+/** Sent by cron/expire-memberships.php when a membership transitions from active to expired. */
+function send_membership_expired_email(array $user): bool
+{
+    $subject = 'Your ' . SITE_NAME . ' membership has expired';
+
+    $body = '<p>Hi ' . e($user['first_name']) . ',</p>'
+        . '<p>Your membership has expired, so members-only resources are no longer available for download.</p>'
+        . '<p><a href="' . e(base_url('member/subscription.php')) . '">Renew your membership</a> to keep your access going.</p>';
+
+    return send_email($user['email'], $subject, $body);
+}

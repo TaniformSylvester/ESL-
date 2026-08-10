@@ -1,8 +1,10 @@
 <?php
 /**
- * Reads admin-configurable values from the settings table (bank details,
- * payment instructions, branding overrides, etc). Write access is added
- * alongside /admin/settings.php in a later stage.
+ * Reads and writes admin-configurable values from the settings table
+ * (currently: bank/PromptPay details and payment instructions, used by
+ * member/subscription.php and edited via /admin/settings.php). Branding
+ * fields like site name stay in config/config.php as the source of
+ * truth — see that file's header comment.
  */
 
 function get_setting(string $key, string $default = ''): string
@@ -20,4 +22,14 @@ function get_setting(string $key, string $default = ''): string
     $value = $settings[$key] ?? null;
 
     return ($value !== null && $value !== '') ? $value : $default;
+}
+
+/** @param array<string,string> $values setting_key => new value */
+function update_settings(array $values): void
+{
+    $stmt = getDB()->prepare('UPDATE settings SET setting_value = ? WHERE setting_key = ?');
+
+    foreach ($values as $key => $value) {
+        $stmt->execute([$value, $key]);
+    }
 }

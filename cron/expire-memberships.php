@@ -1,0 +1,49 @@
+<?php
+/**
+ * Optional scheduled cleanup. isMemberActive() already self-heals a stale
+ * 'active' row past its expiry the moment anyone checks it, so correctness
+ * never depends on this script running — it exists to (a) keep admin
+ * reports/stats accurate even for members nobody has "looked at" recently,
+ * and (b) send the "membership expired" email at the moment of transition.
+ *
+ * Hostinger setup (hPanel > Advanced > Cron Jobs), run once daily:
+ *   php /home/USERNAME/domains/yourdomain.com/public_html/cron/expire-memberships.php
+ *
+ * If your host only supports URL-based cron jobs instead of running a
+ * PHP file directly, set CRON_SECRET in config/config.php and call:
+ *   https://yourdomain.com/cron/expire-memberships.php?token=YOUR_SECRET
+ */
+require_once __DIR__ . '/../includes/init.php';
+require_once __DIR__ . '/../includes/email.php';
+
+$isCli = (php_sapi_name() === 'cli');
+
+if (!$isCli) {
+    if (CRON_SECRET === '' || ($_GET['token'] ?? '') !== CRON_SECRET) {
+        http_response_code(403);
+        exit('Forbidden.');
+    }
+}
+
+$db = getDB();
+
+// Capture who is about to expire before flipping their status, so we can
+// email them exactly once at the moment of transition.
+$stmt = $db->query(
+    "SELECT u.id, u.first_name, u.email
+     FROM memberships m
+     INNER JOIN users u ON u.id = m.user_id
+     WHERE m.status = 'active' AND m.expiry_date < CURDATE()"
+);
+$expiring = $stmt->fetchAll();
+
+$db->prepare("UPDATE memberships SET status = 'expired' WHERE status = 'active' AND expiry_date < CURDATE()")
+    ->execute();
+
+foreach ($expiring as $user) {
+    send_membership_expired_email($user);
+}
+
+$message = date('Y-m-d H:i:s') . ' - Expired ' . count($expiring) . ' membership(s).';
+error_log($message);
+echo $message . PHP_EOL;
