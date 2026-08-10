@@ -227,6 +227,7 @@ function attempt_login(string $email, string $password): array
     $user = $stmt->fetch();
 
     if (!$user) {
+        error_log("Login failure: unknown email '{$email}' from " . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
         return ['success' => false, 'error' => $genericError, 'user' => null];
     }
 
@@ -248,6 +249,9 @@ function attempt_login(string $email, string $password): array
 
         $db->prepare('UPDATE users SET failed_login_attempts = ?, locked_until = ? WHERE id = ?')
             ->execute([$attempts, $lockedUntil, $user['id']]);
+
+        // Never log the password itself — only that an attempt failed, for whom, and from where.
+        error_log("Login failure: wrong password for user #{$user['id']} ({$email}) from " . ($_SERVER['REMOTE_ADDR'] ?? 'unknown') . ($lockedUntil ? ' — account now locked' : ''));
 
         return ['success' => false, 'error' => $genericError, 'user' => null];
     }

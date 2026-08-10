@@ -25,6 +25,27 @@ ErrorDocument 500 /500.php
     RewriteRule ^sitemap\.xml$ sitemap.php [L]
 </IfModule>
 
+# Basic security headers (defense in depth — the app also sets its own
+# security-relevant headers, e.g. X-Content-Type-Options on downloads)
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Cache static assets — these are served with content-based/versioned
+# paths in mind; if you update a CSS/JS file and don't see the change,
+# hard-refresh or bump a ?v= query string on the asset link.
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType image/svg+xml "access plus 1 month"
+</IfModule>
+
 # Force HTTPS — uncomment AFTER SSL is active in Hostinger hPanel,
 # otherwise you may get a redirect loop before the certificate is issued.
 # RewriteEngine On

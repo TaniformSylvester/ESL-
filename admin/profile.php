@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/admin-functions.php';
 
 require_admin();
 $user = current_user();
@@ -14,6 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form'] ?? '') === 'profile
     $result = update_user_profile($user['id'], $_POST);
 
     if ($result['success']) {
+        log_admin_action($user['id'], 'update_own_profile', 'Admin updated their own profile');
         flash_set('success', 'Your profile has been updated.');
         redirect('admin/profile.php');
     }
@@ -39,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form'] ?? '') === 'passwor
     );
 
     if ($result['success']) {
+        log_admin_action($user['id'], 'change_own_password', 'Admin changed their own password');
         flash_set('success', 'Your password has been changed.');
         redirect('admin/profile.php');
     }

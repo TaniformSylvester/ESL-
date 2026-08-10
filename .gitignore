@@ -1,0 +1,22 @@
+# Runtime logs
+/logs/*.log
+
+# User-uploaded content — directory structure (.gitkeep, .htaccess) is
+# tracked, but files uploaded through the app at runtime are not.
+/uploads/protected/*
+/uploads/thumbnails/*
+/uploads/previews/*
+/uploads/payment-proofs/*
+!/uploads/protected/.gitkeep
+!/uploads/protected/.htaccess
+!/uploads/thumbnails/.gitkeep
+!/uploads/thumbnails/.htaccess
+!/uploads/previews/.gitkeep
+!/uploads/previews/.htaccess
+!/uploads/payment-proofs/.gitkeep
+!/uploads/payment-proofs/.htaccess
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp

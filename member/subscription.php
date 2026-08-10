@@ -15,15 +15,20 @@ $old = ['amount' => (string)SUBSCRIPTION_PRICE, 'method' => 'bank_transfer', 'pa
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_csrf();
 
-    $result = submit_payment($user['id'], $_POST, $_FILES['screenshot'] ?? []);
+    if (too_many_attempts('payment_submit:' . $user['id'], 5, 600)) {
+        $errors['general'] = 'You\'ve submitted several payments recently. Please wait a few minutes and try again, or contact us if you need help.';
+    } else {
+        record_attempt('payment_submit:' . $user['id']);
+        $result = submit_payment($user['id'], $_POST, $_FILES['screenshot'] ?? []);
 
-    if ($result['success']) {
-        send_payment_submitted_email($user, ['amount' => (float)($_POST['amount'] ?? 0)]);
-        flash_set('success', 'Thanks! Your payment has been submitted and is awaiting approval.');
-        redirect('member/subscription.php');
+        if ($result['success']) {
+            send_payment_submitted_email($user, ['amount' => (float)($_POST['amount'] ?? 0)]);
+            flash_set('success', 'Thanks! Your payment has been submitted and is awaiting approval.');
+            redirect('member/subscription.php');
+        }
+
+        $errors = $result['errors'];
     }
-
-    $errors = $result['errors'];
     $old = [
         'amount'           => clean_input($_POST['amount'] ?? $old['amount']),
         'method'           => clean_input($_POST['method'] ?? $old['method']),

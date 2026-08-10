@@ -13,14 +13,20 @@ $old = [
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_csrf();
 
-    $result = register_teacher($_POST);
+    if (too_many_attempts('register_form:' . ($_SERVER['REMOTE_ADDR'] ?? ''), 5, 900)) {
+        $errors['general'] = 'Too many registration attempts from this connection. Please wait a few minutes and try again.';
+    } else {
+        record_attempt('register_form:' . ($_SERVER['REMOTE_ADDR'] ?? ''));
+        $result = register_teacher($_POST);
 
-    if ($result['success']) {
-        flash_set('success', 'Your account has been created. Please log in to continue.');
-        redirect('login.php');
+        if ($result['success']) {
+            flash_set('success', 'Your account has been created. Please log in to continue.');
+            redirect('login.php');
+        }
+
+        $errors = $result['errors'];
     }
 
-    $errors = $result['errors'];
     foreach ($old as $key => $value) {
         $old[$key] = clean_input($_POST[$key] ?? $value);
     }

@@ -37,7 +37,7 @@ require_once __DIR__ . '/includes/header.php';
         </ol>
     </nav>
 
-    <div class="row g-5">
+    <div class="row g-4 g-lg-5">
         <div class="col-lg-6">
             <?php if ($displayImage): ?>
                 <img src="<?= e($displayImage) ?>" alt="<?= e($resource['title']) ?>" class="img-fluid rounded shadow-sm">
