@@ -6,8 +6,12 @@
  * reports/stats accurate even for members nobody has "looked at" recently,
  * and (b) send the "membership expired" email at the moment of transition.
  *
- * Hostinger setup (hPanel > Advanced > Cron Jobs), run once daily:
- *   php /home/USERNAME/domains/yourdomain.com/public_html/cron/expire-memberships.php
+ * cPanel setup (Cron Jobs), run once daily:
+ *   php /home/USERNAME/public_html/cron/expire-memberships.php
+ * (adjust the path if the site lives in an addon domain's document root
+ * instead of public_html directly — cPanel's Cron Jobs page shows your
+ * home directory path at the top of the form. If a bare "php" doesn't
+ * work, your host may require a version-specific binary instead.)
  *
  * If your host only supports URL-based cron jobs instead of running a
  * PHP file directly, set CRON_SECRET in config/config.php and call:

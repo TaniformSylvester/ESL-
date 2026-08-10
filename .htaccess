@@ -1,4 +1,6 @@
-# ESL Teacher Hub — root .htaccess (Apache, Hostinger-compatible)
+# ESL Teacher Hub — root .htaccess (Apache/LiteSpeed, cPanel-compatible —
+# every module-dependent directive below is <IfModule>-guarded so a missing
+# module skips that feature instead of breaking the whole site)
 
 # Disable directory browsing
 Options -Indexes -MultiViews
@@ -46,8 +48,9 @@ ErrorDocument 500 /500.php
     ExpiresByType image/svg+xml "access plus 1 month"
 </IfModule>
 
-# Force HTTPS — uncomment AFTER SSL is active in Hostinger hPanel,
-# otherwise you may get a redirect loop before the certificate is issued.
+# Force HTTPS — uncomment AFTER SSL is active (cPanel: SSL/TLS Status, or
+# AutoSSL), otherwise you may get a redirect loop before the certificate
+# is issued.
 # RewriteEngine On
 # RewriteCond %{HTTPS} off
 # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

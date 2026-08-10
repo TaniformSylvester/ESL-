@@ -2,14 +2,16 @@
 /**
  * ESL Teacher Hub — Database Credentials
  *
- * >>> EDIT THIS FILE WITH YOUR HOSTINGER MySQL CREDENTIALS <<<
+ * >>> EDIT THIS FILE WITH YOUR REAL MySQL CREDENTIALS <<<
  *
- * In Hostinger hPanel, go to: Databases > MySQL Databases
- * There you will find/create:
+ * In cPanel, go to: MySQL® Databases
+ * There you will create/find:
  *   - Database host   (usually "localhost")
- *   - Database name    e.g. u123456789_esl
- *   - Database user    e.g. u123456789_esladmin
+ *   - Database name    e.g. yourusername_esl
+ *   - Database user    e.g. yourusername_esladmin
  *   - Database password
+ * Note: cPanel creates the database, the user, and the privilege link
+ * between them as three separate steps — see README.md Section 4, Step 2.
  *
  * Replace the placeholder values below with those real values.
  * Do NOT commit real production credentials to a public repository.

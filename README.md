@@ -1,6 +1,6 @@
 # ESL Teacher Hub
 
-A subscription resource platform for ESL/primary school teachers: browse lesson plans, worksheets, PowerPoints, flashcards, games and assessments, with a ฿200/month membership unlocking members-only downloads. Built as plain PHP + MySQL specifically so it can run on ordinary Hostinger shared hosting — no VPS, no Node.js, no Docker required.
+A subscription resource platform for ESL/primary school teachers: browse lesson plans, worksheets, PowerPoints, flashcards, games and assessments, with a ฿200/month membership unlocking members-only downloads. Built as plain PHP + MySQL specifically so it can run on ordinary cPanel shared hosting (FastComet, Hostinger, or similar) — no VPS, no Node.js, no Docker required.
 
 This README assumes no prior server-admin experience. Every step says exactly where to click.
 
@@ -39,32 +39,37 @@ Nothing here needs `composer install` or `npm install` to deploy. You just uploa
 
 ## 3. Before You Start
 
-You'll need, from Hostinger (or any shared host with PHP 8.1+/MySQL):
+You'll need, from FastComet (or any cPanel shared host with PHP 8.1+/MySQL):
 - A hosting account with a domain pointed at it
-- Access to **hPanel** (Hostinger's control panel)
-- Access to **File Manager** or an FTP client (e.g. FileZilla)
-- Access to **phpMyAdmin** (available in hPanel under Databases)
+- Access to **cPanel**
+- Access to **File Manager** (in cPanel) or an FTP client (e.g. FileZilla) — FastComet's welcome email includes your FTP/cPanel login details
+- Access to **phpMyAdmin** (in cPanel, under the "Databases" section)
 
 ---
 
-## 4. Step-by-Step Hostinger Deployment
+## 4. Step-by-Step cPanel Deployment (FastComet)
+
+These steps use FastComet's cPanel menu names. Any other cPanel host (including Hostinger's cPanel-based plans) works almost identically — the tool names and layout are standard cPanel, not FastComet-specific.
 
 ### Step 1 — Connect your domain
-In hPanel, go to **Domains** and either register a new domain or point an existing one at your Hostinger hosting plan. This can take a few hours to propagate.
+Your primary domain is normally already connected once FastComet provisions your hosting account (you chose it during signup). If you're deploying to an **additional** domain on the same account, go to cPanel → **Domains** → **Create A New Domain** and follow the wizard. Note the **document root** it creates — that's where you'll upload files in Step 4 (for your primary domain this is just `public_html`).
 
 ### Step 2 — Create a MySQL database
-1. In hPanel, go to **Databases → MySQL Databases**.
-2. Click **Create a new database**. Note down the **database name**, **username**, and **password** you set — Hostinger will prefix them like `u123456789_esl`.
-3. Note the **database host** (usually `localhost` on Hostinger).
+cPanel splits this into three small steps (the **MySQL® Database Wizard** icon in cPanel walks through the same three steps with a guided UI, if you prefer):
+1. In cPanel, go to **MySQL® Databases**. Under "Create New Database," enter a name (e.g. `esl`) and click **Create Database**. cPanel automatically prefixes it with your cPanel username, e.g. `yourusername_esl` — that full prefixed name is what you'll use as `DB_NAME`.
+2. Scroll to "MySQL Users" → "Add New User." Choose a username (also auto-prefixed, e.g. `yourusername_esladmin`) and a strong password. Click **Create User**.
+3. Scroll to "Add User To Database," select the user and database you just created, click **Add**, then on the privileges screen check **ALL PRIVILEGES** and click **Make Changes**. Skipping this step is the most common reason the site can't connect to the database afterward.
+4. The **database host** is `localhost` on FastComet shared hosting.
 
 ### Step 3 — Import the database schema
-1. In hPanel, go to **Databases → phpMyAdmin** and open it for the database you just created.
-2. Click the **Import** tab.
-3. Click **Choose File** and select `database.sql` from this project.
-4. Click **Go** at the bottom. You should see a success message and a new set of tables (users, resources, memberships, etc.) plus some starter categories, default settings, and four sample resources.
+1. In cPanel, open **phpMyAdmin** (under the Databases section).
+2. In the left sidebar, click the database you just created.
+3. Click the **Import** tab.
+4. Click **Choose File** and select `database.sql` from this project.
+5. Click **Go** at the bottom. You should see a success message and a new set of tables (users, resources, memberships, etc.) plus some starter categories, default settings, and four sample resources.
 
 ### Step 4 — Upload the site files
-1. In hPanel, go to **Files → File Manager**, and open `public_html` (or the subfolder for your domain, if you're using an add-on domain).
+1. In cPanel, open **File Manager**, and navigate to `public_html` (or the document root noted in Step 1, if this is an addon domain).
 2. Upload every file and folder from this project into that directory. If File Manager offers a "zip and upload" option, zip the project first, upload the zip, then use File Manager's **Extract** feature — it's much faster than uploading hundreds of files one by one.
 3. Double check that hidden files were included — especially every `.htaccess` file (`/`, `/config/`, `/includes/`, `/uploads/`, and its subfolders). These are what keep your database credentials and uploaded files from being directly browsable. FTP clients sometimes hide dotfiles by default — enable "show hidden files" if you're using FTP.
 
@@ -73,8 +78,8 @@ In hPanel, go to **Domains** and either register a new domain or point an existi
 2. Replace the placeholder values with what you noted in Step 2:
    ```php
    define('DB_HOST', 'localhost');
-   define('DB_NAME', 'u123456789_esl');
-   define('DB_USER', 'u123456789_esladmin');
+   define('DB_NAME', 'yourusername_esl');
+   define('DB_USER', 'yourusername_esladmin');
    define('DB_PASS', 'your-real-password');
    ```
 3. Save.
@@ -89,25 +94,31 @@ In hPanel, go to **Domains** and either register a new domain or point an existi
 4. Set `ENVIRONMENT` to `'production'` once you're done testing (see Section 9) — this hides PHP error details from visitors and shows a friendly error page instead.
 5. Save.
 
-### Step 7 — Verify upload folder permissions
-The `uploads/` folder (and its subfolders `protected/`, `thumbnails/`, `previews/`, `payment-proofs/`) need to be writable by PHP so the admin panel can save uploaded files. On Hostinger these are usually writable by default, but if you get an upload error later:
-1. In File Manager, right-click each `uploads/` subfolder → **Permissions**.
+### Step 7 — Select your PHP version
+1. In cPanel, go to **MultiPHP Manager** (or **Select PHP Version**).
+2. Select your domain and choose **PHP 8.1 or newer**.
+3. While you're there, click through to the extension list and confirm `fileinfo`, `mbstring`, and `pdo_mysql` are checked — they're enabled by default on FastComet, but it's worth a glance.
+4. If uploads larger than a few MB fail later, go to **MultiPHP INI Editor** and confirm `upload_max_filesize` and `post_max_size` are both at least `32M`.
+
+### Step 8 — Verify upload folder permissions
+The `uploads/` folder (and its subfolders `protected/`, `thumbnails/`, `previews/`, `payment-proofs/`) need to be writable by PHP so the admin panel can save uploaded files. On FastComet these are usually writable by default, but if you get an upload error later:
+1. In File Manager, right-click each `uploads/` subfolder → **Permissions** (or **Change Permissions**).
 2. Set to `755` (or `775` if `755` doesn't work — never use `777`).
 
-### Step 8 — Enable SSL (HTTPS)
-1. In hPanel, go to **SSL** and enable the free **Let's Encrypt** certificate for your domain. This usually activates within a few minutes.
+### Step 9 — Enable SSL (HTTPS)
+1. In cPanel, go to **SSL/TLS Status**, select your domain, and click **Run AutoSSL** if it isn't already showing as active. FastComet issues free AutoSSL (Let's Encrypt) certificates automatically for most accounts, often within a few hours of the domain resolving — check here first before running it manually.
 2. Once it's active, open `.htaccess` at the project root and uncomment the three "Force HTTPS" lines at the bottom (remove the `#` from the start of each line). Doing this **before** SSL is active can cause a redirect loop, so wait until the certificate shows as active first.
 
-### Step 9 — Create your first admin account
+### Step 10 — Create your first admin account
 1. Visit `https://www.yourdomain.com/install/create-admin.php` in your browser.
 2. Fill in your name, email, and a password (your choice — nothing is pre-set).
 3. Submit. You'll see a confirmation and a link to the admin login.
 4. **Immediately delete the `/install/` folder** from File Manager. The script refuses to run a second time on its own, but deleting the folder removes any doubt.
 
-### Step 10 — Set up the optional cron job
+### Step 11 — Set up the optional cron job
 See Section 7 below. This step is optional — the site works correctly without it.
 
-### Step 11 — Test everything
+### Step 12 — Test everything
 Work through `TESTING.md` — it covers registration, login, membership, resource downloads, admin functions, and basic security checks. At minimum, verify: you can register a teacher account, log in, submit a manual payment, approve it as admin, and then download a members-only resource as that teacher.
 
 ---
@@ -136,14 +147,14 @@ Work through `TESTING.md` — it covers registration, login, membership, resourc
 
 `cron/expire-memberships.php` flips memberships whose `expiry_date` has passed from `active` to `expired`, and sends a "your membership has expired" email at that moment. **This is optional** — `isMemberActive()` already re-checks the real expiry date on every single access attempt and self-heals a stale `active` row the moment anyone checks it, so download access is correctly blocked with or without this cron job running. What the cron job adds is: admin reports/stats staying accurate without needing a page visit to trigger the check, and the expiry email actually being sent.
 
-To set it up on Hostinger:
-1. In hPanel, go to **Advanced → Cron Jobs**.
-2. Choose to run **daily** (any time is fine — e.g. 2:00 AM).
+To set it up on FastComet:
+1. In cPanel, go to **Cron Jobs**.
+2. Under "Common Settings," choose **Once Per Day** (or set the minute/hour fields manually — any time is fine, e.g. 2:00 AM).
 3. Command:
    ```
-   php /home/YOUR_USERNAME/domains/yourdomain.com/public_html/cron/expire-memberships.php
+   php /home/YOUR_CPANEL_USERNAME/public_html/cron/expire-memberships.php
    ```
-   (Adjust the path to match where you uploaded the site — Hostinger shows you the exact path format when you set up the cron job.)
+   Adjust the path if you uploaded the site to an addon domain's document root instead of `public_html` directly. If running the command as shown fails, your account may need a version-specific PHP binary instead of a bare `php` — FastComet support can confirm the exact path (often something like `/usr/local/bin/php` or a path containing the PHP version number), and cPanel's Cron Jobs page will show your correct home directory path at the top of the form.
 
 If your hosting plan only offers **URL-based** cron jobs instead of running a PHP file directly, set a random string as `CRON_SECRET` in `config/config.php` and point the cron job at:
 ```

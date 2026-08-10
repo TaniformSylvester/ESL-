@@ -8,8 +8,8 @@
 function send_email(string $to, string $subject, string $bodyHtml): bool
 {
     // Extension point: when SMTP_ENABLED is turned on in config.php, wire a
-    // real SMTP client here (e.g. PHPMailer). For now, and for most
-    // Hostinger shared-hosting setups, PHP's built-in mail() is sufficient.
+    // real SMTP client here (e.g. PHPMailer). For now, and for most cPanel
+    // shared-hosting setups, PHP's built-in mail() is sufficient.
 
     $headers = [
         'MIME-Version: 1.0',
