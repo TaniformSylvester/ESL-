@@ -52,6 +52,7 @@ function handle_upload(array $file, string $destDir, array $allowedMimeMap, int 
     }
 
     if (!$actualMime || !in_array($actualMime, $allowedMimeMap[$ext], true)) {
+        error_log("Upload rejected: extension '.{$ext}' but finfo detected MIME '" . ($actualMime ?: '(none)') . "' for original filename '{$file['name']}'");
         return ['success' => false, 'filename' => null, 'error' => 'The file content does not match its extension.'];
     }
 
