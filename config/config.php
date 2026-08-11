@@ -79,18 +79,20 @@ define('MAX_IMAGE_SIZE_BYTES', MAX_IMAGE_SIZE_MB * 1024 * 1024);
 
 // docx/pptx/xlsx are ZIP archives internally, and not every server's libmagic
 // build has the rules to tell an Office file apart from a generic ZIP — some
-// report plain application/zip for genuine Office files. That's harmless here
-// (uploads are stored under random filenames, never executed, and always
-// served as forced downloads), so the generic ZIP types are accepted as a
-// fallback for the Office extensions rather than rejecting valid uploads.
+// report plain application/zip, and some (confirmed on live FastComet
+// hosting) don't recognize the ZIP signature at all and fall back to the
+// generic application/octet-stream. Both are harmless here (uploads are
+// stored under random filenames, never executed, and always served as
+// forced downloads), so both are accepted as fallbacks for the Office
+// extensions rather than rejecting valid uploads.
 define('ALLOWED_RESOURCE_MIME_TYPES', [
     'pdf'  => ['application/pdf'],
     'doc'  => ['application/msword'],
-    'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip', 'application/x-zip-compressed'],
+    'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip', 'application/x-zip-compressed', 'application/octet-stream'],
     'ppt'  => ['application/vnd.ms-powerpoint'],
-    'pptx' => ['application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/zip', 'application/x-zip-compressed'],
+    'pptx' => ['application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/zip', 'application/x-zip-compressed', 'application/octet-stream'],
     'xls'  => ['application/vnd.ms-excel'],
-    'xlsx' => ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/zip', 'application/x-zip-compressed'],
+    'xlsx' => ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/zip', 'application/x-zip-compressed', 'application/octet-stream'],
     'zip'  => ['application/zip', 'application/x-zip-compressed'],
 ]);
 
