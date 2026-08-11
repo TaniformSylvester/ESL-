@@ -20,6 +20,13 @@ $userRole = $_SESSION['user_role'] ?? null;
     <meta property="og:description" content="<?= e($pageDescription) ?>">
     <meta property="og:site_name" content="<?= e(SITE_NAME) ?>">
     <meta property="og:type" content="website">
+    <meta property="og:image" content="<?= e(asset_url('images/og-image-icon.png')) ?>">
+
+    <link rel="icon" type="image/svg+xml" href="<?= e(asset_url('images/logo.svg')) ?>">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= e(asset_url('images/favicon-32x32.png')) ?>">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?= e(asset_url('images/favicon-16x16.png')) ?>">
+    <link rel="icon" href="<?= e(asset_url('images/favicon.ico')) ?>">
+    <link rel="apple-touch-icon" href="<?= e(asset_url('images/apple-touch-icon.png')) ?>">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -29,8 +36,9 @@ $userRole = $_SESSION['user_role'] ?? null;
 
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="<?= e(base_url()) ?>">
-            <i class="fa-solid fa-graduation-cap text-primary me-1"></i> <?= e(SITE_NAME) ?>
+        <a class="navbar-brand fw-bold d-flex align-items-center" href="<?= e(base_url()) ?>">
+            <img src="<?= e(asset_url('images/logo.svg')) ?>" alt="<?= e(SITE_NAME) ?> logo" width="28" height="28" class="me-2">
+            <?= e(SITE_NAME) ?>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>

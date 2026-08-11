@@ -26,6 +26,12 @@ $navItems = [
     <title><?= e($pageTitle) ?> | <?= e(SITE_NAME) ?> Admin</title>
     <meta name="robots" content="noindex, nofollow">
 
+    <link rel="icon" type="image/svg+xml" href="<?= e(asset_url('images/logo.svg')) ?>">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= e(asset_url('images/favicon-32x32.png')) ?>">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?= e(asset_url('images/favicon-16x16.png')) ?>">
+    <link rel="icon" href="<?= e(asset_url('images/favicon.ico')) ?>">
+    <link rel="apple-touch-icon" href="<?= e(asset_url('images/apple-touch-icon.png')) ?>">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="<?= e(asset_url('css/style.css')) ?>">
@@ -50,8 +56,9 @@ $navItems = [
         </div>
         <div class="offcanvas-body d-flex flex-column p-0">
             <div class="p-3 d-none d-lg-block">
-                <a href="<?= e(base_url('admin/index.php')) ?>" class="text-white text-decoration-none fw-bold">
-                    <i class="fa-solid fa-graduation-cap me-1"></i> <?= e(SITE_NAME) ?> Admin
+                <a href="<?= e(base_url('admin/index.php')) ?>" class="text-white text-decoration-none fw-bold d-flex align-items-center">
+                    <img src="<?= e(asset_url('images/logo.svg')) ?>" alt="<?= e(SITE_NAME) ?> logo" width="24" height="24" class="me-2">
+                    <?= e(SITE_NAME) ?> Admin
                 </a>
             </div>
             <ul class="nav nav-pills flex-column mb-auto px-2">
