@@ -38,6 +38,41 @@ function send_password_reset_email(array $user, string $resetLink): bool
     return send_email($user['email'], $subject, $body);
 }
 
+function send_welcome_email(array $user): bool
+{
+    $subject = 'Welcome to ' . SITE_NAME . '!';
+
+    $body = '<p>Hi ' . e($user['first_name']) . ',</p>'
+        . '<p>Thanks for creating your ' . e(SITE_NAME) . ' account! You can browse free resources right away.</p>'
+        . '<p><a href="' . e(base_url('member/subscription.php')) . '">Subscribe for ' . e(format_currency(SUBSCRIPTION_PRICE)) . '/month</a> '
+        . 'any time to unlock the full resource library.</p>';
+
+    return send_email($user['email'], $subject, $body);
+}
+
+/** Lets the site owner know a new teacher signed up, since nothing else surfaces this in real time. */
+function send_admin_new_registration_email(array $user): bool
+{
+    $subject = 'New teacher registered — ' . SITE_NAME;
+
+    $body = '<p>A new teacher just registered:</p>'
+        . '<p><strong>' . e($user['first_name'] . ' ' . $user['last_name']) . '</strong><br>' . e($user['email']) . '</p>';
+
+    return send_email(ADMIN_EMAIL, $subject, $body);
+}
+
+/** Lets the site owner know a payment is waiting for review, since manual approval depends on someone noticing it. */
+function send_admin_new_payment_email(array $user, array $payment): bool
+{
+    $subject = 'New payment submitted — ' . SITE_NAME;
+
+    $body = '<p>' . e($user['first_name'] . ' ' . $user['last_name']) . ' (' . e($user['email']) . ') submitted a payment of '
+        . e(format_currency($payment['amount'])) . ', awaiting your review.</p>'
+        . '<p><a href="' . e(base_url('admin/payments.php')) . '">Review pending payments</a></p>';
+
+    return send_email(ADMIN_EMAIL, $subject, $body);
+}
+
 function send_payment_submitted_email(array $user, array $payment): bool
 {
     $subject = 'We received your payment — ' . SITE_NAME;

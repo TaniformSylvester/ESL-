@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/init.php';
 require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/email.php';
 
 require_guest();
 
@@ -20,6 +21,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = register_teacher($_POST);
 
         if ($result['success']) {
+            $newTeacher = [
+                'first_name' => clean_input($_POST['first_name'] ?? ''),
+                'last_name'  => clean_input($_POST['last_name'] ?? ''),
+                'email'      => strtolower(clean_input($_POST['email'] ?? '')),
+            ];
+            send_welcome_email($newTeacher);
+            send_admin_new_registration_email($newTeacher);
+
             flash_set('success', 'Your account has been created. Please log in to continue.');
             redirect('login.php');
         }
