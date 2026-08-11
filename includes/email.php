@@ -17,7 +17,11 @@ function send_email(string $to, string $subject, string $bodyHtml): bool
         'From: ' . SMTP_FROM_NAME . ' <' . SMTP_FROM_EMAIL . '>',
     ];
 
-    $sent = @mail($to, $subject, $bodyHtml, implode("\r\n", $headers));
+    // Aligns the envelope sender with the From header — without this, mail()
+    // lets the server pick its own envelope sender, which can silently
+    // mismatch SMTP_FROM_EMAIL and undermine SPF/DKIM alignment checks even
+    // when both are otherwise configured correctly.
+    $sent = @mail($to, $subject, $bodyHtml, implode("\r\n", $headers), '-f' . SMTP_FROM_EMAIL);
 
     if (!$sent) {
         error_log("Failed to send email to {$to}: {$subject}");
