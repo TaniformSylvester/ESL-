@@ -1,5 +1,3 @@
-# IMPORTANT: update the Sitemap URL below to match your real domain
-# (config/config.php SITE_URL) before going live.
 User-agent: *
 Allow: /
 Disallow: /admin/
@@ -8,4 +6,4 @@ Disallow: /includes/
 Disallow: /config/
 Disallow: /uploads/protected/
 
-Sitemap: http://localhost/esl-teacher-hub/sitemap.xml
+Sitemap: https://teachluma.com/sitemap.xml

@@ -8,6 +8,14 @@ $pageTitle = $pageTitle ?? SITE_NAME;
 $pageDescription = $pageDescription ?? SITE_DESCRIPTION;
 $isLoggedIn = isset($_SESSION['user_id']);
 $userRole = $_SESSION['user_role'] ?? null;
+$canonicalUrl = rtrim(SITE_URL, '/') . ($_SERVER['REQUEST_URI'] ?? '/');
+$organizationSchema = [
+    '@context' => 'https://schema.org',
+    '@type'    => 'Organization',
+    'name'     => SITE_NAME,
+    'url'      => base_url(),
+    'logo'     => asset_url('images/og-image-icon.png'),
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,6 +29,12 @@ $userRole = $_SESSION['user_role'] ?? null;
     <meta property="og:site_name" content="<?= e(SITE_NAME) ?>">
     <meta property="og:type" content="website">
     <meta property="og:image" content="<?= e(asset_url('images/og-image-icon.png')) ?>">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="<?= e($pageTitle) ?>">
+    <meta name="twitter:description" content="<?= e($pageDescription) ?>">
+    <meta name="twitter:image" content="<?= e(asset_url('images/og-image-icon.png')) ?>">
+    <link rel="canonical" href="<?= e($canonicalUrl) ?>">
+    <script type="application/ld+json"><?= json_encode($organizationSchema, JSON_UNESCAPED_SLASHES) ?></script>
 
     <link rel="icon" type="image/svg+xml" href="<?= e(asset_url('images/logo.svg')) ?>">
     <link rel="icon" type="image/png" sizes="32x32" href="<?= e(asset_url('images/favicon-32x32.png')) ?>">
