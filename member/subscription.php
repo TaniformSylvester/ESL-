@@ -91,11 +91,11 @@ require_once __DIR__ . '/../includes/header.php';
             <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <div>
                     <h2 class="h5 fw-bold mb-1"><i class="fa-solid fa-credit-card text-primary me-1"></i> Pay Instantly by Card</h2>
-                    <p class="text-secondary mb-0">Activates your membership automatically — no waiting for approval.</p>
+                    <p class="text-secondary mb-0">Charged in USD — activates your membership automatically, no waiting for approval.</p>
                 </div>
                 <form method="post" action="<?= e(base_url('member/stripe-checkout.php')) ?>">
                     <?php csrf_field(); ?>
-                    <button type="submit" class="btn btn-primary px-4"><?= format_currency(SUBSCRIPTION_PRICE) ?> — Pay with Card</button>
+                    <button type="submit" class="btn btn-primary px-4">$<?= number_format(STRIPE_PRICE_USD, 2) ?> — Pay with Card</button>
                 </form>
             </div>
         </div>
@@ -200,8 +200,8 @@ require_once __DIR__ . '/../includes/header.php';
                     <?php foreach ($payments as $payment): ?>
                         <tr>
                             <td><?= e(format_date($payment['payment_date'])) ?></td>
-                            <td><?= format_currency($payment['amount']) ?></td>
-                            <td><?= e(PAYMENT_METHODS[$payment['method']] ?? $payment['method']) ?></td>
+                            <td><?= format_payment_amount($payment) ?></td>
+                            <td><?= e(payment_method_label($payment['method'])) ?></td>
                             <td><?= e($payment['reference_number']) ?></td>
                             <td>
                                 <span class="badge <?= e(payment_status_badge_class($payment['status'])) ?>"><?= e(ucfirst($payment['status'])) ?></span>

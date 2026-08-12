@@ -104,8 +104,8 @@ require_once __DIR__ . '/../includes/admin-header.php';
                             <?= e($payment['first_name'] . ' ' . $payment['last_name']) ?>
                             <div class="small text-secondary"><?= e($payment['email']) ?></div>
                         </td>
-                        <td><?= format_currency($payment['amount']) ?></td>
-                        <td class="small"><?= e(PAYMENT_METHODS[$payment['method']] ?? $payment['method']) ?></td>
+                        <td><?= format_payment_amount($payment) ?></td>
+                        <td class="small"><?= e(payment_method_label($payment['method'])) ?></td>
                         <td class="small"><?= e($payment['reference_number']) ?></td>
                         <td class="small text-secondary"><?= e(format_date($payment['payment_date'])) ?></td>
                         <td>

@@ -22,3 +22,10 @@ define('STRIPE_ENABLED', false); // set to true once the keys below are filled i
 define('STRIPE_SECRET_KEY', '');
 define('STRIPE_PUBLISHABLE_KEY', '');
 define('STRIPE_WEBHOOK_SECRET', '');
+
+// Card payments via Stripe are priced in USD (fixed price, not a live THB
+// conversion) since this is the option international teachers use — bank
+// transfer/PromptPay stay priced in THB (config.php SUBSCRIPTION_PRICE) for
+// local payments, unaffected by this.
+define('STRIPE_CURRENCY', 'usd');
+define('STRIPE_PRICE_USD', 6.99);

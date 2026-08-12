@@ -6,11 +6,19 @@
  * approve/reject functions here don't care how a payment was created.
  */
 
+// The manual-submission form's selectable options — deliberately excludes
+// 'stripe', which is only ever set by the webhook, never chosen by a user.
 const PAYMENT_METHODS = [
     'bank_transfer' => 'Bank Transfer',
     'promptpay'     => 'PromptPay',
     'manual_other'  => 'Other',
 ];
+
+/** For displaying any payment row's method, including the gateway-only 'stripe' value PAYMENT_METHODS excludes. */
+function payment_method_label(string $method): string
+{
+    return $method === 'stripe' ? 'Stripe (Card)' : (PAYMENT_METHODS[$method] ?? $method);
+}
 
 /**
  * Validates and stores a manual payment submission, and marks the
@@ -95,10 +103,12 @@ function record_stripe_payment(int $userId, float $amount, string $sessionId): v
         return;
     }
 
+    // Stripe charges are always USD (STRIPE_CURRENCY) regardless of the
+    // site's default THB currency used for bank transfer/PromptPay.
     $db->prepare(
         "INSERT INTO payments (user_id, amount, currency, method, reference_number, payment_date, status, gateway_reference, reviewed_at)
          VALUES (?, ?, ?, 'stripe', ?, CURDATE(), 'approved', ?, NOW())"
-    )->execute([$userId, $amount, CURRENCY, $sessionId, $sessionId]);
+    )->execute([$userId, $amount, strtoupper(STRIPE_CURRENCY), $sessionId, $sessionId]);
 
     $paymentId = (int)$db->lastInsertId();
 
@@ -106,6 +116,20 @@ function record_stripe_payment(int $userId, float $amount, string $sessionId): v
 
     $db->prepare('UPDATE memberships SET last_payment_id = ? WHERE user_id = ?')
         ->execute([$paymentId, $userId]);
+}
+
+/**
+ * Payment rows can be in THB (bank transfer/PromptPay) or USD (Stripe) —
+ * format_currency() alone always assumes THB, so payment-history tables
+ * need this instead to display each row in its own actual currency.
+ */
+function format_payment_amount(array $payment): string
+{
+    if (($payment['currency'] ?? '') === 'USD') {
+        return '$' . number_format((float)$payment['amount'], 2);
+    }
+
+    return format_currency($payment['amount']);
 }
 
 function get_user_payments(int $userId): array

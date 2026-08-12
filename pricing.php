@@ -20,7 +20,12 @@ require_once __DIR__ . '/includes/header.php';
                 <div class="card-body p-4 p-md-5 text-center">
                     <h2 class="h5 fw-bold text-uppercase text-secondary">Teacher Membership</h2>
                     <p class="display-4 fw-bold text-primary mb-0"><?= format_currency(SUBSCRIPTION_PRICE) ?></p>
-                    <p class="text-secondary mb-4">per <?= e(SUBSCRIPTION_PERIOD_LABEL) ?></p>
+                    <p class="text-secondary mb-1">per <?= e(SUBSCRIPTION_PERIOD_LABEL) ?></p>
+                    <?php if (STRIPE_ENABLED): ?>
+                        <p class="text-secondary small mb-4">(≈ $<?= number_format(STRIPE_PRICE_USD, 2) ?> USD by card for international teachers)</p>
+                    <?php else: ?>
+                        <div class="mb-4"></div>
+                    <?php endif; ?>
 
                     <ul class="list-unstyled text-start mb-4">
                         <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Unlimited access to member resources</li>

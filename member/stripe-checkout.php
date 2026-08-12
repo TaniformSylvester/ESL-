@@ -19,7 +19,7 @@ if (too_many_attempts('stripe_checkout:' . $user['id'], 5, 600)) {
 }
 record_attempt('stripe_checkout:' . $user['id']);
 
-$result = create_stripe_checkout_session($user, (float)SUBSCRIPTION_PRICE);
+$result = create_stripe_checkout_session($user);
 
 if (!$result['success'] || !$result['url']) {
     flash_set('error', $result['error'] ?? 'Could not start the Stripe checkout. Please try again.');
