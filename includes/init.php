@@ -13,6 +13,7 @@ if (!defined('ROOT_PATH')) {
 
 require_once ROOT_PATH . '/config/config.php';
 require_once ROOT_PATH . '/config/database.php';
+require_once ROOT_PATH . '/config/stripe.php';
 require_once ROOT_PATH . '/includes/db.php';
 require_once ROOT_PATH . '/includes/security.php';
 require_once ROOT_PATH . '/includes/functions.php';

@@ -58,6 +58,18 @@ require_once __DIR__ . '/../includes/header.php';
     <h1 class="fw-bold mb-1"><?= e(SITE_NAME) ?> Membership</h1>
     <p class="text-secondary mb-4"><?= format_currency(SUBSCRIPTION_PRICE) ?>/<?= e(SUBSCRIPTION_PERIOD_LABEL) ?></p>
 
+    <?php if (($_GET['stripe'] ?? '') === 'success'): ?>
+        <div class="alert alert-success alert-dismissible fade show">
+            Payment received! We're confirming it with Stripe now — your membership will show as active within a few seconds. Refresh this page if it hasn't updated yet.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php elseif (($_GET['stripe'] ?? '') === 'cancelled'): ?>
+        <div class="alert alert-warning alert-dismissible fade show">
+            Checkout was cancelled — no payment was made. Feel free to try again below.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
             <div>
@@ -73,6 +85,22 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
         </div>
     </div>
+
+    <?php if (STRIPE_ENABLED): ?>
+        <div class="card shadow-sm border-0 mb-4 border-primary-subtle">
+            <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <h2 class="h5 fw-bold mb-1"><i class="fa-solid fa-credit-card text-primary me-1"></i> Pay Instantly by Card</h2>
+                    <p class="text-secondary mb-0">Activates your membership automatically — no waiting for approval.</p>
+                </div>
+                <form method="post" action="<?= e(base_url('member/stripe-checkout.php')) ?>">
+                    <?php csrf_field(); ?>
+                    <button type="submit" class="btn btn-primary px-4"><?= format_currency(SUBSCRIPTION_PRICE) ?> — Pay with Card</button>
+                </form>
+            </div>
+        </div>
+        <p class="text-secondary text-center small mb-4">— or pay by bank transfer / PromptPay below —</p>
+    <?php endif; ?>
 
     <div class="row g-4">
         <div class="col-lg-6">

@@ -78,6 +78,36 @@ function submit_payment(int $userId, array $input, array $file): array
     return ['success' => true, 'errors' => []];
 }
 
+/**
+ * Records a Stripe-confirmed payment and immediately extends membership —
+ * the automatic counterpart to approve_payment(), called from the webhook
+ * once Stripe confirms the charge actually succeeded. Idempotent against
+ * Stripe's at-least-once webhook delivery: a session already recorded
+ * (checked via gateway_reference) is a no-op, not a duplicate extension.
+ */
+function record_stripe_payment(int $userId, float $amount, string $sessionId): void
+{
+    $db = getDB();
+
+    $existing = $db->prepare('SELECT id FROM payments WHERE gateway_reference = ? LIMIT 1');
+    $existing->execute([$sessionId]);
+    if ($existing->fetchColumn()) {
+        return;
+    }
+
+    $db->prepare(
+        "INSERT INTO payments (user_id, amount, currency, method, reference_number, payment_date, status, gateway_reference, reviewed_at)
+         VALUES (?, ?, ?, 'stripe', ?, CURDATE(), 'approved', ?, NOW())"
+    )->execute([$userId, $amount, CURRENCY, $sessionId, $sessionId]);
+
+    $paymentId = (int)$db->lastInsertId();
+
+    extend_membership($userId, 1);
+
+    $db->prepare('UPDATE memberships SET last_payment_id = ? WHERE user_id = ?')
+        ->execute([$paymentId, $userId]);
+}
+
 function get_user_payments(int $userId): array
 {
     $stmt = getDB()->prepare('SELECT * FROM payments WHERE user_id = ? ORDER BY created_at DESC');
