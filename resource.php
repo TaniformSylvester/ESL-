@@ -24,8 +24,32 @@ $displayImage = $previewUrl ?? $thumbUrl;
 
 $pageTitle = $resource['title'];
 $pageDescription = truncate_text($resource['description'] ?? '', 160);
+
+$resourceSchema = [
+    '@context'              => 'https://schema.org',
+    '@type'                 => 'LearningResource',
+    'name'                  => $resource['title'],
+    'description'           => $resource['description'] ?? $pageDescription,
+    'learningResourceType'  => $resource['resource_type'],
+    'isAccessibleForFree'   => (bool)$resource['is_free'],
+    'url'                   => base_url('resource.php?slug=' . rawurlencode($resource['slug'])),
+    'datePublished'         => date('c', strtotime($resource['created_at'])),
+    'dateModified'          => date('c', strtotime($resource['updated_at'])),
+    'publisher'             => ['@type' => 'Organization', 'name' => SITE_NAME, 'url' => base_url()],
+];
+if (!empty($resource['grade_level'])) {
+    $resourceSchema['educationalLevel'] = $resource['grade_level'];
+}
+if (!empty($resource['category_name'])) {
+    $resourceSchema['about'] = $resource['category_name'];
+}
+if (!empty($displayImage)) {
+    $resourceSchema['image'] = $displayImage;
+}
+
 require_once __DIR__ . '/includes/header.php';
 ?>
+<script type="application/ld+json"><?= json_encode($resourceSchema, JSON_UNESCAPED_SLASHES) ?></script>
 <div class="container py-5">
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb small">
