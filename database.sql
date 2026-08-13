@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS users (
     last_name VARCHAR(100) NOT NULL,
     email VARCHAR(190) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
+    google_id VARCHAR(190) NULL,
     role ENUM('admin', 'teacher') NOT NULL DEFAULT 'teacher',
     school_name VARCHAR(150) NULL,
     country VARCHAR(100) NULL,
@@ -28,6 +29,7 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY uq_users_email (email),
+    UNIQUE KEY uq_users_google_id (google_id),
     KEY idx_users_role (role)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

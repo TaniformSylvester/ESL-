@@ -48,6 +48,15 @@ require_once __DIR__ . '/includes/header.php';
                         <div class="alert alert-danger"><?= e($error) ?></div>
                     <?php endif; ?>
 
+                    <?php if (GOOGLE_ENABLED): ?>
+                        <a href="<?= e(base_url('google-login.php?redirect=' . urlencode($redirectPath))) ?>" class="btn btn-outline-secondary w-100 py-2 mb-3 d-flex align-items-center justify-content-center gap-2">
+                            <i class="fa-brands fa-google"></i> Continue with Google
+                        </a>
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <hr class="flex-grow-1"><span class="text-secondary small">or</span><hr class="flex-grow-1">
+                        </div>
+                    <?php endif; ?>
+
                     <form method="post" action="<?= e(base_url('login.php')) ?>" novalidate>
                         <?php csrf_field(); ?>
                         <input type="hidden" name="redirect" value="<?= e($redirectPath) ?>">
