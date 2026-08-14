@@ -139,7 +139,8 @@ function extend_membership(int $userId, int $months = 1): void
 
     if ($membership) {
         $startDate = $membership['start_date'] ?? $today->format('Y-m-d');
-        $db->prepare("UPDATE memberships SET status = 'active', start_date = COALESCE(start_date, ?), expiry_date = ? WHERE user_id = ?")
+        // Reset the reminder flag so the next expiry cycle can send a fresh one.
+        $db->prepare("UPDATE memberships SET status = 'active', start_date = COALESCE(start_date, ?), expiry_date = ?, expiry_reminder_sent_at = NULL WHERE user_id = ?")
             ->execute([$startDate, $newExpiry, $userId]);
     } else {
         $db->prepare("INSERT INTO memberships (user_id, status, start_date, expiry_date) VALUES (?, 'active', ?, ?)")

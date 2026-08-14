@@ -52,6 +52,7 @@ define('CURRENCY', 'THB');
 define('SITE_CURRENCY_SYMBOL', '฿');
 define('SUBSCRIPTION_PRICE', 200);       // amount per billing period
 define('SUBSCRIPTION_PERIOD_LABEL', 'month');
+define('MEMBERSHIP_EXPIRY_REMINDER_DAYS', 3); // how many days before expiry_date to send the renewal reminder
 
 // -----------------------------------------------------------------------
 // SESSION

@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS memberships (
     start_date DATE NULL,
     expiry_date DATE NULL,
     last_payment_id INT UNSIGNED NULL,
+    expiry_reminder_sent_at DATETIME NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
