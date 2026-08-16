@@ -1,6 +1,6 @@
-# ESL Teacher Hub
+# TeachLuma
 
-A subscription resource platform for ESL/primary school teachers: browse lesson plans, worksheets, PowerPoints, flashcards, games and assessments, with a ฿200/month membership unlocking members-only downloads. Built as plain PHP + MySQL specifically so it can run on ordinary cPanel shared hosting (FastComet, Hostinger, or similar) — no VPS, no Node.js, no Docker required.
+A subscription resource platform for ESL, Math, and Science teachers: browse lesson plans, worksheets, PowerPoints, flashcards, games and assessments, with a ฿200/month membership unlocking members-only downloads. Built as plain PHP + MySQL specifically so it can run on ordinary cPanel shared hosting (FastComet, Hostinger, or similar) — no VPS, no Node.js, no Docker required.
 
 This README assumes no prior server-admin experience. Every step says exactly where to click.
 

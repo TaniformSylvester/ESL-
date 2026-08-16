@@ -1,6 +1,6 @@
 <?php
 /**
- * ESL Teacher Hub — Central Configuration
+ * TeachLuma — Central Configuration
  *
  * Every brand, pricing, and environment value the app uses lives here.
  * Nothing else in the codebase should hardcode the site name, price,
@@ -32,9 +32,9 @@ if (ENVIRONMENT === 'development') {
 // SITE / BRANDING
 // Change these to rebrand the site without touching any other file.
 // -----------------------------------------------------------------------
-define('SITE_NAME', 'ESL Teacher Hub');
+define('SITE_NAME', 'TeachLuma');
 define('SITE_TAGLINE', 'Save Time. Teach Better.');
-define('SITE_DESCRIPTION', 'Ready-to-teach ESL lesson plans, worksheets, PowerPoints, games and classroom resources for primary school teachers.');
+define('SITE_DESCRIPTION', 'Ready-to-teach ESL, Math, and Science lesson plans, worksheets, PowerPoints, games and classroom resources for primary and secondary school teachers.');
 
 // IMPORTANT: change this to your real domain before going live, no trailing slash.
 define('SITE_URL', 'http://localhost/esl-teacher-hub');
@@ -107,8 +107,11 @@ define('ALLOWED_IMAGE_MIME_TYPES', [
 // -----------------------------------------------------------------------
 // TEACHING DATA (configurable lists used across forms and filters)
 // -----------------------------------------------------------------------
+// Full range across all subjects — each subject's actual valid range (e.g.
+// Math is Grade 1-6, not K or Grade 7-9) is sliced from this list via
+// get_subject_grade_levels() rather than duplicated here.
 define('GRADE_LEVELS', [
-    'Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6',
+    'Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9',
 ]);
 
 define('RESOURCE_TYPES', [

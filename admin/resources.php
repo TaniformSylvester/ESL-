@@ -3,11 +3,13 @@ require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/admin-functions.php';
 require_once __DIR__ . '/../includes/resource-functions.php';
+require_once __DIR__ . '/../includes/subject-functions.php';
 
 require_admin();
 
 $filters = [
     'search'        => trim((string)($_GET['search'] ?? '')),
+    'subject_id'    => (int)($_GET['subject_id'] ?? 0),
     'resource_type' => trim((string)($_GET['resource_type'] ?? '')),
     'category_id'   => (int)($_GET['category_id'] ?? 0),
     'status'        => trim((string)($_GET['status'] ?? '')),
@@ -15,6 +17,7 @@ $filters = [
 $page = max(1, (int)($_GET['page'] ?? 1));
 $result = get_all_resources_paginated($filters, $page, ADMIN_ROWS_PER_PAGE);
 $categoriesGrouped = get_categories_grouped();
+$subjects = get_all_subjects();
 
 $pageTitle = 'Resources';
 require_once __DIR__ . '/../includes/admin-header.php';
@@ -25,8 +28,16 @@ require_once __DIR__ . '/../includes/admin-header.php';
 </div>
 
 <form method="get" action="<?= e(base_url('admin/resources.php')) ?>" class="row g-2 mb-4">
-    <div class="col-md-4">
-        <input type="text" name="search" class="form-control" placeholder="Search title, topic, subject&hellip;" value="<?= e($filters['search']) ?>">
+    <div class="col-md-3">
+        <input type="text" name="search" class="form-control" placeholder="Search title, topic&hellip;" value="<?= e($filters['search']) ?>">
+    </div>
+    <div class="col-md-2">
+        <select name="subject_id" class="form-select">
+            <option value="">All Subjects</option>
+            <?php foreach ($subjects as $subjectOption): ?>
+                <option value="<?= (int)$subjectOption['id'] ?>" <?= $filters['subject_id'] === (int)$subjectOption['id'] ? 'selected' : '' ?>><?= e($subjectOption['name']) ?></option>
+            <?php endforeach; ?>
+        </select>
     </div>
     <div class="col-md-2">
         <select name="resource_type" class="form-select">
@@ -36,7 +47,7 @@ require_once __DIR__ . '/../includes/admin-header.php';
             <?php endforeach; ?>
         </select>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
         <select name="category_id" class="form-select">
             <option value="">All Categories</option>
             <?php foreach ($categoriesGrouped as $groupName => $categories): ?>
@@ -66,6 +77,7 @@ require_once __DIR__ . '/../includes/admin-header.php';
             <thead>
                 <tr>
                     <th>Title</th>
+                    <th>Subject</th>
                     <th>Type</th>
                     <th>Category</th>
                     <th>Access</th>
@@ -76,11 +88,12 @@ require_once __DIR__ . '/../includes/admin-header.php';
             </thead>
             <tbody>
                 <?php if (empty($result['items'])): ?>
-                    <tr><td colspan="7" class="text-center text-secondary py-4">No resources found.</td></tr>
+                    <tr><td colspan="8" class="text-center text-secondary py-4">No resources found.</td></tr>
                 <?php endif; ?>
                 <?php foreach ($result['items'] as $resource): ?>
                     <tr>
                         <td><?= e($resource['title']) ?></td>
+                        <td class="small text-secondary"><?= e($resource['subject_name'] ?? '&mdash;') ?></td>
                         <td class="small"><?= e($resource['resource_type']) ?></td>
                         <td class="small text-secondary"><?= e($resource['category_name'] ?? '&mdash;') ?></td>
                         <td><span class="badge <?= $resource['is_free'] ? 'badge-free' : 'badge-members' ?>"><?= $resource['is_free'] ? 'Free' : 'Members' ?></span></td>

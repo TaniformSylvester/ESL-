@@ -1,6 +1,6 @@
 <?php
 /**
- * ESL Teacher Hub — Google Sign-In Credentials
+ * TeachLuma — Google Sign-In Credentials
  *
  * >>> EDIT THIS FILE WITH YOUR REAL GOOGLE OAUTH CREDENTIALS <<<
  *

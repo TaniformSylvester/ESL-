@@ -4,6 +4,7 @@ require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/admin-functions.php';
 require_once __DIR__ . '/../includes/upload-functions.php';
 require_once __DIR__ . '/../includes/resource-functions.php';
+require_once __DIR__ . '/../includes/subject-functions.php';
 
 require_admin();
 $admin = current_user();
@@ -39,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $isEdit = true;
 $actionUrl = base_url('admin/resource-edit.php?id=' . $resourceId);
 $categoriesGrouped = get_categories_grouped();
+$subjects = get_all_subjects();
 
 $pageTitle = 'Edit Resource';
 require_once __DIR__ . '/../includes/admin-header.php';

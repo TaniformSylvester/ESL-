@@ -5,25 +5,35 @@
  * /admin/resources.php, resource-add.php, resource-edit.php).
  */
 
-function get_categories(): array
+/** $subjectId filters to one subject's categories; omit/0 for all subjects (e.g. the admin category list). */
+function get_categories(int $subjectId = 0): array
 {
-    static $categories = null;
+    static $all = null;
 
-    if ($categories === null) {
-        $stmt = getDB()->query('SELECT id, name, slug, group_name FROM categories ORDER BY group_name, sort_order, name');
-        $categories = $stmt->fetchAll();
+    if ($all === null) {
+        $stmt = getDB()->query(
+            'SELECT c.id, c.name, c.slug, c.group_name, c.subject_id, c.sort_order, s.name AS subject_name, s.slug AS subject_slug
+             FROM categories c
+             INNER JOIN subjects s ON s.id = c.subject_id
+             ORDER BY s.sort_order, c.sort_order, c.name'
+        );
+        $all = $stmt->fetchAll();
     }
 
-    return $categories;
+    if ($subjectId <= 0) {
+        return $all;
+    }
+
+    return array_values(array_filter($all, static fn($c) => (int)$c['subject_id'] === $subjectId));
 }
 
-/** Categories grouped by their group_name, e.g. ['English Skills' => [...], 'Teaching Resources' => [...]]. */
-function get_categories_grouped(): array
+/** Categories grouped by subject name, e.g. ['ESL' => [...], 'Math' => [...], 'Science' => [...]]. */
+function get_categories_grouped(int $subjectId = 0): array
 {
     $grouped = [];
 
-    foreach (get_categories() as $category) {
-        $grouped[$category['group_name']][] = $category;
+    foreach (get_categories($subjectId) as $category) {
+        $grouped[$category['subject_name']][] = $category;
     }
 
     return $grouped;
@@ -61,11 +71,11 @@ function create_category(array $input): array
 
     $name = clean_input($input['name']);
     $slug = slugify($input['name']);
-    $groupName = clean_input($input['group_name']);
+    $subjectId = (int)$input['subject_id'];
     $sortOrder = (int)($input['sort_order'] ?? 0);
 
-    getDB()->prepare('INSERT INTO categories (name, slug, group_name, sort_order) VALUES (?, ?, ?, ?)')
-        ->execute([$name, $slug, $groupName, $sortOrder]);
+    getDB()->prepare('INSERT INTO categories (subject_id, name, slug, sort_order) VALUES (?, ?, ?, ?)')
+        ->execute([$subjectId, $name, $slug, $sortOrder]);
 
     return ['success' => true, 'errors' => []];
 }
@@ -81,11 +91,11 @@ function update_category(int $id, array $input): array
 
     $name = clean_input($input['name']);
     $slug = slugify($input['name']);
-    $groupName = clean_input($input['group_name']);
+    $subjectId = (int)$input['subject_id'];
     $sortOrder = (int)($input['sort_order'] ?? 0);
 
-    getDB()->prepare('UPDATE categories SET name = ?, slug = ?, group_name = ?, sort_order = ? WHERE id = ?')
-        ->execute([$name, $slug, $groupName, $sortOrder, $id]);
+    getDB()->prepare('UPDATE categories SET subject_id = ?, name = ?, slug = ?, sort_order = ? WHERE id = ?')
+        ->execute([$subjectId, $name, $slug, $sortOrder, $id]);
 
     return ['success' => true, 'errors' => []];
 }
@@ -95,7 +105,6 @@ function validate_category_input(array $input, ?int $excludeId = null): array
     $errors = [];
 
     $name = clean_input($input['name'] ?? '');
-    $groupName = clean_input($input['group_name'] ?? '');
 
     if ($name === '' || mb_strlen($name) > 100) {
         $errors['name'] = 'Please enter a category name.';
@@ -103,8 +112,8 @@ function validate_category_input(array $input, ?int $excludeId = null): array
         $errors['name'] = 'A category with this name already exists.';
     }
 
-    if ($groupName === '' || mb_strlen($groupName) > 50) {
-        $errors['group_name'] = 'Please enter a group name.';
+    if (!get_subject_by_id((int)($input['subject_id'] ?? 0))) {
+        $errors['subject_id'] = 'Please choose a valid subject.';
     }
 
     return $errors;
@@ -135,7 +144,7 @@ function resource_type_icon(string $resourceType): string
 
 /**
  * Fetches a page of published resources matching the given filters.
- * $filters may contain: search, grade, resource_type, category_id, access ('free'|'members'|'all')
+ * $filters may contain: search, subject_id, grade, resource_type, category_id, access ('free'|'members'|'all')
  * Returns ['items' => array, 'total' => int, 'total_pages' => int]
  */
 function get_published_resources(array $filters, int $page, int $perPage): array
@@ -145,9 +154,15 @@ function get_published_resources(array $filters, int $page, int $perPage): array
 
     $search = trim((string)($filters['search'] ?? ''));
     if ($search !== '') {
-        $where[] = '(r.title LIKE ? OR r.topic LIKE ? OR r.subject LIKE ?)';
+        $where[] = '(r.title LIKE ? OR r.topic LIKE ?)';
         $like = '%' . $search . '%';
-        array_push($params, $like, $like, $like);
+        array_push($params, $like, $like);
+    }
+
+    $subjectId = (int)($filters['subject_id'] ?? 0);
+    if ($subjectId > 0) {
+        $where[] = 'r.subject_id = ?';
+        $params[] = $subjectId;
     }
 
     $grade = trim((string)($filters['grade'] ?? ''));
@@ -186,9 +201,10 @@ function get_published_resources(array $filters, int $page, int $perPage): array
     $page = max(1, min($page, max(1, $totalPages)));
     $offset = ($page - 1) * $perPage;
 
-    $sql = "SELECT r.*, c.name AS category_name, c.slug AS category_slug
+    $sql = "SELECT r.*, c.name AS category_name, c.slug AS category_slug, s.name AS subject_name, s.slug AS subject_slug
             FROM resources r
             LEFT JOIN categories c ON c.id = r.category_id
+            INNER JOIN subjects s ON s.id = r.subject_id
             WHERE {$whereSql}
             ORDER BY r.created_at DESC
             LIMIT {$perPage} OFFSET {$offset}";
@@ -203,9 +219,10 @@ function get_published_resources(array $filters, int $page, int $perPage): array
 function get_resource_by_slug(string $slug): ?array
 {
     $stmt = getDB()->prepare(
-        'SELECT r.*, c.name AS category_name, c.slug AS category_slug
+        'SELECT r.*, c.name AS category_name, c.slug AS category_slug, s.name AS subject_name, s.slug AS subject_slug
          FROM resources r
          LEFT JOIN categories c ON c.id = r.category_id
+         INNER JOIN subjects s ON s.id = r.subject_id
          WHERE r.slug = ? AND r.is_published = 1
          LIMIT 1'
     );
@@ -222,9 +239,10 @@ function get_published_resource_count(): int
 function get_featured_resources(int $limit = 6): array
 {
     $stmt = getDB()->prepare(
-        'SELECT r.*, c.name AS category_name
+        'SELECT r.*, c.name AS category_name, s.name AS subject_name, s.slug AS subject_slug
          FROM resources r
          LEFT JOIN categories c ON c.id = r.category_id
+         INNER JOIN subjects s ON s.id = r.subject_id
          WHERE r.is_published = 1
          ORDER BY r.created_at DESC
          LIMIT ' . max(1, $limit)
@@ -237,9 +255,10 @@ function get_featured_resources(int $limit = 6): array
 function get_free_resources(int $limit = 6): array
 {
     $stmt = getDB()->prepare(
-        'SELECT r.*, c.name AS category_name
+        'SELECT r.*, c.name AS category_name, s.name AS subject_name, s.slug AS subject_slug
          FROM resources r
          LEFT JOIN categories c ON c.id = r.category_id
+         INNER JOIN subjects s ON s.id = r.subject_id
          WHERE r.is_published = 1 AND r.is_free = 1
          ORDER BY r.created_at DESC
          LIMIT ' . max(1, $limit)
@@ -263,7 +282,7 @@ function get_resource_by_id(int $id): ?array
 
 /**
  * Admin listing — unlike get_published_resources(), this includes drafts.
- * $filters may contain: search, resource_type, category_id, status ('published'|'draft'|'').
+ * $filters may contain: search, subject_id, resource_type, category_id, status ('published'|'draft'|'').
  */
 function get_all_resources_paginated(array $filters, int $page, int $perPage): array
 {
@@ -272,9 +291,15 @@ function get_all_resources_paginated(array $filters, int $page, int $perPage): a
 
     $search = trim((string)($filters['search'] ?? ''));
     if ($search !== '') {
-        $where[] = '(r.title LIKE ? OR r.topic LIKE ? OR r.subject LIKE ?)';
+        $where[] = '(r.title LIKE ? OR r.topic LIKE ?)';
         $like = '%' . $search . '%';
-        array_push($params, $like, $like, $like);
+        array_push($params, $like, $like);
+    }
+
+    $subjectId = (int)($filters['subject_id'] ?? 0);
+    if ($subjectId > 0) {
+        $where[] = 'r.subject_id = ?';
+        $params[] = $subjectId;
     }
 
     $type = trim((string)($filters['resource_type'] ?? ''));
@@ -307,9 +332,10 @@ function get_all_resources_paginated(array $filters, int $page, int $perPage): a
     $page = max(1, min($page, $totalPages));
     $offset = ($page - 1) * $perPage;
 
-    $sql = "SELECT r.*, c.name AS category_name
+    $sql = "SELECT r.*, c.name AS category_name, s.name AS subject_name
             FROM resources r
             LEFT JOIN categories c ON c.id = r.category_id
+            INNER JOIN subjects s ON s.id = r.subject_id
             {$whereSql}
             ORDER BY r.created_at DESC
             LIMIT {$perPage} OFFSET {$offset}";
@@ -370,18 +396,31 @@ function validate_resource_input(array $input): array
         $errors['resource_type'] = 'Please choose a resource type.';
     }
 
+    // Grade and category are validated against the chosen subject (not just
+    // "any valid value site-wide") so a Math resource can't end up tagged
+    // with an ESL-only category or a grade outside that subject's range —
+    // checked here server-side, not just filtered client-side in the form.
+    $subject = get_subject_by_id((int)($input['subject_id'] ?? 0));
+    if (!$subject) {
+        $errors['subject_id'] = 'Please choose a subject.';
+    }
+
     $grade = $input['grade_level'] ?? '';
-    if ($grade !== '' && !in_array($grade, GRADE_LEVELS, true)) {
-        $errors['grade_level'] = 'Please choose a valid grade level.';
+    if ($grade !== '') {
+        $allowedGrades = $subject ? get_subject_grade_levels($subject) : GRADE_LEVELS;
+        if (!in_array($grade, $allowedGrades, true)) {
+            $errors['grade_level'] = 'Please choose a grade level valid for this subject.';
+        }
     }
 
     $categoryId = trim((string)($input['category_id'] ?? ''));
-    if ($categoryId !== '' && !get_category_by_id((int)$categoryId)) {
-        $errors['category_id'] = 'Please choose a valid category.';
-    }
-
-    if (!empty($input['subject']) && mb_strlen($input['subject']) > 100) {
-        $errors['subject'] = 'Subject is too long.';
+    if ($categoryId !== '') {
+        $category = get_category_by_id((int)$categoryId);
+        if (!$category) {
+            $errors['category_id'] = 'Please choose a valid category.';
+        } elseif ($subject && (int)$category['subject_id'] !== (int)$subject['id']) {
+            $errors['category_id'] = 'That category does not belong to the selected subject.';
+        }
     }
 
     if (!empty($input['topic']) && mb_strlen($input['topic']) > 150) {
@@ -449,11 +488,10 @@ function create_resource(array $input, array $files): array
 
     $title = clean_input($input['title']);
     $description = clean_input($input['description'] ?? '');
-    $subject = clean_input($input['subject'] ?? '');
     $topic = clean_input($input['topic'] ?? '');
 
     $stmt = getDB()->prepare(
-        'INSERT INTO resources (title, slug, description, resource_type, category_id, grade_level, subject, topic,
+        'INSERT INTO resources (title, slug, description, resource_type, subject_id, category_id, grade_level, topic,
                                  thumbnail, preview_image, file_path, file_name, file_size, file_type, is_free, is_published)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     );
@@ -462,9 +500,9 @@ function create_resource(array $input, array $files): array
         generate_unique_resource_slug($title),
         $description !== '' ? $description : null,
         $input['resource_type'],
+        (int)$input['subject_id'],
         !empty($input['category_id']) ? (int)$input['category_id'] : null,
         $input['grade_level'] !== '' ? $input['grade_level'] : null,
-        $subject !== '' ? $subject : null,
         $topic !== '' ? $topic : null,
         $uploadedThumbnail['filename'] ?? null,
         $uploadedPreview['filename'] ?? null,
@@ -540,7 +578,6 @@ function update_resource(int $id, array $input, array $files): array
 
     $title = clean_input($input['title']);
     $description = clean_input($input['description'] ?? '');
-    $subject = clean_input($input['subject'] ?? '');
     $topic = clean_input($input['topic'] ?? '');
 
     $filePath = $existing['file_path'];
@@ -575,17 +612,17 @@ function update_resource(int $id, array $input, array $files): array
     }
 
     getDB()->prepare(
-        'UPDATE resources SET title = ?, slug = ?, description = ?, resource_type = ?, category_id = ?, grade_level = ?,
-                               subject = ?, topic = ?, thumbnail = ?, preview_image = ?, file_path = ?, file_name = ?,
+        'UPDATE resources SET title = ?, slug = ?, description = ?, resource_type = ?, subject_id = ?, category_id = ?, grade_level = ?,
+                               topic = ?, thumbnail = ?, preview_image = ?, file_path = ?, file_name = ?,
                                file_size = ?, file_type = ?, is_free = ?, is_published = ? WHERE id = ?'
     )->execute([
         $title,
         generate_unique_resource_slug($title, $id),
         $description !== '' ? $description : null,
         $input['resource_type'],
+        (int)$input['subject_id'],
         !empty($input['category_id']) ? (int)$input['category_id'] : null,
         $input['grade_level'] !== '' ? $input['grade_level'] : null,
-        $subject !== '' ? $subject : null,
         $topic !== '' ? $topic : null,
         $thumbnail,
         $preview,

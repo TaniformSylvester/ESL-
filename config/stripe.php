@@ -1,6 +1,6 @@
 <?php
 /**
- * ESL Teacher Hub — Stripe Credentials
+ * TeachLuma — Stripe Credentials
  *
  * >>> EDIT THIS FILE WITH YOUR REAL STRIPE KEYS <<<
  *

@@ -2,8 +2,8 @@
 /**
  * Shared add/edit resource form. Expects these variables set by the caller:
  * $resource (array|null), $errors (array), $categoriesGrouped (array),
- * $actionUrl (string), $isEdit (bool), $old (array — used to repopulate
- * text fields after a validation error on create).
+ * $subjects (array), $actionUrl (string), $isEdit (bool), $old (array —
+ * used to repopulate text fields after a validation error on create).
  */
 $field = static function (string $key) use ($resource, $old, $isEdit) {
     if (!$isEdit && isset($old[$key])) {
@@ -11,6 +11,15 @@ $field = static function (string $key) use ($resource, $old, $isEdit) {
     }
     return $resource[$key] ?? '';
 };
+
+// Powers the Subject dropdown's client-side filtering of Grade Level and
+// Category options — kept in sync with validate_resource_input()'s
+// server-side check of the same rule, so JS convenience never becomes the
+// only thing enforcing it.
+$subjectGradeMap = [];
+foreach ($subjects as $subjectRow) {
+    $subjectGradeMap[(int)$subjectRow['id']] = get_subject_grade_levels($subjectRow);
+}
 ?>
 <form method="post" action="<?= e($actionUrl) ?>" enctype="multipart/form-data" novalidate>
     <?php csrf_field(); ?>
@@ -37,6 +46,16 @@ $field = static function (string $key) use ($resource, $old, $isEdit) {
 
                     <div class="row g-3">
                         <div class="col-md-6">
+                            <label class="form-label" for="subject_id">Subject</label>
+                            <select class="form-select <?= isset($errors['subject_id']) ? 'is-invalid' : '' ?>" id="subject_id" name="subject_id" required>
+                                <option value="">Choose&hellip;</option>
+                                <?php foreach ($subjects as $subjectOption): ?>
+                                    <option value="<?= (int)$subjectOption['id'] ?>" <?= (int)$field('subject_id') === (int)$subjectOption['id'] ? 'selected' : '' ?>><?= e($subjectOption['name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <?php if (isset($errors['subject_id'])): ?><div class="invalid-feedback"><?= e($errors['subject_id']) ?></div><?php endif; ?>
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label" for="resource_type">Resource Type</label>
                             <select class="form-select <?= isset($errors['resource_type']) ? 'is-invalid' : '' ?>" id="resource_type" name="resource_type" required>
                                 <option value="">Choose&hellip;</option>
@@ -57,12 +76,6 @@ $field = static function (string $key) use ($resource, $old, $isEdit) {
                             <?php if (isset($errors['grade_level'])): ?><div class="invalid-feedback"><?= e($errors['grade_level']) ?></div><?php endif; ?>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label" for="subject">Subject</label>
-                            <input type="text" class="form-control <?= isset($errors['subject']) ? 'is-invalid' : '' ?>"
-                                   id="subject" name="subject" value="<?= e($field('subject')) ?>" maxlength="100">
-                            <?php if (isset($errors['subject'])): ?><div class="invalid-feedback"><?= e($errors['subject']) ?></div><?php endif; ?>
-                        </div>
-                        <div class="col-md-6">
                             <label class="form-label" for="topic">Topic</label>
                             <input type="text" class="form-control <?= isset($errors['topic']) ? 'is-invalid' : '' ?>"
                                    id="topic" name="topic" value="<?= e($field('topic')) ?>" maxlength="150">
@@ -75,7 +88,7 @@ $field = static function (string $key) use ($resource, $old, $isEdit) {
                                 <?php foreach ($categoriesGrouped as $groupName => $categories): ?>
                                     <optgroup label="<?= e($groupName) ?>">
                                         <?php foreach ($categories as $category): ?>
-                                            <option value="<?= (int)$category['id'] ?>" <?= (int)$field('category_id') === (int)$category['id'] ? 'selected' : '' ?>>
+                                            <option value="<?= (int)$category['id'] ?>" data-subject-id="<?= (int)$category['subject_id'] ?>" <?= (int)$field('category_id') === (int)$category['id'] ? 'selected' : '' ?>>
                                                 <?= e($category['name']) ?>
                                             </option>
                                         <?php endforeach; ?>
@@ -162,3 +175,49 @@ $field = static function (string $key) use ($resource, $old, $isEdit) {
         </div>
     </div>
 </form>
+
+<script>
+(function () {
+    var subjectGrades = <?= json_encode($subjectGradeMap, JSON_UNESCAPED_SLASHES) ?>;
+    var subjectSelect = document.getElementById('subject_id');
+    var gradeSelect = document.getElementById('grade_level');
+    var categorySelect = document.getElementById('category_id');
+
+    function applySubjectFilter() {
+        var subjectId = subjectSelect.value;
+        var allowedGrades = subjectId && subjectGrades[subjectId] ? subjectGrades[subjectId] : null;
+
+        Array.prototype.forEach.call(gradeSelect.options, function (opt) {
+            if (opt.value === '') {
+                return;
+            }
+            var allowed = !allowedGrades || allowedGrades.indexOf(opt.value) !== -1;
+            opt.hidden = !allowed;
+            if (!allowed && opt.selected) {
+                gradeSelect.value = '';
+            }
+        });
+
+        Array.prototype.forEach.call(categorySelect.options, function (opt) {
+            if (opt.value === '') {
+                return;
+            }
+            var allowed = !subjectId || opt.getAttribute('data-subject-id') === subjectId;
+            opt.hidden = !allowed;
+            if (!allowed && opt.selected) {
+                categorySelect.value = '';
+            }
+        });
+
+        Array.prototype.forEach.call(categorySelect.querySelectorAll('optgroup'), function (group) {
+            var hasVisible = Array.prototype.some.call(group.querySelectorAll('option'), function (opt) {
+                return !opt.hidden;
+            });
+            group.hidden = !hasVisible;
+        });
+    }
+
+    subjectSelect.addEventListener('change', applySubjectFilter);
+    applySubjectFilter();
+})();
+</script>

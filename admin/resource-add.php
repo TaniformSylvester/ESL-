@@ -4,6 +4,7 @@ require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/admin-functions.php';
 require_once __DIR__ . '/../includes/upload-functions.php';
 require_once __DIR__ . '/../includes/resource-functions.php';
+require_once __DIR__ . '/../includes/subject-functions.php';
 
 require_admin();
 $admin = current_user();
@@ -30,6 +31,7 @@ $resource = null;
 $isEdit = false;
 $actionUrl = base_url('admin/resource-add.php');
 $categoriesGrouped = get_categories_grouped();
+$subjects = get_all_subjects();
 
 $pageTitle = 'Add Resource';
 require_once __DIR__ . '/../includes/admin-header.php';

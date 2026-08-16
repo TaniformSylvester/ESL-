@@ -40,8 +40,8 @@ $resourceSchema = [
 if (!empty($resource['grade_level'])) {
     $resourceSchema['educationalLevel'] = $resource['grade_level'];
 }
-if (!empty($resource['category_name'])) {
-    $resourceSchema['about'] = $resource['category_name'];
+if (!empty($resource['subject_name'])) {
+    $resourceSchema['about'] = $resource['subject_name'];
 }
 if (!empty($displayImage)) {
     $resourceSchema['image'] = $displayImage;
@@ -54,6 +54,9 @@ require_once __DIR__ . '/includes/header.php';
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb small">
             <li class="breadcrumb-item"><a href="<?= e(base_url('resources.php')) ?>">Resources</a></li>
+            <?php if (!empty($resource['subject_name'])): ?>
+                <li class="breadcrumb-item"><a href="<?= e(base_url('resources.php?subject_id=' . (int)$resource['subject_id'])) ?>"><?= e($resource['subject_name']) ?></a></li>
+            <?php endif; ?>
             <?php if (!empty($resource['category_name'])): ?>
                 <li class="breadcrumb-item"><?= e($resource['category_name']) ?></li>
             <?php endif; ?>
@@ -77,6 +80,9 @@ require_once __DIR__ . '/includes/header.php';
                 <span class="badge <?= $resource['is_free'] ? 'badge-free' : 'badge-members' ?>">
                     <?= $resource['is_free'] ? 'Free' : '<i class="fa-solid fa-lock me-1"></i>Members Only' ?>
                 </span>
+                <?php if (!empty($resource['subject_name'])): ?>
+                    <span class="badge bg-light text-dark border"><?= e($resource['subject_name']) ?></span>
+                <?php endif; ?>
                 <span class="badge bg-light text-dark border"><?= e($resource['resource_type']) ?></span>
                 <?php if (!empty($resource['grade_level'])): ?>
                     <span class="badge bg-light text-dark border"><?= e($resource['grade_level']) ?></span>
@@ -100,8 +106,8 @@ require_once __DIR__ . '/includes/header.php';
             <?php endif; ?>
 
             <dl class="row small mt-4">
-                <?php if (!empty($resource['subject'])): ?>
-                    <dt class="col-4">Subject</dt><dd class="col-8"><?= e($resource['subject']) ?></dd>
+                <?php if (!empty($resource['subject_name'])): ?>
+                    <dt class="col-4">Subject</dt><dd class="col-8"><?= e($resource['subject_name']) ?></dd>
                 <?php endif; ?>
                 <?php if (!empty($resource['topic'])): ?>
                     <dt class="col-4">Topic</dt><dd class="col-8"><?= e($resource['topic']) ?></dd>

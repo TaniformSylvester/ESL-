@@ -3,10 +3,18 @@ require_once __DIR__ . '/includes/init.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/resource-functions.php';
 require_once __DIR__ . '/includes/favorites-functions.php';
+require_once __DIR__ . '/includes/subject-functions.php';
 
 $featuredResources = get_featured_resources(6);
 $freeResources = get_free_resources(6);
 $categoriesGrouped = get_categories_grouped();
+$subjects = get_all_subjects();
+
+$subjectIcons = [
+    'esl'     => 'fa-comments',
+    'math'    => 'fa-calculator',
+    'science' => 'fa-flask',
+];
 
 $pageTitle = 'Home';
 $pageDescription = SITE_DESCRIPTION;
@@ -17,8 +25,8 @@ require_once __DIR__ . '/includes/header.php';
     <div class="container py-5">
         <div class="row align-items-center">
             <div class="col-lg-8 mx-auto text-center">
-                <h1 class="display-5 fw-bold mb-3">Ready-to-Teach ESL Resources for Primary Teachers</h1>
-                <p class="lead mb-4">Lesson plans, worksheets, PowerPoints, games and classroom resources — all in one place.</p>
+                <h1 class="display-5 fw-bold mb-3">Ready-to-Teach ESL, Math &amp; Science Resources for Teachers</h1>
+                <p class="lead mb-4">Lesson plans, worksheets, PowerPoints, games and classroom resources for Kindergarten through Grade 9 — all in one place.</p>
                 <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
                     <a href="<?= e(base_url('resources.php')) ?>" class="btn btn-light btn-lg px-4 fw-semibold">Explore Resources</a>
                     <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-outline-light btn-lg px-4">Join for <?= format_currency(SUBSCRIPTION_PRICE) ?>/month</a>
@@ -27,6 +35,27 @@ require_once __DIR__ . '/includes/header.php';
         </div>
     </div>
 </section>
+
+<?php if (!empty($subjects)): ?>
+<section class="py-5 section-soft">
+    <div class="container">
+        <h2 class="h3 fw-bold text-center mb-5">Browse by Subject</h2>
+        <div class="row g-4 justify-content-center">
+            <?php foreach ($subjects as $subject): ?>
+                <div class="col-md-4">
+                    <a href="<?= e(base_url('resources.php?subject_id=' . (int)$subject['id'])) ?>" class="card shadow-sm border-0 text-center text-decoration-none h-100">
+                        <div class="card-body p-4">
+                            <i class="fa-solid <?= e($subjectIcons[$subject['slug']] ?? 'fa-book') ?> fa-2x text-primary mb-3"></i>
+                            <h3 class="h5 fw-bold text-dark mb-1"><?= e($subject['name']) ?></h3>
+                            <p class="small text-secondary mb-0"><?= e($subject['min_grade']) ?> &ndash; <?= e($subject['max_grade']) ?></p>
+                        </div>
+                    </a>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
 
 <section class="py-5">
     <div class="container">
@@ -40,7 +69,7 @@ require_once __DIR__ . '/includes/header.php';
             <div class="col-md-3">
                 <i class="fa-solid fa-child-reaching fa-2x text-primary mb-3"></i>
                 <h3 class="h6 fw-bold">Built for Real Classrooms</h3>
-                <p class="small text-secondary">Practical resources designed for primary school ESL classes, not generic content.</p>
+                <p class="small text-secondary">Practical resources designed for real ESL, Math and Science classes, not generic content.</p>
             </div>
             <div class="col-md-3">
                 <i class="fa-solid fa-layer-group fa-2x text-primary mb-3"></i>

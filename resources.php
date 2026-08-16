@@ -3,9 +3,11 @@ require_once __DIR__ . '/includes/init.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/resource-functions.php';
 require_once __DIR__ . '/includes/favorites-functions.php';
+require_once __DIR__ . '/includes/subject-functions.php';
 
 $filters = [
     'search'        => trim((string)($_GET['search'] ?? '')),
+    'subject_id'    => (int)($_GET['subject_id'] ?? 0),
     'grade'         => trim((string)($_GET['grade'] ?? '')),
     'resource_type' => trim((string)($_GET['resource_type'] ?? '')),
     'category_id'   => (int)($_GET['category_id'] ?? 0),
@@ -14,10 +16,11 @@ $filters = [
 
 $page = max(1, (int)($_GET['page'] ?? 1));
 $result = get_published_resources($filters, $page, RESOURCES_PER_PAGE);
-$categoriesGrouped = get_categories_grouped();
+$categoriesGrouped = get_categories_grouped($filters['subject_id']);
+$subjects = get_all_subjects();
 
 $pageTitle = 'Resources';
-$pageDescription = 'Browse ESL lesson plans, worksheets, PowerPoints, games and more for primary school teachers.';
+$pageDescription = 'Browse ESL, Math, and Science lesson plans, worksheets, PowerPoints, games and more for primary and secondary school teachers.';
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container py-5">
@@ -27,8 +30,16 @@ require_once __DIR__ . '/includes/header.php';
     </p>
 
     <form method="get" action="<?= e(base_url('resources.php')) ?>" class="row g-2 mb-4">
-        <div class="col-lg-3 col-md-6">
-            <input type="text" name="search" class="form-control" placeholder="Search title, topic, subject&hellip;" value="<?= e($filters['search']) ?>">
+        <div class="col-lg-2 col-md-6">
+            <input type="text" name="search" class="form-control" placeholder="Search title, topic&hellip;" value="<?= e($filters['search']) ?>">
+        </div>
+        <div class="col-lg-2 col-md-6">
+            <select name="subject_id" class="form-select" onchange="this.form.submit()">
+                <option value="">All Subjects</option>
+                <?php foreach ($subjects as $subjectOption): ?>
+                    <option value="<?= (int)$subjectOption['id'] ?>" <?= $filters['subject_id'] === (int)$subjectOption['id'] ? 'selected' : '' ?>><?= e($subjectOption['name']) ?></option>
+                <?php endforeach; ?>
+            </select>
         </div>
         <div class="col-lg-2 col-md-6">
             <select name="grade" class="form-select">
@@ -60,7 +71,7 @@ require_once __DIR__ . '/includes/header.php';
                 <?php endforeach; ?>
             </select>
         </div>
-        <div class="col-lg-2 col-md-6">
+        <div class="col-lg-1 col-md-6">
             <select name="access" class="form-select">
                 <option value="">All Access</option>
                 <option value="free" <?= $filters['access'] === 'free' ? 'selected' : '' ?>>Free</option>

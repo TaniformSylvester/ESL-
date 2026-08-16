@@ -1,5 +1,5 @@
 -- ============================================================================
--- ESL Teacher Hub — Database Schema
+-- TeachLuma — Database Schema
 -- Import this file through phpMyAdmin (or `mysql -u user -p dbname < database.sql`)
 -- into the empty database you created in Hostinger hPanel.
 -- Engine: InnoDB, Charset: utf8mb4 (full Unicode + emoji support)
@@ -84,17 +84,37 @@ ALTER TABLE memberships
     ADD CONSTRAINT fk_memberships_last_payment FOREIGN KEY (last_payment_id) REFERENCES payments (id) ON DELETE SET NULL;
 
 -- ----------------------------------------------------------------------------
+-- subjects — ESL / Math / Science, each with its own valid grade range
+-- (min_grade/max_grade are labels from config.php's GRADE_LEVELS, sliced at
+-- runtime via get_subject_grade_levels() rather than duplicating the list here)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS subjects (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    slug VARCHAR(120) NOT NULL,
+    min_grade VARCHAR(30) NULL,
+    max_grade VARCHAR(30) NULL,
+    sort_order INT UNSIGNED NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_subjects_slug (slug)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
 -- categories
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS categories (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    subject_id INT UNSIGNED NOT NULL,
     name VARCHAR(100) NOT NULL,
     slug VARCHAR(120) NOT NULL,
     group_name VARCHAR(50) NOT NULL DEFAULT 'Teaching Resources',
     sort_order INT NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
-    UNIQUE KEY uq_categories_slug (slug)
+    UNIQUE KEY uq_categories_slug (slug),
+    KEY idx_categories_subject (subject_id),
+    CONSTRAINT fk_categories_subject FOREIGN KEY (subject_id) REFERENCES subjects (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------------------------
@@ -109,9 +129,9 @@ CREATE TABLE IF NOT EXISTS resources (
         'Lesson Plan', 'Worksheet', 'PowerPoint', 'Flashcards',
         'Classroom Activity', 'Game', 'Test', 'Assessment', 'Poster', 'Teacher Resource'
     ) NOT NULL,
+    subject_id INT UNSIGNED NOT NULL,
     category_id INT UNSIGNED NULL,
     grade_level VARCHAR(30) NULL,
-    subject VARCHAR(100) NULL,
     topic VARCHAR(150) NULL,
     thumbnail VARCHAR(255) NULL,
     preview_image VARCHAR(255) NULL,
@@ -126,10 +146,12 @@ CREATE TABLE IF NOT EXISTS resources (
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY uq_resources_slug (slug),
+    KEY idx_resources_subject (subject_id),
     KEY idx_resources_category (category_id),
     KEY idx_resources_grade (grade_level),
     KEY idx_resources_type (resource_type),
     KEY idx_resources_published (is_published),
+    CONSTRAINT fk_resources_subject FOREIGN KEY (subject_id) REFERENCES subjects (id),
     CONSTRAINT fk_resources_category FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -223,33 +245,65 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- SEED DATA
 -- ============================================================================
 
--- Categories: English Skills
-INSERT INTO categories (name, slug, group_name, sort_order) VALUES
-    ('Phonics', 'phonics', 'English Skills', 1),
-    ('Vocabulary', 'vocabulary', 'English Skills', 2),
-    ('Grammar', 'grammar', 'English Skills', 3),
-    ('Reading', 'reading', 'English Skills', 4),
-    ('Writing', 'writing', 'English Skills', 5),
-    ('Speaking', 'speaking', 'English Skills', 6),
-    ('Listening', 'listening', 'English Skills', 7),
-    ('Pronunciation', 'pronunciation', 'English Skills', 8);
+-- Subjects
+INSERT INTO subjects (name, slug, min_grade, max_grade, sort_order) VALUES
+    ('ESL', 'esl', 'Kindergarten', 'Grade 9', 1),
+    ('Math', 'math', 'Grade 1', 'Grade 6', 2),
+    ('Science', 'science', 'Grade 1', 'Grade 6', 3);
 
--- Categories: Teaching Resources
-INSERT INTO categories (name, slug, group_name, sort_order) VALUES
-    ('Lesson Plans', 'lesson-plans', 'Teaching Resources', 1),
-    ('Worksheets', 'worksheets', 'Teaching Resources', 2),
-    ('PowerPoints', 'powerpoints', 'Teaching Resources', 3),
-    ('Flashcards', 'flashcards', 'Teaching Resources', 4),
-    ('Games', 'games', 'Teaching Resources', 5),
-    ('Classroom Activities', 'classroom-activities', 'Teaching Resources', 6),
-    ('Tests', 'tests', 'Teaching Resources', 7),
-    ('Assessments', 'assessments', 'Teaching Resources', 8);
+-- Categories: ESL — English Skills
+INSERT INTO categories (subject_id, name, slug, group_name, sort_order) VALUES
+    ((SELECT id FROM subjects WHERE slug = 'esl'), 'Phonics', 'phonics', 'English Skills', 1),
+    ((SELECT id FROM subjects WHERE slug = 'esl'), 'Vocabulary', 'vocabulary', 'English Skills', 2),
+    ((SELECT id FROM subjects WHERE slug = 'esl'), 'Grammar', 'grammar', 'English Skills', 3),
+    ((SELECT id FROM subjects WHERE slug = 'esl'), 'Reading', 'reading', 'English Skills', 4),
+    ((SELECT id FROM subjects WHERE slug = 'esl'), 'Writing', 'writing', 'English Skills', 5),
+    ((SELECT id FROM subjects WHERE slug = 'esl'), 'Speaking', 'speaking', 'English Skills', 6),
+    ((SELECT id FROM subjects WHERE slug = 'esl'), 'Listening', 'listening', 'English Skills', 7),
+    ((SELECT id FROM subjects WHERE slug = 'esl'), 'Pronunciation', 'pronunciation', 'English Skills', 8);
+
+-- Categories: ESL — Teaching Resources
+INSERT INTO categories (subject_id, name, slug, group_name, sort_order) VALUES
+    ((SELECT id FROM subjects WHERE slug = 'esl'), 'Lesson Plans', 'lesson-plans', 'Teaching Resources', 1),
+    ((SELECT id FROM subjects WHERE slug = 'esl'), 'Worksheets', 'worksheets', 'Teaching Resources', 2),
+    ((SELECT id FROM subjects WHERE slug = 'esl'), 'PowerPoints', 'powerpoints', 'Teaching Resources', 3),
+    ((SELECT id FROM subjects WHERE slug = 'esl'), 'Flashcards', 'flashcards', 'Teaching Resources', 4),
+    ((SELECT id FROM subjects WHERE slug = 'esl'), 'Games', 'games', 'Teaching Resources', 5),
+    ((SELECT id FROM subjects WHERE slug = 'esl'), 'Classroom Activities', 'classroom-activities', 'Teaching Resources', 6),
+    ((SELECT id FROM subjects WHERE slug = 'esl'), 'Tests', 'tests', 'Teaching Resources', 7),
+    ((SELECT id FROM subjects WHERE slug = 'esl'), 'Assessments', 'assessments', 'Teaching Resources', 8);
+
+-- Categories: Math
+INSERT INTO categories (subject_id, name, slug, group_name, sort_order) VALUES
+    ((SELECT id FROM subjects WHERE slug = 'math'), 'Numbers & Counting', 'numbers-and-counting', 'Math Skills', 1),
+    ((SELECT id FROM subjects WHERE slug = 'math'), 'Addition & Subtraction', 'addition-and-subtraction', 'Math Skills', 2),
+    ((SELECT id FROM subjects WHERE slug = 'math'), 'Multiplication & Division', 'multiplication-and-division', 'Math Skills', 3),
+    ((SELECT id FROM subjects WHERE slug = 'math'), 'Fractions & Decimals', 'fractions-and-decimals', 'Math Skills', 4),
+    ((SELECT id FROM subjects WHERE slug = 'math'), 'Geometry & Shapes', 'geometry-and-shapes', 'Math Skills', 5),
+    ((SELECT id FROM subjects WHERE slug = 'math'), 'Measurement', 'measurement', 'Math Skills', 6),
+    ((SELECT id FROM subjects WHERE slug = 'math'), 'Time & Money', 'time-and-money', 'Math Skills', 7),
+    ((SELECT id FROM subjects WHERE slug = 'math'), 'Word Problems', 'word-problems', 'Math Skills', 8),
+    ((SELECT id FROM subjects WHERE slug = 'math'), 'Data & Graphs', 'data-and-graphs', 'Math Skills', 9),
+    ((SELECT id FROM subjects WHERE slug = 'math'), 'Patterns & Algebra Basics', 'patterns-and-algebra-basics', 'Math Skills', 10);
+
+-- Categories: Science
+INSERT INTO categories (subject_id, name, slug, group_name, sort_order) VALUES
+    ((SELECT id FROM subjects WHERE slug = 'science'), 'Living Things', 'living-things', 'Science Skills', 1),
+    ((SELECT id FROM subjects WHERE slug = 'science'), 'Human Body', 'human-body', 'Science Skills', 2),
+    ((SELECT id FROM subjects WHERE slug = 'science'), 'Plants', 'plants', 'Science Skills', 3),
+    ((SELECT id FROM subjects WHERE slug = 'science'), 'Animals & Habitats', 'animals-and-habitats', 'Science Skills', 4),
+    ((SELECT id FROM subjects WHERE slug = 'science'), 'Materials & Properties', 'materials-and-properties', 'Science Skills', 5),
+    ((SELECT id FROM subjects WHERE slug = 'science'), 'Forces & Energy', 'forces-and-energy', 'Science Skills', 6),
+    ((SELECT id FROM subjects WHERE slug = 'science'), 'Earth & Space', 'earth-and-space', 'Science Skills', 7),
+    ((SELECT id FROM subjects WHERE slug = 'science'), 'Weather & Seasons', 'weather-and-seasons', 'Science Skills', 8),
+    ((SELECT id FROM subjects WHERE slug = 'science'), 'Simple Experiments', 'simple-experiments', 'Science Skills', 9),
+    ((SELECT id FROM subjects WHERE slug = 'science'), 'Environment & Conservation', 'environment-and-conservation', 'Science Skills', 10);
 
 -- Default settings. Bank/PromptPay fields are intentionally left blank —
 -- fill these in later via /admin/settings.php. Do NOT put real account
 -- details directly into this SQL file if it will be shared or committed publicly.
 INSERT INTO settings (setting_key, setting_value) VALUES
-    ('site_name', 'ESL Teacher Hub'),
+    ('site_name', 'TeachLuma'),
     ('site_tagline', 'Save Time. Teach Better.'),
     ('subscription_price', '200'),
     ('contact_email', 'contact@example.com'),
@@ -272,11 +326,11 @@ INSERT INTO settings (setting_key, setting_value) VALUES
 -- "not currently available" message until you edit it in Admin > Resources
 -- and upload a real file. Feel free to delete these once you add your own.
 -- ----------------------------------------------------------------------------
-INSERT INTO resources (title, slug, description, resource_type, category_id, grade_level, subject, topic, is_free, is_published) VALUES
-    ('Numbers 1-10 Worksheet', 'numbers-1-10-worksheet', 'A simple worksheet practicing numbers one through ten.', 'Worksheet', (SELECT id FROM categories WHERE slug = 'vocabulary'), 'Grade 1', 'Vocabulary', 'Numbers', 1, 1),
-    ('Classroom Objects Lesson Plan', 'classroom-objects-lesson-plan', 'A full lesson plan teaching classroom object vocabulary.', 'Lesson Plan', (SELECT id FROM categories WHERE slug = 'lesson-plans'), 'Grade 1', 'Vocabulary', 'Classroom Objects', 0, 1),
-    ('Animals PowerPoint', 'animals-powerpoint', 'An engaging slideshow introducing animal vocabulary.', 'PowerPoint', (SELECT id FROM categories WHERE slug = 'powerpoints'), 'Grade 2', 'Vocabulary', 'Animals', 0, 1),
-    ('Present Simple Worksheet', 'present-simple-worksheet', 'Practice exercises for the present simple tense.', 'Worksheet', (SELECT id FROM categories WHERE slug = 'grammar'), 'Grade 3', 'Grammar', 'Present Simple', 0, 1);
+INSERT INTO resources (title, slug, description, resource_type, subject_id, category_id, grade_level, topic, is_free, is_published) VALUES
+    ('Numbers 1-10 Worksheet', 'numbers-1-10-worksheet', 'A simple worksheet practicing numbers one through ten.', 'Worksheet', (SELECT id FROM subjects WHERE slug = 'esl'), (SELECT id FROM categories WHERE slug = 'vocabulary'), 'Grade 1', 'Numbers', 1, 1),
+    ('Classroom Objects Lesson Plan', 'classroom-objects-lesson-plan', 'A full lesson plan teaching classroom object vocabulary.', 'Lesson Plan', (SELECT id FROM subjects WHERE slug = 'esl'), (SELECT id FROM categories WHERE slug = 'lesson-plans'), 'Grade 1', 'Classroom Objects', 0, 1),
+    ('Animals PowerPoint', 'animals-powerpoint', 'An engaging slideshow introducing animal vocabulary.', 'PowerPoint', (SELECT id FROM subjects WHERE slug = 'esl'), (SELECT id FROM categories WHERE slug = 'powerpoints'), 'Grade 2', 'Animals', 0, 1),
+    ('Present Simple Worksheet', 'present-simple-worksheet', 'Practice exercises for the present simple tense.', 'Worksheet', (SELECT id FROM subjects WHERE slug = 'esl'), (SELECT id FROM categories WHERE slug = 'grammar'), 'Grade 3', 'Present Simple', 0, 1);
 
 -- ----------------------------------------------------------------------------
 -- FIRST ADMIN ACCOUNT

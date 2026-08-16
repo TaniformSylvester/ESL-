@@ -3,6 +3,7 @@ require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/admin-functions.php';
 require_once __DIR__ . '/../includes/resource-functions.php';
+require_once __DIR__ . '/../includes/subject-functions.php';
 
 require_admin();
 $admin = current_user();
@@ -43,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $categoriesGrouped = get_categories_grouped();
+$subjects = get_all_subjects();
 
 $pageTitle = 'Categories';
 require_once __DIR__ . '/../includes/admin-header.php';
@@ -112,14 +114,14 @@ require_once __DIR__ . '/../includes/admin-header.php';
                         <?php if (isset($errors['name'])): ?><div class="invalid-feedback"><?= e($errors['name']) ?></div><?php endif; ?>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="group_name">Group</label>
-                        <input type="text" class="form-control <?= isset($errors['group_name']) ? 'is-invalid' : '' ?>"
-                               id="group_name" name="group_name" value="<?= e($editing['group_name'] ?? 'Teaching Resources') ?>" required maxlength="50" list="group-suggestions">
-                        <datalist id="group-suggestions">
-                            <option value="English Skills">
-                            <option value="Teaching Resources">
-                        </datalist>
-                        <?php if (isset($errors['group_name'])): ?><div class="invalid-feedback"><?= e($errors['group_name']) ?></div><?php endif; ?>
+                        <label class="form-label" for="subject_id">Subject</label>
+                        <select class="form-select <?= isset($errors['subject_id']) ? 'is-invalid' : '' ?>" id="subject_id" name="subject_id" required>
+                            <option value="">Choose&hellip;</option>
+                            <?php foreach ($subjects as $subjectOption): ?>
+                                <option value="<?= (int)$subjectOption['id'] ?>" <?= (int)($editing['subject_id'] ?? 0) === (int)$subjectOption['id'] ? 'selected' : '' ?>><?= e($subjectOption['name']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <?php if (isset($errors['subject_id'])): ?><div class="invalid-feedback"><?= e($errors['subject_id']) ?></div><?php endif; ?>
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="sort_order">Sort Order</label>

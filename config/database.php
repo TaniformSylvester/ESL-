@@ -1,6 +1,6 @@
 <?php
 /**
- * ESL Teacher Hub — Database Credentials
+ * TeachLuma — Database Credentials
  *
  * >>> EDIT THIS FILE WITH YOUR REAL MySQL CREDENTIALS <<<
  *
