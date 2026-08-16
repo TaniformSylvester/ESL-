@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS users (
     school_name VARCHAR(150) NULL,
     country VARCHAR(100) NULL,
     phone VARCHAR(30) NULL,
+    current_session_token VARCHAR(64) NULL,
     is_active TINYINT(1) NOT NULL DEFAULT 1,
     failed_login_attempts INT UNSIGNED NOT NULL DEFAULT 0,
     locked_until DATETIME NULL,

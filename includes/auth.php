@@ -50,6 +50,7 @@ function require_login(): void
         $current = $_SERVER['REQUEST_URI'] ?? '';
         redirect('login.php' . ($current !== '' ? '?redirect=' . urlencode($current) : ''));
     }
+    enforce_single_session();
 }
 
 /** Redirects already-logged-in users away from guest-only pages (login, register). */
@@ -189,13 +190,47 @@ function register_teacher(array $input): array
 // LOGIN / LOGOUT
 // -----------------------------------------------------------------------
 
-/** Starts an authenticated session for the given user row. */
+/**
+ * Starts an authenticated session for the given user row. Also rotates
+ * this account's session token, both in the session and in the users
+ * table — since a fresh login always overwrites the stored token, any
+ * other browser still holding the previous token stops matching, which
+ * is what enforce_single_session() uses to sign that other session out.
+ */
 function login_user_session(array $user): void
 {
     session_regenerate_id(true);
     $_SESSION['user_id'] = (int)$user['id'];
     $_SESSION['user_role'] = $user['role'];
     $_SESSION['user_name'] = $user['first_name'];
+
+    $token = bin2hex(random_bytes(32));
+    $_SESSION['session_token'] = $token;
+    getDB()->prepare('UPDATE users SET current_session_token = ? WHERE id = ?')->execute([$token, $user['id']]);
+}
+
+/**
+ * Enforces single-session-per-account for the member-facing login flow:
+ * logging in elsewhere invalidates this session. Not applied to the admin
+ * panel (require_admin() doesn't call this) — there's no incentive to
+ * share admin credentials, so it would only add friction to the site
+ * owner's own workflow across devices.
+ */
+function enforce_single_session(): void
+{
+    if (!isset($_SESSION['user_id']) || !isset($_SESSION['session_token'])) {
+        return;
+    }
+
+    $stmt = getDB()->prepare('SELECT current_session_token FROM users WHERE id = ? LIMIT 1');
+    $stmt->execute([$_SESSION['user_id']]);
+    $dbToken = $stmt->fetchColumn();
+
+    if ($dbToken === false || !hash_equals((string)$dbToken, $_SESSION['session_token'])) {
+        logout_user();
+        flash_set('error', 'You were signed out because this account was signed in from another device.');
+        redirect('login.php');
+    }
 }
 
 function logout_user(): void
