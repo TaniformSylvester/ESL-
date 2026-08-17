@@ -1,0 +1,9 @@
+# TeachLuma — ads.txt
+#
+# Required by Google AdSense once you go live with ads. Replace the
+# placeholder publisher ID below with your real one (Ads > Overview in
+# your AdSense dashboard — it looks like "pub-1234567890123456"), keeping
+# the exact line format Google expects. This file must be reachable at
+# https://teachluma.com/ads.txt (no extra folders).
+#
+# google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0

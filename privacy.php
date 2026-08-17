@@ -26,6 +26,9 @@ require_once __DIR__ . '/includes/header.php';
             <h2 class="h5 fw-bold mt-4">Data Security</h2>
             <p>Passwords are stored using industry-standard hashing and are never stored or visible in plain text, including to our own team.</p>
 
+            <h2 class="h5 fw-bold mt-4">Advertising &amp; Cookies</h2>
+            <p><?= e(SITE_NAME) ?> shows ads served by Google AdSense to visitors and free-tier members (never to paying members with an active subscription). Google and its partners may use cookies or similar technologies to serve ads based on your prior visits to this or other websites. You can opt out of personalized advertising by visiting <a href="https://adssettings.google.com" target="_blank" rel="noopener">Google Ads Settings</a>, and you can learn more about how Google uses data at <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">policies.google.com/technologies/partner-sites</a>. Where required, a consent banner lets you choose whether to allow personalized advertising.</p>
+
             <h2 class="h5 fw-bold mt-4">Your Choices</h2>
             <p>You can update your account details at any time from your profile page, or contact us to request that your account be deleted.</p>
 
