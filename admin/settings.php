@@ -60,7 +60,7 @@ require_once __DIR__ . '/../includes/admin-header.php';
                 <h2 class="h5 fw-bold mb-1">Payment Settings</h2>
                 <p class="text-secondary small mb-4">
                     Shown to teachers on the Subscription page as instructions for paying their
-                    <?= format_currency(SUBSCRIPTION_PRICE) ?>/<?= e(SUBSCRIPTION_PERIOD_LABEL) ?> membership.
+                    Teacher Pro membership (<?= format_currency(PRICE_MONTHLY) ?>/month or <?= format_currency(PRICE_ANNUAL) ?>/year).
                     Leave a field blank to hide it.
                 </p>
 

@@ -4,11 +4,13 @@ require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/membership.php';
 require_once __DIR__ . '/includes/resource-functions.php';
 require_once __DIR__ . '/includes/favorites-functions.php';
+require_once __DIR__ . '/includes/download-functions.php';
 
 require_login();
 $user = current_user();
 $membership = get_membership($user['id']) ?? ['status' => 'inactive', 'expiry_date' => null];
 $isActive = isMemberActive($user['id']);
+$freeUsage = $isActive ? null : get_free_download_usage($user['id']);
 
 $totalResources = get_published_resource_count();
 $recentResources = get_featured_resources(4);
@@ -26,11 +28,13 @@ require_once __DIR__ . '/includes/header.php';
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
                     <p class="text-secondary small mb-1 text-uppercase">Membership</p>
-                    <span class="badge <?= e(membership_status_badge_class($membership)) ?> mb-2"><?= e(membership_status_label($membership)) ?></span>
                     <?php if ($isActive): ?>
-                        <p class="small mb-0">Renews/expires <?= e(format_date($membership['expiry_date'])) ?></p>
+                        <span class="badge bg-success mb-2">⭐ Teacher Pro</span>
+                        <p class="small mb-0">Unlimited downloads. Expires <?= e(format_date($membership['expiry_date'])) ?></p>
                     <?php else: ?>
-                        <p class="small mb-0"><a href="<?= e(base_url('member/subscription.php')) ?>">Subscribe now &rarr;</a></p>
+                        <span class="badge bg-secondary mb-2">Free Plan</span>
+                        <p class="small mb-1"><?= e(free_download_usage_message($freeUsage)) ?></p>
+                        <p class="small mb-0"><a href="<?= e(base_url('member/subscription.php')) ?>">Upgrade to Pro &rarr;</a></p>
                     <?php endif; ?>
                 </div>
             </div>

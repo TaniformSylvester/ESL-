@@ -26,6 +26,12 @@ CREATE TABLE IF NOT EXISTS users (
     is_active TINYINT(1) NOT NULL DEFAULT 1,
     failed_login_attempts INT UNSIGNED NOT NULL DEFAULT 0,
     locked_until DATETIME NULL,
+    -- Free-plan monthly download allowance (resources.is_free = 1 only).
+    -- free_downloads_month is 'YYYY-MM'; a mismatch against the current
+    -- calendar month means a lazy reset is due — see get_free_download_usage()
+    -- and try_consume_free_download() in includes/download-functions.php.
+    free_downloads_used INT UNSIGNED NOT NULL DEFAULT 0,
+    free_downloads_month CHAR(7) NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -41,6 +47,7 @@ CREATE TABLE IF NOT EXISTS memberships (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id INT UNSIGNED NOT NULL,
     status ENUM('inactive', 'pending', 'active', 'expired', 'cancelled') NOT NULL DEFAULT 'inactive',
+    plan ENUM('monthly', 'annual') NULL,
     start_date DATE NULL,
     expiry_date DATE NULL,
     last_payment_id INT UNSIGNED NULL,
@@ -63,6 +70,7 @@ CREATE TABLE IF NOT EXISTS payments (
     amount DECIMAL(10, 2) NOT NULL,
     currency VARCHAR(10) NOT NULL DEFAULT 'THB',
     method ENUM('bank_transfer', 'promptpay', 'manual_other', 'stripe', 'omise') NOT NULL DEFAULT 'bank_transfer',
+    plan ENUM('monthly', 'annual') NOT NULL DEFAULT 'monthly',
     reference_number VARCHAR(150) NULL,
     payment_date DATE NULL,
     screenshot_path VARCHAR(255) NULL,
@@ -247,7 +255,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 -- Subjects
 INSERT INTO subjects (name, slug, min_grade, max_grade, sort_order) VALUES
-    ('ESL', 'esl', 'Kindergarten', 'Grade 9', 1),
+    ('ESL', 'esl', 'Kindergarten', 'Grade 10', 1),
     ('Math', 'math', 'Grade 1', 'Grade 6', 2),
     ('Science', 'science', 'Grade 1', 'Grade 6', 3);
 

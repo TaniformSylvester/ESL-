@@ -236,6 +236,45 @@ function get_published_resource_count(): int
     return (int)getDB()->query('SELECT COUNT(*) FROM resources WHERE is_published = 1')->fetchColumn();
 }
 
+/**
+ * Published resource counts by resource_type, e.g. ['Worksheet' => 42,
+ * 'PowerPoint' => 18, ...] — types with zero published resources are
+ * omitted. Used for marketing copy (pricing.php, index.php) so counts are
+ * always read from real data rather than hardcoded.
+ */
+function get_resource_type_counts(): array
+{
+    $stmt = getDB()->query(
+        'SELECT resource_type, COUNT(*) AS total FROM resources WHERE is_published = 1 GROUP BY resource_type'
+    );
+
+    $counts = [];
+    foreach ($stmt->fetchAll() as $row) {
+        $counts[$row['resource_type']] = (int)$row['total'];
+    }
+
+    return $counts;
+}
+
+/** Published resource counts by subject name, e.g. ['ESL' => 30, 'Math' => 10, 'Science' => 10]. */
+function get_resource_counts_by_subject(): array
+{
+    $stmt = getDB()->query(
+        'SELECT s.name, COUNT(*) AS total
+         FROM resources r
+         INNER JOIN subjects s ON s.id = r.subject_id
+         WHERE r.is_published = 1
+         GROUP BY s.name'
+    );
+
+    $counts = [];
+    foreach ($stmt->fetchAll() as $row) {
+        $counts[$row['name']] = (int)$row['total'];
+    }
+
+    return $counts;
+}
+
 function get_featured_resources(int $limit = 6): array
 {
     $stmt = getDB()->prepare(

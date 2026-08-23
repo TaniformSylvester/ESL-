@@ -42,6 +42,7 @@ require_once __DIR__ . '/../includes/admin-header.php';
                 <tr>
                     <th>Teacher</th>
                     <th>Status</th>
+                    <th>Plan</th>
                     <th>Started</th>
                     <th>Expires</th>
                     <th></th>
@@ -49,7 +50,7 @@ require_once __DIR__ . '/../includes/admin-header.php';
             </thead>
             <tbody>
                 <?php if (empty($result['items'])): ?>
-                    <tr><td colspan="5" class="text-center text-secondary py-4">No members found.</td></tr>
+                    <tr><td colspan="6" class="text-center text-secondary py-4">No members found.</td></tr>
                 <?php endif; ?>
                 <?php foreach ($result['items'] as $u): ?>
                     <?php $membership = ['status' => $u['membership_status'] ?? 'inactive', 'expiry_date' => $u['expiry_date'] ?? null]; ?>
@@ -59,6 +60,7 @@ require_once __DIR__ . '/../includes/admin-header.php';
                             <div class="small text-secondary"><?= e($u['email']) ?></div>
                         </td>
                         <td><span class="badge <?= e(membership_status_badge_class($membership)) ?>"><?= e(membership_status_label($membership)) ?></span></td>
+                        <td class="small text-secondary"><?= !empty($u['plan']) ? e(ucfirst($u['plan'])) : '&mdash;' ?></td>
                         <td class="small text-secondary"><?= !empty($u['start_date']) ? e(format_date($u['start_date'])) : '&mdash;' ?></td>
                         <td class="small text-secondary"><?= !empty($u['expiry_date']) ? e(format_date($u['expiry_date'])) : '&mdash;' ?></td>
                         <td><a href="<?= e(base_url('admin/user.php?id=' . $u['id'])) ?>" class="btn btn-sm btn-outline-primary">Manage</a></td>

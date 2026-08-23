@@ -15,14 +15,14 @@ require_once __DIR__ . '/includes/header.php';
             <p>Every worksheet, lesson plan, and activity on <?= e(SITE_NAME) ?> is built with one goal in mind &mdash; being genuinely useful to a teacher standing in front of a class of students. We focus on practical, classroom-tested resources rather than generic, mass-produced materials.</p>
 
             <h2 class="h4 fw-bold mt-5 mb-3">Who We're For</h2>
-            <p><?= e(SITE_NAME) ?> was built primarily for teachers in Thai schools, but any primary or secondary school teacher, anywhere in the world, is welcome to use our resources. We cover ESL for Kindergarten through Grade 9, and Math and Science for Grades 1&ndash;6.</p>
+            <p><?= e(SITE_NAME) ?> was built primarily for teachers in Thai schools, but any kindergarten, primary, or secondary school teacher, anywhere in the world, is welcome to use our resources. We cover English/ESL for Kindergarten through Grade 10, and Math and Science for Grades 1&ndash;6.</p>
 
             <h2 class="h4 fw-bold mt-5 mb-3">What Makes Us Different</h2>
             <ul>
                 <li>Resources organized specifically for each grade level and subject &mdash; ESL, Math, and Science.</li>
                 <li>A mix of lesson plans, worksheets, PowerPoints, flashcards, games and assessments &mdash; everything you need for a lesson in one place.</li>
                 <li>New materials added regularly.</li>
-                <li>A simple, affordable membership at <?= format_currency(SUBSCRIPTION_PRICE) ?>/month &mdash; no long-term contracts.</li>
+                <li>A free plan with 5 downloads a month, or Teacher Pro for unlimited downloads from <?= format_currency(PRICE_MONTHLY) ?>/month &mdash; no long-term contracts.</li>
             </ul>
 
             <h2 class="h4 fw-bold mt-5 mb-3">Save Time. Teach Better.</h2>

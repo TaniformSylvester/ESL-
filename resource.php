@@ -17,6 +17,8 @@ if (!$resource) {
 
 $isLoggedIn = is_logged_in();
 $canDownload = can_download_resource($resource);
+$isPro = $isLoggedIn && isMemberActive();
+$freeUsage = ($isLoggedIn && !$isPro && !is_admin()) ? get_free_download_usage((int)$_SESSION['user_id']) : null;
 $isFavorited = $isLoggedIn && is_favorited((int)$_SESSION['user_id'], (int)$resource['id']);
 $previewUrl = !empty($resource['preview_image']) ? UPLOAD_PREVIEW_URL . '/' . rawurlencode($resource['preview_image']) : null;
 $thumbUrl = !empty($resource['thumbnail']) ? UPLOAD_THUMBNAIL_URL . '/' . rawurlencode($resource['thumbnail']) : null;
@@ -130,16 +132,37 @@ require_once __DIR__ . '/includes/header.php';
                     <a href="<?= e(base_url('member/download.php?id=' . (int)$resource['id'])) ?>" class="btn btn-primary btn-lg px-4">
                         <i class="fa-solid fa-download me-2"></i>Download
                     </a>
-                <?php else: ?>
+                    <?php if ($freeUsage !== null && $resource['is_free']): ?>
+                        <p class="small text-secondary mt-2 mb-0">
+                            <?= e(free_download_usage_message($freeUsage)) ?>
+                            <a href="<?= e(base_url('pricing.php')) ?>">Upgrade to Pro for unlimited downloads.</a>
+                        </p>
+                    <?php endif; ?>
+                <?php elseif (!$resource['is_free']): ?>
                     <div class="alert alert-warning">
                         <p class="fw-bold mb-1"><i class="fa-solid fa-lock me-1"></i> Members Only</p>
-                        <p class="mb-3">Subscribe for <?= format_currency(SUBSCRIPTION_PRICE) ?>/month to download this resource.</p>
+                        <p class="mb-3">Upgrade to Teacher Pro (from <?= format_currency(PRICE_MONTHLY) ?>/month) to download this resource.</p>
                         <div class="d-flex gap-2 flex-wrap">
-                            <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-primary">Subscribe for <?= format_currency(SUBSCRIPTION_PRICE) ?>/month</a>
+                            <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-primary">Upgrade to Pro</a>
                             <?php if (!$isLoggedIn): ?>
                                 <a href="<?= e(base_url('login.php')) ?>" class="btn btn-outline-secondary">Login</a>
                             <?php endif; ?>
                         </div>
+                    </div>
+                <?php elseif (!$isLoggedIn): ?>
+                    <div class="alert alert-info">
+                        <p class="fw-bold mb-1"><i class="fa-solid fa-circle-info me-1"></i> Create a free account to download</p>
+                        <p class="mb-3">Free accounts get up to <?= (int)FREE_DOWNLOAD_MONTHLY_LIMIT ?> downloads every month, no payment required.</p>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="<?= e(base_url('register.php')) ?>" class="btn btn-primary">Create Free Account</a>
+                            <a href="<?= e(base_url('login.php')) ?>" class="btn btn-outline-secondary">Login</a>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <div class="alert alert-warning">
+                        <p class="fw-bold mb-1"><i class="fa-solid fa-lock me-1"></i> <?= e(free_download_usage_message($freeUsage)) ?></p>
+                        <p class="mb-3">Upgrade to Teacher Pro for unlimited downloads, or wait until next month for your free downloads to reset.</p>
+                        <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-primary">Upgrade to Pro</a>
                     </div>
                 <?php endif; ?>
             </div>

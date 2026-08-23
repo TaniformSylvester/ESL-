@@ -16,7 +16,7 @@ $subjectIcons = [
     'science' => 'fa-flask',
 ];
 
-$pageTitle = 'Home';
+$pageTitle = 'ESL, Math & Science Resources for Teachers in Thailand';
 $pageDescription = SITE_DESCRIPTION;
 require_once __DIR__ . '/includes/header.php';
 ?>
@@ -25,11 +25,11 @@ require_once __DIR__ . '/includes/header.php';
     <div class="container py-5">
         <div class="row align-items-center">
             <div class="col-lg-8 mx-auto text-center">
-                <h1 class="display-5 fw-bold mb-3">Ready-to-Teach ESL, Math &amp; Science Resources for Teachers</h1>
-                <p class="lead mb-4">Lesson plans, worksheets, PowerPoints, games and classroom resources for Kindergarten through Grade 9 — all in one place.</p>
+                <h1 class="display-5 fw-bold mb-3">Ready-to-Teach Resources for Teachers in Thailand</h1>
+                <p class="lead mb-4">Ready-to-use English and ESL resources from Kindergarten to Grade 10, plus Mathematics and Science resources for Grades 1&ndash;6.</p>
                 <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
                     <a href="<?= e(base_url('resources.php')) ?>" class="btn btn-light btn-lg px-4 fw-semibold">Explore Resources</a>
-                    <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-outline-light btn-lg px-4">Join for <?= format_currency(SUBSCRIPTION_PRICE) ?>/month</a>
+                    <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-outline-light btn-lg px-4">Become a Pro Teacher</a>
                 </div>
             </div>
         </div>
@@ -132,17 +132,17 @@ require_once __DIR__ . '/includes/header.php';
             <div class="col-md-4">
                 <div class="fw-bold fs-3 text-primary mb-2">1</div>
                 <h3 class="h6 fw-bold">Create a Free Account</h3>
-                <p class="small text-secondary">Register in a minute and browse the full resource library.</p>
+                <p class="small text-secondary">Register in a minute, browse the full library, and get 5 free downloads a month.</p>
             </div>
             <div class="col-md-4">
                 <div class="fw-bold fs-3 text-primary mb-2">2</div>
-                <h3 class="h6 fw-bold">Subscribe for <?= format_currency(SUBSCRIPTION_PRICE) ?>/month</h3>
+                <h3 class="h6 fw-bold">Upgrade to Pro (Optional)</h3>
                 <p class="small text-secondary">Send your payment and get approved &mdash; usually within a day.</p>
             </div>
             <div class="col-md-4">
                 <div class="fw-bold fs-3 text-primary mb-2">3</div>
-                <h3 class="h6 fw-bold">Download &amp; Teach</h3>
-                <p class="small text-secondary">Unlimited access to every members-only resource, all month long.</p>
+                <h3 class="h6 fw-bold">Find It. Download It. Teach It.</h3>
+                <p class="small text-secondary">Unlimited downloads for Pro members, or 5 a month on the Free plan.</p>
             </div>
         </div>
     </div>
@@ -150,14 +150,25 @@ require_once __DIR__ . '/includes/header.php';
 
 <section class="py-5">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-6">
-                <div class="card border-primary shadow-sm text-center">
+        <div class="row justify-content-center g-4">
+            <div class="col-md-5">
+                <div class="card border-0 shadow-sm text-center h-100">
                     <div class="card-body p-4">
-                        <h2 class="h5 fw-bold mb-1">Teacher Membership</h2>
-                        <p class="display-6 fw-bold text-primary mb-0"><?= format_currency(SUBSCRIPTION_PRICE) ?><span class="fs-6 text-secondary">/month</span></p>
-                        <p class="text-secondary small mt-2 mb-3">Unlimited access to all members-only resources.</p>
-                        <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-primary px-4">See Full Pricing Details</a>
+                        <h2 class="h5 fw-bold mb-1">TeachLuma Pro</h2>
+                        <p class="display-6 fw-bold text-primary mb-0"><?= format_currency(PRICE_MONTHLY) ?><span class="fs-6 text-secondary">/month</span></p>
+                        <p class="text-secondary small mt-2 mb-3">Unlimited downloads of every members-only resource.</p>
+                        <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-outline-primary px-4">See Full Pricing</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="card border-primary shadow text-center h-100" style="border-width:2px;">
+                    <div class="card-body p-4">
+                        <span class="badge bg-warning text-dark mb-2">🏆 BEST VALUE</span>
+                        <h2 class="h5 fw-bold mb-1">Or Save with Annual</h2>
+                        <p class="display-6 fw-bold text-primary mb-0"><?= format_currency(PRICE_ANNUAL) ?><span class="fs-6 text-secondary">/year</span></p>
+                        <p class="text-secondary small mt-2 mb-3">Save <?= format_currency((PRICE_MONTHLY * 12) - PRICE_ANNUAL) ?>/year vs. paying monthly.</p>
+                        <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-primary px-4">Become a Pro Teacher</a>
                     </div>
                 </div>
             </div>
@@ -190,41 +201,61 @@ require_once __DIR__ . '/includes/header.php';
                     <div class="accordion-item">
                         <h3 class="accordion-header">
                             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                What do I get with a membership?
+                                How many resources can I download for free?
                             </button>
                         </h3>
                         <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">Unlimited downloads of every members-only lesson plan, worksheet, PowerPoint, flashcard set, game and assessment in the library, for as long as your membership is active.</div>
+                            <div class="accordion-body">Free members can download up to 5 resources per calendar month.</div>
                         </div>
                     </div>
                     <div class="accordion-item">
                         <h3 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                How do I pay?
+                                What do I get with TeachLuma Pro?
                             </button>
                         </h3>
                         <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">Currently membership is activated through a simple bank transfer or PromptPay payment that our team confirms manually, usually within a day. Details are shown once you register.</div>
+                            <div class="accordion-body">Pro members get unlimited downloads of members-only resources while their membership is active.</div>
                         </div>
                     </div>
                     <div class="accordion-item">
                         <h3 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                Can I cancel anytime?
+                                What subjects does TeachLuma cover?
                             </button>
                         </h3>
                         <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">Yes. Your membership simply isn't renewed for the following month &mdash; there's no lock-in contract.</div>
+                            <div class="accordion-body">TeachLuma provides English and ESL resources from Kindergarten to Grade 10, plus Mathematics and Science resources for Grades 1&ndash;6.</div>
                         </div>
                     </div>
                     <div class="accordion-item">
                         <h3 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
-                                Are any resources free?
+                                How do I pay?
                             </button>
                         </h3>
                         <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">Yes, a selection of resources is always free to download, no account required for browsing.</div>
+                            <div class="accordion-body">Currently, TeachLuma uses manual PromptPay or bank-transfer payment. After submitting your payment details, our team reviews and approves your membership.</div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                How long does approval take?
+                            </button>
+                        </h3>
+                        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">Usually within a day.</div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+                                Can I cancel anytime?
+                            </button>
+                        </h3>
+                        <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">Yes. Membership renews manually, not automatically &mdash; if you don't submit another payment before your expiry date, your account simply reverts to the Free plan (5 downloads/month) rather than being charged or locked out.</div>
                         </div>
                     </div>
                 </div>
@@ -236,7 +267,7 @@ require_once __DIR__ . '/includes/header.php';
 <section class="hero py-5">
     <div class="container py-4 text-center">
         <h2 class="h3 fw-bold mb-3">Ready to spend less time preparing and more time teaching?</h2>
-        <a href="<?= e(base_url('register.php')) ?>" class="btn btn-light btn-lg px-4 fw-semibold">Join for <?= format_currency(SUBSCRIPTION_PRICE) ?>/month</a>
+        <a href="<?= e(base_url('register.php')) ?>" class="btn btn-light btn-lg px-4 fw-semibold">Become a Pro Teacher</a>
     </div>
 </section>
 

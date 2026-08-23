@@ -30,6 +30,11 @@ function submit_payment(int $userId, array $input, array $file): array
 {
     $errors = [];
 
+    $plan = (string)($input['plan'] ?? 'monthly');
+    if (!array_key_exists($plan, PLAN_DAYS)) {
+        $plan = 'monthly';
+    }
+
     $amount = (float)($input['amount'] ?? 0);
     $method = (string)($input['method'] ?? 'bank_transfer');
     $paymentDate = trim((string)($input['payment_date'] ?? ''));
@@ -75,9 +80,9 @@ function submit_payment(int $userId, array $input, array $file): array
 
     $db = getDB();
     $db->prepare(
-        'INSERT INTO payments (user_id, amount, currency, method, reference_number, payment_date, screenshot_path, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
-    )->execute([$userId, $amount, CURRENCY, $method, $reference, $paymentDate, $screenshotFilename, 'pending']);
+        'INSERT INTO payments (user_id, amount, currency, method, plan, reference_number, payment_date, screenshot_path, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    )->execute([$userId, $amount, CURRENCY, $method, $plan, $reference, $paymentDate, $screenshotFilename, 'pending']);
 
     // Don't downgrade a currently-active member who is paying ahead of expiry.
     $db->prepare("UPDATE memberships SET status = 'pending' WHERE user_id = ? AND status != 'active'")
@@ -104,15 +109,16 @@ function record_stripe_payment(int $userId, float $amount, string $sessionId): v
     }
 
     // Stripe charges are always USD (STRIPE_CURRENCY) regardless of the
-    // site's default THB currency used for bank transfer/PromptPay.
+    // site's default THB currency used for bank transfer/PromptPay, and
+    // only ever offers the monthly plan (see config/stripe.php).
     $db->prepare(
-        "INSERT INTO payments (user_id, amount, currency, method, reference_number, payment_date, status, gateway_reference, reviewed_at)
-         VALUES (?, ?, ?, 'stripe', ?, CURDATE(), 'approved', ?, NOW())"
+        "INSERT INTO payments (user_id, amount, currency, method, plan, reference_number, payment_date, status, gateway_reference, reviewed_at)
+         VALUES (?, ?, ?, 'stripe', 'monthly', ?, CURDATE(), 'approved', ?, NOW())"
     )->execute([$userId, $amount, strtoupper(STRIPE_CURRENCY), $sessionId, $sessionId]);
 
     $paymentId = (int)$db->lastInsertId();
 
-    extend_membership($userId, 1);
+    extend_membership_for_plan($userId, 'monthly');
 
     $db->prepare('UPDATE memberships SET last_payment_id = ? WHERE user_id = ?')
         ->execute([$paymentId, $userId]);
@@ -210,10 +216,11 @@ function get_all_payments_paginated(array $filters, int $page, int $perPage): ar
 }
 
 /**
- * Approves a pending payment and extends the member's subscription by one
- * month via extend_membership() (includes/admin-functions.php, must already
- * be loaded by the caller) — the same date math used for manual admin
- * extensions, so membership dates are only ever computed in one place.
+ * Approves a pending payment and extends the member's subscription by the
+ * payment's plan (30 days for monthly, 365 for annual) via
+ * extend_membership_for_plan() (includes/admin-functions.php, must already
+ * be loaded by the caller) — the same date math used for the Stripe path,
+ * so membership dates are only ever computed in one place.
  * Returns the payment row (with user info) on success, or null if the
  * payment doesn't exist or was already processed.
  */
@@ -229,7 +236,7 @@ function approve_payment(int $paymentId, int $adminId): ?array
     $db->prepare("UPDATE payments SET status = 'approved', reviewed_by = ?, reviewed_at = NOW() WHERE id = ?")
         ->execute([$adminId, $paymentId]);
 
-    extend_membership((int)$payment['user_id'], 1);
+    extend_membership_for_plan((int)$payment['user_id'], $payment['plan'] ?? 'monthly');
 
     $db->prepare('UPDATE memberships SET last_payment_id = ? WHERE user_id = ?')
         ->execute([$paymentId, $payment['user_id']]);

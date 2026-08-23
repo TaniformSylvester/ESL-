@@ -85,6 +85,7 @@ require_once __DIR__ . '/../includes/admin-header.php';
             <thead>
                 <tr>
                     <th>Teacher</th>
+                    <th>Plan</th>
                     <th>Amount</th>
                     <th>Method</th>
                     <th>Reference</th>
@@ -96,7 +97,7 @@ require_once __DIR__ . '/../includes/admin-header.php';
             </thead>
             <tbody>
                 <?php if (empty($result['items'])): ?>
-                    <tr><td colspan="8" class="text-center text-secondary py-4">No payments found.</td></tr>
+                    <tr><td colspan="9" class="text-center text-secondary py-4">No payments found.</td></tr>
                 <?php endif; ?>
                 <?php foreach ($result['items'] as $payment): ?>
                     <tr>
@@ -104,6 +105,7 @@ require_once __DIR__ . '/../includes/admin-header.php';
                             <?= e($payment['first_name'] . ' ' . $payment['last_name']) ?>
                             <div class="small text-secondary"><?= e($payment['email']) ?></div>
                         </td>
+                        <td class="small"><?= e(ucfirst($payment['plan'] ?? 'monthly')) ?></td>
                         <td><?= format_payment_amount($payment) ?></td>
                         <td class="small"><?= e(payment_method_label($payment['method'])) ?></td>
                         <td class="small"><?= e($payment['reference_number']) ?></td>

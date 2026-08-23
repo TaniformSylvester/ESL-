@@ -8,9 +8,11 @@ require_once __DIR__ . '/../includes/payment-functions.php';
 require_once __DIR__ . '/../includes/email.php';
 
 require_login();
+require_once __DIR__ . '/../includes/download-functions.php';
 $user = current_user();
 $errors = [];
-$old = ['amount' => (string)SUBSCRIPTION_PRICE, 'method' => 'bank_transfer', 'payment_date' => date('Y-m-d'), 'reference_number' => ''];
+$selectedPlan = in_array($_GET['plan'] ?? '', ['monthly', 'annual'], true) ? $_GET['plan'] : 'monthly';
+$old = ['plan' => $selectedPlan, 'amount' => (string)PRICE_MONTHLY, 'method' => 'bank_transfer', 'payment_date' => date('Y-m-d'), 'reference_number' => ''];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_csrf();
@@ -32,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors = $result['errors'];
     }
     $old = [
+        'plan'             => in_array($_POST['plan'] ?? '', ['monthly', 'annual'], true) ? $_POST['plan'] : 'monthly',
         'amount'           => clean_input($_POST['amount'] ?? $old['amount']),
         'method'           => clean_input($_POST['method'] ?? $old['method']),
         'payment_date'     => clean_input($_POST['payment_date'] ?? $old['payment_date']),
@@ -41,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $membership = get_membership($user['id']) ?? ['status' => 'inactive', 'expiry_date' => null];
 $isActive = isMemberActive($user['id']);
+$freeUsage = $isActive ? null : get_free_download_usage($user['id']);
 $payments = get_user_payments($user['id']);
 
 $bankName = get_setting('bank_name');
@@ -56,7 +60,7 @@ require_once __DIR__ . '/../includes/header.php';
 ?>
 <div class="container py-5">
     <h1 class="fw-bold mb-1"><?= e(SITE_NAME) ?> Membership</h1>
-    <p class="text-secondary mb-4"><?= format_currency(SUBSCRIPTION_PRICE) ?>/<?= e(SUBSCRIPTION_PERIOD_LABEL) ?></p>
+    <p class="text-secondary mb-4">Teacher Pro: <?= format_currency(PRICE_MONTHLY) ?>/month or <?= format_currency(PRICE_ANNUAL) ?>/year</p>
 
     <?php if (($_GET['stripe'] ?? '') === 'success'): ?>
         <div class="alert alert-success alert-dismissible fade show">
@@ -73,14 +77,18 @@ require_once __DIR__ . '/../includes/header.php';
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
             <div>
-                <span class="badge <?= e(membership_status_badge_class($membership)) ?> mb-2"><?= e(membership_status_label($membership)) ?></span>
                 <?php if ($isActive): ?>
-                    <p class="mb-0">Active until <strong><?= e(format_date($membership['expiry_date'])) ?></strong>
+                    <span class="badge bg-success mb-2">⭐ Teacher Pro<?= !empty($membership['plan']) ? ' (' . e(ucfirst($membership['plan'])) . ')' : '' ?></span>
+                    <p class="mb-0">Unlimited downloads. Active until <strong><?= e(format_date($membership['expiry_date'])) ?></strong>
                         (<?= (int)membership_days_remaining($membership) ?> days remaining)</p>
-                <?php elseif ($membership['status'] === 'pending'): ?>
-                    <p class="mb-0">Your payment is awaiting approval. This usually takes less than a day.</p>
                 <?php else: ?>
-                    <p class="mb-0">You don't have an active membership yet. Submit a payment below to get started.</p>
+                    <span class="badge <?= e(membership_status_badge_class($membership)) ?> mb-2">Free Plan<?= $membership['status'] === 'pending' ? ' &mdash; Payment Pending' : '' ?></span>
+                    <?php if ($membership['status'] === 'pending'): ?>
+                        <p class="mb-0">Your payment is awaiting approval. This usually takes less than a day.</p>
+                    <?php else: ?>
+                        <p class="mb-1">You're on the Free plan. <?= e(free_download_usage_message($freeUsage)) ?></p>
+                        <p class="mb-0 text-secondary small">Upgrade to Teacher Pro below for unlimited downloads of every resource.</p>
+                    <?php endif; ?>
                 <?php endif; ?>
             </div>
         </div>
@@ -91,7 +99,7 @@ require_once __DIR__ . '/../includes/header.php';
             <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <div>
                     <h2 class="h5 fw-bold mb-1"><i class="fa-solid fa-credit-card text-primary me-1"></i> Pay Instantly by Card</h2>
-                    <p class="text-secondary mb-0">Charged in USD — activates your membership automatically, no waiting for approval.</p>
+                    <p class="text-secondary mb-0">Charged in USD, Teacher Pro Monthly — activates your membership automatically, no waiting for approval.</p>
                 </div>
                 <form method="post" action="<?= e(base_url('member/stripe-checkout.php')) ?>">
                     <?php csrf_field(); ?>
@@ -99,7 +107,7 @@ require_once __DIR__ . '/../includes/header.php';
                 </form>
             </div>
         </div>
-        <p class="text-secondary text-center small mb-4">— or pay by bank transfer / PromptPay below —</p>
+        <p class="text-secondary text-center small mb-4">— or pay by bank transfer / PromptPay below (also available for the Annual plan) —</p>
     <?php endif; ?>
 
     <div class="row g-4">
@@ -141,11 +149,23 @@ require_once __DIR__ . '/../includes/header.php';
                     <form method="post" action="<?= e(base_url('member/subscription.php')) ?>" enctype="multipart/form-data" novalidate>
                         <?php csrf_field(); ?>
 
+                        <div class="mb-3">
+                            <label class="form-label d-block">Plan</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="plan" id="plan_monthly" value="monthly" data-price="<?= (int)PRICE_MONTHLY ?>" <?= $old['plan'] !== 'annual' ? 'checked' : '' ?>>
+                                <label class="btn btn-outline-primary" for="plan_monthly">Monthly &mdash; <?= format_currency(PRICE_MONTHLY) ?></label>
+
+                                <input type="radio" class="btn-check" name="plan" id="plan_annual" value="annual" data-price="<?= (int)PRICE_ANNUAL ?>" <?= $old['plan'] === 'annual' ? 'checked' : '' ?>>
+                                <label class="btn btn-outline-primary" for="plan_annual">Annual &mdash; <?= format_currency(PRICE_ANNUAL) ?> <span class="badge bg-warning text-dark">Best Value</span></label>
+                            </div>
+                        </div>
+
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label" for="amount">Amount (<?= e(CURRENCY) ?>)</label>
                                 <input type="number" step="0.01" min="0" class="form-control <?= isset($errors['amount']) ? 'is-invalid' : '' ?>"
                                        id="amount" name="amount" value="<?= e($old['amount']) ?>" required>
+                                <div class="form-text">Pre-filled for your selected plan &mdash; adjust only if you sent a different amount.</div>
                                 <?php if (isset($errors['amount'])): ?><div class="invalid-feedback"><?= e($errors['amount']) ?></div><?php endif; ?>
                             </div>
                             <div class="col-md-6">
@@ -178,6 +198,19 @@ require_once __DIR__ . '/../includes/header.php';
 
                         <button type="submit" class="btn btn-primary w-100 mt-4 py-2">Submit Payment</button>
                     </form>
+                    <script>
+                        (function () {
+                            var amountInput = document.getElementById('amount');
+                            var planRadios = document.querySelectorAll('input[name="plan"]');
+                            Array.prototype.forEach.call(planRadios, function (radio) {
+                                radio.addEventListener('change', function () {
+                                    if (radio.checked) {
+                                        amountInput.value = radio.getAttribute('data-price');
+                                    }
+                                });
+                            });
+                        })();
+                    </script>
                 </div>
             </div>
         </div>
@@ -190,6 +223,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <thead>
                     <tr>
                         <th>Date</th>
+                        <th>Plan</th>
                         <th>Amount</th>
                         <th>Method</th>
                         <th>Reference</th>
@@ -200,6 +234,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <?php foreach ($payments as $payment): ?>
                         <tr>
                             <td><?= e(format_date($payment['payment_date'])) ?></td>
+                            <td class="small"><?= e(ucfirst($payment['plan'] ?? 'monthly')) ?></td>
                             <td><?= format_payment_amount($payment) ?></td>
                             <td><?= e(payment_method_label($payment['method'])) ?></td>
                             <td><?= e($payment['reference_number']) ?></td>

@@ -14,12 +14,16 @@ if (!$resource || !$resource['is_published']) {
     exit;
 }
 
-if (!can_download_resource($resource)) {
-    if (!is_logged_in()) {
-        redirect('login.php?redirect=' . urlencode($_SERVER['REQUEST_URI']));
-    }
+if (!is_logged_in()) {
+    redirect('login.php?redirect=' . urlencode($_SERVER['REQUEST_URI']));
+}
 
-    flash_set('warning', 'This resource is available to members. Subscribe to download it.');
+if (!can_download_resource($resource)) {
+    if (!$resource['is_free']) {
+        flash_set('warning', 'This resource is available to Teacher Pro members. Upgrade to download it.');
+    } else {
+        flash_set('warning', "You've reached your 5 free downloads for this month. Upgrade to Teacher Pro for unlimited downloads.");
+    }
     redirect('resource.php?slug=' . urlencode($resource['slug']));
 }
 
@@ -35,6 +39,17 @@ if (!is_file($filePath)) {
     error_log("Download error: file missing on disk for resource #{$id}: {$filePath}");
     flash_set('error', 'This resource is not currently available for download. Please contact support.');
     redirect('resource.php?slug=' . urlencode($resource['slug']));
+}
+
+// can_download_resource() already confirmed eligibility, but the actual
+// quota decrement for a free-plan user must happen here, atomically, and
+// only once we know the file genuinely exists — a missing file on the
+// server shouldn't cost the user one of their 5 free downloads.
+if ($resource['is_free'] && !isMemberActive() && !is_admin()) {
+    if (!try_consume_free_download((int)$_SESSION['user_id'])) {
+        flash_set('warning', "You've reached your 5 free downloads for this month. Upgrade to Teacher Pro for unlimited downloads.");
+        redirect('resource.php?slug=' . urlencode($resource['slug']));
+    }
 }
 
 record_download(is_logged_in() ? (int)$_SESSION['user_id'] : null, $id);

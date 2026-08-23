@@ -34,7 +34,7 @@ if (ENVIRONMENT === 'development') {
 // -----------------------------------------------------------------------
 define('SITE_NAME', 'TeachLuma');
 define('SITE_TAGLINE', 'Save Time. Teach Better.');
-define('SITE_DESCRIPTION', 'Ready-to-teach ESL, Math, and Science lesson plans, worksheets, PowerPoints, games and classroom resources for primary and secondary school teachers.');
+define('SITE_DESCRIPTION', 'Ready-to-teach English, ESL, Math and Science resources for teachers in Thailand.');
 
 // IMPORTANT: change this to your real domain before going live, no trailing slash.
 define('SITE_URL', 'http://localhost/esl-teacher-hub');
@@ -50,8 +50,22 @@ date_default_timezone_set(TIMEZONE);
 
 define('CURRENCY', 'THB');
 define('SITE_CURRENCY_SYMBOL', '฿');
-define('SUBSCRIPTION_PRICE', 200);       // amount per billing period
-define('SUBSCRIPTION_PERIOD_LABEL', 'month');
+
+// Teacher Pro pricing. PLAN_DAYS controls exactly how membership
+// activation math works (see extend_membership_for_plan() in
+// admin-functions.php) — calendar-day extension, not calendar-month, so
+// "annual" always means 365 days regardless of the approval date.
+define('PRICE_MONTHLY', 199);
+define('PRICE_ANNUAL', 999);
+define('PLAN_DAYS', ['monthly' => 30, 'annual' => 365]);
+define('PLAN_LABELS', ['monthly' => 'Teacher Pro Monthly', 'annual' => 'Teacher Pro Annual']);
+
+// Free-plan monthly download allowance (resources.is_free = 1 only —
+// members-only resources always require an active Pro membership
+// regardless of this limit). Enforced server-side in
+// includes/download-functions.php; never trust a client-supplied count.
+define('FREE_DOWNLOAD_MONTHLY_LIMIT', 5);
+
 define('MEMBERSHIP_EXPIRY_REMINDER_DAYS', 3); // how many days before expiry_date to send the renewal reminder
 
 // -----------------------------------------------------------------------
@@ -108,10 +122,10 @@ define('ALLOWED_IMAGE_MIME_TYPES', [
 // TEACHING DATA (configurable lists used across forms and filters)
 // -----------------------------------------------------------------------
 // Full range across all subjects — each subject's actual valid range (e.g.
-// Math is Grade 1-6, not K or Grade 7-9) is sliced from this list via
+// Math is Grade 1-6, not K or Grade 10) is sliced from this list via
 // get_subject_grade_levels() rather than duplicated here.
 define('GRADE_LEVELS', [
-    'Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9',
+    'Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10',
 ]);
 
 define('RESOURCE_TYPES', [
