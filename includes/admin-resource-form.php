@@ -101,6 +101,26 @@ foreach ($subjects as $subjectRow) {
                 </div>
             </div>
 
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h2 class="h6 fw-bold mb-1">SEO <span class="text-secondary fw-normal">(optional)</span></h2>
+                    <p class="text-secondary small mb-3">Leave blank to auto-generate from the title, subject, and grade — e.g. "[Title] | Grade X Subject Resource". Only fill these in if you need to override that.</p>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="seo_title">SEO Title</label>
+                        <input type="text" class="form-control <?= isset($errors['seo_title']) ? 'is-invalid' : '' ?>"
+                               id="seo_title" name="seo_title" value="<?= e($field('seo_title')) ?>" maxlength="255">
+                        <?php if (isset($errors['seo_title'])): ?><div class="invalid-feedback"><?= e($errors['seo_title']) ?></div><?php endif; ?>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label" for="meta_description">Meta Description</label>
+                        <textarea class="form-control <?= isset($errors['meta_description']) ? 'is-invalid' : '' ?>"
+                                  id="meta_description" name="meta_description" rows="2" maxlength="300"><?= e($field('meta_description')) ?></textarea>
+                        <?php if (isset($errors['meta_description'])): ?><div class="invalid-feedback"><?= e($errors['meta_description']) ?></div><?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <h2 class="h6 fw-bold mb-3">Files</h2>

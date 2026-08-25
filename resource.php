@@ -6,6 +6,7 @@ require_once __DIR__ . '/includes/resource-functions.php';
 require_once __DIR__ . '/includes/download-functions.php';
 require_once __DIR__ . '/includes/favorites-functions.php';
 require_once __DIR__ . '/includes/review-functions.php';
+require_once __DIR__ . '/includes/seo-functions.php';
 
 $slug = trim((string)($_GET['slug'] ?? ''));
 $resource = $slug !== '' ? get_resource_by_slug($slug) : null;
@@ -61,8 +62,28 @@ if ($isLoggedIn) {
     }
 }
 
-$pageTitle = $resource['title'];
-$pageDescription = truncate_text($resource['description'] ?? '', 160);
+$relatedResources = get_related_resources($resource, 6);
+
+$pageTitle = generate_resource_seo_title($resource);
+$pageDescription = generate_resource_seo_description($resource);
+$pageImage = $displayImage ?? asset_url('images/og-image-icon.png');
+
+$breadcrumbItems = [['name' => 'Resources', 'url' => base_url('resources.php')]];
+if (!empty($resource['subject_name'])) {
+    $breadcrumbItems[] = ['name' => $resource['subject_name'], 'url' => base_url('resources.php?subject_id=' . (int)$resource['subject_id'])];
+}
+if (!empty($resource['category_name'])) {
+    $breadcrumbItems[] = ['name' => $resource['category_name'], 'url' => base_url('resources.php?category_id=' . (int)$resource['category_id'])];
+}
+$breadcrumbItems[] = ['name' => $resource['title'], 'url' => base_url('resource.php?slug=' . rawurlencode($resource['slug']))];
+
+$breadcrumbSchema = [
+    '@context'        => 'https://schema.org',
+    '@type'           => 'BreadcrumbList',
+    'itemListElement' => array_map(static function (array $item, int $index): array {
+        return ['@type' => 'ListItem', 'position' => $index + 1, 'name' => $item['name'], 'item' => $item['url']];
+    }, $breadcrumbItems, array_keys($breadcrumbItems)),
+];
 
 $resourceSchema = [
     '@context'              => 'https://schema.org',
@@ -107,6 +128,7 @@ if ($ratingSummary['total'] > 0) {
 require_once __DIR__ . '/includes/header.php';
 ?>
 <script type="application/ld+json"><?= json_encode($resourceSchema, JSON_UNESCAPED_SLASHES) ?></script>
+<script type="application/ld+json"><?= json_encode($breadcrumbSchema, JSON_UNESCAPED_SLASHES) ?></script>
 <div class="container py-5">
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb small">
@@ -171,9 +193,11 @@ require_once __DIR__ . '/includes/header.php';
             </div>
 
             <?php if (!empty($resource['description'])): ?>
+                <h2 class="h6 fw-bold text-secondary text-uppercase mt-4 mb-2">About This Resource</h2>
                 <p class="text-secondary"><?= nl2br(e($resource['description'])) ?></p>
             <?php endif; ?>
 
+            <h2 class="h6 fw-bold text-secondary text-uppercase mt-4 mb-2">What's Included</h2>
             <dl class="row small mt-4">
                 <?php if (!empty($resource['subject_name'])): ?>
                     <dt class="col-4">Subject</dt><dd class="col-8"><?= e($resource['subject_name']) ?></dd>
@@ -232,6 +256,17 @@ require_once __DIR__ . '/includes/header.php';
                         <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-primary">Upgrade to Pro</a>
                     </div>
                 <?php endif; ?>
+            </div>
+
+            <div class="mt-3 d-flex align-items-center gap-2 small text-secondary">
+                <span>Share:</span>
+                <a href="https://www.facebook.com/sharer/sharer.php?u=<?= rawurlencode(base_url('resource.php?slug=' . $resource['slug'])) ?>"
+                   target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary" title="Share on Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="https://social-plugins.line.me/lineit/share?url=<?= rawurlencode(base_url('resource.php?slug=' . $resource['slug'])) ?>"
+                   target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary" title="Share on LINE"><i class="fa-brands fa-line"></i></a>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="copyResourceLink" title="Copy Link" data-url="<?= e(base_url('resource.php?slug=' . rawurlencode($resource['slug']))) ?>">
+                    <i class="fa-solid fa-link"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -341,5 +376,33 @@ require_once __DIR__ . '/includes/header.php';
             <?php endif; ?>
         </div>
     </div>
+
+    <?php if (!empty($relatedResources)): ?>
+        <hr class="my-5">
+        <h2 class="h4 fw-bold mb-4">Related Resources</h2>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+            <?php foreach ($relatedResources as $relatedResource): ?>
+                <?php $resource = $relatedResource; // resource-card.php expects $resource in scope ?>
+                <?php include __DIR__ . '/includes/resource-card.php'; ?>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
 </div>
+<script>
+(function () {
+    var copyBtn = document.getElementById('copyResourceLink');
+    if (!copyBtn) { return; }
+    copyBtn.addEventListener('click', function () {
+        navigator.clipboard.writeText(copyBtn.dataset.url).then(function () {
+            var icon = copyBtn.querySelector('i');
+            icon.classList.remove('fa-link');
+            icon.classList.add('fa-check');
+            setTimeout(function () {
+                icon.classList.remove('fa-check');
+                icon.classList.add('fa-link');
+            }, 1500);
+        });
+    });
+})();
+</script>
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

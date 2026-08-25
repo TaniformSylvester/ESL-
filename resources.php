@@ -4,6 +4,7 @@ require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/resource-functions.php';
 require_once __DIR__ . '/includes/favorites-functions.php';
 require_once __DIR__ . '/includes/subject-functions.php';
+require_once __DIR__ . '/includes/seo-functions.php';
 
 $filters = [
     'search'        => trim((string)($_GET['search'] ?? '')),
@@ -19,12 +20,53 @@ $result = get_published_resources($filters, $page, RESOURCES_PER_PAGE);
 $categoriesGrouped = get_categories_grouped($filters['subject_id']);
 $subjects = get_all_subjects();
 
-$pageTitle = 'Resources';
-$pageDescription = 'Browse ESL, Math, and Science lesson plans, worksheets, PowerPoints, games and more for primary and secondary school teachers.';
+$activeSubject = $filters['subject_id'] > 0 ? get_subject_by_id($filters['subject_id']) : null;
+$activeCategory = $filters['category_id'] > 0 ? get_category_by_id($filters['category_id']) : null;
+$listingSeo = generate_resources_listing_seo($filters, $activeSubject, $activeCategory, (int)$result['total']);
+
+$pageTitle = $listingSeo['title'];
+$pageDescription = $listingSeo['description'];
+$pageRobots = $listingSeo['noindex'] ? 'noindex, follow' : 'index, follow';
+
+$breadcrumbSchema = null;
+if ($activeSubject || $activeCategory) {
+    $crumbs = [['name' => 'Resources', 'url' => base_url('resources.php')]];
+    if ($activeSubject) {
+        $crumbs[] = ['name' => $activeSubject['name'], 'url' => base_url('resources.php?subject_id=' . (int)$activeSubject['id'])];
+    }
+    if ($activeCategory) {
+        $crumbs[] = ['name' => $activeCategory['name'], 'url' => base_url('resources.php?category_id=' . (int)$activeCategory['id'])];
+    }
+    $breadcrumbSchema = [
+        '@context'        => 'https://schema.org',
+        '@type'           => 'BreadcrumbList',
+        'itemListElement' => array_map(static function (array $item, int $index): array {
+            return ['@type' => 'ListItem', 'position' => $index + 1, 'name' => $item['name'], 'item' => $item['url']];
+        }, $crumbs, array_keys($crumbs)),
+    ];
+}
+
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container py-5">
-    <h1 class="fw-bold mb-1">Resources</h1>
+    <?php if ($breadcrumbSchema): ?>
+        <script type="application/ld+json"><?= json_encode($breadcrumbSchema, JSON_UNESCAPED_SLASHES) ?></script>
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb small">
+                <li class="breadcrumb-item"><a href="<?= e(base_url('resources.php')) ?>">Resources</a></li>
+                <?php if ($activeSubject): ?>
+                    <li class="breadcrumb-item"><a href="<?= e(base_url('resources.php?subject_id=' . (int)$activeSubject['id'])) ?>"><?= e($activeSubject['name']) ?></a></li>
+                <?php endif; ?>
+                <?php if ($activeCategory): ?>
+                    <li class="breadcrumb-item active" aria-current="page"><?= e($activeCategory['name']) ?></li>
+                <?php endif; ?>
+            </ol>
+        </nav>
+    <?php endif; ?>
+    <h1 class="fw-bold mb-1"><?= e($listingSeo['h1']) ?></h1>
+    <?php if (!empty($listingSeo['intro'])): ?>
+        <p class="text-secondary mb-2"><?= e($listingSeo['intro']) ?></p>
+    <?php endif; ?>
     <p class="text-secondary mb-4">
         <?= (int)$result['total'] ?> resource<?= $result['total'] === 1 ? '' : 's' ?> found
     </p>

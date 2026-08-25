@@ -275,6 +275,41 @@ function get_resource_counts_by_subject(): array
     return $counts;
 }
 
+/**
+ * Related resources for the "Related Resources" section on a resource
+ * page — always real, published resources from the database, never
+ * invented. Ranked by relevance: same category (+3), same grade (+2),
+ * same resource type (+1), all constrained to the same subject as a
+ * baseline (a Science worksheet should never surface as "related" to an
+ * ESL lesson plan just because both happen to be Grade 3).
+ */
+function get_related_resources(array $resource, int $limit = 6): array
+{
+    $stmt = getDB()->prepare(
+        'SELECT r.*, c.name AS category_name, c.slug AS category_slug, s.name AS subject_name, s.slug AS subject_slug,
+                (
+                    (CASE WHEN r.category_id IS NOT NULL AND r.category_id = ? THEN 3 ELSE 0 END) +
+                    (CASE WHEN r.grade_level IS NOT NULL AND r.grade_level = ? THEN 2 ELSE 0 END) +
+                    (CASE WHEN r.resource_type = ? THEN 1 ELSE 0 END)
+                ) AS relevance
+         FROM resources r
+         LEFT JOIN categories c ON c.id = r.category_id
+         INNER JOIN subjects s ON s.id = r.subject_id
+         WHERE r.is_published = 1 AND r.id != ? AND r.subject_id = ?
+         ORDER BY relevance DESC, r.created_at DESC
+         LIMIT ' . max(1, $limit)
+    );
+    $stmt->execute([
+        $resource['category_id'] ?? 0,
+        $resource['grade_level'] ?? '',
+        $resource['resource_type'],
+        $resource['id'],
+        $resource['subject_id'],
+    ]);
+
+    return $stmt->fetchAll();
+}
+
 function get_featured_resources(int $limit = 6): array
 {
     $stmt = getDB()->prepare(
@@ -284,6 +319,22 @@ function get_featured_resources(int $limit = 6): array
          INNER JOIN subjects s ON s.id = r.subject_id
          WHERE r.is_published = 1
          ORDER BY r.created_at DESC
+         LIMIT ' . max(1, $limit)
+    );
+    $stmt->execute();
+
+    return $stmt->fetchAll();
+}
+
+/** Published resources ordered by download_count — used for the 404 page's "Popular Resources" recovery links. */
+function get_popular_resources(int $limit = 6): array
+{
+    $stmt = getDB()->prepare(
+        'SELECT r.*, s.name AS subject_name
+         FROM resources r
+         INNER JOIN subjects s ON s.id = r.subject_id
+         WHERE r.is_published = 1
+         ORDER BY r.download_count DESC, r.created_at DESC
          LIMIT ' . max(1, $limit)
     );
     $stmt->execute();
@@ -466,6 +517,14 @@ function validate_resource_input(array $input): array
         $errors['topic'] = 'Topic is too long.';
     }
 
+    if (!empty($input['seo_title']) && mb_strlen($input['seo_title']) > 255) {
+        $errors['seo_title'] = 'SEO title is too long (255 characters max).';
+    }
+
+    if (!empty($input['meta_description']) && mb_strlen($input['meta_description']) > 300) {
+        $errors['meta_description'] = 'Meta description is too long (300 characters max).';
+    }
+
     return $errors;
 }
 
@@ -528,16 +587,20 @@ function create_resource(array $input, array $files): array
     $title = clean_input($input['title']);
     $description = clean_input($input['description'] ?? '');
     $topic = clean_input($input['topic'] ?? '');
+    $seoTitle = clean_input($input['seo_title'] ?? '');
+    $metaDescription = clean_input($input['meta_description'] ?? '');
 
     $stmt = getDB()->prepare(
-        'INSERT INTO resources (title, slug, description, resource_type, subject_id, category_id, grade_level, topic,
+        'INSERT INTO resources (title, slug, description, seo_title, meta_description, resource_type, subject_id, category_id, grade_level, topic,
                                  thumbnail, preview_image, file_path, file_name, file_size, file_type, is_free, is_published)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     );
     $stmt->execute([
         $title,
         generate_unique_resource_slug($title),
         $description !== '' ? $description : null,
+        $seoTitle !== '' ? $seoTitle : null,
+        $metaDescription !== '' ? $metaDescription : null,
         $input['resource_type'],
         (int)$input['subject_id'],
         !empty($input['category_id']) ? (int)$input['category_id'] : null,
@@ -618,6 +681,8 @@ function update_resource(int $id, array $input, array $files): array
     $title = clean_input($input['title']);
     $description = clean_input($input['description'] ?? '');
     $topic = clean_input($input['topic'] ?? '');
+    $seoTitle = clean_input($input['seo_title'] ?? '');
+    $metaDescription = clean_input($input['meta_description'] ?? '');
 
     $filePath = $existing['file_path'];
     $fileName = $existing['file_name'];
@@ -651,13 +716,19 @@ function update_resource(int $id, array $input, array $files): array
     }
 
     getDB()->prepare(
-        'UPDATE resources SET title = ?, slug = ?, description = ?, resource_type = ?, subject_id = ?, category_id = ?, grade_level = ?,
+        'UPDATE resources SET title = ?, description = ?, seo_title = ?, meta_description = ?, resource_type = ?, subject_id = ?, category_id = ?, grade_level = ?,
                                topic = ?, thumbnail = ?, preview_image = ?, file_path = ?, file_name = ?,
                                file_size = ?, file_type = ?, is_free = ?, is_published = ? WHERE id = ?'
     )->execute([
         $title,
-        generate_unique_resource_slug($title, $id),
+        // slug is deliberately NOT regenerated here — once a resource is
+        // published its URL may already be indexed by search engines and
+        // shared/bookmarked by teachers, so editing the title must never
+        // silently change the URL. The slug only exists to be set once,
+        // on creation (see create_resource()).
         $description !== '' ? $description : null,
+        $seoTitle !== '' ? $seoTitle : null,
+        $metaDescription !== '' ? $metaDescription : null,
         $input['resource_type'],
         (int)$input['subject_id'],
         !empty($input['category_id']) ? (int)$input['category_id'] : null,

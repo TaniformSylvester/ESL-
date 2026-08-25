@@ -133,6 +133,11 @@ CREATE TABLE IF NOT EXISTS resources (
     title VARCHAR(200) NOT NULL,
     slug VARCHAR(220) NOT NULL,
     description TEXT NULL,
+    -- Optional admin SEO overrides — leave blank to use the automatically
+    -- generated title/description (see includes/seo-functions.php). Only
+    -- filled in when an admin needs manual control over a specific page.
+    seo_title VARCHAR(255) NULL,
+    meta_description VARCHAR(300) NULL,
     resource_type ENUM(
         'Lesson Plan', 'Worksheet', 'PowerPoint', 'Flashcards',
         'Classroom Activity', 'Game', 'Test', 'Assessment', 'Poster', 'Teacher Resource'

@@ -14,6 +14,39 @@ function asset_url(string $path): string
     return rtrim(SITE_URL, '/') . '/assets/' . ltrim($path, '/');
 }
 
+/**
+ * Strips known tracking/marketing query parameters from a path+query
+ * string before it's used to build a canonical URL — a link like
+ * resource.php?slug=x&utm_source=facebook must still canonicalize to
+ * the clean resource.php?slug=x, not to itself with the tracking noise
+ * intact (which would create a duplicate indexable URL per visit source).
+ * Leaves every other parameter (slug, subject_id, grade, page, search,
+ * etc.) untouched since those define genuinely different page content.
+ */
+function strip_tracking_params(string $requestUri): string
+{
+    $trackingKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'fbclid', 'gclid', 'msclkid', 'ref'];
+
+    $parts = parse_url($requestUri);
+    $path = $parts['path'] ?? '/';
+
+    if (empty($parts['query'])) {
+        return $path;
+    }
+
+    parse_str($parts['query'], $queryParams);
+
+    foreach ($trackingKeys as $key) {
+        unset($queryParams[$key]);
+    }
+
+    if (empty($queryParams)) {
+        return $path;
+    }
+
+    return $path . '?' . http_build_query($queryParams);
+}
+
 function redirect(string $path): void
 {
     $url = (str_starts_with($path, 'http://') || str_starts_with($path, 'https://'))

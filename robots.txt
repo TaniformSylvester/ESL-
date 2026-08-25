@@ -5,5 +5,7 @@ Disallow: /member/
 Disallow: /includes/
 Disallow: /config/
 Disallow: /uploads/protected/
+Disallow: /api/
+Disallow: /cron/
 
 Sitemap: https://teachluma.com/sitemap.xml
