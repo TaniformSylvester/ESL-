@@ -195,6 +195,44 @@ CREATE TABLE IF NOT EXISTS downloads (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------------------------
+-- reviews (one row per user per resource — enforced by the unique key so a
+-- teacher can only ever have one review per resource; editing it updates
+-- the same row and resets it to 'pending' for re-moderation)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS reviews (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    resource_id INT UNSIGNED NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
+    rating TINYINT UNSIGNED NOT NULL,
+    review_text TEXT NULL,
+    status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+    helpful_count INT UNSIGNED NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_reviews_resource_user (resource_id, user_id),
+    KEY idx_reviews_resource (resource_id),
+    KEY idx_reviews_status (status),
+    KEY idx_reviews_rating (rating),
+    CONSTRAINT fk_reviews_resource FOREIGN KEY (resource_id) REFERENCES resources (id) ON DELETE CASCADE,
+    CONSTRAINT fk_reviews_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
+-- review_helpful (one row per user per review they've marked helpful)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS review_helpful (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    review_id INT UNSIGNED NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_review_helpful_review_user (review_id, user_id),
+    CONSTRAINT fk_review_helpful_review FOREIGN KEY (review_id) REFERENCES reviews (id) ON DELETE CASCADE,
+    CONSTRAINT fk_review_helpful_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
 -- password_resets (tokens are stored hashed, never in plain text)
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS password_resets (

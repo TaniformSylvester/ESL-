@@ -94,6 +94,15 @@ function try_consume_free_download(int $userId): bool
     return $stmt->rowCount() > 0;
 }
 
+/** Whether this user has ever downloaded this resource — the basis for review eligibility and the "Verified Teacher" badge (see includes/review-functions.php). */
+function has_downloaded_resource(int $userId, int $resourceId): bool
+{
+    $stmt = getDB()->prepare('SELECT id FROM downloads WHERE user_id = ? AND resource_id = ? LIMIT 1');
+    $stmt->execute([$userId, $resourceId]);
+
+    return (bool)$stmt->fetch();
+}
+
 function record_download(?int $userId, int $resourceId): void
 {
     $db = getDB();

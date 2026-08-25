@@ -87,3 +87,53 @@ footer a:hover {
 .favorite-btn.active {
     background-color: #fff;
 }
+
+/* ---------------------------------------------------------------------
+   Teacher review & rating system
+   ------------------------------------------------------------------- */
+
+/* Interactive star selector on the review form — pure CSS, radio-based.
+   Markup order must be 5,4,3,2,1 (see resource.php) so that, combined
+   with row-reverse below, hovering/checking a star highlights it and
+   every star to its left via the general sibling selector. Works
+   identically on touch (tap sets :checked) as on desktop hover. */
+.star-rating-input {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 0.25rem;
+}
+
+.star-rating-input input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.star-rating-input label {
+    cursor: pointer;
+    font-size: 1.85rem;
+    line-height: 1;
+    color: #d8dce1;
+    padding: 0.25rem;
+    transition: color 0.15s ease;
+}
+
+.star-rating-input label:hover,
+.star-rating-input label:hover ~ label,
+.star-rating-input input:checked ~ label {
+    color: #f5b301;
+}
+
+/* Review cards on the resource detail page */
+.review-item .review-text {
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.review-helpful-btn.active {
+    background-color: var(--brand-bg-soft);
+    border-color: var(--brand-primary);
+    color: var(--brand-primary);
+}

@@ -78,6 +78,7 @@ $organizationSchema = [
                     <li class="nav-item"><a class="nav-link" href="<?= e(base_url('dashboard.php')) ?>">Dashboard</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= e(base_url('member/favorites.php')) ?>">Favorites</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= e(base_url('member/downloads.php')) ?>">Downloads</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= e(base_url('member/reviews.php')) ?>">My Reviews</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= e(base_url('member/subscription.php')) ?>">Subscription</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= e(base_url('member/profile.php')) ?>">Profile</a></li>
                     <?php if ($userRole === 'admin'): ?>

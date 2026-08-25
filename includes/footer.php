@@ -35,5 +35,6 @@
 <script>window.APP_BASE_URL = <?= json_encode(rtrim(SITE_URL, '/')) ?>;</script>
 <script src="<?= e(asset_url('js/main.js')) ?>"></script>
 <script src="<?= e(asset_url('js/favorites.js')) ?>"></script>
+<script src="<?= e(asset_url('js/reviews.js')) ?>"></script>
 </body>
 </html>

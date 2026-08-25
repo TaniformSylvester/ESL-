@@ -13,6 +13,7 @@ $navItems = [
     ['label' => 'Users',          'href' => 'admin/users.php',       'icon' => 'fa-users',        'match' => ['users.php', 'user.php']],
     ['label' => 'Resources',      'href' => 'admin/resources.php',   'icon' => 'fa-book',         'match' => ['resources.php', 'resource-add.php', 'resource-edit.php']],
     ['label' => 'Categories',     'href' => 'admin/categories.php',  'icon' => 'fa-tags',         'match' => ['categories.php']],
+    ['label' => 'Reviews',        'href' => 'admin/reviews.php',     'icon' => 'fa-star',         'match' => ['reviews.php']],
     ['label' => 'Payments',       'href' => 'admin/payments.php',    'icon' => 'fa-money-bill',   'match' => ['payments.php']],
     ['label' => 'Subscriptions',  'href' => 'admin/subscriptions.php', 'icon' => 'fa-id-card',    'match' => ['subscriptions.php']],
     ['label' => 'Settings',       'href' => 'admin/settings.php',    'icon' => 'fa-gear',         'match' => ['settings.php']],
