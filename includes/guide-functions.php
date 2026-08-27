@@ -281,11 +281,11 @@ function delete_guide(int $id): void
 function get_guide_related_resources(int $guideId): array
 {
     $stmt = getDB()->prepare(
-        'SELECT r.*, gr.sort_order
+        "SELECT r.*, gr.sort_order
          FROM guide_related_resources gr
          INNER JOIN resources r ON r.id = gr.resource_id
-         WHERE gr.guide_id = ? AND r.is_published = 1
-         ORDER BY gr.sort_order, r.title'
+         WHERE gr.guide_id = ? AND r.is_published = 1 AND r.status = 'active'
+         ORDER BY gr.sort_order, r.title"
     );
     $stmt->execute([$guideId]);
 

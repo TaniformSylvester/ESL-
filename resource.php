@@ -13,6 +13,36 @@ $slug = trim((string)($_GET['slug'] ?? ''));
 $resource = $slug !== '' ? get_resource_by_slug($slug) : null;
 
 if (!$resource) {
+    // This slug might belong to an archived resource rather than one that
+    // never existed — don't blindly 404 an old URL when we can send the
+    // visitor somewhere useful instead (TeachLuma 2.0 Phase 1).
+    $archived = $slug !== '' ? get_archived_resource_by_slug($slug) : null;
+
+    if ($archived) {
+        $redirectTarget = !empty($archived['redirect_resource_id'])
+            ? get_resource_by_id((int)$archived['redirect_resource_id'])
+            : null;
+
+        if ($redirectTarget && $redirectTarget['is_published'] && $redirectTarget['status'] === 'active') {
+            header('Location: ' . base_url('resource.php?slug=' . rawurlencode($redirectTarget['slug'])), true, 301);
+            exit;
+        }
+
+        // No specific replacement set — fall back to the archived
+        // resource's own category/subject listing rather than the
+        // homepage, so the visitor lands somewhere relevant.
+        $fallbackParams = [];
+        if (!empty($archived['category_id'])) {
+            $fallbackParams['category_id'] = (int)$archived['category_id'];
+        } elseif (!empty($archived['subject_id'])) {
+            $fallbackParams['subject_id'] = (int)$archived['subject_id'];
+        }
+        $fallbackUrl = base_url('resources.php') . (!empty($fallbackParams) ? '?' . http_build_query($fallbackParams) : '');
+        flash_set('info', 'That resource has been retired. Here are similar resources instead.');
+        header('Location: ' . $fallbackUrl, true, 302);
+        exit;
+    }
+
     http_response_code(404);
     require __DIR__ . '/404.php';
     exit;

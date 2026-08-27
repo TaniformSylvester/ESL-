@@ -310,6 +310,7 @@ function get_featured_site_reviews(int $limit = 6): array
          INNER JOIN users u ON u.id = rv.user_id
          INNER JOIN resources r ON r.id = rv.resource_id
          WHERE rv.status = 'approved' AND rv.rating >= 4 AND rv.review_text IS NOT NULL AND rv.review_text != ''
+           AND r.status = 'active'
          ORDER BY rv.helpful_count DESC, rv.created_at DESC
          LIMIT " . max(1, $limit)
     );

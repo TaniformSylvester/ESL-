@@ -38,7 +38,7 @@ require_once __DIR__ . '/../includes/header.php';
                                 <td class="small text-secondary"><?= e($row['resource_type']) ?></td>
                                 <td class="small text-secondary"><?= e(format_date($row['downloaded_at'], 'd M Y, g:i a')) ?></td>
                                 <td class="text-end">
-                                    <?php if ($row['is_published']): ?>
+                                    <?php if ($row['is_published'] && $row['status'] === 'active'): ?>
                                         <a href="<?= e(base_url('member/download.php?id=' . $row['resource_id'])) ?>" class="btn btn-sm btn-outline-primary">Download Again</a>
                                     <?php else: ?>
                                         <span class="text-secondary small">No longer available</span>

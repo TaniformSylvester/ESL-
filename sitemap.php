@@ -17,7 +17,7 @@ $staticPages = [
 // Note: getDB() itself halts the request with a friendly error if the
 // database is unreachable (see includes/db.php), the same as every
 // other page, so no extra error handling is needed here.
-$stmt = getDB()->query('SELECT slug, updated_at FROM resources WHERE is_published = 1 ORDER BY updated_at DESC');
+$stmt = getDB()->query("SELECT slug, updated_at FROM resources WHERE is_published = 1 AND status = 'active' ORDER BY updated_at DESC");
 $resources = $stmt->fetchAll();
 
 $stmt = getDB()->query('SELECT slug, updated_at FROM guides WHERE is_published = 1 ORDER BY updated_at DESC');

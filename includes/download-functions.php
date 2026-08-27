@@ -127,7 +127,7 @@ function get_user_downloads(int $userId, int $page, int $perPage): array
     $offset = ($page - 1) * $perPage;
 
     $stmt = $db->prepare(
-        "SELECT d.downloaded_at, r.id AS resource_id, r.title, r.slug, r.resource_type, r.is_published
+        "SELECT d.downloaded_at, r.id AS resource_id, r.title, r.slug, r.resource_type, r.is_published, r.status
          FROM downloads d
          INNER JOIN resources r ON r.id = d.resource_id
          WHERE d.user_id = ?

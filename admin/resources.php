@@ -8,11 +8,12 @@ require_once __DIR__ . '/../includes/subject-functions.php';
 require_admin();
 
 $filters = [
-    'search'        => trim((string)($_GET['search'] ?? '')),
-    'subject_id'    => (int)($_GET['subject_id'] ?? 0),
-    'resource_type' => trim((string)($_GET['resource_type'] ?? '')),
-    'category_id'   => (int)($_GET['category_id'] ?? 0),
-    'status'        => trim((string)($_GET['status'] ?? '')),
+    'search'         => trim((string)($_GET['search'] ?? '')),
+    'subject_id'     => (int)($_GET['subject_id'] ?? 0),
+    'resource_type'  => trim((string)($_GET['resource_type'] ?? '')),
+    'category_id'    => (int)($_GET['category_id'] ?? 0),
+    'status'         => trim((string)($_GET['status'] ?? '')),
+    'archive_status' => trim((string)($_GET['archive_status'] ?? '')),
 ];
 $page = max(1, (int)($_GET['page'] ?? 1));
 $result = get_all_resources_paginated($filters, $page, ADMIN_ROWS_PER_PAGE);
@@ -66,6 +67,13 @@ require_once __DIR__ . '/../includes/admin-header.php';
             <option value="draft" <?= $filters['status'] === 'draft' ? 'selected' : '' ?>>Draft</option>
         </select>
     </div>
+    <div class="col-md-2">
+        <select name="archive_status" class="form-select">
+            <option value="">Active + Archived</option>
+            <option value="active" <?= $filters['archive_status'] === 'active' ? 'selected' : '' ?>>Active Only</option>
+            <option value="archived" <?= $filters['archive_status'] === 'archived' ? 'selected' : '' ?>>Archived Only</option>
+        </select>
+    </div>
     <div class="col-md-1 d-grid">
         <button type="submit" class="btn btn-outline-secondary"><i class="fa-solid fa-magnifying-glass"></i></button>
     </div>
@@ -82,13 +90,14 @@ require_once __DIR__ . '/../includes/admin-header.php';
                     <th>Category</th>
                     <th>Access</th>
                     <th>Status</th>
+                    <th>Archive</th>
                     <th>Downloads</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($result['items'])): ?>
-                    <tr><td colspan="8" class="text-center text-secondary py-4">No resources found.</td></tr>
+                    <tr><td colspan="9" class="text-center text-secondary py-4">No resources found.</td></tr>
                 <?php endif; ?>
                 <?php foreach ($result['items'] as $resource): ?>
                     <tr>
@@ -98,10 +107,27 @@ require_once __DIR__ . '/../includes/admin-header.php';
                         <td class="small text-secondary"><?= e($resource['category_name'] ?? '&mdash;') ?></td>
                         <td><span class="badge <?= $resource['is_free'] ? 'badge-free' : 'badge-members' ?>"><?= $resource['is_free'] ? 'Free' : 'Members' ?></span></td>
                         <td><span class="badge <?= $resource['is_published'] ? 'bg-success' : 'bg-secondary' ?>"><?= $resource['is_published'] ? 'Published' : 'Draft' ?></span></td>
+                        <td><span class="badge <?= $resource['status'] === 'archived' ? 'bg-warning text-dark' : 'bg-light text-dark border' ?>"><?= $resource['status'] === 'archived' ? 'Archived' : 'Active' ?></span></td>
                         <td><?= (int)$resource['download_count'] ?></td>
                         <td class="text-end text-nowrap">
                             <a href="<?= e(base_url('resource.php?slug=' . urlencode($resource['slug']))) ?>" class="btn btn-sm btn-outline-secondary" target="_blank">View</a>
                             <a href="<?= e(base_url('admin/resource-edit.php?id=' . $resource['id'])) ?>" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <?php if ($resource['status'] === 'archived'): ?>
+                                <form method="post" action="<?= e(base_url('admin/resource-archive-toggle.php')) ?>" class="d-inline">
+                                    <?php csrf_field(); ?>
+                                    <input type="hidden" name="id" value="<?= (int)$resource['id'] ?>">
+                                    <input type="hidden" name="action" value="unarchive">
+                                    <button type="submit" class="btn btn-sm btn-outline-success">Restore</button>
+                                </form>
+                            <?php else: ?>
+                                <form method="post" action="<?= e(base_url('admin/resource-archive-toggle.php')) ?>" class="d-inline"
+                                      onsubmit="return confirm('Archive this resource? It will be hidden from the public site, but its record, reviews, and download history are kept.');">
+                                    <?php csrf_field(); ?>
+                                    <input type="hidden" name="id" value="<?= (int)$resource['id'] ?>">
+                                    <input type="hidden" name="action" value="archive">
+                                    <button type="submit" class="btn btn-sm btn-outline-warning">Archive</button>
+                                </form>
+                            <?php endif; ?>
                             <form method="post" action="<?= e(base_url('admin/resource-delete.php')) ?>" class="d-inline"
                                   onsubmit="return confirm('Delete this resource? This also removes its uploaded files. This cannot be undone.');">
                                 <?php csrf_field(); ?>

@@ -219,7 +219,7 @@ function resource_type_icon(string $resourceType): string
  */
 function get_published_resources(array $filters, int $page, int $perPage): array
 {
-    $where = ['r.is_published = 1'];
+    $where = ["r.is_published = 1", "r.status = 'active'"];
     $params = [];
 
     $search = trim((string)($filters['search'] ?? ''));
@@ -289,12 +289,33 @@ function get_published_resources(array $filters, int $page, int $perPage): array
 function get_resource_by_slug(string $slug): ?array
 {
     $stmt = getDB()->prepare(
-        'SELECT r.*, c.name AS category_name, c.slug AS category_slug, s.name AS subject_name, s.slug AS subject_slug
+        "SELECT r.*, c.name AS category_name, c.slug AS category_slug, s.name AS subject_name, s.slug AS subject_slug
          FROM resources r
          LEFT JOIN categories c ON c.id = r.category_id
          INNER JOIN subjects s ON s.id = r.subject_id
-         WHERE r.slug = ? AND r.is_published = 1
-         LIMIT 1'
+         WHERE r.slug = ? AND r.is_published = 1 AND r.status = 'active'
+         LIMIT 1"
+    );
+    $stmt->execute([$slug]);
+
+    return $stmt->fetch() ?: null;
+}
+
+/**
+ * Looks up an archived resource by slug regardless of is_published, so
+ * resource.php can tell "this URL used to be a real resource, now
+ * archived" apart from "this URL never existed" — used to redirect old
+ * URLs somewhere useful instead of a blind 404 (TeachLuma 2.0 Phase 1).
+ */
+function get_archived_resource_by_slug(string $slug): ?array
+{
+    $stmt = getDB()->prepare(
+        "SELECT r.*, c.slug AS category_slug, s.slug AS subject_slug
+         FROM resources r
+         LEFT JOIN categories c ON c.id = r.category_id
+         LEFT JOIN subjects s ON s.id = r.subject_id
+         WHERE r.slug = ? AND r.status = 'archived'
+         LIMIT 1"
     );
     $stmt->execute([$slug]);
 
@@ -303,7 +324,7 @@ function get_resource_by_slug(string $slug): ?array
 
 function get_published_resource_count(): int
 {
-    return (int)getDB()->query('SELECT COUNT(*) FROM resources WHERE is_published = 1')->fetchColumn();
+    return (int)getDB()->query("SELECT COUNT(*) FROM resources WHERE is_published = 1 AND status = 'active'")->fetchColumn();
 }
 
 /**
@@ -315,7 +336,7 @@ function get_published_resource_count(): int
 function get_resource_type_counts(): array
 {
     $stmt = getDB()->query(
-        'SELECT resource_type, COUNT(*) AS total FROM resources WHERE is_published = 1 GROUP BY resource_type'
+        "SELECT resource_type, COUNT(*) AS total FROM resources WHERE is_published = 1 AND status = 'active' GROUP BY resource_type"
     );
 
     $counts = [];
@@ -330,11 +351,11 @@ function get_resource_type_counts(): array
 function get_resource_counts_by_subject(): array
 {
     $stmt = getDB()->query(
-        'SELECT s.name, COUNT(*) AS total
+        "SELECT s.name, COUNT(*) AS total
          FROM resources r
          INNER JOIN subjects s ON s.id = r.subject_id
-         WHERE r.is_published = 1
-         GROUP BY s.name'
+         WHERE r.is_published = 1 AND r.status = 'active'
+         GROUP BY s.name"
     );
 
     $counts = [];
@@ -356,7 +377,7 @@ function get_resource_counts_by_subject(): array
 function get_related_resources(array $resource, int $limit = 6): array
 {
     $stmt = getDB()->prepare(
-        'SELECT r.*, c.name AS category_name, c.slug AS category_slug, s.name AS subject_name, s.slug AS subject_slug,
+        "SELECT r.*, c.name AS category_name, c.slug AS category_slug, s.name AS subject_name, s.slug AS subject_slug,
                 (
                     (CASE WHEN r.category_id IS NOT NULL AND r.category_id = ? THEN 3 ELSE 0 END) +
                     (CASE WHEN r.grade_level IS NOT NULL AND r.grade_level = ? THEN 2 ELSE 0 END) +
@@ -365,9 +386,9 @@ function get_related_resources(array $resource, int $limit = 6): array
          FROM resources r
          LEFT JOIN categories c ON c.id = r.category_id
          INNER JOIN subjects s ON s.id = r.subject_id
-         WHERE r.is_published = 1 AND r.id != ? AND r.subject_id = ?
+         WHERE r.is_published = 1 AND r.status = 'active' AND r.id != ? AND r.subject_id = ?
          ORDER BY relevance DESC, r.created_at DESC
-         LIMIT ' . max(1, $limit)
+         LIMIT " . max(1, $limit)
     );
     $stmt->execute([
         $resource['category_id'] ?? 0,
@@ -383,13 +404,13 @@ function get_related_resources(array $resource, int $limit = 6): array
 function get_featured_resources(int $limit = 6): array
 {
     $stmt = getDB()->prepare(
-        'SELECT r.*, c.name AS category_name, s.name AS subject_name, s.slug AS subject_slug
+        "SELECT r.*, c.name AS category_name, s.name AS subject_name, s.slug AS subject_slug
          FROM resources r
          LEFT JOIN categories c ON c.id = r.category_id
          INNER JOIN subjects s ON s.id = r.subject_id
-         WHERE r.is_published = 1
+         WHERE r.is_published = 1 AND r.status = 'active'
          ORDER BY r.created_at DESC
-         LIMIT ' . max(1, $limit)
+         LIMIT " . max(1, $limit)
     );
     $stmt->execute();
 
@@ -400,12 +421,12 @@ function get_featured_resources(int $limit = 6): array
 function get_popular_resources(int $limit = 6): array
 {
     $stmt = getDB()->prepare(
-        'SELECT r.*, s.name AS subject_name
+        "SELECT r.*, s.name AS subject_name
          FROM resources r
          INNER JOIN subjects s ON s.id = r.subject_id
-         WHERE r.is_published = 1
+         WHERE r.is_published = 1 AND r.status = 'active'
          ORDER BY r.download_count DESC, r.created_at DESC
-         LIMIT ' . max(1, $limit)
+         LIMIT " . max(1, $limit)
     );
     $stmt->execute();
 
@@ -415,13 +436,13 @@ function get_popular_resources(int $limit = 6): array
 function get_free_resources(int $limit = 6): array
 {
     $stmt = getDB()->prepare(
-        'SELECT r.*, c.name AS category_name, s.name AS subject_name, s.slug AS subject_slug
+        "SELECT r.*, c.name AS category_name, s.name AS subject_name, s.slug AS subject_slug
          FROM resources r
          LEFT JOIN categories c ON c.id = r.category_id
          INNER JOIN subjects s ON s.id = r.subject_id
-         WHERE r.is_published = 1 AND r.is_free = 1
+         WHERE r.is_published = 1 AND r.status = 'active' AND r.is_free = 1
          ORDER BY r.created_at DESC
-         LIMIT ' . max(1, $limit)
+         LIMIT " . max(1, $limit)
     );
     $stmt->execute();
 
@@ -479,6 +500,18 @@ function get_all_resources_paginated(array $filters, int $page, int $perPage): a
         $where[] = 'r.is_published = 1';
     } elseif ($status === 'draft') {
         $where[] = 'r.is_published = 0';
+    }
+
+    // Distinct from the is_published draft/published toggle above: archived
+    // resources are kept out of the admin list by default only when the
+    // caller explicitly asks (e.g. the guide-editor's resource picker
+    // shouldn't offer archived resources); the main admin resources list
+    // passes no archive_status so admins can still see/manage everything.
+    $archiveStatus = trim((string)($filters['archive_status'] ?? ''));
+    if ($archiveStatus === 'active') {
+        $where[] = "r.status = 'active'";
+    } elseif ($archiveStatus === 'archived') {
+        $where[] = "r.status = 'archived'";
     }
 
     $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
@@ -893,4 +926,27 @@ function delete_resource(int $id): void
     }
 
     getDB()->prepare('DELETE FROM resources WHERE id = ?')->execute([$id]);
+}
+
+/**
+ * Archives a resource: hides it from every public listing/search/featured
+ * section while keeping its row, reviews, and download history intact —
+ * the safe alternative to delete_resource() used by the TeachLuma 2.0
+ * library rebuild. Optionally points old visitors at a specific
+ * replacement resource; with no target, resource.php falls back to the
+ * resource's subject/category listing page instead of a blind 404.
+ */
+function archive_resource(int $id, ?int $redirectResourceId = null): void
+{
+    getDB()->prepare(
+        "UPDATE resources SET status = 'archived', redirect_resource_id = ?, archived_at = NOW() WHERE id = ?"
+    )->execute([$redirectResourceId ?: null, $id]);
+}
+
+/** Restores a previously archived resource back to normal public visibility. */
+function unarchive_resource(int $id): void
+{
+    getDB()->prepare(
+        "UPDATE resources SET status = 'active', redirect_resource_id = NULL, archived_at = NULL WHERE id = ?"
+    )->execute([$id]);
 }

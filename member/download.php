@@ -8,7 +8,7 @@ require_once __DIR__ . '/../includes/download-functions.php';
 $id = (int)($_GET['id'] ?? 0);
 $resource = $id > 0 ? get_resource_by_id($id) : null;
 
-if (!$resource || !$resource['is_published']) {
+if (!$resource || !$resource['is_published'] || $resource['status'] !== 'active') {
     http_response_code(404);
     require __DIR__ . '/../404.php';
     exit;

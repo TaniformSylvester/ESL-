@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $isEdit = true;
 $actionUrl = base_url('admin/guide-edit.php?id=' . $guideId);
 $subjects = get_all_subjects();
-$allResources = get_all_resources_paginated(['status' => 'published'], 1, 1000)['items'];
+$allResources = get_all_resources_paginated(['status' => 'published', 'archive_status' => 'active'], 1, 1000)['items'];
 $selectedResourceIds = $_SERVER['REQUEST_METHOD'] === 'POST'
     ? array_map('intval', $_POST['resource_ids'] ?? [])
     : array_map(static fn(array $r): int => (int)$r['id'], get_guide_related_resources($guideId));

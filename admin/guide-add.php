@@ -32,7 +32,7 @@ $guide = null;
 $isEdit = false;
 $actionUrl = base_url('admin/guide-add.php');
 $subjects = get_all_subjects();
-$allResources = get_all_resources_paginated(['status' => 'published'], 1, 1000)['items'];
+$allResources = get_all_resources_paginated(['status' => 'published', 'archive_status' => 'active'], 1, 1000)['items'];
 $selectedResourceIds = array_map('intval', $_POST['resource_ids'] ?? []);
 
 $pageTitle = 'Add Guide';

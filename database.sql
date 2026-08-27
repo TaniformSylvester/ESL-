@@ -167,6 +167,12 @@ CREATE TABLE IF NOT EXISTS resources (
     file_type VARCHAR(20) NULL,
     is_free TINYINT(1) NOT NULL DEFAULT 0,
     is_published TINYINT(1) NOT NULL DEFAULT 0,
+    -- 'archived' resources are hidden from every public listing/search/featured
+    -- section but their row, reviews, and download history are preserved —
+    -- used by the TeachLuma 2.0 library rebuild instead of deleting resources.
+    status ENUM('active', 'archived') NOT NULL DEFAULT 'active',
+    redirect_resource_id INT UNSIGNED NULL,
+    archived_at DATETIME NULL,
     download_count INT UNSIGNED NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -177,8 +183,10 @@ CREATE TABLE IF NOT EXISTS resources (
     KEY idx_resources_grade (grade_level),
     KEY idx_resources_type (resource_type),
     KEY idx_resources_published (is_published),
+    KEY idx_resources_status (status),
     CONSTRAINT fk_resources_subject FOREIGN KEY (subject_id) REFERENCES subjects (id),
-    CONSTRAINT fk_resources_category FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE SET NULL
+    CONSTRAINT fk_resources_category FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE SET NULL,
+    CONSTRAINT fk_resources_redirect FOREIGN KEY (redirect_resource_id) REFERENCES resources (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------------------------
