@@ -121,6 +121,64 @@ foreach ($subjects as $subjectRow) {
                 </div>
             </div>
 
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h2 class="h6 fw-bold mb-1">Teaching Details <span class="text-secondary fw-normal">(optional)</span></h2>
+                    <p class="text-secondary small mb-3">Only fill these in with what's genuinely true of this specific file — they're shown on the resource page exactly as written, and left off entirely when blank. Leave anything blank you're not sure about.</p>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label" for="recommended_level">Recommended Level</label>
+                            <input type="text" class="form-control <?= isset($errors['recommended_level']) ? 'is-invalid' : '' ?>"
+                                   id="recommended_level" name="recommended_level" value="<?= e($field('recommended_level')) ?>" maxlength="100" placeholder="e.g. Beginner ESL">
+                            <?php if (isset($errors['recommended_level'])): ?><div class="invalid-feedback"><?= e($errors['recommended_level']) ?></div><?php endif; ?>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="suggested_duration">Suggested Duration</label>
+                            <input type="text" class="form-control <?= isset($errors['suggested_duration']) ? 'is-invalid' : '' ?>"
+                                   id="suggested_duration" name="suggested_duration" value="<?= e($field('suggested_duration')) ?>" maxlength="50" placeholder="e.g. 30 minutes">
+                            <?php if (isset($errors['suggested_duration'])): ?><div class="invalid-feedback"><?= e($errors['suggested_duration']) ?></div><?php endif; ?>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="skills_practiced">Skills Practiced</label>
+                            <input type="text" class="form-control <?= isset($errors['skills_practiced']) ? 'is-invalid' : '' ?>"
+                                   id="skills_practiced" name="skills_practiced" value="<?= e($field('skills_practiced')) ?>" maxlength="255" placeholder="Comma-separated, e.g. Vocabulary, Speaking">
+                            <?php if (isset($errors['skills_practiced'])): ?><div class="invalid-feedback"><?= e($errors['skills_practiced']) ?></div><?php endif; ?>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="learning_objectives">Learning Objectives <span class="text-secondary">(one per line)</span></label>
+                        <textarea class="form-control" id="learning_objectives" name="learning_objectives" rows="3" placeholder="Identify common animal vocabulary.&#10;Match spoken words with pictures."><?= e($field('learning_objectives')) ?></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="how_to_use">How to Use This Resource <span class="text-secondary">(one step per line)</span></label>
+                        <textarea class="form-control" id="how_to_use" name="how_to_use" rows="3"><?= e($field('how_to_use')) ?></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="activity_ideas">Classroom Activity Ideas <span class="text-secondary">(one per line)</span></label>
+                        <textarea class="form-control" id="activity_ideas" name="activity_ideas" rows="3"><?= e($field('activity_ideas')) ?></textarea>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="teacher_tips">Teacher Tips</label>
+                            <textarea class="form-control" id="teacher_tips" name="teacher_tips" rows="2"><?= e($field('teacher_tips')) ?></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="differentiation_notes">Differentiation</label>
+                            <textarea class="form-control" id="differentiation_notes" name="differentiation_notes" rows="2"><?= e($field('differentiation_notes')) ?></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label" for="assessment_notes">Assessment</label>
+                        <textarea class="form-control" id="assessment_notes" name="assessment_notes" rows="2"><?= e($field('assessment_notes')) ?></textarea>
+                    </div>
+                </div>
+            </div>
+
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <h2 class="h6 fw-bold mb-3">Files</h2>

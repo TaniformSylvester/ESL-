@@ -34,7 +34,7 @@ if (ENVIRONMENT === 'development') {
 // -----------------------------------------------------------------------
 define('SITE_NAME', 'TeachLuma');
 define('SITE_TAGLINE', 'Save Time. Teach Better.');
-define('SITE_DESCRIPTION', 'Ready-to-teach English, ESL, Math and Science resources for teachers in Thailand.');
+define('SITE_DESCRIPTION', 'Ready-to-teach English/ESL, Math and Science resources, plus practical teaching guidance, for teachers everywhere.');
 
 // IMPORTANT: change this to your real domain before going live, no trailing slash.
 define('SITE_URL', 'http://localhost/esl-teacher-hub');

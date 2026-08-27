@@ -7,6 +7,7 @@ require_once __DIR__ . '/includes/download-functions.php';
 require_once __DIR__ . '/includes/favorites-functions.php';
 require_once __DIR__ . '/includes/review-functions.php';
 require_once __DIR__ . '/includes/seo-functions.php';
+require_once __DIR__ . '/includes/guide-functions.php';
 
 $slug = trim((string)($_GET['slug'] ?? ''));
 $resource = $slug !== '' ? get_resource_by_slug($slug) : null;
@@ -49,6 +50,16 @@ $previewUrl = !empty($resource['preview_image']) ? UPLOAD_PREVIEW_URL . '/' . ra
 $thumbUrl = !empty($resource['thumbnail']) ? UPLOAD_THUMBNAIL_URL . '/' . rawurlencode($resource['thumbnail']) : null;
 $displayImage = $previewUrl ?? $thumbUrl;
 
+$teachingLayout = get_teaching_detail_layout($resource['resource_type']);
+$teachingSections = [];
+foreach ($teachingLayout as $field => $label) {
+    if (!empty($resource[$field])) {
+        $teachingSections[$field] = $label;
+    }
+}
+$listFields = ['learning_objectives', 'how_to_use', 'activity_ideas'];
+$skillsList = !empty($resource['skills_practiced']) ? array_filter(array_map('trim', explode(',', $resource['skills_practiced']))) : [];
+
 $ratingSummary = get_resource_rating_summary((int)$resource['id']);
 $resourceReviews = get_resource_reviews((int)$resource['id']);
 $myReview = $isLoggedIn ? get_user_review((int)$_SESSION['user_id'], (int)$resource['id']) : null;
@@ -63,6 +74,7 @@ if ($isLoggedIn) {
 }
 
 $relatedResources = get_related_resources($resource, 6);
+$relatedGuides = get_resource_related_guides((int)$resource['id'], 3);
 
 $pageTitle = generate_resource_seo_title($resource);
 $pageDescription = generate_resource_seo_description($resource);
@@ -99,6 +111,12 @@ $resourceSchema = [
 ];
 if (!empty($resource['grade_level'])) {
     $resourceSchema['educationalLevel'] = $resource['grade_level'];
+}
+if (!empty($resource['learning_objectives'])) {
+    $resourceSchema['teaches'] = array_filter(array_map('trim', explode("\n", $resource['learning_objectives'])));
+}
+if (!empty($resource['suggested_duration'])) {
+    $resourceSchema['timeRequired'] = $resource['suggested_duration'];
 }
 if (!empty($resource['subject_name'])) {
     $resourceSchema['about'] = $resource['subject_name'];
@@ -271,6 +289,40 @@ require_once __DIR__ . '/includes/header.php';
         </div>
     </div>
 
+    <?php if (!empty($teachingSections) || !empty($skillsList) || !empty($resource['recommended_level']) || !empty($resource['suggested_duration'])): ?>
+    <hr class="my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <?php if (!empty($skillsList) || !empty($resource['recommended_level']) || !empty($resource['suggested_duration'])): ?>
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                    <?php if (!empty($resource['recommended_level'])): ?>
+                        <span class="badge bg-light text-dark border"><i class="fa-solid fa-graduation-cap me-1"></i><?= e($resource['recommended_level']) ?></span>
+                    <?php endif; ?>
+                    <?php if (!empty($resource['suggested_duration'])): ?>
+                        <span class="badge bg-light text-dark border"><i class="fa-regular fa-clock me-1"></i><?= e($resource['suggested_duration']) ?></span>
+                    <?php endif; ?>
+                    <?php foreach ($skillsList as $skill): ?>
+                        <span class="badge bg-light text-dark border"><?= e($skill) ?></span>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+            <?php foreach ($teachingSections as $field => $label): ?>
+                <h2 class="h6 fw-bold text-secondary text-uppercase mb-2 mt-4"><?= e($label) ?></h2>
+                <?php if (in_array($field, $listFields, true)): ?>
+                    <ul class="mb-0">
+                        <?php foreach (array_filter(array_map('trim', explode("\n", $resource[$field]))) as $line): ?>
+                            <li><?= e($line) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php else: ?>
+                    <p class="text-secondary mb-0"><?= nl2br(e($resource[$field])) ?></p>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <hr class="my-5">
 
     <div id="reviews" class="row">
@@ -376,6 +428,25 @@ require_once __DIR__ . '/includes/header.php';
             <?php endif; ?>
         </div>
     </div>
+
+    <?php if (!empty($relatedGuides)): ?>
+        <hr class="my-5">
+        <h2 class="h4 fw-bold mb-4">From the Teacher Hub</h2>
+        <div class="row row-cols-1 row-cols-sm-3 g-4">
+            <?php foreach ($relatedGuides as $guide): ?>
+                <div class="col">
+                    <a href="<?= e(base_url('teacher-hub-guide.php?slug=' . urlencode($guide['slug']))) ?>" class="card shadow-sm border-0 h-100 text-decoration-none text-reset">
+                        <div class="card-body">
+                            <h3 class="h6 fw-bold"><?= e($guide['title']) ?></h3>
+                            <?php if (!empty($guide['summary'])): ?>
+                                <p class="small text-secondary mb-0"><?= e($guide['summary']) ?></p>
+                            <?php endif; ?>
+                        </div>
+                    </a>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
 
     <?php if (!empty($relatedResources)): ?>
         <hr class="my-5">

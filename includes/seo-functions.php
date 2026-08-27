@@ -82,6 +82,33 @@ function seo_truncate_at_word(string $text, int $maxLength): string
     return rtrim($truncated, " .,;:-") . '...';
 }
 
+/** "[Title] | Teacher Hub" — mirrors generate_resource_seo_title()'s override-first pattern. */
+function generate_guide_seo_title(array $guide): string
+{
+    if (!empty($guide['seo_title'])) {
+        return $guide['seo_title'];
+    }
+
+    return $guide['title'] . ' | Teacher Hub';
+}
+
+function generate_guide_seo_description(array $guide): string
+{
+    if (!empty($guide['meta_description'])) {
+        return $guide['meta_description'];
+    }
+
+    if (!empty($guide['summary'])) {
+        return seo_truncate_at_word($guide['summary'], 160);
+    }
+
+    if (!empty($guide['intro'])) {
+        return seo_truncate_at_word($guide['intro'], 160);
+    }
+
+    return seo_truncate_at_word($guide['title'] . ' — practical teaching guidance from ' . SITE_NAME . '.', 160);
+}
+
 /**
  * Dynamic title/description/H1/intro for resources.php's filtered views —
  * these filters (subject, grade, resource type, category) are TeachLuma's

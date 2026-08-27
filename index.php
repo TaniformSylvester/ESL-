@@ -4,11 +4,15 @@ require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/resource-functions.php';
 require_once __DIR__ . '/includes/favorites-functions.php';
 require_once __DIR__ . '/includes/subject-functions.php';
+require_once __DIR__ . '/includes/guide-functions.php';
+require_once __DIR__ . '/includes/review-functions.php';
 
 $featuredResources = get_featured_resources(6);
 $freeResources = get_free_resources(6);
 $categoriesGrouped = get_categories_grouped();
 $subjects = get_all_subjects();
+$recentGuides = get_recent_guides(3);
+$featuredReviews = get_featured_site_reviews(3);
 
 $subjectIcons = [
     'esl'     => 'fa-comments',
@@ -16,7 +20,7 @@ $subjectIcons = [
     'science' => 'fa-flask',
 ];
 
-$pageTitle = 'ESL, Math & Science Resources for Teachers in Thailand';
+$pageTitle = 'Teaching Resources & Classroom Guidance for Teachers';
 $pageDescription = SITE_DESCRIPTION;
 require_once __DIR__ . '/includes/header.php';
 ?>
@@ -25,11 +29,11 @@ require_once __DIR__ . '/includes/header.php';
     <div class="container py-5">
         <div class="row align-items-center">
             <div class="col-lg-8 mx-auto text-center">
-                <h1 class="display-5 fw-bold mb-3">Ready-to-Teach Resources for Teachers in Thailand</h1>
-                <p class="lead mb-4">Ready-to-use English and ESL resources from Kindergarten to Grade 10, plus Mathematics and Science resources for Grades 1&ndash;6.</p>
+                <h1 class="display-5 fw-bold mb-3">Ready-to-Teach Resources and Real Classroom Guidance</h1>
+                <p class="lead mb-4"><?= e(SITE_NAME) ?> is a resource platform for teachers &mdash; ESL/EFL teachers, primary teachers, international-school teachers, tutors, and homeschool educators anywhere in the world. Download English/ESL resources from Kindergarten to Grade 10, plus Math and Science for Grades 1&ndash;6, and get practical how-to-teach guidance in the Teacher Hub.</p>
                 <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
                     <a href="<?= e(base_url('resources.php')) ?>" class="btn btn-light btn-lg px-4 fw-semibold">Explore Resources</a>
-                    <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-outline-light btn-lg px-4">Become a Pro Teacher</a>
+                    <a href="<?= e(base_url('teacher-hub.php')) ?>" class="btn btn-outline-light btn-lg px-4">Visit the Teacher Hub</a>
                 </div>
             </div>
         </div>
@@ -39,7 +43,7 @@ require_once __DIR__ . '/includes/header.php';
 <?php if (!empty($subjects)): ?>
 <section class="py-5 section-soft">
     <div class="container">
-        <h2 class="h3 fw-bold text-center mb-5">Browse by Subject</h2>
+        <h2 class="h3 fw-bold text-center mb-5">What's Here: Browse by Subject</h2>
         <div class="row g-4 justify-content-center">
             <?php foreach ($subjects as $subject): ?>
                 <div class="col-md-4">
@@ -125,7 +129,39 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 </section>
 
+<?php if (!empty($recentGuides)): ?>
 <section class="py-5 section-soft">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h2 class="h3 fw-bold mb-0">From the Teacher Hub</h2>
+            <a href="<?= e(base_url('teacher-hub.php')) ?>" class="small">View All Guides &rarr;</a>
+        </div>
+        <p class="text-secondary mb-4" style="max-width:640px;">Beyond downloads, the Teacher Hub has practical how-to-teach guides &mdash; classroom activities, common student difficulties, and differentiation ideas.</p>
+        <div class="row row-cols-1 row-cols-sm-3 g-4 mb-4">
+            <?php foreach ($recentGuides as $guide): ?>
+                <div class="col">
+                    <a href="<?= e(base_url('teacher-hub-guide.php?slug=' . urlencode($guide['slug']))) ?>" class="card shadow-sm border-0 h-100 text-decoration-none text-reset">
+                        <div class="card-body">
+                            <span class="badge bg-light text-dark border mb-2"><?= e(GUIDE_CATEGORIES[$guide['category']]) ?></span>
+                            <h3 class="h6 fw-bold"><?= e($guide['title']) ?></h3>
+                            <?php if (!empty($guide['summary'])): ?>
+                                <p class="small text-secondary mb-0"><?= e($guide['summary']) ?></p>
+                            <?php endif; ?>
+                        </div>
+                    </a>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <?php foreach (GUIDE_CATEGORIES as $categorySlug => $categoryLabel): ?>
+                <a href="<?= e(base_url('teacher-hub.php#' . $categorySlug)) ?>" class="btn btn-sm btn-outline-secondary"><?= e($categoryLabel) ?></a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<section class="py-5">
     <div class="container">
         <h2 class="h3 fw-bold text-center mb-5">How It Works</h2>
         <div class="row g-4 text-center">
@@ -147,6 +183,22 @@ require_once __DIR__ . '/includes/header.php';
         </div>
     </div>
 </section>
+
+<?php if (!empty($freeResources)): ?>
+<section class="py-5 section-soft">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h2 class="h3 fw-bold mb-0">Free Resources</h2>
+            <a href="<?= e(base_url('resources.php?access=free')) ?>" class="small">View All &rarr;</a>
+        </div>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+            <?php foreach ($freeResources as $resource): ?>
+                <?php include __DIR__ . '/includes/resource-card.php'; ?>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
 
 <section class="py-5">
     <div class="container">
@@ -176,16 +228,28 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 </section>
 
-<?php if (!empty($freeResources)): ?>
+<?php if (!empty($featuredReviews)): ?>
 <section class="py-5 section-soft">
     <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-5">
-            <h2 class="h3 fw-bold mb-0">Free Resources</h2>
-            <a href="<?= e(base_url('resources.php?access=free')) ?>" class="small">View All &rarr;</a>
-        </div>
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
-            <?php foreach ($freeResources as $resource): ?>
-                <?php include __DIR__ . '/includes/resource-card.php'; ?>
+        <h2 class="h3 fw-bold text-center mb-5">What Teachers Are Saying</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <?php foreach ($featuredReviews as $review): ?>
+                <div class="col">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="text-warning mb-2">
+                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                    <i class="fa-solid fa-star<?= $i > (int)$review['rating'] ? ' text-secondary opacity-25' : '' ?>"></i>
+                                <?php endfor; ?>
+                            </div>
+                            <p class="small mb-3">&ldquo;<?= e($review['review_text']) ?>&rdquo;</p>
+                            <p class="small text-secondary mb-0">
+                                &mdash; <?= e($review['first_name']) ?>, on
+                                <a href="<?= e(base_url('resource.php?slug=' . urlencode($review['resource_slug']))) ?>"><?= e($review['resource_title']) ?></a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
             <?php endforeach; ?>
         </div>
     </div>

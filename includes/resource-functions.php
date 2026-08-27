@@ -125,6 +125,76 @@ function delete_category(int $id): void
     getDB()->prepare('DELETE FROM categories WHERE id = ?')->execute([$id]);
 }
 
+/**
+ * Which teaching-detail fields to show, in what order, and under what
+ * heading — varies by resource type so a Lesson Plan and a Flashcards
+ * set don't read identically (a Lesson Plan leads with objectives and
+ * procedure; Flashcards leads with how to present them and games).
+ * Sections with no content are simply skipped by resource.php — this
+ * only controls order/labeling, never invents content.
+ */
+function get_teaching_detail_layout(string $resourceType): array
+{
+    return match ($resourceType) {
+        'Lesson Plan' => [
+            'learning_objectives'   => 'Learning Objectives',
+            'how_to_use'            => 'Lesson Procedure',
+            'assessment_notes'      => 'Assessment',
+            'differentiation_notes' => 'Differentiation',
+            'activity_ideas'        => 'Classroom Activity Ideas',
+            'teacher_tips'          => 'Teacher Tips',
+        ],
+        'Worksheet' => [
+            'how_to_use'            => 'Student Task',
+            'activity_ideas'        => 'Classroom Use',
+            'differentiation_notes' => 'Differentiation',
+            'assessment_notes'      => 'Answer Key & Assessment',
+            'learning_objectives'   => 'Learning Objectives',
+            'teacher_tips'          => 'Teacher Tips',
+        ],
+        'PowerPoint' => [
+            'how_to_use'            => 'Lesson Sequence',
+            'activity_ideas'        => 'Classroom Activities',
+            'teacher_tips'          => 'Teacher Tips',
+            'learning_objectives'   => 'Learning Objectives',
+            'differentiation_notes' => 'Differentiation',
+            'assessment_notes'      => 'Assessment',
+        ],
+        'Flashcards' => [
+            'how_to_use'            => 'How to Present',
+            'activity_ideas'        => 'Games & Speaking Activities',
+            'teacher_tips'          => 'Teacher Tips',
+            'learning_objectives'   => 'Learning Objectives',
+            'differentiation_notes' => 'Differentiation',
+            'assessment_notes'      => 'Assessment',
+        ],
+        'Test', 'Assessment' => [
+            'assessment_notes'      => 'Question Types & Suggested Use',
+            'learning_objectives'   => 'Skills Assessed',
+            'how_to_use'            => 'How to Administer',
+            'differentiation_notes' => 'Differentiation',
+            'activity_ideas'        => 'Follow-Up Activities',
+            'teacher_tips'          => 'Teacher Tips',
+        ],
+        'Game', 'Classroom Activity' => [
+            'how_to_use'            => 'How to Play',
+            'activity_ideas'        => 'Variations',
+            'teacher_tips'          => 'Teacher Tips',
+            'learning_objectives'   => 'Learning Objectives',
+            'differentiation_notes' => 'Differentiation',
+            'assessment_notes'      => 'Assessment',
+        ],
+        default => [
+            'learning_objectives'   => 'Learning Objectives',
+            'how_to_use'            => 'How to Use This Resource',
+            'activity_ideas'        => 'Classroom Activity Ideas',
+            'differentiation_notes' => 'Differentiation',
+            'assessment_notes'      => 'Assessment',
+            'teacher_tips'          => 'Teacher Tips',
+        ],
+    };
+}
+
 function resource_type_icon(string $resourceType): string
 {
     return match ($resourceType) {
@@ -525,7 +595,36 @@ function validate_resource_input(array $input): array
         $errors['meta_description'] = 'Meta description is too long (300 characters max).';
     }
 
+    if (!empty($input['recommended_level']) && mb_strlen($input['recommended_level']) > 100) {
+        $errors['recommended_level'] = 'Recommended level is too long (100 characters max).';
+    }
+
+    if (!empty($input['suggested_duration']) && mb_strlen($input['suggested_duration']) > 50) {
+        $errors['suggested_duration'] = 'Suggested duration is too long (50 characters max).';
+    }
+
+    if (!empty($input['skills_practiced']) && mb_strlen($input['skills_practiced']) > 255) {
+        $errors['skills_practiced'] = 'Skills practiced is too long (255 characters max).';
+    }
+
     return $errors;
+}
+
+/**
+ * The nine optional teaching-detail fields shared by create_resource()
+ * and update_resource() — cleaned and normalized to null-when-empty so
+ * resource.php can render each section only when it has real content.
+ */
+function extract_teaching_detail_fields(array $input): array
+{
+    $fields = [];
+    foreach (['learning_objectives', 'recommended_level', 'suggested_duration', 'skills_practiced',
+              'how_to_use', 'activity_ideas', 'teacher_tips', 'differentiation_notes', 'assessment_notes'] as $key) {
+        $value = clean_input($input[$key] ?? '');
+        $fields[$key] = $value !== '' ? $value : null;
+    }
+
+    return $fields;
 }
 
 /** Returns ['success' => bool, 'errors' => array<string,string>, 'id' => ?int] */
@@ -589,11 +688,15 @@ function create_resource(array $input, array $files): array
     $topic = clean_input($input['topic'] ?? '');
     $seoTitle = clean_input($input['seo_title'] ?? '');
     $metaDescription = clean_input($input['meta_description'] ?? '');
+    $teaching = extract_teaching_detail_fields($input);
 
     $stmt = getDB()->prepare(
-        'INSERT INTO resources (title, slug, description, seo_title, meta_description, resource_type, subject_id, category_id, grade_level, topic,
+        'INSERT INTO resources (title, slug, description, seo_title, meta_description,
+                                 learning_objectives, recommended_level, suggested_duration, skills_practiced,
+                                 how_to_use, activity_ideas, teacher_tips, differentiation_notes, assessment_notes,
+                                 resource_type, subject_id, category_id, grade_level, topic,
                                  thumbnail, preview_image, file_path, file_name, file_size, file_type, is_free, is_published)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     );
     $stmt->execute([
         $title,
@@ -601,6 +704,15 @@ function create_resource(array $input, array $files): array
         $description !== '' ? $description : null,
         $seoTitle !== '' ? $seoTitle : null,
         $metaDescription !== '' ? $metaDescription : null,
+        $teaching['learning_objectives'],
+        $teaching['recommended_level'],
+        $teaching['suggested_duration'],
+        $teaching['skills_practiced'],
+        $teaching['how_to_use'],
+        $teaching['activity_ideas'],
+        $teaching['teacher_tips'],
+        $teaching['differentiation_notes'],
+        $teaching['assessment_notes'],
         $input['resource_type'],
         (int)$input['subject_id'],
         !empty($input['category_id']) ? (int)$input['category_id'] : null,
@@ -683,6 +795,7 @@ function update_resource(int $id, array $input, array $files): array
     $topic = clean_input($input['topic'] ?? '');
     $seoTitle = clean_input($input['seo_title'] ?? '');
     $metaDescription = clean_input($input['meta_description'] ?? '');
+    $teaching = extract_teaching_detail_fields($input);
 
     $filePath = $existing['file_path'];
     $fileName = $existing['file_name'];
@@ -716,7 +829,10 @@ function update_resource(int $id, array $input, array $files): array
     }
 
     getDB()->prepare(
-        'UPDATE resources SET title = ?, description = ?, seo_title = ?, meta_description = ?, resource_type = ?, subject_id = ?, category_id = ?, grade_level = ?,
+        'UPDATE resources SET title = ?, description = ?, seo_title = ?, meta_description = ?,
+                               learning_objectives = ?, recommended_level = ?, suggested_duration = ?, skills_practiced = ?,
+                               how_to_use = ?, activity_ideas = ?, teacher_tips = ?, differentiation_notes = ?, assessment_notes = ?,
+                               resource_type = ?, subject_id = ?, category_id = ?, grade_level = ?,
                                topic = ?, thumbnail = ?, preview_image = ?, file_path = ?, file_name = ?,
                                file_size = ?, file_type = ?, is_free = ?, is_published = ? WHERE id = ?'
     )->execute([
@@ -729,6 +845,15 @@ function update_resource(int $id, array $input, array $files): array
         $description !== '' ? $description : null,
         $seoTitle !== '' ? $seoTitle : null,
         $metaDescription !== '' ? $metaDescription : null,
+        $teaching['learning_objectives'],
+        $teaching['recommended_level'],
+        $teaching['suggested_duration'],
+        $teaching['skills_practiced'],
+        $teaching['how_to_use'],
+        $teaching['activity_ideas'],
+        $teaching['teacher_tips'],
+        $teaching['differentiation_notes'],
+        $teaching['assessment_notes'],
         $input['resource_type'],
         (int)$input['subject_id'],
         !empty($input['category_id']) ? (int)$input['category_id'] : null,

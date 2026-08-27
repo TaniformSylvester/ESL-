@@ -301,6 +301,23 @@ function get_review_stats(): array
     ];
 }
 
+/** Real approved reviews with text, for homepage display — never fabricated, pulled straight from the reviews table. */
+function get_featured_site_reviews(int $limit = 6): array
+{
+    $stmt = getDB()->prepare(
+        "SELECT rv.rating, rv.review_text, rv.created_at, u.first_name, r.title AS resource_title, r.slug AS resource_slug
+         FROM reviews rv
+         INNER JOIN users u ON u.id = rv.user_id
+         INNER JOIN resources r ON r.id = rv.resource_id
+         WHERE rv.status = 'approved' AND rv.rating >= 4 AND rv.review_text IS NOT NULL AND rv.review_text != ''
+         ORDER BY rv.helpful_count DESC, rv.created_at DESC
+         LIMIT " . max(1, $limit)
+    );
+    $stmt->execute();
+
+    return $stmt->fetchAll();
+}
+
 /** Top $limit resources by average approved rating (at least 1 approved review). */
 function get_top_rated_resources(int $limit = 5): array
 {

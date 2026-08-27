@@ -11,6 +11,7 @@
                 <h6 class="fw-bold">Quick Links</h6>
                 <ul class="list-unstyled small">
                     <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('resources.php')) ?>">Resources</a></li>
+                    <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('teacher-hub.php')) ?>">Teacher Hub</a></li>
                     <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('pricing.php')) ?>">Pricing</a></li>
                     <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('about.php')) ?>">About</a></li>
                     <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('contact.php')) ?>">Contact</a></li>

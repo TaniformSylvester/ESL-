@@ -138,6 +138,19 @@ CREATE TABLE IF NOT EXISTS resources (
     -- filled in when an admin needs manual control over a specific page.
     seo_title VARCHAR(255) NULL,
     meta_description VARCHAR(300) NULL,
+    -- Optional teaching-detail fields, filled in by whoever actually made
+    -- the resource. Blank by default and only rendered on the resource
+    -- page when present — TeachLuma never invents objectives/procedures
+    -- for a resource nobody has actually described (see resource.php).
+    learning_objectives TEXT NULL,
+    recommended_level VARCHAR(100) NULL,
+    suggested_duration VARCHAR(50) NULL,
+    skills_practiced VARCHAR(255) NULL,
+    how_to_use TEXT NULL,
+    activity_ideas TEXT NULL,
+    teacher_tips TEXT NULL,
+    differentiation_notes TEXT NULL,
+    assessment_notes TEXT NULL,
     resource_type ENUM(
         'Lesson Plan', 'Worksheet', 'PowerPoint', 'Flashcards',
         'Classroom Activity', 'Game', 'Test', 'Assessment', 'Poster', 'Teacher Resource'
@@ -235,6 +248,55 @@ CREATE TABLE IF NOT EXISTS review_helpful (
     UNIQUE KEY uq_review_helpful_review_user (review_id, user_id),
     CONSTRAINT fk_review_helpful_review FOREIGN KEY (review_id) REFERENCES reviews (id) ON DELETE CASCADE,
     CONSTRAINT fk_review_helpful_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
+-- guides (Teacher Hub — genuine teaching guidance, separate from the
+-- downloadable resource library). Structured into distinct sections
+-- rather than one text blob, so each guide only shows the sections that
+-- were actually written for it.
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS guides (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    title VARCHAR(200) NOT NULL,
+    slug VARCHAR(220) NOT NULL,
+    category ENUM('esl', 'math', 'science', 'classroom') NOT NULL,
+    subject_id INT UNSIGNED NULL,
+    summary VARCHAR(300) NULL,
+    intro TEXT NULL,
+    practical_advice TEXT NULL,
+    classroom_examples TEXT NULL,
+    activities TEXT NULL,
+    common_difficulties TEXT NULL,
+    differentiation TEXT NULL,
+    assessment TEXT NULL,
+    seo_title VARCHAR(255) NULL,
+    meta_description VARCHAR(300) NULL,
+    is_published TINYINT(1) NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_guides_slug (slug),
+    KEY idx_guides_category (category),
+    KEY idx_guides_published (is_published),
+    CONSTRAINT fk_guides_subject FOREIGN KEY (subject_id) REFERENCES subjects (id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
+-- guide_related_resources (a guide's hand-picked "Recommended Resources"
+-- — always real resource IDs, never auto-matched by keyword, so a guide
+-- never links to something irrelevant)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS guide_related_resources (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    guide_id INT UNSIGNED NOT NULL,
+    resource_id INT UNSIGNED NOT NULL,
+    sort_order INT UNSIGNED NOT NULL DEFAULT 0,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_guide_related_resource (guide_id, resource_id),
+    KEY idx_guide_related_resource_resource (resource_id),
+    CONSTRAINT fk_guide_related_guide FOREIGN KEY (guide_id) REFERENCES guides (id) ON DELETE CASCADE,
+    CONSTRAINT fk_guide_related_resource FOREIGN KEY (resource_id) REFERENCES resources (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------------------------
