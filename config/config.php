@@ -129,8 +129,12 @@ define('GRADE_LEVELS', [
 ]);
 
 define('RESOURCE_TYPES', [
-    'Lesson Plan', 'Worksheet', 'PowerPoint', 'Flashcards',
-    'Classroom Activity', 'Game', 'Test', 'Assessment', 'Poster', 'Teacher Resource',
+    'Complete Lesson Pack', 'Lesson Plan', 'PowerPoint', 'Worksheet', 'Flashcards',
+    'Speaking Activity', 'Reading Activity', 'Writing Activity', 'Game', 'Quiz',
+    'Assessment', 'Homework', 'Classroom Poster', 'Activity Pack',
+    // Legacy types kept selectable so existing (including archived) resources
+    // using them still validate correctly on edit.
+    'Classroom Activity', 'Test', 'Poster', 'Teacher Resource',
 ]);
 
 // -----------------------------------------------------------------------

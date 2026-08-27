@@ -5,6 +5,7 @@ require_once __DIR__ . '/../includes/admin-functions.php';
 require_once __DIR__ . '/../includes/upload-functions.php';
 require_once __DIR__ . '/../includes/resource-functions.php';
 require_once __DIR__ . '/../includes/subject-functions.php';
+require_once __DIR__ . '/../includes/guide-functions.php';
 
 require_admin();
 $admin = current_user();
@@ -32,6 +33,11 @@ $isEdit = false;
 $actionUrl = base_url('admin/resource-add.php');
 $categoriesGrouped = get_categories_grouped();
 $subjects = get_all_subjects();
+$allResourcesForPicker = get_all_resources_paginated(['status' => 'published', 'archive_status' => 'active'], 1, 1000)['items'];
+$allGuidesForPicker = get_all_guides_paginated(['status' => 'published'], 1, 1000)['items'];
+$selectedRelatedIds = array_map('intval', $old['related_resource_ids'] ?? []);
+$selectedGuideIds = array_map('intval', $old['related_guide_ids'] ?? []);
+$existingFiles = [];
 
 $pageTitle = 'Add Resource';
 require_once __DIR__ . '/../includes/admin-header.php';

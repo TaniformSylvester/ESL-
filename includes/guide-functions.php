@@ -309,6 +309,38 @@ function set_guide_related_resources(int $guideId, array $resourceIds): void
     }
 }
 
+/**
+ * Replaces the set of guides linked to one resource wholesale — the same
+ * guide_related_resources table as set_guide_related_resources(), just
+ * scoped and replaced by resource_id instead of guide_id, so editing the
+ * links from a resource's own admin page doesn't disturb any other
+ * guide's unrelated links to other resources.
+ */
+function set_resource_related_guides(int $resourceId, array $guideIds): void
+{
+    $db = getDB();
+    $db->prepare('DELETE FROM guide_related_resources WHERE resource_id = ?')->execute([$resourceId]);
+
+    $stmt = $db->prepare('INSERT INTO guide_related_resources (guide_id, resource_id, sort_order) VALUES (?, ?, ?)');
+    $order = 0;
+    foreach ($guideIds as $guideId) {
+        $guideId = (int)$guideId;
+        if ($guideId > 0) {
+            $stmt->execute([$guideId, $resourceId, $order]);
+            $order++;
+        }
+    }
+}
+
+/** Every guide ID currently linked to this resource, regardless of the guide's published state — used to pre-check the admin resource form's guide picker. */
+function get_guide_ids_for_resource(int $resourceId): array
+{
+    $stmt = getDB()->prepare('SELECT guide_id FROM guide_related_resources WHERE resource_id = ? ORDER BY sort_order');
+    $stmt->execute([$resourceId]);
+
+    return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+}
+
 /** Published guides that recommend this resource — shown on resource.php as "From the Teacher Hub". */
 function get_resource_related_guides(int $resourceId, int $limit = 3): array
 {

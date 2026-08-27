@@ -103,8 +103,15 @@ if ($isLoggedIn) {
     }
 }
 
-$relatedResources = get_related_resources($resource, 6);
+// Manual admin picks take priority (Phase 2 Step 12); fall back to the
+// automatic relevance query only when nothing has been manually chosen.
+$relatedResources = get_manual_related_resources((int)$resource['id']);
+if (empty($relatedResources)) {
+    $relatedResources = get_related_resources($resource, 6);
+}
 $relatedGuides = get_resource_related_guides((int)$resource['id'], 3);
+$additionalFiles = get_resource_files((int)$resource['id']);
+$whatsIncludedList = !empty($resource['whats_included']) ? array_filter(array_map('trim', explode("\n", $resource['whats_included']))) : [];
 
 $pageTitle = generate_resource_seo_title($resource);
 $pageDescription = generate_resource_seo_description($resource);
@@ -245,7 +252,12 @@ require_once __DIR__ . '/includes/header.php';
                 <p class="text-secondary"><?= nl2br(e($resource['description'])) ?></p>
             <?php endif; ?>
 
-            <h2 class="h6 fw-bold text-secondary text-uppercase mt-4 mb-2">What's Included</h2>
+            <?php if (!empty($resource['overview'])): ?>
+                <h2 class="h6 fw-bold text-secondary text-uppercase mt-4 mb-2">Overview</h2>
+                <p class="text-secondary"><?= nl2br(e($resource['overview'])) ?></p>
+            <?php endif; ?>
+
+            <h2 class="h6 fw-bold text-secondary text-uppercase mt-4 mb-2">Resource Details</h2>
             <dl class="row small mt-4">
                 <?php if (!empty($resource['subject_name'])): ?>
                     <dt class="col-4">Subject</dt><dd class="col-8"><?= e($resource['subject_name']) ?></dd>
@@ -319,7 +331,7 @@ require_once __DIR__ . '/includes/header.php';
         </div>
     </div>
 
-    <?php if (!empty($teachingSections) || !empty($skillsList) || !empty($resource['recommended_level']) || !empty($resource['suggested_duration'])): ?>
+    <?php if (!empty($teachingSections) || !empty($skillsList) || !empty($resource['recommended_level']) || !empty($resource['suggested_duration']) || !empty($whatsIncludedList) || !empty($additionalFiles)): ?>
     <hr class="my-5">
     <div class="row">
         <div class="col-lg-8 mx-auto">
@@ -349,6 +361,32 @@ require_once __DIR__ . '/includes/header.php';
                     <p class="text-secondary mb-0"><?= nl2br(e($resource[$field])) ?></p>
                 <?php endif; ?>
             <?php endforeach; ?>
+
+            <?php if (!empty($whatsIncludedList)): ?>
+                <h2 class="h6 fw-bold text-secondary text-uppercase mb-2 mt-4">What's Included</h2>
+                <ul class="mb-0">
+                    <?php foreach ($whatsIncludedList as $item): ?>
+                        <li><?= e($item) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+
+            <?php if (!empty($additionalFiles)): ?>
+                <h2 class="h6 fw-bold text-secondary text-uppercase mb-2 mt-4">Additional Files</h2>
+                <ul class="list-unstyled mb-0">
+                    <?php foreach ($additionalFiles as $extraFile): ?>
+                        <li class="mb-2">
+                            <?php if ($canDownload): ?>
+                                <a href="<?= e(base_url('member/download-extra.php?id=' . (int)$extraFile['id'])) ?>" class="btn btn-sm btn-outline-primary">
+                                    <i class="fa-solid fa-download me-1"></i><?= e($extraFile['label'] ?: $extraFile['file_name']) ?>
+                                </a>
+                            <?php else: ?>
+                                <span class="text-secondary"><i class="fa-solid fa-lock me-1"></i><?= e($extraFile['label'] ?: $extraFile['file_name']) ?></span>
+                            <?php endif; ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
         </div>
     </div>
     <?php endif; ?>

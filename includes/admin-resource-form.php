@@ -148,6 +148,11 @@ foreach ($subjects as $subjectRow) {
                     </div>
 
                     <div class="mb-3">
+                        <label class="form-label" for="overview">Overview <span class="text-secondary">(a fuller explanation than the short description above)</span></label>
+                        <textarea class="form-control" id="overview" name="overview" rows="3"><?= e($field('overview')) ?></textarea>
+                    </div>
+
+                    <div class="mb-3">
                         <label class="form-label" for="learning_objectives">Learning Objectives <span class="text-secondary">(one per line)</span></label>
                         <textarea class="form-control" id="learning_objectives" name="learning_objectives" rows="3" placeholder="Identify common animal vocabulary.&#10;Match spoken words with pictures."><?= e($field('learning_objectives')) ?></textarea>
                     </div>
@@ -172,14 +177,48 @@ foreach ($subjects as $subjectRow) {
                             <textarea class="form-control" id="differentiation_notes" name="differentiation_notes" rows="2"><?= e($field('differentiation_notes')) ?></textarea>
                         </div>
                     </div>
-                    <div class="mt-3">
-                        <label class="form-label" for="assessment_notes">Assessment</label>
-                        <textarea class="form-control" id="assessment_notes" name="assessment_notes" rows="2"><?= e($field('assessment_notes')) ?></textarea>
+                    <div class="row g-3 mt-0">
+                        <div class="col-md-6">
+                            <label class="form-label" for="assessment_notes">Assessment</label>
+                            <textarea class="form-control" id="assessment_notes" name="assessment_notes" rows="2"><?= e($field('assessment_notes')) ?></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="whats_included">What's Included <span class="text-secondary">(one item per line — only list what's genuinely in the download)</span></label>
+                            <textarea class="form-control" id="whats_included" name="whats_included" rows="2" placeholder="Lesson plan (PDF)&#10;12-slide PowerPoint&#10;Worksheet with answer key"><?= e($field('whats_included')) ?></textarea>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="card shadow-sm border-0">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h2 class="h6 fw-bold mb-1">Related Resources <span class="text-secondary fw-normal">(optional)</span></h2>
+                    <p class="text-secondary small mb-3">Manually pick genuinely relevant resources. Leave empty to fall back to automatically-matched resources (same subject/category/grade).</p>
+                    <select class="form-select" name="related_resource_ids[]" multiple size="8">
+                        <?php foreach ($allResourcesForPicker as $relatedOption): ?>
+                            <option value="<?= (int)$relatedOption['id'] ?>" <?= in_array((int)$relatedOption['id'], $selectedRelatedIds, true) ? 'selected' : '' ?>>
+                                <?= e($relatedOption['title']) ?> <span>&mdash; <?= e($relatedOption['resource_type']) ?></span>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h2 class="h6 fw-bold mb-1">Related Teacher Hub Guides <span class="text-secondary fw-normal">(optional)</span></h2>
+                    <p class="text-secondary small mb-3">Only link guides that genuinely relate to this resource.</p>
+                    <select class="form-select" name="related_guide_ids[]" multiple size="6">
+                        <?php foreach ($allGuidesForPicker as $guideOption): ?>
+                            <option value="<?= (int)$guideOption['id'] ?>" <?= in_array((int)$guideOption['id'], $selectedGuideIds, true) ? 'selected' : '' ?>>
+                                <?= e($guideOption['title']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body">
                     <h2 class="h6 fw-bold mb-3">Files</h2>
 
@@ -213,6 +252,38 @@ foreach ($subjects as $subjectRow) {
                             <?php if (isset($errors['preview_image'])): ?><div class="invalid-feedback d-block"><?= e($errors['preview_image']) ?></div><?php endif; ?>
                         </div>
                     </div>
+
+                    <hr class="my-3">
+                    <h3 class="h6 fw-bold mb-1">Additional Files <span class="text-secondary fw-normal">(optional)</span></h3>
+                    <p class="text-secondary small mb-3">For a separate file that isn't part of the main download above — e.g. a standalone answer key.</p>
+
+                    <?php if ($isEdit && !empty($existingFiles)): ?>
+                        <ul class="list-group mb-3">
+                            <?php foreach ($existingFiles as $extraFile): ?>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><?= e($extraFile['label'] ?: $extraFile['file_name']) ?> <span class="text-secondary small">(<?= e(format_file_size((int)$extraFile['file_size'])) ?>)</span></span>
+                                    <form method="post" action="<?= e(base_url('admin/resource-file-delete.php')) ?>" class="d-inline"
+                                          onsubmit="return confirm('Remove this file?');">
+                                        <?php csrf_field(); ?>
+                                        <input type="hidden" name="id" value="<?= (int)$extraFile['id'] ?>">
+                                        <input type="hidden" name="resource_id" value="<?= (int)$resource['id'] ?>">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                                    </form>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+
+                    <?php for ($slot = 1; $slot <= 3; $slot++): ?>
+                        <div class="row g-2 mb-2">
+                            <div class="col-md-7">
+                                <input type="file" class="form-control form-control-sm" name="additional_file_<?= $slot ?>">
+                            </div>
+                            <div class="col-md-5">
+                                <input type="text" class="form-control form-control-sm" name="additional_file_label_<?= $slot ?>" placeholder="Label, e.g. Answer Key">
+                            </div>
+                        </div>
+                    <?php endfor; ?>
                 </div>
             </div>
         </div>
@@ -244,6 +315,23 @@ foreach ($subjects as $subjectRow) {
                             <input class="form-check-input" type="radio" name="is_published" id="status_published" value="1" <?= $field('is_published') ? 'checked' : '' ?>>
                             <label class="form-check-label" for="status_published">Published</label>
                         </div>
+                    </div>
+
+                    <div class="mb-3 p-2 border rounded <?= isset($errors['qc_confirmed']) ? 'border-danger' : '' ?>" id="qc_checklist_box">
+                        <p class="small fw-bold mb-1">Before publishing, confirm:</p>
+                        <ul class="small text-secondary mb-2 ps-3">
+                            <li>Title, subject, grade, topic and type are correct</li>
+                            <li>The download file exists and opens correctly</li>
+                            <li>Description and teaching information are accurate</li>
+                            <li>"What's Included" matches the actual file(s)</li>
+                            <li>No spelling/grammar errors; related resources and guide links are genuinely relevant</li>
+                        </ul>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="qc_confirmed" id="qc_confirmed" value="1"
+                                   <?= !empty($resource['qc_confirmed_at']) ? 'checked' : '' ?>>
+                            <label class="form-check-label small" for="qc_confirmed">I've checked this against the list above</label>
+                        </div>
+                        <?php if (isset($errors['qc_confirmed'])): ?><div class="text-danger small mt-1"><?= e($errors['qc_confirmed']) ?></div><?php endif; ?>
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100"><?= $isEdit ? 'Save Changes' : 'Add Resource' ?></button>
@@ -297,5 +385,17 @@ foreach ($subjects as $subjectRow) {
 
     subjectSelect.addEventListener('change', applySubjectFilter);
     applySubjectFilter();
+
+    var qcBox = document.getElementById('qc_checklist_box');
+    var publishedRadio = document.getElementById('status_published');
+    var draftRadio = document.getElementById('status_draft');
+
+    function toggleQcBox() {
+        qcBox.style.display = publishedRadio.checked ? '' : 'none';
+    }
+
+    publishedRadio.addEventListener('change', toggleQcBox);
+    draftRadio.addEventListener('change', toggleQcBox);
+    toggleQcBox();
 })();
 </script>

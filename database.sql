@@ -151,9 +151,22 @@ CREATE TABLE IF NOT EXISTS resources (
     teacher_tips TEXT NULL,
     differentiation_notes TEXT NULL,
     assessment_notes TEXT NULL,
+    -- Overview: a fuller explanation of the resource than `description`'s
+    -- short blurb. What's Included: an accurate list of what the download
+    -- actually contains — never claim a file/answer key/etc. is included
+    -- unless it genuinely is. Both optional, same never-fabricate rule.
+    overview TEXT NULL,
+    whats_included TEXT NULL,
+    -- Set only when an admin has explicitly confirmed the Phase 2 quality
+    -- checklist for the resource's current published state (see
+    -- includes/admin-resource-form.php) — is_published cannot be set to 1
+    -- without it. NULL again after any edit that changes is_published.
+    qc_confirmed_at DATETIME NULL,
     resource_type ENUM(
         'Lesson Plan', 'Worksheet', 'PowerPoint', 'Flashcards',
-        'Classroom Activity', 'Game', 'Test', 'Assessment', 'Poster', 'Teacher Resource'
+        'Classroom Activity', 'Game', 'Test', 'Assessment', 'Poster', 'Teacher Resource',
+        'Complete Lesson Pack', 'Speaking Activity', 'Reading Activity', 'Writing Activity',
+        'Quiz', 'Homework', 'Classroom Poster', 'Activity Pack'
     ) NOT NULL,
     subject_id INT UNSIGNED NOT NULL,
     category_id INT UNSIGNED NULL,
@@ -187,6 +200,44 @@ CREATE TABLE IF NOT EXISTS resources (
     CONSTRAINT fk_resources_subject FOREIGN KEY (subject_id) REFERENCES subjects (id),
     CONSTRAINT fk_resources_category FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE SET NULL,
     CONSTRAINT fk_resources_redirect FOREIGN KEY (redirect_resource_id) REFERENCES resources (id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
+-- resource_files (optional additional files on a resource, e.g. a separate
+-- answer key alongside the main pack — distinct from the single required
+-- `resources.file_path`, which remains the primary download.)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS resource_files (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    resource_id INT UNSIGNED NOT NULL,
+    file_path VARCHAR(255) NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_size INT UNSIGNED NOT NULL,
+    file_type VARCHAR(20) NOT NULL,
+    label VARCHAR(150) NULL,
+    sort_order INT UNSIGNED NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_resource_files_resource (resource_id),
+    CONSTRAINT fk_resource_files_resource FOREIGN KEY (resource_id) REFERENCES resources (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
+-- resource_related_resources (admin-picked related resources — manual
+-- relevance is preferred over automatic keyword matching; resource.php
+-- falls back to the automatic relevance query only when a resource has
+-- no manual picks.)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS resource_related_resources (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    resource_id INT UNSIGNED NOT NULL,
+    related_resource_id INT UNSIGNED NOT NULL,
+    sort_order INT UNSIGNED NOT NULL DEFAULT 0,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_resource_related (resource_id, related_resource_id),
+    KEY idx_resource_related_target (related_resource_id),
+    CONSTRAINT fk_resource_related_source FOREIGN KEY (resource_id) REFERENCES resources (id) ON DELETE CASCADE,
+    CONSTRAINT fk_resource_related_target FOREIGN KEY (related_resource_id) REFERENCES resources (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------------------------
@@ -381,7 +432,8 @@ INSERT INTO categories (subject_id, name, slug, group_name, sort_order) VALUES
     ((SELECT id FROM subjects WHERE slug = 'esl'), 'Writing', 'writing', 'English Skills', 5),
     ((SELECT id FROM subjects WHERE slug = 'esl'), 'Speaking', 'speaking', 'English Skills', 6),
     ((SELECT id FROM subjects WHERE slug = 'esl'), 'Listening', 'listening', 'English Skills', 7),
-    ((SELECT id FROM subjects WHERE slug = 'esl'), 'Pronunciation', 'pronunciation', 'English Skills', 8);
+    ((SELECT id FROM subjects WHERE slug = 'esl'), 'Pronunciation', 'pronunciation', 'English Skills', 8),
+    ((SELECT id FROM subjects WHERE slug = 'esl'), 'Classroom English', 'classroom-english', 'English Skills', 9);
 
 -- Categories: ESL — Teaching Resources
 INSERT INTO categories (subject_id, name, slug, group_name, sort_order) VALUES
@@ -405,7 +457,9 @@ INSERT INTO categories (subject_id, name, slug, group_name, sort_order) VALUES
     ((SELECT id FROM subjects WHERE slug = 'math'), 'Time & Money', 'time-and-money', 'Math Skills', 7),
     ((SELECT id FROM subjects WHERE slug = 'math'), 'Word Problems', 'word-problems', 'Math Skills', 8),
     ((SELECT id FROM subjects WHERE slug = 'math'), 'Data & Graphs', 'data-and-graphs', 'Math Skills', 9),
-    ((SELECT id FROM subjects WHERE slug = 'math'), 'Patterns & Algebra Basics', 'patterns-and-algebra-basics', 'Math Skills', 10);
+    ((SELECT id FROM subjects WHERE slug = 'math'), 'Patterns & Algebra Basics', 'patterns-and-algebra-basics', 'Math Skills', 10),
+    ((SELECT id FROM subjects WHERE slug = 'math'), 'Number Sense', 'number-sense', 'Math Skills', 11),
+    ((SELECT id FROM subjects WHERE slug = 'math'), 'Assessments', 'math-assessments', 'Math Skills', 12);
 
 -- Categories: Science
 INSERT INTO categories (subject_id, name, slug, group_name, sort_order) VALUES
@@ -418,7 +472,10 @@ INSERT INTO categories (subject_id, name, slug, group_name, sort_order) VALUES
     ((SELECT id FROM subjects WHERE slug = 'science'), 'Earth & Space', 'earth-and-space', 'Science Skills', 7),
     ((SELECT id FROM subjects WHERE slug = 'science'), 'Weather & Seasons', 'weather-and-seasons', 'Science Skills', 8),
     ((SELECT id FROM subjects WHERE slug = 'science'), 'Simple Experiments', 'simple-experiments', 'Science Skills', 9),
-    ((SELECT id FROM subjects WHERE slug = 'science'), 'Environment & Conservation', 'environment-and-conservation', 'Science Skills', 10);
+    ((SELECT id FROM subjects WHERE slug = 'science'), 'Environment & Conservation', 'environment-and-conservation', 'Science Skills', 10),
+    ((SELECT id FROM subjects WHERE slug = 'science'), 'Life Science', 'life-science', 'Science Skills', 11),
+    ((SELECT id FROM subjects WHERE slug = 'science'), 'Physical Science', 'physical-science', 'Science Skills', 12),
+    ((SELECT id FROM subjects WHERE slug = 'science'), 'Assessments', 'science-assessments', 'Science Skills', 13);
 
 -- Default settings. Bank/PromptPay fields are intentionally left blank —
 -- fill these in later via /admin/settings.php. Do NOT put real account

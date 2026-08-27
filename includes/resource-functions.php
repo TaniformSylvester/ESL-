@@ -640,11 +640,20 @@ function validate_resource_input(array $input): array
         $errors['skills_practiced'] = 'Skills practiced is too long (255 characters max).';
     }
 
+    // Quality-checklist gate (Phase 2 Step 15/16): a resource can only be
+    // published once an admin has explicitly ticked the confirmation —
+    // never automatically. $alreadyConfirmed lets update_resource() skip
+    // re-asking when the resource is already published and staying that way.
+    $alreadyConfirmed = !empty($input['_qc_already_confirmed']);
+    if (!empty($input['is_published']) && !$alreadyConfirmed && empty($input['qc_confirmed'])) {
+        $errors['qc_confirmed'] = 'Please confirm the quality checklist before publishing.';
+    }
+
     return $errors;
 }
 
 /**
- * The nine optional teaching-detail fields shared by create_resource()
+ * The eleven optional teaching-detail fields shared by create_resource()
  * and update_resource() — cleaned and normalized to null-when-empty so
  * resource.php can render each section only when it has real content.
  */
@@ -652,7 +661,8 @@ function extract_teaching_detail_fields(array $input): array
 {
     $fields = [];
     foreach (['learning_objectives', 'recommended_level', 'suggested_duration', 'skills_practiced',
-              'how_to_use', 'activity_ideas', 'teacher_tips', 'differentiation_notes', 'assessment_notes'] as $key) {
+              'how_to_use', 'activity_ideas', 'teacher_tips', 'differentiation_notes', 'assessment_notes',
+              'overview', 'whats_included'] as $key) {
         $value = clean_input($input[$key] ?? '');
         $fields[$key] = $value !== '' ? $value : null;
     }
@@ -723,13 +733,16 @@ function create_resource(array $input, array $files): array
     $metaDescription = clean_input($input['meta_description'] ?? '');
     $teaching = extract_teaching_detail_fields($input);
 
+    $isPublished = !empty($input['is_published']) ? 1 : 0;
+
     $stmt = getDB()->prepare(
         'INSERT INTO resources (title, slug, description, seo_title, meta_description,
                                  learning_objectives, recommended_level, suggested_duration, skills_practiced,
                                  how_to_use, activity_ideas, teacher_tips, differentiation_notes, assessment_notes,
+                                 overview, whats_included, qc_confirmed_at,
                                  resource_type, subject_id, category_id, grade_level, topic,
                                  thumbnail, preview_image, file_path, file_name, file_size, file_type, is_free, is_published)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     );
     $stmt->execute([
         $title,
@@ -746,6 +759,9 @@ function create_resource(array $input, array $files): array
         $teaching['teacher_tips'],
         $teaching['differentiation_notes'],
         $teaching['assessment_notes'],
+        $teaching['overview'],
+        $teaching['whats_included'],
+        $isPublished ? date('Y-m-d H:i:s') : null,
         $input['resource_type'],
         (int)$input['subject_id'],
         !empty($input['category_id']) ? (int)$input['category_id'] : null,
@@ -758,10 +774,16 @@ function create_resource(array $input, array $files): array
         (int)$files['resource_file']['size'],
         strtolower(pathinfo($files['resource_file']['name'], PATHINFO_EXTENSION)),
         !empty($input['is_free']) ? 1 : 0,
-        !empty($input['is_published']) ? 1 : 0,
+        $isPublished,
     ]);
 
-    return ['success' => true, 'errors' => [], 'id' => (int)getDB()->lastInsertId()];
+    $newId = (int)getDB()->lastInsertId();
+
+    add_uploaded_additional_files($newId, $files);
+    set_resource_related_resources($newId, $input['related_resource_ids'] ?? []);
+    set_resource_related_guides($newId, $input['related_guide_ids'] ?? []);
+
+    return ['success' => true, 'errors' => [], 'id' => $newId];
 }
 
 /** Returns ['success' => bool, 'errors' => array<string,string>] */
@@ -772,6 +794,13 @@ function update_resource(int $id, array $input, array $files): array
     if (!$existing) {
         return ['success' => false, 'errors' => ['general' => 'Resource not found.']];
     }
+
+    // Staying published with a checklist already confirmed doesn't need the
+    // checkbox re-ticked on every minor edit; going from draft to published
+    // (or re-publishing after a previous unpublish, which clears the
+    // confirmation below) always does.
+    $publishStateUnchanged = (int)$existing['is_published'] === (!empty($input['is_published']) ? 1 : 0);
+    $input['_qc_already_confirmed'] = $publishStateUnchanged && !empty($existing['qc_confirmed_at']);
 
     $errors = validate_resource_input($input);
 
@@ -861,10 +890,18 @@ function update_resource(int $id, array $input, array $files): array
         $preview = $newPreview['filename'];
     }
 
+    $newIsPublished = !empty($input['is_published']) ? 1 : 0;
+    if (!$publishStateUnchanged) {
+        $qcConfirmedAt = $newIsPublished ? date('Y-m-d H:i:s') : null;
+    } else {
+        $qcConfirmedAt = $existing['qc_confirmed_at'];
+    }
+
     getDB()->prepare(
         'UPDATE resources SET title = ?, description = ?, seo_title = ?, meta_description = ?,
                                learning_objectives = ?, recommended_level = ?, suggested_duration = ?, skills_practiced = ?,
                                how_to_use = ?, activity_ideas = ?, teacher_tips = ?, differentiation_notes = ?, assessment_notes = ?,
+                               overview = ?, whats_included = ?, qc_confirmed_at = ?,
                                resource_type = ?, subject_id = ?, category_id = ?, grade_level = ?,
                                topic = ?, thumbnail = ?, preview_image = ?, file_path = ?, file_name = ?,
                                file_size = ?, file_type = ?, is_free = ?, is_published = ? WHERE id = ?'
@@ -887,6 +924,9 @@ function update_resource(int $id, array $input, array $files): array
         $teaching['teacher_tips'],
         $teaching['differentiation_notes'],
         $teaching['assessment_notes'],
+        $teaching['overview'],
+        $teaching['whats_included'],
+        $qcConfirmedAt,
         $input['resource_type'],
         (int)$input['subject_id'],
         !empty($input['category_id']) ? (int)$input['category_id'] : null,
@@ -899,14 +939,135 @@ function update_resource(int $id, array $input, array $files): array
         $fileSize,
         $fileType,
         !empty($input['is_free']) ? 1 : 0,
-        !empty($input['is_published']) ? 1 : 0,
+        $newIsPublished,
         $id,
     ]);
+
+    add_uploaded_additional_files($id, $files);
+    set_resource_related_resources($id, $input['related_resource_ids'] ?? []);
+    set_resource_related_guides($id, $input['related_guide_ids'] ?? []);
 
     return ['success' => true, 'errors' => []];
 }
 
-/** Deletes the resource's uploaded files from disk, then the DB row. Downloads/favorites rows cascade via FK. */
+/** Optional additional files on a resource (e.g. a standalone answer key), in sort_order. */
+function get_resource_files(int $resourceId): array
+{
+    $stmt = getDB()->prepare('SELECT * FROM resource_files WHERE resource_id = ? ORDER BY sort_order, id');
+    $stmt->execute([$resourceId]);
+
+    return $stmt->fetchAll();
+}
+
+function get_resource_file_by_id(int $id): ?array
+{
+    $stmt = getDB()->prepare('SELECT * FROM resource_files WHERE id = ? LIMIT 1');
+    $stmt->execute([$id]);
+
+    return $stmt->fetch() ?: null;
+}
+
+/** Removes one additional file's disk file and DB row. */
+function delete_resource_file(int $id): void
+{
+    $file = get_resource_file_by_id($id);
+
+    if (!$file) {
+        return;
+    }
+
+    @unlink(UPLOAD_PROTECTED_PATH . '/' . $file['file_path']);
+    getDB()->prepare('DELETE FROM resource_files WHERE id = ?')->execute([$id]);
+}
+
+/**
+ * Handles up to three optional "additional file" upload slots from the
+ * admin resource form (additional_file_1..3, each with an optional
+ * additional_file_label_N) — a fixed small number of slots rather than a
+ * dynamic multi-upload widget, since most resources need at most one or
+ * two extras (e.g. a separate answer key). Silently skips empty slots;
+ * upload errors on an optional slot are logged, not fatal to the save.
+ */
+function add_uploaded_additional_files(int $resourceId, array $files): void
+{
+    $db = getDB();
+    $orderStmt = $db->prepare('SELECT COALESCE(MAX(sort_order), -1) + 1 FROM resource_files WHERE resource_id = ?');
+    $orderStmt->execute([$resourceId]);
+    $nextOrder = (int)$orderStmt->fetchColumn();
+
+    for ($slot = 1; $slot <= 3; $slot++) {
+        $fileKey = "additional_file_{$slot}";
+        if (empty($files[$fileKey]['name'])) {
+            continue;
+        }
+
+        $upload = handle_upload($files[$fileKey], UPLOAD_PROTECTED_PATH, ALLOWED_RESOURCE_MIME_TYPES, MAX_UPLOAD_SIZE_BYTES);
+
+        if (!$upload['success'] || $upload['filename'] === null) {
+            error_log("Additional file upload failed for resource #{$resourceId}, slot {$slot}: " . ($upload['error'] ?? 'unknown error'));
+            continue;
+        }
+
+        $label = clean_input($files["additional_file_label_{$slot}"] ?? '');
+
+        $db->prepare(
+            'INSERT INTO resource_files (resource_id, file_path, file_name, file_size, file_type, label, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?)'
+        )->execute([
+            $resourceId,
+            $upload['filename'],
+            safe_display_filename($files[$fileKey]['name']),
+            (int)$files[$fileKey]['size'],
+            strtolower(pathinfo($files[$fileKey]['name'], PATHINFO_EXTENSION)),
+            $label !== '' ? $label : null,
+            $nextOrder++,
+        ]);
+    }
+}
+
+/** Manually admin-picked related resources, published+active only, in sort_order. Empty when none picked — resource.php falls back to the automatic relevance query in that case. */
+function get_manual_related_resources(int $resourceId): array
+{
+    $stmt = getDB()->prepare(
+        "SELECT r.*, c.name AS category_name, s.name AS subject_name, s.slug AS subject_slug
+         FROM resource_related_resources rr
+         INNER JOIN resources r ON r.id = rr.related_resource_id
+         LEFT JOIN categories c ON c.id = r.category_id
+         INNER JOIN subjects s ON s.id = r.subject_id
+         WHERE rr.resource_id = ? AND r.is_published = 1 AND r.status = 'active'
+         ORDER BY rr.sort_order, r.title"
+    );
+    $stmt->execute([$resourceId]);
+
+    return $stmt->fetchAll();
+}
+
+/** Every related_resource_id currently picked for this resource, regardless of the target's published state — used to pre-check the admin resource form's related-resources picker. */
+function get_related_resource_ids(int $resourceId): array
+{
+    $stmt = getDB()->prepare('SELECT related_resource_id FROM resource_related_resources WHERE resource_id = ? ORDER BY sort_order');
+    $stmt->execute([$resourceId]);
+
+    return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+}
+
+/** Replaces a resource's manual related-resources list wholesale — called from the admin resource editor with the full new set each save. Self-references are silently dropped. */
+function set_resource_related_resources(int $resourceId, array $relatedIds): void
+{
+    $db = getDB();
+    $db->prepare('DELETE FROM resource_related_resources WHERE resource_id = ?')->execute([$resourceId]);
+
+    $stmt = $db->prepare('INSERT INTO resource_related_resources (resource_id, related_resource_id, sort_order) VALUES (?, ?, ?)');
+    $order = 0;
+    foreach ($relatedIds as $relatedId) {
+        $relatedId = (int)$relatedId;
+        if ($relatedId > 0 && $relatedId !== $resourceId) {
+            $stmt->execute([$resourceId, $relatedId, $order]);
+            $order++;
+        }
+    }
+}
+
+/** Deletes the resource's uploaded files from disk, then the DB row. Downloads/favorites/resource_files rows cascade via FK. */
 function delete_resource(int $id): void
 {
     $resource = get_resource_by_id($id);
@@ -923,6 +1084,9 @@ function delete_resource(int $id): void
     }
     if (!empty($resource['preview_image'])) {
         @unlink(UPLOAD_PREVIEW_PATH . '/' . $resource['preview_image']);
+    }
+    foreach (get_resource_files($id) as $extraFile) {
+        @unlink(UPLOAD_PROTECTED_PATH . '/' . $extraFile['file_path']);
     }
 
     getDB()->prepare('DELETE FROM resources WHERE id = ?')->execute([$id]);
