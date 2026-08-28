@@ -779,7 +779,7 @@ function create_resource(array $input, array $files): array
 
     $newId = (int)getDB()->lastInsertId();
 
-    add_uploaded_additional_files($newId, $files);
+    add_uploaded_additional_files($newId, $input, $files);
     set_resource_related_resources($newId, $input['related_resource_ids'] ?? []);
     set_resource_related_guides($newId, $input['related_guide_ids'] ?? []);
 
@@ -943,7 +943,7 @@ function update_resource(int $id, array $input, array $files): array
         $id,
     ]);
 
-    add_uploaded_additional_files($id, $files);
+    add_uploaded_additional_files($id, $input, $files);
     set_resource_related_resources($id, $input['related_resource_ids'] ?? []);
     set_resource_related_guides($id, $input['related_guide_ids'] ?? []);
 
@@ -987,8 +987,9 @@ function delete_resource_file(int $id): void
  * dynamic multi-upload widget, since most resources need at most one or
  * two extras (e.g. a separate answer key). Silently skips empty slots;
  * upload errors on an optional slot are logged, not fatal to the save.
+ * $input is the label text fields (from $_POST); $files is the upload data (from $_FILES).
  */
-function add_uploaded_additional_files(int $resourceId, array $files): void
+function add_uploaded_additional_files(int $resourceId, array $input, array $files): void
 {
     $db = getDB();
     $orderStmt = $db->prepare('SELECT COALESCE(MAX(sort_order), -1) + 1 FROM resource_files WHERE resource_id = ?');
@@ -1008,7 +1009,7 @@ function add_uploaded_additional_files(int $resourceId, array $files): void
             continue;
         }
 
-        $label = clean_input($files["additional_file_label_{$slot}"] ?? '');
+        $label = clean_input($input["additional_file_label_{$slot}"] ?? '');
 
         $db->prepare(
             'INSERT INTO resource_files (resource_id, file_path, file_name, file_size, file_type, label, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?)'
