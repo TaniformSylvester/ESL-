@@ -274,7 +274,7 @@ foreach ($subjects as $subjectRow) {
                         </ul>
                     <?php endif; ?>
 
-                    <?php for ($slot = 1; $slot <= 3; $slot++): ?>
+                    <?php for ($slot = 1; $slot <= RESOURCE_ADDITIONAL_FILE_SLOTS; $slot++): ?>
                         <div class="row g-2 mb-2">
                             <div class="col-md-7">
                                 <input type="file" class="form-control form-control-sm" name="additional_file_<?= $slot ?>">

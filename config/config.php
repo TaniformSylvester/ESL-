@@ -92,6 +92,12 @@ define('MAX_UPLOAD_SIZE_BYTES', MAX_UPLOAD_SIZE_MB * 1024 * 1024);
 define('MAX_IMAGE_SIZE_MB', 3);
 define('MAX_IMAGE_SIZE_BYTES', MAX_IMAGE_SIZE_MB * 1024 * 1024);
 
+// How many optional "additional file" upload slots the admin resource form
+// offers per save (resource_files has no cap of its own — this only bounds
+// how many new files a single form submission can add; editing again later
+// offers this many fresh slots on top of whatever already exists).
+define('RESOURCE_ADDITIONAL_FILE_SLOTS', 8);
+
 // docx/pptx/xlsx are ZIP archives internally, and not every server's libmagic
 // build has the rules to tell an Office file apart from a generic ZIP — some
 // report plain application/zip, and some (confirmed on live FastComet

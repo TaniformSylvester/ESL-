@@ -981,13 +981,14 @@ function delete_resource_file(int $id): void
 }
 
 /**
- * Handles up to three optional "additional file" upload slots from the
- * admin resource form (additional_file_1..3, each with an optional
- * additional_file_label_N) — a fixed small number of slots rather than a
- * dynamic multi-upload widget, since most resources need at most one or
- * two extras (e.g. a separate answer key). Silently skips empty slots;
- * upload errors on an optional slot are logged, not fatal to the save.
- * $input is the label text fields (from $_POST); $files is the upload data (from $_FILES).
+ * Handles up to RESOURCE_ADDITIONAL_FILE_SLOTS optional "additional file"
+ * upload slots from the admin resource form (additional_file_1..N, each
+ * with an optional additional_file_label_N) — a fixed number of slots
+ * (config.php) rather than an open-ended dynamic multi-upload widget, so a
+ * single save can only ever create a bounded number of new files. Silently
+ * skips empty slots; upload errors on an optional slot are logged, not
+ * fatal to the save. $input is the label text fields (from $_POST); $files
+ * is the upload data (from $_FILES).
  */
 function add_uploaded_additional_files(int $resourceId, array $input, array $files): void
 {
@@ -996,7 +997,7 @@ function add_uploaded_additional_files(int $resourceId, array $input, array $fil
     $orderStmt->execute([$resourceId]);
     $nextOrder = (int)$orderStmt->fetchColumn();
 
-    for ($slot = 1; $slot <= 3; $slot++) {
+    for ($slot = 1; $slot <= RESOURCE_ADDITIONAL_FILE_SLOTS; $slot++) {
         $fileKey = "additional_file_{$slot}";
         if (empty($files[$fileKey]['name'])) {
             continue;
