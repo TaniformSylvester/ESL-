@@ -39,6 +39,7 @@ if ($event['type'] === 'checkout.session.completed') {
     $sessionId = (string)($session['id'] ?? '');
     $paymentStatus = (string)($session['payment_status'] ?? '');
     $amountTotal = (int)($session['amount_total'] ?? 0);
+    $currency = (string)($session['currency'] ?? 'usd');
 
     // payment_status may be "unpaid" for delayed payment methods even once
     // this event fires — only credit membership once Stripe confirms paid.
@@ -46,7 +47,7 @@ if ($event['type'] === 'checkout.session.completed') {
         $user = get_user_by_id($userId);
 
         if ($user) {
-            record_stripe_payment($userId, $amountTotal / 100, $sessionId);
+            record_stripe_payment($userId, $amountTotal / 100, $sessionId, $currency);
 
             $membership = get_membership($userId);
             send_payment_approved_email($user, $membership['expiry_date'] ?? '');

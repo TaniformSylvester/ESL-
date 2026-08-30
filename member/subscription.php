@@ -99,12 +99,21 @@ require_once __DIR__ . '/../includes/header.php';
             <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <div>
                     <h2 class="h5 fw-bold mb-1"><i class="fa-solid fa-credit-card text-primary me-1"></i> Pay Instantly by Card</h2>
-                    <p class="text-secondary mb-0">Charged in USD, Teacher Pro Monthly — activates your membership automatically, no waiting for approval.</p>
+                    <p class="text-secondary mb-0">Teacher Pro Monthly — activates your membership automatically, no waiting for approval.</p>
+                    <p class="text-secondary small mb-0">If your card is issued in Thailand and gets declined for "currency not supported," use the ฿ option instead.</p>
                 </div>
-                <form method="post" action="<?= e(base_url('member/stripe-checkout.php')) ?>">
-                    <?php csrf_field(); ?>
-                    <button type="submit" class="btn btn-primary px-4">$<?= number_format(STRIPE_PRICE_USD, 2) ?> — Pay with Card</button>
-                </form>
+                <div class="d-flex flex-wrap gap-2">
+                    <form method="post" action="<?= e(base_url('member/stripe-checkout.php')) ?>">
+                        <?php csrf_field(); ?>
+                        <input type="hidden" name="currency" value="usd">
+                        <button type="submit" class="btn btn-primary px-4">$<?= number_format(STRIPE_PRICE_USD, 2) ?> — Pay with Card</button>
+                    </form>
+                    <form method="post" action="<?= e(base_url('member/stripe-checkout.php')) ?>">
+                        <?php csrf_field(); ?>
+                        <input type="hidden" name="currency" value="thb">
+                        <button type="submit" class="btn btn-outline-primary px-4"><?= e(format_currency(PRICE_MONTHLY)) ?> — Pay with Card</button>
+                    </form>
+                </div>
             </div>
         </div>
         <p class="text-secondary text-center small mb-4">— or pay by bank transfer / PromptPay below (also available for the Annual plan) —</p>

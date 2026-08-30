@@ -98,7 +98,7 @@ function submit_payment(int $userId, array $input, array $file): array
  * Stripe's at-least-once webhook delivery: a session already recorded
  * (checked via gateway_reference) is a no-op, not a duplicate extension.
  */
-function record_stripe_payment(int $userId, float $amount, string $sessionId): void
+function record_stripe_payment(int $userId, float $amount, string $sessionId, string $currency = 'usd'): void
 {
     $db = getDB();
 
@@ -108,13 +108,13 @@ function record_stripe_payment(int $userId, float $amount, string $sessionId): v
         return;
     }
 
-    // Stripe charges are always USD (STRIPE_CURRENCY) regardless of the
-    // site's default THB currency used for bank transfer/PromptPay, and
-    // only ever offers the monthly plan (see config/stripe.php).
+    // Stripe charges can be USD or THB (see create_stripe_checkout_session)
+    // — $currency comes from the actual Checkout Session Stripe confirmed,
+    // not assumed. Stripe only ever offers the monthly plan (config/stripe.php).
     $db->prepare(
         "INSERT INTO payments (user_id, amount, currency, method, plan, reference_number, payment_date, status, gateway_reference, reviewed_at)
          VALUES (?, ?, ?, 'stripe', 'monthly', ?, CURDATE(), 'approved', ?, NOW())"
-    )->execute([$userId, $amount, strtoupper(STRIPE_CURRENCY), $sessionId, $sessionId]);
+    )->execute([$userId, $amount, strtoupper($currency), $sessionId, $sessionId]);
 
     $paymentId = (int)$db->lastInsertId();
 
