@@ -21,10 +21,11 @@ if (!is_logged_in()) {
 if (!can_download_resource($resource)) {
     if (!$resource['is_free']) {
         flash_set('warning', 'This resource is available to Teacher Pro members. Upgrade to download it.');
-    } else {
-        flash_set('warning', "You've reached your 5 free downloads for this month. Upgrade to Teacher Pro for unlimited downloads.");
+        redirect('resource.php?slug=' . urlencode($resource['slug']));
     }
-    redirect('resource.php?slug=' . urlencode($resource['slug']));
+
+    flash_set('warning', "You've reached your 5 free downloads for this month. Upgrade to Teacher Pro for unlimited downloads.");
+    redirect('resource.php?slug=' . urlencode($resource['slug']) . '&blocked=quota');
 }
 
 if (empty($resource['file_path'])) {
@@ -48,7 +49,7 @@ if (!is_file($filePath)) {
 if ($resource['is_free'] && !isMemberActive() && !is_admin()) {
     if (!try_consume_free_download((int)$_SESSION['user_id'])) {
         flash_set('warning', "You've reached your 5 free downloads for this month. Upgrade to Teacher Pro for unlimited downloads.");
-        redirect('resource.php?slug=' . urlencode($resource['slug']));
+        redirect('resource.php?slug=' . urlencode($resource['slug']) . '&blocked=quota');
     }
 }
 

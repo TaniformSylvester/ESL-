@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             send_admin_new_registration_email($newTeacher);
 
             flash_set('success', 'Your account has been created. Please log in to continue.');
-            redirect('login.php');
+            redirect('login.php?registered=1');
         }
 
         $errors = $result['errors'];
@@ -43,6 +43,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $pageTitle = 'Register';
 $pageDescription = 'Create your free ' . SITE_NAME . ' account.';
+
+// Fires only on the initial GET landing, not on a form re-submission
+// after a validation error, so retrying doesn't re-count the same start.
+$gaCustomEvents = $_SERVER['REQUEST_METHOD'] !== 'POST'
+    ? [['name' => 'registration_started', 'params' => []]]
+    : [];
+
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container py-5">

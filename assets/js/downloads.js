@@ -58,6 +58,16 @@ document.addEventListener('DOMContentLoaded', function () {
                             countEl.textContent = data.download_count;
                         }
                         changed = true;
+
+                        // The count only increases once the server has
+                        // actually recorded a successful download (see
+                        // record_download() in download-functions.php) —
+                        // this is the one funnel event with no page load
+                        // of its own to attach a script to, so it rides on
+                        // this existing, already-verified success signal.
+                        if (typeof gtag === 'function') {
+                            gtag('event', 'download_success', { resource_id: resourceId });
+                        }
                     }
 
                     if (data.can_review && !reviewBoxShown) {

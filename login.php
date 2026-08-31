@@ -34,6 +34,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $pageTitle = 'Login';
 $pageDescription = 'Log in to your ' . SITE_NAME . ' account.';
+
+// Analytics only — identifies two funnel moments without changing any
+// login/redirect behavior: arriving here because a download required
+// login, and arriving here right after completing registration. Only
+// fired on the initial GET landing, not on a form re-submission, so a
+// failed-login retry doesn't re-count the same funnel moment.
+$gaCustomEvents = [];
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    if (($_GET['registered'] ?? '') === '1') {
+        $gaCustomEvents[] = ['name' => 'registration_completed', 'params' => []];
+    }
+    if (str_starts_with($redirectPath, 'member/download.php')) {
+        $downloadQuery = parse_url($redirectPath, PHP_URL_QUERY);
+        parse_str($downloadQuery ?? '', $downloadParams);
+        $gaCustomEvents[] = [
+            'name'   => 'download_login_required',
+            'params' => ['resource_id' => isset($downloadParams['id']) ? (int)$downloadParams['id'] : null],
+        ];
+    }
+}
+
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container py-5">

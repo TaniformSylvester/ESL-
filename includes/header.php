@@ -9,6 +9,7 @@ $pageTitle = $pageTitle ?? SITE_NAME;
 $pageDescription = $pageDescription ?? SITE_DESCRIPTION;
 $pageImage = $pageImage ?? asset_url('images/og-image-icon.png');
 $pageRobots = $pageRobots ?? 'index, follow';
+$gaCustomEvents = $gaCustomEvents ?? [];
 $isLoggedIn = isset($_SESSION['user_id']);
 $userRole = $_SESSION['user_role'] ?? null;
 $showAds = should_show_ads();
@@ -37,6 +38,16 @@ $websiteSchema = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php if (GA_ENABLED && GA_MEASUREMENT_ID !== ''): ?>
+    <!-- Google Analytics 4 — minimal funnel-diagnosis tracking (config/analytics.php) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<?= e(GA_MEASUREMENT_ID) ?>"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '<?= e(GA_MEASUREMENT_ID) ?>');
+    </script>
+    <?php endif; ?>
     <title><?= e($pageTitle) ?> | <?= e(SITE_NAME) ?></title>
     <meta name="description" content="<?= e($pageDescription) ?>">
     <meta name="robots" content="<?= e($pageRobots) ?>">
@@ -66,6 +77,14 @@ $websiteSchema = [
 
     <?php if ($showAds): ?>
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=<?= e(ADSENSE_PUBLISHER_ID) ?>" crossorigin="anonymous"></script>
+    <?php endif; ?>
+
+    <?php if (GA_ENABLED && GA_MEASUREMENT_ID !== '' && !empty($gaCustomEvents)): ?>
+    <script>
+        <?php foreach ($gaCustomEvents as $gaEvent): ?>
+        gtag('event', <?= json_encode($gaEvent['name']) ?>, <?= json_encode($gaEvent['params'] ?? [], JSON_UNESCAPED_SLASHES) ?>);
+        <?php endforeach; ?>
+    </script>
     <?php endif; ?>
 </head>
 <body>

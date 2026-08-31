@@ -28,6 +28,14 @@ $pageTitle = $listingSeo['title'];
 $pageDescription = $listingSeo['description'];
 $pageRobots = $listingSeo['noindex'] ? 'noindex, follow' : 'index, follow';
 
+$gaCustomEvents = [];
+if ($filters['search'] !== '') {
+    $gaCustomEvents[] = [
+        'name'   => 'search',
+        'params' => ['search_term' => $filters['search'], 'results_count' => (int)$result['total']],
+    ];
+}
+
 $breadcrumbSchema = null;
 if ($activeSubject || $activeCategory) {
     $crumbs = [['name' => 'Resources', 'url' => base_url('resources.php')]];

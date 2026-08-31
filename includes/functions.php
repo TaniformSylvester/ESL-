@@ -25,7 +25,7 @@ function asset_url(string $path): string
  */
 function strip_tracking_params(string $requestUri): string
 {
-    $trackingKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'fbclid', 'gclid', 'msclkid', 'ref'];
+    $trackingKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'fbclid', 'gclid', 'msclkid', 'ref', 'blocked', 'registered'];
 
     $parts = parse_url($requestUri);
     $path = $parts['path'] ?? '/';

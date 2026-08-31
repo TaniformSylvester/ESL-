@@ -11,7 +11,11 @@ $cardIsLoggedIn = is_logged_in();
 $cardIsFavorited = $cardIsLoggedIn && is_favorited((int)$_SESSION['user_id'], (int)$resource['id']);
 ?>
 <div class="col">
-    <div class="card resource-card shadow-sm">
+    <div class="card resource-card shadow-sm"
+         data-resource-id="<?= (int)$resource['id'] ?>"
+         data-resource-title="<?= e($resource['title']) ?>"
+         data-subject="<?= e($resource['subject_name'] ?? '') ?>"
+         data-grade="<?= e($resource['grade_level'] ?? '') ?>">
         <div class="position-relative">
             <a href="<?= e(base_url('resource.php?slug=' . urlencode($resource['slug']))) ?>" class="text-decoration-none text-reset">
                 <?php if ($cardThumbUrl): ?>

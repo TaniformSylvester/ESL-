@@ -74,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 $isLoggedIn = is_logged_in();
 $canDownload = can_download_resource($resource);
 $isPro = $isLoggedIn && isMemberActive();
+$gaAccountState = !$isLoggedIn ? 'guest' : (is_admin() ? 'admin' : ($isPro ? 'pro' : 'free'));
 $freeUsage = ($isLoggedIn && !$isPro && !is_admin()) ? get_free_download_usage((int)$_SESSION['user_id']) : null;
 $isFavorited = $isLoggedIn && is_favorited((int)$_SESSION['user_id'], (int)$resource['id']);
 $previewUrl = !empty($resource['preview_image']) ? UPLOAD_PREVIEW_URL . '/' . rawurlencode($resource['preview_image']) : null;
@@ -116,6 +117,23 @@ $whatsIncludedList = !empty($resource['whats_included']) ? array_filter(array_ma
 $pageTitle = generate_resource_seo_title($resource);
 $pageDescription = generate_resource_seo_description($resource);
 $pageImage = $displayImage ?? asset_url('images/og-image-icon.png');
+
+$gaCustomEvents = [[
+    'name'   => 'resource_view',
+    'params' => [
+        'resource_id'    => (int)$resource['id'],
+        'resource_title' => $resource['title'],
+        'subject'        => $resource['subject_name'] ?? null,
+        'grade'          => $resource['grade_level'] ?? null,
+        'is_free'        => (bool)$resource['is_free'],
+    ],
+]];
+if (($_GET['blocked'] ?? '') === 'quota') {
+    $gaCustomEvents[] = [
+        'name'   => 'quota_blocked',
+        'params' => ['resource_id' => (int)$resource['id']],
+    ];
+}
 
 $breadcrumbItems = [['name' => 'Resources', 'url' => base_url('resources.php')]];
 if (!empty($resource['subject_name'])) {
@@ -282,6 +300,9 @@ require_once __DIR__ . '/includes/header.php';
                 <?php if ($canDownload): ?>
                     <a href="<?= e(base_url('member/download.php?id=' . (int)$resource['id'])) ?>" class="btn btn-primary btn-lg px-4 js-download-link"
                        data-resource-id="<?= (int)$resource['id'] ?>"
+                       data-resource-title="<?= e($resource['title']) ?>"
+                       data-is-free="<?= $resource['is_free'] ? '1' : '0' ?>"
+                       data-account-state="<?= e($gaAccountState) ?>"
                        data-initial-count="<?= (int)$resource['download_count'] ?>"
                        data-csrf="<?= e(generate_csrf_token()) ?>">
                         <i class="fa-solid fa-download me-2"></i>Download

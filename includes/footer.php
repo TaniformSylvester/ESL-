@@ -39,5 +39,8 @@
 <script src="<?= e(asset_url('js/reviews.js')) ?>"></script>
 <script src="<?= e(asset_url('js/downloads.js')) ?>"></script>
 <script src="<?= e(asset_url('js/teaching-demo.js')) ?>"></script>
+<?php if (GA_ENABLED && GA_MEASUREMENT_ID !== ''): ?>
+<script src="<?= e(asset_url('js/analytics.js')) ?>"></script>
+<?php endif; ?>
 </body>
 </html>
