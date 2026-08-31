@@ -38,5 +38,6 @@
 <script src="<?= e(asset_url('js/favorites.js')) ?>"></script>
 <script src="<?= e(asset_url('js/reviews.js')) ?>"></script>
 <script src="<?= e(asset_url('js/downloads.js')) ?>"></script>
+<script src="<?= e(asset_url('js/teaching-demo.js')) ?>"></script>
 </body>
 </html>

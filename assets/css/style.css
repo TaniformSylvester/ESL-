@@ -89,6 +89,28 @@ footer a:hover {
 }
 
 /* ---------------------------------------------------------------------
+   Homepage Teaching Demo section
+   ------------------------------------------------------------------- */
+
+.teaching-demo-play-btn {
+    width: 4.5rem;
+    height: 4.5rem;
+    background-color: rgba(255, 255, 255, 0.92);
+    color: var(--brand-primary);
+    font-size: 1.5rem;
+    box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.25);
+    border: none;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.teaching-demo-play-btn:hover,
+.teaching-demo-play-btn:focus {
+    background-color: #fff;
+    color: var(--brand-primary-dark);
+    transform: translate(-50%, -50%) scale(1.08);
+}
+
+/* ---------------------------------------------------------------------
    Teacher review & rating system
    ------------------------------------------------------------------- */
 

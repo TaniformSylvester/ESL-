@@ -6,6 +6,7 @@ require_once __DIR__ . '/includes/favorites-functions.php';
 require_once __DIR__ . '/includes/subject-functions.php';
 require_once __DIR__ . '/includes/guide-functions.php';
 require_once __DIR__ . '/includes/review-functions.php';
+require_once __DIR__ . '/includes/teaching-demos.php';
 
 $featuredResources = get_featured_resources(6);
 $freeResources = get_free_resources(6);
@@ -13,6 +14,7 @@ $categoriesGrouped = get_categories_grouped();
 $subjects = get_all_subjects();
 $recentGuides = get_recent_guides(3);
 $featuredReviews = get_featured_site_reviews(3);
+$featuredDemo = get_featured_teaching_demo();
 
 $subjectIcons = [
     'esl'     => 'fa-comments',
@@ -157,6 +159,19 @@ require_once __DIR__ . '/includes/header.php';
                 <a href="<?= e(base_url('teacher-hub.php#' . $categorySlug)) ?>" class="btn btn-sm btn-outline-secondary"><?= e($categoryLabel) ?></a>
             <?php endforeach; ?>
         </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php if ($featuredDemo): ?>
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="h3 fw-bold mb-2">See TeachLuma in Action</h2>
+            <p class="text-secondary mx-auto" style="max-width:640px;">Watch short teaching demos and see how TeachLuma resources can be used in a real classroom. Don't just download a resource &mdash; see how it can be taught, across ESL, Mathematics, and Science.</p>
+        </div>
+        <?php $demo = $featuredDemo; // teaching-demo-card.php expects $demo in scope ?>
+        <?php require __DIR__ . '/includes/teaching-demo-card.php'; ?>
     </div>
 </section>
 <?php endif; ?>
