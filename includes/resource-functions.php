@@ -1069,13 +1069,19 @@ function set_resource_related_resources(int $resourceId, array $relatedIds): voi
     }
 }
 
-/** Deletes the resource's uploaded files from disk, then the DB row. Downloads/favorites/resource_files rows cascade via FK. */
-function delete_resource(int $id): void
+/**
+ * Deletes the resource's uploaded files from disk, then the DB row.
+ * Downloads/favorites/resource_files rows cascade via FK. Returns true
+ * only if a row was actually removed — a caller that ignores this return
+ * value has no way to tell a real delete from a silent no-op (e.g. the
+ * row having already been removed by a concurrent request).
+ */
+function delete_resource(int $id): bool
 {
     $resource = get_resource_by_id($id);
 
     if (!$resource) {
-        return;
+        return false;
     }
 
     if (!empty($resource['file_path'])) {
@@ -1091,7 +1097,16 @@ function delete_resource(int $id): void
         @unlink(UPLOAD_PROTECTED_PATH . '/' . $extraFile['file_path']);
     }
 
-    getDB()->prepare('DELETE FROM resources WHERE id = ?')->execute([$id]);
+    try {
+        $stmt = getDB()->prepare('DELETE FROM resources WHERE id = ?');
+        $stmt->execute([$id]);
+
+        return $stmt->rowCount() > 0;
+    } catch (PDOException $e) {
+        error_log("delete_resource(#{$id}) failed: " . $e->getMessage());
+
+        return false;
+    }
 }
 
 /**
