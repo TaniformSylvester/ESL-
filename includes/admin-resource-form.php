@@ -21,6 +21,18 @@ foreach ($subjects as $subjectRow) {
     $subjectGradeMap[(int)$subjectRow['id']] = get_subject_grade_levels($subjectRow);
 }
 ?>
+<?php if ($isEdit && !empty($existingFiles)): ?>
+<!-- Kept outside the main edit form below: an HTML <form> cannot be
+     nested inside another <form>, and each "Remove" action here needs its
+     own independent submit target. This one shared, hidden form is reused
+     for whichever file's Remove button was clicked (see the script at the
+     bottom of this file), rather than one nested form per file. -->
+<form method="post" action="<?= e(base_url('admin/resource-file-delete.php')) ?>" id="removeFileForm" class="d-none">
+    <?php csrf_field(); ?>
+    <input type="hidden" name="id" id="removeFileId">
+    <input type="hidden" name="resource_id" value="<?= (int)$resource['id'] ?>">
+</form>
+<?php endif; ?>
 <form method="post" action="<?= e($actionUrl) ?>" enctype="multipart/form-data" novalidate>
     <?php csrf_field(); ?>
 
@@ -262,13 +274,7 @@ foreach ($subjects as $subjectRow) {
                             <?php foreach ($existingFiles as $extraFile): ?>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <span><?= e($extraFile['label'] ?: $extraFile['file_name']) ?> <span class="text-secondary small">(<?= e(format_file_size((int)$extraFile['file_size'])) ?>)</span></span>
-                                    <form method="post" action="<?= e(base_url('admin/resource-file-delete.php')) ?>" class="d-inline"
-                                          onsubmit="return confirm('Remove this file?');">
-                                        <?php csrf_field(); ?>
-                                        <input type="hidden" name="id" value="<?= (int)$extraFile['id'] ?>">
-                                        <input type="hidden" name="resource_id" value="<?= (int)$resource['id'] ?>">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
-                                    </form>
+                                    <button type="button" class="btn btn-sm btn-outline-danger js-remove-additional-file" data-file-id="<?= (int)$extraFile['id'] ?>">Remove</button>
                                 </li>
                             <?php endforeach; ?>
                         </ul>
@@ -397,5 +403,21 @@ foreach ($subjects as $subjectRow) {
     publishedRadio.addEventListener('change', toggleQcBox);
     draftRadio.addEventListener('change', toggleQcBox);
     toggleQcBox();
+
+    // "Remove" on an existing additional file: fills in and submits the
+    // shared #removeFileForm declared above the main form (can't be a
+    // form nested inside this page's main form — see that form's comment).
+    var removeFileForm = document.getElementById('removeFileForm');
+    if (removeFileForm) {
+        document.querySelectorAll('.js-remove-additional-file').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                if (!confirm('Remove this file?')) {
+                    return;
+                }
+                document.getElementById('removeFileId').value = btn.dataset.fileId;
+                removeFileForm.submit();
+            });
+        });
+    }
 })();
 </script>
