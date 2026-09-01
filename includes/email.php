@@ -47,9 +47,9 @@ function send_welcome_email(array $user): bool
     $subject = 'Welcome to ' . SITE_NAME . '!';
 
     $body = '<p>Hi ' . e($user['first_name']) . ',</p>'
-        . '<p>Thanks for creating your ' . e(SITE_NAME) . ' account! You can browse the full resource library right away, with up to 5 free downloads every month.</p>'
+        . '<p>Thanks for creating your ' . e(SITE_NAME) . ' account! Free resources are unlimited for everyone, and your account also lets you save favorites, write reviews, and track your download history.</p>'
         . '<p><a href="' . e(base_url('member/subscription.php')) . '">Upgrade to Teacher Pro</a> '
-        . 'any time (from ' . e(format_currency(PRICE_MONTHLY)) . '/month, or ' . e(format_currency(PRICE_ANNUAL)) . '/year) for unlimited downloads.</p>';
+        . 'any time (from ' . e(format_currency(PRICE_MONTHLY)) . '/month, or ' . e(format_currency(PRICE_ANNUAL)) . '/year) to unlock members-only resources.</p>';
 
     return send_email($user['email'], $subject, $body);
 }

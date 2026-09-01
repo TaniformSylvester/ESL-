@@ -9,9 +9,10 @@
  * The single source of truth for "can this resource be downloaded right
  * now" — used by both resource.php and member/download.php so they never
  * drift apart. Members-only resources (is_free = 0) always require an
- * active Pro membership, with no exception for remaining free-plan quota.
- * Free resources require a logged-in account and remaining monthly quota
- * unless the account is Pro or admin (both unlimited).
+ * active Pro membership, with no exception. Free resources are always
+ * downloadable — unlimited, no login required — per the TeachLuma
+ * free-access model: account creation is reserved for reviews/community
+ * features and Pro content, never a prerequisite for a free download.
  */
 function can_download_resource(array $resource): bool
 {
@@ -19,14 +20,17 @@ function can_download_resource(array $resource): bool
         return true;
     }
 
-    if (!$resource['is_free']) {
-        return false;
-    }
-
-    return is_logged_in() && get_free_download_usage((int)$_SESSION['user_id'])['remaining'] > 0;
+    return (bool)$resource['is_free'];
 }
 
 /**
+ * Dormant since the free-access model change: no longer called from
+ * can_download_resource() or the download flow, since free resources are
+ * now unlimited for everyone. Kept (with its backing users.free_downloads_*
+ * columns and FREE_DOWNLOAD_MONTHLY_LIMIT constant) rather than deleted,
+ * in case a future rate-limit or quota feature is wanted again — nothing
+ * currently calls it.
+ *
  * Read-only view of a free-plan user's monthly download usage, applying
  * the lazy calendar-month reset described in config.php's
  * FREE_DOWNLOAD_MONTHLY_LIMIT comment. Safe to call repeatedly (e.g. on

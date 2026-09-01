@@ -21,12 +21,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-if (!is_logged_in()) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'error' => 'Please log in.']);
-    exit;
-}
-
+// No login check here — free resources are downloadable by anonymous
+// visitors too (see includes/download-functions.php), and this endpoint
+// only reports already-recorded state, so an anonymous poll is just as
+// safe as a logged-in one. The CSRF token is session-based regardless of
+// login state, so it still protects this endpoint.
 if (!verify_csrf_token($_POST['csrf_token'] ?? null)) {
     http_response_code(403);
     echo json_encode(['success' => false, 'error' => 'Invalid request.']);
@@ -44,10 +43,9 @@ if (!$resource || !$resource['is_published'] || $resource['status'] !== 'active'
     exit;
 }
 
-$userId = (int)$_SESSION['user_id'];
-$isLoggedIn = true;
-$myReview = get_user_review($userId, $resourceId);
-$canWriteReview = can_review_resource($userId, $resourceId);
+$isLoggedIn = is_logged_in();
+$myReview = $isLoggedIn ? get_user_review((int)$_SESSION['user_id'], $resourceId) : null;
+$canWriteReview = $isLoggedIn && can_review_resource((int)$_SESSION['user_id'], $resourceId);
 $reviewErrors = [];
 
 ob_start();

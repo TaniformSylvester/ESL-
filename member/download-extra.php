@@ -15,19 +15,16 @@ if (!$file || !$resource || !$resource['is_published'] || $resource['status'] !=
     exit;
 }
 
-if (!is_logged_in()) {
-    redirect('login.php?redirect=' . urlencode($_SERVER['REQUEST_URI']));
-}
-
-// Additional files share the same access rule as the resource's main file
-// (free/premium, quota already applies to the resource as a whole — this
-// doesn't consume a second free download for a supplementary file).
+// Additional files share the same access rule as the resource's main
+// file: free resources are unlimited and require no login, so this block
+// is only reachable now for a members-only resource the visitor isn't
+// entitled to (same Pro-only gate as member/download.php).
 if (!can_download_resource($resource)) {
-    if (!$resource['is_free']) {
-        flash_set('warning', 'This resource is available to Teacher Pro members. Upgrade to download it.');
-    } else {
-        flash_set('warning', "You've reached your 5 free downloads for this month. Upgrade to Teacher Pro for unlimited downloads.");
+    if (!is_logged_in()) {
+        redirect('login.php?redirect=' . urlencode($_SERVER['REQUEST_URI']));
     }
+
+    flash_set('warning', 'This resource is available to Teacher Pro members. Upgrade to download it.');
     redirect('resource.php?slug=' . urlencode($resource['slug']));
 }
 

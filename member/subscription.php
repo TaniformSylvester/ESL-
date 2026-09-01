@@ -44,7 +44,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $membership = get_membership($user['id']) ?? ['status' => 'inactive', 'expiry_date' => null];
 $isActive = isMemberActive($user['id']);
-$freeUsage = $isActive ? null : get_free_download_usage($user['id']);
 $payments = get_user_payments($user['id']);
 
 $bankName = get_setting('bank_name');
@@ -86,8 +85,8 @@ require_once __DIR__ . '/../includes/header.php';
                     <?php if ($membership['status'] === 'pending'): ?>
                         <p class="mb-0">Your payment is awaiting approval. This usually takes less than a day.</p>
                     <?php else: ?>
-                        <p class="mb-1">You're on the Free plan. <?= e(free_download_usage_message($freeUsage)) ?></p>
-                        <p class="mb-0 text-secondary small">Upgrade to Teacher Pro below for unlimited downloads of every resource.</p>
+                        <p class="mb-1">You're on the Free plan. You can download every free resource, unlimited, no restrictions.</p>
+                        <p class="mb-0 text-secondary small">Upgrade to Teacher Pro below to also unlock members-only resources.</p>
                     <?php endif; ?>
                 <?php endif; ?>
             </div>

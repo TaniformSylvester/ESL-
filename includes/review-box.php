@@ -41,7 +41,7 @@
     </div>
 <?php elseif (!$isLoggedIn): ?>
     <div class="alert alert-light border small mb-4">
-        <a href="<?= e(base_url('login.php')) ?>">Log in</a> and download this resource to write a review.
+        <a href="<?= e(base_url('login.php')) ?>">Sign in</a> to review this resource.
     </div>
 <?php else: ?>
     <div class="alert alert-light border small mb-4">Download this resource to write a review.</div>

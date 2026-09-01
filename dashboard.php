@@ -10,7 +10,6 @@ require_login();
 $user = current_user();
 $membership = get_membership($user['id']) ?? ['status' => 'inactive', 'expiry_date' => null];
 $isActive = isMemberActive($user['id']);
-$freeUsage = $isActive ? null : get_free_download_usage($user['id']);
 
 $totalResources = get_published_resource_count();
 $recentResources = get_featured_resources(4);
@@ -33,8 +32,8 @@ require_once __DIR__ . '/includes/header.php';
                         <p class="small mb-0">Unlimited downloads. Expires <?= e(format_date($membership['expiry_date'])) ?></p>
                     <?php else: ?>
                         <span class="badge bg-secondary mb-2">Free Plan</span>
-                        <p class="small mb-1"><?= e(free_download_usage_message($freeUsage)) ?></p>
-                        <p class="small mb-0"><a href="<?= e(base_url('member/subscription.php')) ?>">Upgrade to Pro &rarr;</a></p>
+                        <p class="small mb-1">Unlimited downloads of every free resource.</p>
+                        <p class="small mb-0"><a href="<?= e(base_url('member/subscription.php')) ?>">Upgrade to Pro for members-only resources &rarr;</a></p>
                     <?php endif; ?>
                 </div>
             </div>

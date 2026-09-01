@@ -12,7 +12,7 @@ $annualMonthlyEquivalent = PRICE_ANNUAL / 12;
 $annualSavings = (PRICE_MONTHLY * 12) - PRICE_ANNUAL;
 
 $pageTitle = 'Pricing';
-$pageDescription = 'TeachLuma pricing: a free plan with 5 downloads a month, or Teacher Pro for unlimited downloads at ' . format_currency(PRICE_MONTHLY) . '/month or ' . format_currency(PRICE_ANNUAL) . '/year.';
+$pageDescription = 'TeachLuma pricing: free resources are unlimited for everyone, no account required, or go Teacher Pro for members-only resources at ' . format_currency(PRICE_MONTHLY) . '/month or ' . format_currency(PRICE_ANNUAL) . '/year.';
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container py-5">
@@ -35,13 +35,13 @@ require_once __DIR__ . '/includes/header.php';
                     <ul class="list-unstyled small mb-4 flex-grow-1">
                         <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Browse the complete resource library</li>
                         <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Search and filter by subject &amp; grade</li>
-                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>5 downloads every month</li>
+                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>Unlimited</strong> downloads of every free resource, no account required</li>
                         <li class="mb-2 text-secondary"><i class="fa-solid fa-xmark me-2"></i>Members-only resources</li>
                     </ul>
                     <?php if ($isLoggedIn): ?>
                         <a href="<?= e(base_url('dashboard.php')) ?>" class="btn btn-outline-secondary w-100">Go to Dashboard</a>
                     <?php else: ?>
-                        <a href="<?= e(base_url('register.php')) ?>" class="btn btn-outline-secondary w-100">Start Free</a>
+                        <a href="<?= e(base_url('resources.php')) ?>" class="btn btn-outline-secondary w-100">Browse Free Resources</a>
                     <?php endif; ?>
                 </div>
             </div>
@@ -137,11 +137,11 @@ require_once __DIR__ . '/includes/header.php';
             <h2 class="h4 fw-bold mb-3">How Membership Works Right Now</h2>
             <p>Membership is currently activated manually after payment is confirmed. Here's the process:</p>
             <ol>
-                <li class="mb-2">Register for a free account and log in &mdash; you'll get 5 free downloads a month right away.</li>
-                <li class="mb-2">When you're ready for unlimited downloads, go to your <strong>Subscription</strong> page, choose Monthly or Annual, and review the payment instructions (bank transfer or PromptPay).</li>
+                <li class="mb-2">Free resources are unlimited for everyone &mdash; download them right away, no account required.</li>
+                <li class="mb-2">When you're ready to unlock members-only resources, go to your <strong>Subscription</strong> page, choose Monthly or Annual, and review the payment instructions (bank transfer or PromptPay).</li>
                 <li class="mb-2">Send your payment, then submit the amount, date, and reference number.</li>
                 <li class="mb-2">Our team reviews and approves your payment &mdash; usually within a day &mdash; and your membership becomes active for 30 days (Monthly) or 365 days (Annual) from approval.</li>
-                <li class="mb-2">Renew before your membership expires to keep unlimited access &mdash; if it lapses, your account simply reverts to the Free plan (5 downloads/month) rather than being locked out.</li>
+                <li class="mb-2">Renew before your membership expires to keep access to members-only resources &mdash; if it lapses, your account simply reverts to the Free plan (still unlimited free downloads) rather than being locked out.</li>
             </ol>
         </div>
     </div>

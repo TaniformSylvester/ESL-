@@ -60,10 +60,13 @@ define('PRICE_ANNUAL', 999);
 define('PLAN_DAYS', ['monthly' => 30, 'annual' => 365]);
 define('PLAN_LABELS', ['monthly' => 'Teacher Pro Monthly', 'annual' => 'Teacher Pro Annual']);
 
-// Free-plan monthly download allowance (resources.is_free = 1 only —
-// members-only resources always require an active Pro membership
-// regardless of this limit). Enforced server-side in
-// includes/download-functions.php; never trust a client-supplied count.
+// NOT currently enforced: free resources are unlimited for everyone,
+// including anonymous visitors (see can_download_resource() in
+// includes/download-functions.php). Retained, along with the dormant
+// get_free_download_usage()/try_consume_free_download() functions and the
+// users.free_downloads_* columns, only in case a future quota/rate-limit
+// feature is wanted again — nothing currently reads this constant to
+// block a download.
 define('FREE_DOWNLOAD_MONTHLY_LIMIT', 5);
 
 define('MEMBERSHIP_EXPIRY_REMINDER_DAYS', 3); // how many days before expiry_date to send the renewal reminder

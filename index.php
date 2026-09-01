@@ -182,18 +182,18 @@ require_once __DIR__ . '/includes/header.php';
         <div class="row g-4 text-center">
             <div class="col-md-4">
                 <div class="fw-bold fs-3 text-primary mb-2">1</div>
-                <h3 class="h6 fw-bold">Create a Free Account</h3>
-                <p class="small text-secondary">Register in a minute, browse the full library, and get 5 free downloads a month.</p>
+                <h3 class="h6 fw-bold">Find It. Download It.</h3>
+                <p class="small text-secondary">Browse the free resource library and download instantly &mdash; no account required.</p>
             </div>
             <div class="col-md-4">
                 <div class="fw-bold fs-3 text-primary mb-2">2</div>
-                <h3 class="h6 fw-bold">Upgrade to Pro (Optional)</h3>
-                <p class="small text-secondary">Send your payment and get approved &mdash; usually within a day.</p>
+                <h3 class="h6 fw-bold">Create a Free Account (Optional)</h3>
+                <p class="small text-secondary">Register anytime to save favorites, write reviews, and track your download history.</p>
             </div>
             <div class="col-md-4">
                 <div class="fw-bold fs-3 text-primary mb-2">3</div>
-                <h3 class="h6 fw-bold">Find It. Download It. Teach It.</h3>
-                <p class="small text-secondary">Unlimited downloads for Pro members, or 5 a month on the Free plan.</p>
+                <h3 class="h6 fw-bold">Upgrade to Pro (Optional)</h3>
+                <p class="small text-secondary">Unlock members-only resources &mdash; send your payment and get approved, usually within a day.</p>
             </div>
         </div>
     </div>
@@ -284,7 +284,7 @@ require_once __DIR__ . '/includes/header.php';
                             </button>
                         </h3>
                         <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">Free members can download up to 5 resources per calendar month.</div>
+                            <div class="accordion-body">Free resources are unlimited for everyone &mdash; no account required. Only members-only resources require a Teacher Pro membership.</div>
                         </div>
                     </div>
                     <div class="accordion-item">
@@ -334,7 +334,7 @@ require_once __DIR__ . '/includes/header.php';
                             </button>
                         </h3>
                         <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">Yes. Membership renews manually, not automatically &mdash; if you don't submit another payment before your expiry date, your account simply reverts to the Free plan (5 downloads/month) rather than being charged or locked out.</div>
+                            <div class="accordion-body">Yes. Membership renews manually, not automatically &mdash; if you don't submit another payment before your expiry date, your account simply reverts to the Free plan (still unlimited downloads of free resources) rather than being charged or locked out.</div>
                         </div>
                     </div>
                 </div>

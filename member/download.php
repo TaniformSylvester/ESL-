@@ -14,18 +14,18 @@ if (!$resource || !$resource['is_published'] || $resource['status'] !== 'active'
     exit;
 }
 
-if (!is_logged_in()) {
-    redirect('login.php?redirect=' . urlencode($_SERVER['REQUEST_URI']));
-}
-
+// can_download_resource() now returns true unconditionally for free
+// resources (see includes/download-functions.php), so this block is only
+// ever reachable for a members-only resource that the visitor isn't
+// entitled to — the login redirect below preserves the existing Pro-only
+// protection exactly as it was, it just no longer runs for free resources.
 if (!can_download_resource($resource)) {
-    if (!$resource['is_free']) {
-        flash_set('warning', 'This resource is available to Teacher Pro members. Upgrade to download it.');
-        redirect('resource.php?slug=' . urlencode($resource['slug']));
+    if (!is_logged_in()) {
+        redirect('login.php?redirect=' . urlencode($_SERVER['REQUEST_URI']));
     }
 
-    flash_set('warning', "You've reached your 5 free downloads for this month. Upgrade to Teacher Pro for unlimited downloads.");
-    redirect('resource.php?slug=' . urlencode($resource['slug']) . '&blocked=quota');
+    flash_set('warning', 'This resource is available to Teacher Pro members. Upgrade to download it.');
+    redirect('resource.php?slug=' . urlencode($resource['slug']));
 }
 
 if (empty($resource['file_path'])) {
@@ -42,17 +42,9 @@ if (!is_file($filePath)) {
     redirect('resource.php?slug=' . urlencode($resource['slug']));
 }
 
-// can_download_resource() already confirmed eligibility, but the actual
-// quota decrement for a free-plan user must happen here, atomically, and
-// only once we know the file genuinely exists — a missing file on the
-// server shouldn't cost the user one of their 5 free downloads.
-if ($resource['is_free'] && !isMemberActive() && !is_admin()) {
-    if (!try_consume_free_download((int)$_SESSION['user_id'])) {
-        flash_set('warning', "You've reached your 5 free downloads for this month. Upgrade to Teacher Pro for unlimited downloads.");
-        redirect('resource.php?slug=' . urlencode($resource['slug']) . '&blocked=quota');
-    }
-}
-
+// Free resources are unlimited now — no quota to consume. The visitor
+// may or may not be logged in; record_download() already accepts a null
+// user_id for an anonymous downloader (downloads.user_id is nullable).
 record_download(is_logged_in() ? (int)$_SESSION['user_id'] : null, $id);
 
 $downloadName = $resource['file_name'] ?: ($resource['slug'] . '.' . $resource['file_type']);

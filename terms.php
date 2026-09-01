@@ -15,12 +15,12 @@ require_once __DIR__ . '/includes/header.php';
             <h2 class="h5 fw-bold mt-4">1. Plans</h2>
             <p><?= e(SITE_NAME) ?> offers a Free plan and a paid Teacher Pro plan (Monthly or Annual):</p>
             <ul>
-                <li><strong>Free:</strong> browse the complete resource library and download up to 5 resources per calendar month. This allowance resets automatically at the start of each calendar month; it does not carry over.</li>
+                <li><strong>Free:</strong> browse the complete resource library and download every free resource, unlimited, with no account required.</li>
                 <li><strong>Teacher Pro Monthly / Annual:</strong> unlimited downloads of every "Members Only" resource for as long as the membership remains active.</li>
             </ul>
 
             <h2 class="h5 fw-bold mt-4">2. Membership Activation &amp; Expiry</h2>
-            <p>Membership is currently activated manually after payment is confirmed: a Monthly plan runs for 30 days and an Annual plan for 365 days from the date of approval. If a membership is not renewed before it expires, the account automatically reverts to the Free plan (5 downloads/month) rather than being suspended.</p>
+            <p>Membership is currently activated manually after payment is confirmed: a Monthly plan runs for 30 days and an Annual plan for 365 days from the date of approval. If a membership is not renewed before it expires, the account automatically reverts to the Free plan (still unlimited downloads of free resources) rather than being suspended.</p>
 
             <h2 class="h5 fw-bold mt-4">3. Use of Resources (Licensing)</h2>
             <p>Resources downloaded from <?= e(SITE_NAME) ?>, whether under the Free or Pro plan, are licensed for use by the downloading teacher in their own classroom(s) only. Redistributing, reselling, sharing account access, or publicly re-hosting downloaded files is not permitted.</p>
