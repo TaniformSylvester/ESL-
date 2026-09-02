@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="ESL Teacher Hub logo">
+    <circle cx="32" cy="32" r="32" fill="#2563eb"/>
+    <path d="M32 15 L55 25.5 L32 36 L9 25.5 Z" fill="#ffffff"/>
+    <path d="M19 28.7 V39 C19 43.5 24.9 48 32 48 C39.1 48 45 43.5 45 39 V28.7 L32 34.6 Z" fill="#ffffff" opacity="0.94"/>
+    <line x1="55" y1="25.5" x2="55" y2="39" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+    <circle cx="55" cy="41.4" r="2.6" fill="#f59e0b"/>
+</svg>

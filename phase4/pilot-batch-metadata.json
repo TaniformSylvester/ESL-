@@ -1,0 +1,496 @@
+[
+  {
+    "key": "my-family",
+    "title": "My Family — Vocabulary & Speaking Pack",
+    "subject": "ESL",
+    "grade": "Grade 1",
+    "topic": "My Family",
+    "resource_type": "Complete Lesson Pack",
+    "category_name": "Vocabulary",
+    "is_free": true,
+    "files": {
+      "main": "my-family-complete-lesson-pack.pdf",
+      "additional_file_1": {
+        "file": "my-family-answer-key.pdf",
+        "label": "Answer Key (Printable)"
+      },
+      "thumbnail": "my-family-thumbnail.jpg",
+      "preview_image": "my-family-preview.jpg"
+    },
+    "teaching_fields": {
+      "recommended_level": "Grade 1",
+      "suggested_duration": "35-45 minutes",
+      "learning_objectives": [
+        "Identify and name eight common family-member words: mother, father, sister, brother, baby, grandmother, grandfather, and family.",
+        "Use the sentence pattern “This is my ___.” to talk about their own family.",
+        "Listen to and repeat family vocabulary with correct pronunciation."
+      ],
+      "how_to_use": [
+        "<b>Presentation (8 min):</b> Introduce each family word one at a time (mother, father, sister, brother, baby, grandmother, grandfather). Say the word clearly, have students repeat it three times, and mime a simple gesture for each (e.g. rocking arms for “baby”).",
+        "<b>Practice (10 min):</b> Point to the words on the board in random order and have students say them chorally, then individually. Play a quick “Point and Say” game: call a word, students point to a family member in their own drawn family (or a picture) and say it.",
+        "<b>Sentence pattern (7 min):</b> Model “This is my mother.” using a puppet, photo, or drawing. Students repeat the pattern with each family word, in pairs, taking turns.",
+        "<b>Production (10 min):</b> Hand out the worksheet. Students complete the matching and fill-in-the-blank sections, then draw and label their own family in the final activity.",
+        "<b>Wrap-up (5 min):</b> A few volunteers show their drawing and say one sentence: “This is my ___.”"
+      ],
+      "activity_ideas": "Ask: “Who is in your family?” Let a few students answer in their home language, then model in English: “I have a mother, a father, and a sister.” Write the word <b>family</b> on the board.",
+      "teacher_tips": "Bring in your own family photo to model the language first — it makes the activity feel real and lowers the affective filter for young learners. Keep the pace brisk; Grade 1 attention spans are short.",
+      "differentiation_notes": "Beginners: allow pointing and single-word answers instead of full sentences. More advanced students: encourage them to add an adjective, e.g. “This is my happy sister.” For students without a two-parent household at home, keep the drawing activity open-ended (“the people in your family”) rather than assuming a fixed family structure.",
+      "assessment_notes": "Informal: during Production, listen for correct use of the sentence pattern and correct family-word pronunciation. The completed worksheet (matching + fill-in-the-blank) serves as a written check of vocabulary recognition.",
+      "whats_included": [
+        "Complete Lesson Pack PDF (lesson plan + student worksheet + answer key)",
+        "Standalone printable Answer Key PDF",
+        "Thumbnail and preview images"
+      ]
+    },
+    "related_resource_keys": [
+      "my-body",
+      "animals"
+    ],
+    "recommended_teacher_hub_guides": [
+      "How to Teach Vocabulary to Young ESL Learners"
+    ]
+  },
+  {
+    "key": "my-body",
+    "title": "My Body — Vocabulary & Action Pack",
+    "subject": "ESL",
+    "grade": "Grade 1",
+    "topic": "My Body",
+    "resource_type": "Complete Lesson Pack",
+    "category_name": "Vocabulary",
+    "is_free": true,
+    "files": {
+      "main": "my-body-complete-lesson-pack.pdf",
+      "additional_file_1": {
+        "file": "my-body-answer-key.pdf",
+        "label": "Answer Key (Printable)"
+      },
+      "thumbnail": "my-body-thumbnail.jpg",
+      "preview_image": "my-body-preview.jpg"
+    },
+    "teaching_fields": {
+      "recommended_level": "Grade 1",
+      "suggested_duration": "35-45 minutes",
+      "learning_objectives": [
+        "Identify and label ten basic body-part words: head, shoulders, eyes, ears, nose, mouth, arms, hands, legs, feet.",
+        "Follow simple Total Physical Response (TPR) instructions using body-part vocabulary, e.g. “Touch your nose.”",
+        "Use the pattern “I have two ___.” / “I have one ___.” correctly for singular and plural body parts."
+      ],
+      "how_to_use": [
+        "<b>Presentation (8 min):</b> Point to each body part on yourself and say the word clearly. Students repeat chorally, touching the same body part on themselves.",
+        "<b>TPR Practice (10 min):</b> Play “Simon Says” using only body-part commands (“Simon says touch your ears.”). This checks listening comprehension without requiring students to speak yet.",
+        "<b>Counting language (7 min):</b> Introduce “I have two eyes.” and “I have one nose.” Go around the room eliciting the pattern for different body parts.",
+        "<b>Production (10 min):</b> Hand out the worksheet. Students label the body diagram and complete the sentence practice.",
+        "<b>Wrap-up (5 min):</b> One more round of Simon Says, this time with a student giving the commands."
+      ],
+      "activity_ideas": "Stand up and say “Touch your head!” Do the action yourself so students can copy even before they know the word. Repeat with 2-3 body parts students likely already know.",
+      "teacher_tips": "Keep TPR games fast-paced — young learners lose interest if the same game runs too long. Mix in a couple of “silly” wrong commands once vocabulary is solid, e.g. “Touch your elbow with your nose!” for a laugh and extra listening challenge.",
+      "differentiation_notes": "Beginners: focus on TPR only (listening and pointing), skip the counting-language sentences. Advanced students: extend with “I have ten fingers.” / “I have ten toes.”",
+      "assessment_notes": "Observe accuracy during Simon Says (listening) and check the completed worksheet diagram labels and sentence practice (speaking/writing transfer).",
+      "whats_included": [
+        "Complete Lesson Pack PDF (lesson plan + student worksheet + answer key)",
+        "Standalone printable Answer Key PDF",
+        "Thumbnail and preview images"
+      ]
+    },
+    "related_resource_keys": [
+      "my-family",
+      "animals"
+    ],
+    "recommended_teacher_hub_guides": [
+      "How to Teach Vocabulary to Young ESL Learners"
+    ]
+  },
+  {
+    "key": "animals",
+    "title": "Animals — Vocabulary & Sounds Pack",
+    "subject": "ESL",
+    "grade": "Grade 1",
+    "topic": "Animals",
+    "resource_type": "Complete Lesson Pack",
+    "category_name": "Vocabulary",
+    "is_free": true,
+    "files": {
+      "main": "animals-complete-lesson-pack.pdf",
+      "additional_file_1": {
+        "file": "animals-answer-key.pdf",
+        "label": "Answer Key (Printable)"
+      },
+      "thumbnail": "animals-thumbnail.jpg",
+      "preview_image": "animals-preview.jpg"
+    },
+    "teaching_fields": {
+      "recommended_level": "Grade 1",
+      "suggested_duration": "35-45 minutes",
+      "learning_objectives": [
+        "Name ten common animals: cat, dog, cow, duck, pig, bird, lion, monkey, fish, elephant.",
+        "Match each animal to the sound it makes, using “A ___ says ___.”",
+        "Use the pattern “I see a ___.” to identify animals in a picture."
+      ],
+      "how_to_use": [
+        "<b>Presentation (8 min):</b> Introduce each animal word with its sound: “A cat says meow.” Students repeat both the animal name and the sound.",
+        "<b>Practice (10 min):</b> Play an animal-sound guessing game: make a sound, students say the animal name; then reverse it — say an animal, students make the sound.",
+        "<b>Sentence pattern (7 min):</b> Model “I see a dog.” pointing at a picture or toy. Students practise the pattern in pairs with different animals.",
+        "<b>Production (10 min):</b> Hand out the worksheet. Students match animals to sounds and complete the “I see a ___” sentences.",
+        "<b>Wrap-up (5 min):</b> Quick chorus round: teacher says an animal, whole class makes the sound together."
+      ],
+      "activity_ideas": "Make an animal sound (e.g. “moo”) and ask “What animal is this?” Let students guess, building excitement before the lesson starts.",
+      "teacher_tips": "Animal sounds are one of the most reliably fun warm-ups for young learners — use them again in future lessons as a quick 2-minute energiser, not just in this lesson.",
+      "differentiation_notes": "Beginners: focus on sounds and single-word naming only. Advanced students: add a describing word, e.g. “I see a big elephant.”",
+      "assessment_notes": "Listen for correct animal-sound matching during the guessing game; check the worksheet matching and sentence-completion sections for written accuracy.",
+      "whats_included": [
+        "Complete Lesson Pack PDF (lesson plan + student worksheet + answer key)",
+        "Standalone printable Answer Key PDF",
+        "Thumbnail and preview images"
+      ]
+    },
+    "related_resource_keys": [
+      "my-family",
+      "my-body"
+    ],
+    "recommended_teacher_hub_guides": [
+      "How to Teach Vocabulary to Young ESL Learners",
+      "How to Teach Animals to Young Learners"
+    ]
+  },
+  {
+    "key": "addition-within-20",
+    "title": "Addition Within 20 — Practice Pack",
+    "subject": "Math",
+    "grade": "Grade 1",
+    "topic": "Addition Within 20",
+    "resource_type": "Complete Lesson Pack",
+    "category_name": "Addition & Subtraction",
+    "is_free": true,
+    "files": {
+      "main": "addition-within-20-complete-lesson-pack.pdf",
+      "additional_file_1": {
+        "file": "addition-within-20-answer-key.pdf",
+        "label": "Answer Key (Printable)"
+      },
+      "thumbnail": "addition-within-20-thumbnail.jpg",
+      "preview_image": "addition-within-20-preview.jpg"
+    },
+    "teaching_fields": {
+      "recommended_level": "Grade 1",
+      "suggested_duration": "35-45 minutes",
+      "learning_objectives": [
+        "Add two numbers with a sum of 20 or less.",
+        "Use the “counting on” strategy and “making ten” strategy to add efficiently.",
+        "Solve simple real-world addition word problems within 20."
+      ],
+      "how_to_use": [
+        "<b>Presentation (8 min):</b> Model “counting on” on a number line: for 8 + 5, start at 8 and count on 5 more (9, 10, 11, 12, 13).",
+        "<b>Making Ten (7 min):</b> Show the “make a ten” strategy for near-ten facts, e.g. 9 + 4 = 9 + 1 + 3 = 10 + 3 = 13.",
+        "<b>Guided Practice (10 min):</b> Work through 3-4 problems together on the board using counters, then a number line, then mental math.",
+        "<b>Independent Practice (10 min):</b> Students complete the worksheet's addition grid and word problems.",
+        "<b>Wrap-up (5 min):</b> Pairs check answers together and explain one strategy they used."
+      ],
+      "activity_ideas": "Show 7 fingers, then 3 more fingers. Ask: “How many fingers in total?” Count all together to get 10, then repeat with a sum that goes past 10 to introduce today's focus.",
+      "teacher_tips": "Encourage more than one correct strategy — some students will always count all, and that's fine at this stage as long as the answer is correct and they're building toward faster strategies over time.",
+      "differentiation_notes": "Struggling students: allow counters/fingers for every problem and a printed number line at the desk. Advanced students: challenge them to solve the last 3 problems using make-a-ten mentally, without a number line.",
+      "assessment_notes": "Review the completed addition grid for accuracy; listen during pair-checking for correct strategy explanations (counting on / making ten).",
+      "whats_included": [
+        "Complete Lesson Pack PDF (lesson plan + student worksheet + answer key)",
+        "Standalone printable Answer Key PDF",
+        "Thumbnail and preview images"
+      ]
+    },
+    "related_resource_keys": [
+      "subtraction-within-20",
+      "addition-regrouping"
+    ],
+    "recommended_teacher_hub_guides": [
+      "How to Teach Addition to Young Learners"
+    ]
+  },
+  {
+    "key": "subtraction-within-20",
+    "title": "Subtraction Within 20 — Practice Pack",
+    "subject": "Math",
+    "grade": "Grade 1",
+    "topic": "Subtraction Within 20",
+    "resource_type": "Complete Lesson Pack",
+    "category_name": "Addition & Subtraction",
+    "is_free": true,
+    "files": {
+      "main": "subtraction-within-20-complete-lesson-pack.pdf",
+      "additional_file_1": {
+        "file": "subtraction-within-20-answer-key.pdf",
+        "label": "Answer Key (Printable)"
+      },
+      "thumbnail": "subtraction-within-20-thumbnail.jpg",
+      "preview_image": "subtraction-within-20-preview.jpg"
+    },
+    "teaching_fields": {
+      "recommended_level": "Grade 1",
+      "suggested_duration": "35-45 minutes",
+      "learning_objectives": [
+        "Subtract within 20 using take-away and counting-back strategies.",
+        "Understand subtraction as “how many are left” and as “the difference between two numbers.”",
+        "Solve simple real-world subtraction word problems within 20."
+      ],
+      "how_to_use": [
+        "<b>Presentation (8 min):</b> Model “counting back” on a number line: for 15 − 4, start at 15 and count back 4 (14, 13, 12, 11).",
+        "<b>Take-Away Model (7 min):</b> Use counters to physically remove objects for 2-3 problems, connecting the action to the subtraction symbol.",
+        "<b>Guided Practice (10 min):</b> Work through 3-4 problems together, encouraging students to choose counters, a number line, or mental subtraction.",
+        "<b>Independent Practice (10 min):</b> Students complete the worksheet's subtraction grid and word problems.",
+        "<b>Wrap-up (5 min):</b> Pairs check answers and explain their strategy for one problem."
+      ],
+      "activity_ideas": "Show 12 counters, then take away 5 in front of the class while counting aloud. Ask: “How many are left?” Count together to check.",
+      "teacher_tips": "If a student consistently subtracts the smaller number from the larger regardless of order (a common early error), go back to physical counters before returning to the abstract number line.",
+      "differentiation_notes": "Struggling students: allow counters for every problem; keep numbers on the smaller end of the set (e.g. 10-13). Advanced students: ask them to also write the matching addition fact for two problems (e.g. 18 − 9 = 9, so 9 + 9 = 18).",
+      "assessment_notes": "Review the completed subtraction grid; listen during wrap-up for correct strategy explanations.",
+      "whats_included": [
+        "Complete Lesson Pack PDF (lesson plan + student worksheet + answer key)",
+        "Standalone printable Answer Key PDF",
+        "Thumbnail and preview images"
+      ]
+    },
+    "related_resource_keys": [
+      "addition-within-20"
+    ],
+    "recommended_teacher_hub_guides": [
+      "How to Teach Addition to Young Learners"
+    ]
+  },
+  {
+    "key": "shapes",
+    "title": "2D Shapes — Identify & Count Pack",
+    "subject": "Math",
+    "grade": "Grade 1",
+    "topic": "Shapes",
+    "resource_type": "Complete Lesson Pack",
+    "category_name": "Geometry & Shapes",
+    "is_free": true,
+    "files": {
+      "main": "shapes-complete-lesson-pack.pdf",
+      "additional_file_1": {
+        "file": "shapes-answer-key.pdf",
+        "label": "Answer Key (Printable)"
+      },
+      "thumbnail": "shapes-thumbnail.jpg",
+      "preview_image": "shapes-preview.jpg"
+    },
+    "teaching_fields": {
+      "recommended_level": "Grade 1",
+      "suggested_duration": "35-45 minutes",
+      "learning_objectives": [
+        "Name six 2D shapes: circle, square, triangle, rectangle, pentagon, hexagon.",
+        "Count the number of sides and corners of each shape.",
+        "Identify these shapes in everyday classroom objects."
+      ],
+      "how_to_use": [
+        "<b>Presentation (8 min):</b> Show each cut-out shape one at a time. Name it, then count its sides and corners together as a class, tracing each side with a finger.",
+        "<b>Practice (10 min):</b> Play “Shape Hunt” — students look around the classroom and name one real object for each shape (e.g. clock = circle, door = rectangle).",
+        "<b>Sorting (7 min):</b> In small groups, students sort a mixed pile of paper shapes into groups by name.",
+        "<b>Independent Practice (10 min):</b> Students complete the worksheet: naming shapes, counting sides/corners, and a shape-counting picture.",
+        "<b>Wrap-up (5 min):</b> Quick quiz: hold up a shape, students call out its name and side count together."
+      ],
+      "activity_ideas": "Hold up a round plate or clock and ask “What shape is this?” Then hold up a book and ask the same. Introduce today's focus: shapes all around us.",
+      "teacher_tips": "Let students physically trace each shape's sides with a finger while counting aloud — the physical action helps the side count “stick” far better than just looking at it.",
+      "differentiation_notes": "Struggling students: focus on circle, square, and triangle only, skipping pentagon/hexagon. Advanced students: ask them to find and draw two more real-life examples of each shape for homework.",
+      "assessment_notes": "Observe accuracy during the Shape Hunt and sorting activity; check the worksheet's naming, side/corner counts, and shape-counting section.",
+      "whats_included": [
+        "Complete Lesson Pack PDF (lesson plan + student worksheet + answer key)",
+        "Standalone printable Answer Key PDF",
+        "Thumbnail and preview images"
+      ]
+    },
+    "related_resource_keys": [],
+    "recommended_teacher_hub_guides": []
+  },
+  {
+    "key": "five-senses",
+    "title": "My Five Senses — Exploration Pack",
+    "subject": "Science",
+    "grade": "Grade 1",
+    "topic": "My Five Senses",
+    "resource_type": "Complete Lesson Pack",
+    "category_name": "Human Body",
+    "is_free": true,
+    "files": {
+      "main": "five-senses-complete-lesson-pack.pdf",
+      "additional_file_1": {
+        "file": "five-senses-answer-key.pdf",
+        "label": "Answer Key (Printable)"
+      },
+      "thumbnail": "five-senses-thumbnail.jpg",
+      "preview_image": "five-senses-preview.jpg"
+    },
+    "teaching_fields": {
+      "recommended_level": "Grade 1",
+      "suggested_duration": "35-45 minutes",
+      "learning_objectives": [
+        "Name the five senses: sight, hearing, smell, taste, and touch.",
+        "Match each sense to the body part used for it.",
+        "Sort everyday actions and objects by which sense they mainly use."
+      ],
+      "how_to_use": [
+        "<b>Presentation (8 min):</b> Introduce each sense with its body part, using simple actions: point to eyes for sight, ears for hearing, nose for smell, tongue for taste, hands/skin for touch.",
+        "<b>Senses Stations (12 min):</b> In small groups, students rotate through 2-3 simple stations (e.g. listen to a sound, feel a texture, smell a scent) and say which sense they used.",
+        "<b>Sorting Practice (8 min):</b> As a class, sort a list of actions (e.g. “listening to music,” “smelling bread”) into the correct sense.",
+        "<b>Independent Practice (7 min):</b> Students complete the worksheet's matching and sorting sections.",
+        "<b>Wrap-up (5 min):</b> Ask a few students to share one thing they discovered at the senses stations."
+      ],
+      "activity_ideas": "Close your eyes and ring a small bell or clap your hands. Ask: “How did you know I did that if your eyes were closed?” Lead into today's topic: our senses.",
+      "teacher_tips": "Be mindful of any student allergies or sensory sensitivities before choosing smell/taste station items, and always offer a way to opt out of any single station.",
+      "differentiation_notes": "Struggling students: focus on matching sense-to-body-part only, skip the sorting section. Advanced students: ask them to name one more example action for each sense.",
+      "assessment_notes": "Observe participation and correct sense-naming at the stations; check the worksheet matching and sorting activities.",
+      "whats_included": [
+        "Complete Lesson Pack PDF (lesson plan + student worksheet + answer key)",
+        "Standalone printable Answer Key PDF",
+        "Thumbnail and preview images"
+      ]
+    },
+    "related_resource_keys": [
+      "living-nonliving"
+    ],
+    "recommended_teacher_hub_guides": []
+  },
+  {
+    "key": "living-nonliving",
+    "title": "Living and Non-Living Things — Sorting Pack",
+    "subject": "Science",
+    "grade": "Grade 1",
+    "topic": "Living and Non-Living Things",
+    "resource_type": "Complete Lesson Pack",
+    "category_name": "Living Things",
+    "is_free": true,
+    "files": {
+      "main": "living-nonliving-complete-lesson-pack.pdf",
+      "additional_file_1": {
+        "file": "living-nonliving-answer-key.pdf",
+        "label": "Answer Key (Printable)"
+      },
+      "thumbnail": "living-nonliving-thumbnail.jpg",
+      "preview_image": "living-nonliving-preview.jpg"
+    },
+    "teaching_fields": {
+      "recommended_level": "Grade 1",
+      "suggested_duration": "35-45 minutes",
+      "learning_objectives": [
+        "Describe the basic needs and behaviours of living things: they grow, need food/water/air, move on their own, and can reproduce.",
+        "Sort familiar objects into living and non-living groups.",
+        "Explain, in simple terms, why an object is living or non-living."
+      ],
+      "how_to_use": [
+        "<b>Presentation (8 min):</b> Introduce the four simple signs of living things: they grow, they need food/water/air, they can move by themselves, and they can make more of their own kind. Non-living things do none of these on their own.",
+        "<b>Guided Sorting (10 min):</b> As a class, sort 6-8 picture cards into “Living” and “Non-Living” columns on the board, explaining the reason for each.",
+        "<b>Group Activity (8 min):</b> In small groups, students sort a new set of cards on their own and prepare one reason for a tricky one (e.g. a cloud, a candle flame).",
+        "<b>Independent Practice (9 min):</b> Students complete the worksheet's sorting table and short-answer question.",
+        "<b>Wrap-up (5 min):</b> Discuss any tricky examples as a class (e.g. fire looks like it “moves” and “grows” but is non-living because it doesn't need food/water and can't reproduce)."
+      ],
+      "activity_ideas": "Hold up a real plant and a rock. Ask: “Which one is alive? How do you know?” Let students share ideas before introducing vocabulary.",
+      "teacher_tips": "Avoid over-using “moves” alone as the test for living — it's the single most common misconception (e.g. clouds, cars, and rivers all move but are non-living). Always circle back to needing food/water/air and being able to grow and reproduce.",
+      "differentiation_notes": "Struggling students: use only clearly living (animal/plant) vs. clearly non-living (rock/toy) examples. Advanced students: challenge them with borderline examples like a cut flower or a battery-powered toy, and ask them to justify their answer using the four signs of life.",
+      "assessment_notes": "Check accuracy and reasoning during group sorting; review the worksheet's sorting table and written explanation for correct use of the four signs of living things.",
+      "whats_included": [
+        "Complete Lesson Pack PDF (lesson plan + student worksheet + answer key)",
+        "Standalone printable Answer Key PDF",
+        "Thumbnail and preview images"
+      ]
+    },
+    "related_resource_keys": [
+      "five-senses"
+    ],
+    "recommended_teacher_hub_guides": []
+  },
+  {
+    "key": "addition-regrouping",
+    "title": "Addition With Regrouping — Practice Pack",
+    "subject": "Math",
+    "grade": "Grade 2",
+    "topic": "Addition With Regrouping",
+    "resource_type": "Complete Lesson Pack",
+    "category_name": "Addition & Subtraction",
+    "is_free": false,
+    "files": {
+      "main": "addition-regrouping-complete-lesson-pack.pdf",
+      "additional_file_1": {
+        "file": "addition-regrouping-answer-key.pdf",
+        "label": "Answer Key (Printable)"
+      },
+      "thumbnail": "addition-regrouping-thumbnail.jpg",
+      "preview_image": "addition-regrouping-preview.jpg"
+    },
+    "teaching_fields": {
+      "recommended_level": "Grade 2",
+      "suggested_duration": "35-45 minutes",
+      "learning_objectives": [
+        "Add two 2-digit numbers where the ones digits total 10 or more, requiring regrouping (“carrying”) into the tens place.",
+        "Explain the regrouping step using place value (ones and tens).",
+        "Solve real-world word problems that require 2-digit addition with regrouping."
+      ],
+      "how_to_use": [
+        "<b>Presentation (10 min):</b> Model 27 + 15 using a place-value chart: add the ones (7 + 5 = 12), regroup 10 ones as 1 ten, write 2 in the ones column and carry the 1 ten, then add the tens (1 + 2 + 1 = 4) for a final answer of 42.",
+        "<b>Guided Practice (10 min):</b> Work through 2-3 more problems together on the board, having students say each step out loud (“7 plus 5 is 12, write 2, carry 1”).",
+        "<b>Partner Practice (8 min):</b> In pairs, students solve 2 problems together using base-ten blocks or a place-value chart, checking each other's regrouping step.",
+        "<b>Independent Practice (10 min):</b> Students complete the worksheet's addition problems and word problems.",
+        "<b>Wrap-up (5 min):</b> Cold-call a few students to explain their regrouping step for one problem."
+      ],
+      "activity_ideas": "Write 8 + 5 on the board. Ask students to solve it, then ask: “What if it were 28 + 5? What changes?” Lead into today's focus on adding bigger numbers.",
+      "teacher_tips": "The single most common error is forgetting to add the carried 1 into the tens column — remind students to always check: “Did I add my little 1?” before finalizing an answer.",
+      "differentiation_notes": "Struggling students: provide a printed place-value chart with ones/tens columns to write directly into for every problem. Advanced students: include one 3-addend or near-100 problem as a bonus challenge.",
+      "assessment_notes": "Check accuracy and correct regrouping notation on the completed worksheet; listen during wrap-up for a clear place-value explanation of the carrying step.",
+      "whats_included": [
+        "Complete Lesson Pack PDF (lesson plan + student worksheet + answer key)",
+        "Standalone printable Answer Key PDF",
+        "Thumbnail and preview images"
+      ]
+    },
+    "related_resource_keys": [
+      "addition-within-20"
+    ],
+    "recommended_teacher_hub_guides": [
+      "How to Teach Addition to Young Learners",
+      "How to Teach Place Value"
+    ]
+  },
+  {
+    "key": "classroom-objects",
+    "title": "Classroom Objects — Vocabulary & Prepositions Pack",
+    "subject": "ESL",
+    "grade": "Grade 2",
+    "topic": "Classroom Objects",
+    "resource_type": "Complete Lesson Pack",
+    "category_name": "Classroom English",
+    "is_free": true,
+    "files": {
+      "main": "classroom-objects-complete-lesson-pack.pdf",
+      "additional_file_1": {
+        "file": "classroom-objects-answer-key.pdf",
+        "label": "Answer Key (Printable)"
+      },
+      "thumbnail": "classroom-objects-thumbnail.jpg",
+      "preview_image": "classroom-objects-preview.jpg"
+    },
+    "teaching_fields": {
+      "recommended_level": "Grade 2",
+      "suggested_duration": "35-45 minutes",
+      "learning_objectives": [
+        "Name ten common classroom objects: pencil, book, chair, desk, bag, ruler, eraser, scissors, crayon, backpack.",
+        "Use the prepositions “on,” “in,” and “under” to describe where an object is.",
+        "Ask and answer “Where is the ___?” using a full sentence."
+      ],
+      "how_to_use": [
+        "<b>Presentation (8 min):</b> Introduce each classroom object word, holding up the real object or a picture card. Students repeat chorally and individually.",
+        "<b>Preposition Practice (10 min):</b> Physically place an object on/in/under something and model “The pencil is on the desk.” Students repeat and then take turns placing and describing objects themselves.",
+        "<b>Question Practice (8 min):</b> Model the question “Where is the ___?” and its answer. Pairs take turns hiding/placing an object and asking/answering about its location.",
+        "<b>Independent Practice (9 min):</b> Students complete the worksheet's labeling and preposition sentence sections.",
+        "<b>Wrap-up (5 min):</b> A few pairs demonstrate one question-and-answer exchange for the class."
+      ],
+      "activity_ideas": "Hold up a pencil and ask “What is this?” Then place it on the desk, in a bag, and under a book in turn, asking “Where is the pencil now?” each time to preview today's language.",
+      "teacher_tips": "Real objects work far better than pictures for the preposition practice here — students remember “on/in/under” much more reliably after physically placing something themselves.",
+      "differentiation_notes": "Beginners: focus on object naming and “on/in/under” only, skipping full question formation. Advanced students: add a second object into the sentence, e.g. “The pencil is in the bag, under the book.”",
+      "assessment_notes": "Observe accuracy during the pair question-and-answer practice; check the worksheet's labeling and preposition sentences for written accuracy.",
+      "whats_included": [
+        "Complete Lesson Pack PDF (lesson plan + student worksheet + answer key)",
+        "Standalone printable Answer Key PDF",
+        "Thumbnail and preview images"
+      ]
+    },
+    "related_resource_keys": [],
+    "recommended_teacher_hub_guides": []
+  }
+]
