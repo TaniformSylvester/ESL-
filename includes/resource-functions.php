@@ -449,6 +449,47 @@ function get_free_resources(int $limit = 6): array
     return $stmt->fetchAll();
 }
 
+/**
+ * Attaches real avg_rating (float, rounded to 1dp) and review_count (int)
+ * to each resource in $resources, via a single batched query keyed on
+ * resource id — never one query per card. A resource with no approved
+ * reviews gets avg_rating = null (never fabricated); resource-card.php
+ * only renders a rating line when avg_rating is present.
+ */
+function attach_rating_summaries(array $resources): array
+{
+    if (empty($resources)) {
+        return $resources;
+    }
+
+    $ids = array_map(static fn(array $r): int => (int)$r['id'], $resources);
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+
+    $stmt = getDB()->prepare(
+        "SELECT resource_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count
+         FROM reviews
+         WHERE status = 'approved' AND resource_id IN ({$placeholders})
+         GROUP BY resource_id"
+    );
+    $stmt->execute($ids);
+
+    $summaries = [];
+    foreach ($stmt->fetchAll() as $row) {
+        $summaries[(int)$row['resource_id']] = [
+            'avg_rating'   => round((float)$row['avg_rating'], 1),
+            'review_count' => (int)$row['review_count'],
+        ];
+    }
+
+    foreach ($resources as &$resource) {
+        $resource['avg_rating'] = $summaries[(int)$resource['id']]['avg_rating'] ?? null;
+        $resource['review_count'] = $summaries[(int)$resource['id']]['review_count'] ?? 0;
+    }
+    unset($resource);
+
+    return $resources;
+}
+
 // -----------------------------------------------------------------------
 // ADMIN RESOURCE CRUD
 // -----------------------------------------------------------------------

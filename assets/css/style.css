@@ -159,3 +159,16 @@ footer a:hover {
     border-color: var(--brand-primary);
     color: var(--brand-primary);
 }
+
+/* ---------------------------------------------------------------------
+   Homepage "Play & Learn" — Number Challenge game
+   ------------------------------------------------------------------- */
+
+.number-challenge {
+    border-radius: 0.75rem;
+}
+
+.nc-answer-btn {
+    font-weight: 600;
+    min-height: 3.25rem;
+}

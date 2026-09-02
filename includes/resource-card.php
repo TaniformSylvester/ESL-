@@ -48,6 +48,12 @@ $cardIsFavorited = $cardIsLoggedIn && is_favorited((int)$_SESSION['user_id'], (i
                 </a>
             </h3>
             <p class="small text-secondary mb-2"><?= e($resource['resource_type']) ?><?= !empty($resource['topic']) ? ' &middot; ' . e($resource['topic']) : '' ?></p>
+            <?php if (!empty($resource['avg_rating'])): ?>
+                <p class="small text-warning mb-2">
+                    <i class="fa-solid fa-star"></i> <span class="text-dark fw-bold"><?= e(number_format((float)$resource['avg_rating'], 1)) ?></span>
+                    <span class="text-secondary">(<?= (int)$resource['review_count'] ?> review<?= (int)$resource['review_count'] === 1 ? '' : 's' ?>)</span>
+                </p>
+            <?php endif; ?>
             <p class="small text-secondary flex-grow-1"><?= e(truncate_text($resource['description'] ?? '', 90)) ?></p>
             <a href="<?= e(base_url('resource.php?slug=' . urlencode($resource['slug']))) ?>" class="btn btn-outline-primary btn-sm mt-2">
                 View Resource
