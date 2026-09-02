@@ -2,7 +2,7 @@
 require_once __DIR__ . '/includes/init.php';
 
 $pageTitle = 'About Us';
-$pageDescription = 'Learn about ' . SITE_NAME . '\'s mission to help teachers save preparation time with ready-to-use resources and practical classroom guidance.';
+$pageDescription = 'Learn about ' . SITE_NAME . '\'s mission to help teachers across Southeast Asia save preparation time with ready-to-use resources and practical classroom guidance.';
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container py-5">
@@ -16,7 +16,7 @@ require_once __DIR__ . '/includes/header.php';
             <p>Planning a lesson from scratch takes time most teachers don't have. Searching the internet for a worksheet or activity often turns up something generic, mistargeted at the wrong level, or missing the pieces a teacher actually needs &mdash; an answer key, clear instructions, or a sense of how long it will take in class. <?= e(SITE_NAME) ?> exists to shorten that search: resources organized by subject and grade, with enough context on each one to know whether it fits your lesson before you download it.</p>
 
             <h2 class="h4 fw-bold mt-5 mb-3">Who We're For</h2>
-            <p><?= e(SITE_NAME) ?> is built for teachers generally &mdash; ESL/EFL teachers, primary school teachers, international-school teachers, private tutors, and homeschool educators, in Thailand and anywhere else in the world. We cover English/ESL for Kindergarten through Grade 10, and Math and Science for Grades 1&ndash;6.</p>
+            <p><?= e(SITE_NAME) ?> is built for teachers across Southeast Asia &mdash; ESL/EFL teachers, primary school teachers, international and bilingual school teachers, private tutors, and homeschool educators working in international, bilingual, and English Program classrooms in Thailand and neighboring countries, and anywhere else in the world. We cover English/ESL for Kindergarten through Grade 10, and Math and Science for Grades 1&ndash;6.</p>
 
             <h2 class="h4 fw-bold mt-5 mb-3">What's on <?= e(SITE_NAME) ?></h2>
             <ul>

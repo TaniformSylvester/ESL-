@@ -33,8 +33,8 @@ $subjectDescriptions = [
     'science' => 'Simple science resources and activities for young learners.',
 ];
 
-$pageTitle = 'Ready-to-Use Teaching Resources for Busy Teachers';
-$pageDescription = 'Find practical ESL, Mathematics and Science resources, classroom activities and interactive learning games for busy teachers.';
+$pageTitle = 'Ready-to-Use Teaching Resources for Schools Across Southeast Asia';
+$pageDescription = 'Find practical ESL, Mathematics and Science resources, classroom activities and interactive learning games designed for classrooms across Southeast Asia.';
 require_once __DIR__ . '/includes/header.php';
 ?>
 
@@ -42,8 +42,8 @@ require_once __DIR__ . '/includes/header.php';
     <div class="container py-4">
         <div class="row align-items-center">
             <div class="col-lg-8 mx-auto text-center">
-                <h1 class="display-5 fw-bold mb-3">Ready-to-Use Teaching Resources for Busy Teachers</h1>
-                <p class="lead mb-3">Find practical ESL, Mathematics and Science resources, classroom activities and interactive learning games.</p>
+                <h1 class="display-5 fw-bold mb-3">Ready-to-Use Teaching Resources for Schools Across Southeast Asia</h1>
+                <p class="lead mb-3">Find practical ESL, Mathematics and Science resources, classroom activities and interactive learning games designed for classrooms across Southeast Asia.</p>
                 <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 mb-3">
                     <a href="<?= e(base_url('resources.php?access=free')) ?>" class="btn btn-light btn-lg px-4 fw-semibold">Browse Free Resources</a>
                     <a href="<?= e(base_url('') . '#play-and-learn') ?>" class="btn btn-outline-light btn-lg px-4">Play &amp; Learn</a>
