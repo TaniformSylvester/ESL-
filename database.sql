@@ -166,7 +166,7 @@ CREATE TABLE IF NOT EXISTS resources (
         'Lesson Plan', 'Worksheet', 'PowerPoint', 'Flashcards',
         'Classroom Activity', 'Game', 'Test', 'Assessment', 'Poster', 'Teacher Resource',
         'Complete Lesson Pack', 'Speaking Activity', 'Reading Activity', 'Writing Activity',
-        'Quiz', 'Homework', 'Classroom Poster', 'Activity Pack'
+        'Quiz', 'Homework', 'Classroom Poster', 'Activity Pack', 'Grading Rubric'
     ) NOT NULL,
     subject_id INT UNSIGNED NOT NULL,
     category_id INT UNSIGNED NULL,

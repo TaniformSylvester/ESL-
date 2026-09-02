@@ -140,7 +140,7 @@ define('GRADE_LEVELS', [
 define('RESOURCE_TYPES', [
     'Complete Lesson Pack', 'Lesson Plan', 'PowerPoint', 'Worksheet', 'Flashcards',
     'Speaking Activity', 'Reading Activity', 'Writing Activity', 'Game', 'Quiz',
-    'Assessment', 'Homework', 'Classroom Poster', 'Activity Pack',
+    'Assessment', 'Grading Rubric', 'Homework', 'Classroom Poster', 'Activity Pack',
     // Legacy types kept selectable so existing (including archived) resources
     // using them still validate correctly on edit.
     'Classroom Activity', 'Test', 'Poster', 'Teacher Resource',
