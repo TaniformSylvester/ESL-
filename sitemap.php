@@ -23,6 +23,27 @@ $resources = $stmt->fetchAll();
 $stmt = getDB()->query('SELECT slug, updated_at FROM guides WHERE is_published = 1 ORDER BY updated_at DESC');
 $guides = $stmt->fetchAll();
 
+// Subject and category listing pages (resources.php?subject_id=/?category_id=)
+// are real, uniquely-titled landing pages (see generate_resources_listing_seo())
+// — but only worth indexing when they actually have published resources behind
+// them, matching that same function's own noindex-when-empty rule so the
+// sitemap never points Google at a page it would tell it not to index.
+$stmt = getDB()->query(
+    "SELECT s.id, MAX(r.updated_at) AS last_updated
+     FROM subjects s
+     INNER JOIN resources r ON r.subject_id = s.id AND r.is_published = 1 AND r.status = 'active'
+     GROUP BY s.id"
+);
+$subjectPages = $stmt->fetchAll();
+
+$stmt = getDB()->query(
+    "SELECT c.id, MAX(r.updated_at) AS last_updated
+     FROM categories c
+     INNER JOIN resources r ON r.category_id = c.id AND r.is_published = 1 AND r.status = 'active'
+     GROUP BY c.id"
+);
+$categoryPages = $stmt->fetchAll();
+
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -30,6 +51,20 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     <url>
         <loc><?= e($page['loc']) ?></loc>
         <priority><?= e($page['priority']) ?></priority>
+    </url>
+<?php endforeach; ?>
+<?php foreach ($subjectPages as $subjectPage): ?>
+    <url>
+        <loc><?= e(base_url('resources.php?subject_id=' . (int)$subjectPage['id'])) ?></loc>
+        <lastmod><?= e(date('Y-m-d', strtotime($subjectPage['last_updated']))) ?></lastmod>
+        <priority>0.7</priority>
+    </url>
+<?php endforeach; ?>
+<?php foreach ($categoryPages as $categoryPage): ?>
+    <url>
+        <loc><?= e(base_url('resources.php?category_id=' . (int)$categoryPage['id'])) ?></loc>
+        <lastmod><?= e(date('Y-m-d', strtotime($categoryPage['last_updated']))) ?></lastmod>
+        <priority>0.6</priority>
     </url>
 <?php endforeach; ?>
 <?php foreach ($resources as $resource): ?>

@@ -35,8 +35,51 @@ $subjectDescriptions = [
 
 $pageTitle = 'Ready-to-Use Teaching Resources for Schools Across Southeast Asia';
 $pageDescription = 'Find practical ESL, Mathematics and Science resources, classroom activities and interactive learning games designed for classrooms across Southeast Asia.';
+
+// Single source of truth for the FAQ accordion below — also drives the
+// FAQPage schema, so the structured data can never drift from what a
+// visitor actually sees on the page.
+$faqItems = [
+    [
+        'question' => 'How many resources can I download for free?',
+        'answer'   => 'Free resources are unlimited for everyone — no account required. Only members-only resources require a Teacher Pro membership.',
+    ],
+    [
+        'question' => 'What do I get with TeachLuma Pro?',
+        'answer'   => 'Pro members get unlimited downloads of members-only resources while their membership is active.',
+    ],
+    [
+        'question' => 'What subjects does TeachLuma cover?',
+        'answer'   => 'TeachLuma provides English and ESL resources from Kindergarten to Grade 10, plus Mathematics and Science resources for Grades 1–6.',
+    ],
+    [
+        'question' => 'How do I pay?',
+        'answer'   => 'Currently, TeachLuma uses manual PromptPay or bank-transfer payment. After submitting your payment details, our team reviews and approves your membership.',
+    ],
+    [
+        'question' => 'How long does approval take?',
+        'answer'   => 'Usually within a day.',
+    ],
+    [
+        'question' => 'Can I cancel anytime?',
+        'answer'   => "Yes. Membership renews manually, not automatically — if you don't submit another payment before your expiry date, your account simply reverts to the Free plan (still unlimited downloads of free resources) rather than being charged or locked out.",
+    ],
+];
+$faqSchema = [
+    '@context'   => 'https://schema.org',
+    '@type'      => 'FAQPage',
+    'mainEntity' => array_map(static function (array $item): array {
+        return [
+            '@type'          => 'Question',
+            'name'           => $item['question'],
+            'acceptedAnswer' => ['@type' => 'Answer', 'text' => $item['answer']],
+        ];
+    }, $faqItems),
+];
+
 require_once __DIR__ . '/includes/header.php';
 ?>
+<script type="application/ld+json"><?= json_encode($faqSchema, JSON_UNESCAPED_SLASHES) ?></script>
 
 <section class="hero py-5">
     <div class="container py-4">
@@ -247,66 +290,18 @@ require_once __DIR__ . '/includes/header.php';
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="accordion" id="faqAccordion">
-                    <div class="accordion-item">
-                        <h3 class="accordion-header">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                How many resources can I download for free?
-                            </button>
-                        </h3>
-                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">Free resources are unlimited for everyone &mdash; no account required. Only members-only resources require a Teacher Pro membership.</div>
+                    <?php foreach ($faqItems as $faqIndex => $faqItem): ?>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button<?= $faqIndex === 0 ? '' : ' collapsed' ?>" type="button" data-bs-toggle="collapse" data-bs-target="#faq<?= (int)$faqIndex + 1 ?>">
+                                    <?= e($faqItem['question']) ?>
+                                </button>
+                            </h3>
+                            <div id="faq<?= (int)$faqIndex + 1 ?>" class="accordion-collapse collapse<?= $faqIndex === 0 ? ' show' : '' ?>" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body"><?= e($faqItem['answer']) ?></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h3 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                What do I get with TeachLuma Pro?
-                            </button>
-                        </h3>
-                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">Pro members get unlimited downloads of members-only resources while their membership is active.</div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h3 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                What subjects does TeachLuma cover?
-                            </button>
-                        </h3>
-                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">TeachLuma provides English and ESL resources from Kindergarten to Grade 10, plus Mathematics and Science resources for Grades 1&ndash;6.</div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h3 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
-                                How do I pay?
-                            </button>
-                        </h3>
-                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">Currently, TeachLuma uses manual PromptPay or bank-transfer payment. After submitting your payment details, our team reviews and approves your membership.</div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h3 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
-                                How long does approval take?
-                            </button>
-                        </h3>
-                        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">Usually within a day.</div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h3 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
-                                Can I cancel anytime?
-                            </button>
-                        </h3>
-                        <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body">Yes. Membership renews manually, not automatically &mdash; if you don't submit another payment before your expiry date, your account simply reverts to the Free plan (still unlimited downloads of free resources) rather than being charged or locked out.</div>
-                        </div>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>
