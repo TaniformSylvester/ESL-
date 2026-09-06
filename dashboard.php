@@ -15,6 +15,13 @@ $totalResources = get_published_resource_count();
 $recentResources = get_featured_resources(4);
 $categoriesGrouped = get_categories_grouped();
 
+// "Continue Where You Left Off" — built entirely from this teacher's own
+// real activity. Left out for a brand-new account with neither yet,
+// rather than showing an empty section.
+$recentFavorites = get_user_favorites($user['id'], 1, 4)['items'];
+$recentDownloads = get_recent_active_downloads($user['id'], 5);
+$hasContinueSection = !empty($recentFavorites) || !empty($recentDownloads);
+
 $pageTitle = 'Dashboard';
 require_once __DIR__ . '/includes/header.php';
 ?>
@@ -61,6 +68,36 @@ require_once __DIR__ . '/includes/header.php';
             </div>
         </div>
     </div>
+
+    <?php if ($hasContinueSection): ?>
+    <div class="mb-4">
+        <h2 class="h5 fw-bold mb-3">Continue Where You Left Off</h2>
+
+        <?php if (!empty($recentFavorites)): ?>
+            <p class="small fw-bold text-secondary text-uppercase mb-2">Your Favorites</p>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-4">
+                <?php foreach ($recentFavorites as $resource): ?>
+                    <?php include __DIR__ . '/includes/resource-card.php'; ?>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($recentDownloads)): ?>
+            <p class="small fw-bold text-secondary text-uppercase mb-2">Recently Downloaded</p>
+            <div class="list-group">
+                <?php foreach ($recentDownloads as $download): ?>
+                    <a href="<?= e(base_url('resource.php?slug=' . urlencode($download['slug']))) ?>" class="list-group-item list-group-item-action d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <span>
+                            <?= e($download['title']) ?>
+                            <span class="text-secondary small ms-2"><?= e($download['resource_type']) ?><?= !empty($download['grade_level']) ? ' &middot; ' . e($download['grade_level']) : '' ?></span>
+                        </span>
+                        <span class="text-secondary small text-nowrap">Downloaded <?= e(format_date($download['downloaded_at'])) ?></span>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
 
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body">

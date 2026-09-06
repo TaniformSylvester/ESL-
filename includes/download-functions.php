@@ -118,6 +118,32 @@ function record_download(?int $userId, int $resourceId): void
         ->execute([$resourceId]);
 }
 
+/**
+ * A short, dashboard-friendly list of resources this user has actually
+ * downloaded — one row per resource (deduped, most recent download wins),
+ * and only resources still published and active, so "Continue Where You
+ * Left Off" never links to something retired. Distinct from
+ * get_user_downloads(), which intentionally returns the full unfiltered
+ * history (including archived resources) for the My Downloads page.
+ */
+function get_recent_active_downloads(int $userId, int $limit): array
+{
+    $limit = max(0, $limit);
+
+    $stmt = getDB()->prepare(
+        "SELECT r.id, r.title, r.slug, r.resource_type, r.grade_level, MAX(d.downloaded_at) AS downloaded_at
+         FROM downloads d
+         INNER JOIN resources r ON r.id = d.resource_id
+         WHERE d.user_id = ? AND r.is_published = 1 AND r.status = 'active'
+         GROUP BY r.id
+         ORDER BY downloaded_at DESC
+         LIMIT {$limit}"
+    );
+    $stmt->execute([$userId]);
+
+    return $stmt->fetchAll();
+}
+
 function get_user_downloads(int $userId, int $page, int $perPage): array
 {
     $db = getDB();
