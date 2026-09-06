@@ -172,3 +172,26 @@ footer a:hover {
     font-weight: 600;
     min-height: 3.25rem;
 }
+
+/* ---------------------------------------------------------------------
+   Teacher Tools — Random Name Picker & Classroom Timer
+   ------------------------------------------------------------------- */
+
+.teacher-tool-card {
+    border-radius: 0.75rem;
+}
+
+.teacher-tool-display {
+    font-size: 2.5rem;
+    font-weight: 700;
+    padding: 1.5rem 1rem;
+    border-radius: 0.5rem;
+    background-color: var(--brand-bg-soft);
+    color: var(--brand-primary);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.teacher-tool-display-alert {
+    background-color: #fde8e8;
+    color: #b91c1c;
+}

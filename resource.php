@@ -307,6 +307,9 @@ require_once __DIR__ . '/includes/header.php';
                             <i class="fa-solid fa-circle-check text-success me-1"></i>Free download &mdash; no account required.
                         </p>
                     <?php endif; ?>
+                    <p class="small text-secondary mt-2 mb-0">
+                        <i class="fa-solid fa-shuffle me-1"></i>Teaching this in class? Try our free <a href="<?= e(base_url('teacher-tools.php')) ?>">Random Name Picker &amp; Timer</a>.
+                    </p>
                 <?php else: ?>
                     <!-- Only reachable for a members-only resource now: free
                          resources are always downloadable, so this branch is

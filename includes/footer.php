@@ -13,6 +13,7 @@
                     <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('resources.php')) ?>">Resources</a></li>
                     <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('') . '#play-and-learn') ?>">Games</a></li>
                     <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('teacher-hub.php')) ?>">Teacher Hub</a></li>
+                    <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('teacher-tools.php')) ?>">Teacher Tools</a></li>
                     <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('pricing.php')) ?>">Pricing</a></li>
                     <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('about.php')) ?>">About</a></li>
                     <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('contact.php')) ?>">Contact</a></li>
@@ -41,6 +42,7 @@
 <script src="<?= e(asset_url('js/downloads.js')) ?>"></script>
 <script src="<?= e(asset_url('js/teaching-demo.js')) ?>"></script>
 <script src="<?= e(asset_url('js/number-challenge.js')) ?>"></script>
+<script src="<?= e(asset_url('js/teacher-tools.js')) ?>"></script>
 <?php if (GA_ENABLED && GA_MEASUREMENT_ID !== ''): ?>
 <script src="<?= e(asset_url('js/analytics.js')) ?>"></script>
 <?php endif; ?>

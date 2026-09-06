@@ -7,6 +7,7 @@ $staticPages = [
     ['loc' => base_url(), 'priority' => '1.0'],
     ['loc' => base_url('resources.php'), 'priority' => '0.9'],
     ['loc' => base_url('teacher-hub.php'), 'priority' => '0.8'],
+    ['loc' => base_url('teacher-tools.php'), 'priority' => '0.6'],
     ['loc' => base_url('pricing.php'), 'priority' => '0.8'],
     ['loc' => base_url('about.php'), 'priority' => '0.5'],
     ['loc' => base_url('contact.php'), 'priority' => '0.5'],
