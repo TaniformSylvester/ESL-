@@ -57,6 +57,63 @@ function get_most_downloaded_resources(int $limit = 5): array
     return $stmt->fetchAll();
 }
 
+/**
+ * Every valid subject/grade combination (via get_subject_grade_levels(),
+ * so a grade a subject doesn't actually cover never appears) with its real
+ * published-resource count and total downloads — including combinations
+ * with zero resources, shown as 0 rather than omitted. This is what turns
+ * "which grade needs content next" from a guess into a measurement: a
+ * grade with resources but few downloads is a different problem than a
+ * grade with nothing published yet, and both show up here.
+ */
+function get_downloads_by_subject_grade(): array
+{
+    $stmt = getDB()->prepare(
+        "SELECT COUNT(*) AS resource_count, COALESCE(SUM(download_count), 0) AS total_downloads
+         FROM resources
+         WHERE subject_id = ? AND grade_level = ? AND is_published = 1 AND status = 'active'"
+    );
+
+    $rows = [];
+    foreach (get_all_subjects() as $subject) {
+        foreach (get_subject_grade_levels($subject) as $grade) {
+            $stmt->execute([$subject['id'], $grade]);
+            $stats = $stmt->fetch();
+            $rows[] = [
+                'subject_name'     => $subject['name'],
+                'grade_level'      => $grade,
+                'resource_count'   => (int)$stats['resource_count'],
+                'total_downloads'  => (int)$stats['total_downloads'],
+            ];
+        }
+    }
+
+    return $rows;
+}
+
+/**
+ * The $limit topics with the most total downloads across their published
+ * resources — grouped by subject as well as topic, since the same topic
+ * name (e.g. "Numbers") can reasonably exist under more than one subject
+ * without being the same topic. Feeds directly into deciding which topic
+ * to expand next, using real usage instead of a curriculum-sequence guess.
+ */
+function get_top_topics_by_downloads(int $limit = 10): array
+{
+    $stmt = getDB()->prepare(
+        "SELECT r.topic, s.name AS subject_name, COUNT(*) AS resource_count, SUM(r.download_count) AS total_downloads
+         FROM resources r
+         INNER JOIN subjects s ON s.id = r.subject_id
+         WHERE r.is_published = 1 AND r.status = 'active' AND r.topic IS NOT NULL AND r.topic != ''
+         GROUP BY r.topic, s.name
+         ORDER BY total_downloads DESC, resource_count DESC
+         LIMIT " . max(1, $limit)
+    );
+    $stmt->execute();
+
+    return $stmt->fetchAll();
+}
+
 /** Top $limit users by total download count, for the admin download-analytics panel. */
 function get_most_active_users(int $limit = 5): array
 {

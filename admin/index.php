@@ -3,6 +3,7 @@ require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/admin-functions.php';
 require_once __DIR__ . '/../includes/review-functions.php';
+require_once __DIR__ . '/../includes/subject-functions.php';
 
 require_admin();
 $stats = get_dashboard_stats();
@@ -11,6 +12,8 @@ $mostActiveUsers = get_most_active_users(5);
 $reviewStats = get_review_stats();
 $topRatedResources = get_top_rated_resources(5);
 $mostReviewedResources = get_most_reviewed_resources(5);
+$downloadsBySubjectGrade = get_downloads_by_subject_grade();
+$topTopics = get_top_topics_by_downloads(10);
 
 $pageTitle = 'Dashboard';
 require_once __DIR__ . '/../includes/admin-header.php';
@@ -127,6 +130,58 @@ require_once __DIR__ . '/../includes/admin-header.php';
             <p class="text-secondary small text-uppercase mb-1">Downloads This Month</p>
             <p class="stat-value mb-0"><?= (int)$stats['downloads_this_month'] ?></p>
         </div></div>
+    </div>
+</div>
+
+<h2 class="h6 fw-bold text-secondary text-uppercase mb-3">Downloads by Subject &amp; Grade</h2>
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <p class="small text-secondary mb-3">Every grade each subject covers, with real published-resource and download counts — a highlighted 0 means that grade has no published content yet, a different problem from a grade that has content but few downloads.</p>
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Grade</th>
+                        <th class="text-end">Resources</th>
+                        <th class="text-end">Total Downloads</th>
+                        <th class="text-end">Avg / Resource</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($downloadsBySubjectGrade as $row): ?>
+                        <?php $avgDownloads = $row['resource_count'] > 0 ? $row['total_downloads'] / $row['resource_count'] : 0; ?>
+                        <tr<?= $row['resource_count'] === 0 ? ' class="table-warning"' : '' ?>>
+                            <td><?= e($row['subject_name']) ?></td>
+                            <td><?= e($row['grade_level']) ?></td>
+                            <td class="text-end"><?= (int)$row['resource_count'] ?></td>
+                            <td class="text-end"><?= (int)$row['total_downloads'] ?></td>
+                            <td class="text-end"><?= $row['resource_count'] > 0 ? number_format($avgDownloads, 1) : '&mdash;' ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<h2 class="h6 fw-bold text-secondary text-uppercase mb-3">Top Topics by Downloads</h2>
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <?php if (empty($topTopics)): ?>
+            <p class="text-secondary small mb-0">No downloads recorded yet.</p>
+        <?php else: ?>
+            <ol class="mb-0 ps-3">
+                <?php foreach ($topTopics as $topic): ?>
+                    <li class="small mb-1">
+                        <span class="fw-bold"><?= e($topic['topic']) ?></span>
+                        <span class="text-secondary">(<?= e($topic['subject_name']) ?>)</span>
+                        &mdash; <?= (int)$topic['total_downloads'] ?> download<?= (int)$topic['total_downloads'] === 1 ? '' : 's' ?>
+                        across <?= (int)$topic['resource_count'] ?> resource<?= (int)$topic['resource_count'] === 1 ? '' : 's' ?>
+                    </li>
+                <?php endforeach; ?>
+            </ol>
+        <?php endif; ?>
     </div>
 </div>
 
