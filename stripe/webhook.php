@@ -36,18 +36,19 @@ if (!is_array($event) || !isset($event['type'])) {
 if ($event['type'] === 'checkout.session.completed') {
     $session = $event['data']['object'] ?? [];
     $userId = (int)($session['metadata']['user_id'] ?? 0);
+    $plan = (string)($session['metadata']['plan'] ?? 'monthly');
     $sessionId = (string)($session['id'] ?? '');
     $paymentStatus = (string)($session['payment_status'] ?? '');
     $amountTotal = (int)($session['amount_total'] ?? 0);
-    $currency = (string)($session['currency'] ?? 'usd');
 
-    // payment_status may be "unpaid" for delayed payment methods even once
-    // this event fires — only credit membership once Stripe confirms paid.
+    // payment_status may be "unpaid" for delayed payment methods (PromptPay
+    // included) even once this event first fires — only credit membership
+    // once Stripe confirms the payment actually cleared.
     if ($userId > 0 && $sessionId !== '' && $paymentStatus === 'paid') {
         $user = get_user_by_id($userId);
 
         if ($user) {
-            record_stripe_payment($userId, $amountTotal / 100, $sessionId, $currency);
+            record_stripe_payment($userId, $amountTotal / 100, $sessionId, $plan);
 
             $membership = get_membership($userId);
             send_payment_approved_email($user, $membership['expiry_date'] ?? '');

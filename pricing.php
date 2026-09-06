@@ -134,13 +134,12 @@ require_once __DIR__ . '/includes/header.php';
 
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <h2 class="h4 fw-bold mb-3">How Membership Works Right Now</h2>
-            <p>Membership is currently activated manually after payment is confirmed. Here's the process:</p>
+            <h2 class="h4 fw-bold mb-3">How Membership Works</h2>
+            <p>Membership activates automatically as soon as your payment is confirmed. Here's how it works:</p>
             <ol>
                 <li class="mb-2">Free resources are unlimited for everyone &mdash; download them right away, no account required.</li>
-                <li class="mb-2">When you're ready to unlock members-only resources, go to your <strong>Subscription</strong> page, choose Monthly or Annual, and review the payment instructions (bank transfer or PromptPay).</li>
-                <li class="mb-2">Send your payment, then submit the amount, date, and reference number.</li>
-                <li class="mb-2">Our team reviews and approves your payment &mdash; usually within a day &mdash; and your membership becomes active for 30 days (Monthly) or 365 days (Annual) from approval.</li>
+                <li class="mb-2">When you're ready to unlock members-only resources, go to your <strong>Subscription</strong> page and choose Monthly or Annual.</li>
+                <li class="mb-2">Pay securely by card or scan to pay with PromptPay &mdash; handled by Stripe. Your membership activates immediately once payment is confirmed, no waiting.</li>
                 <li class="mb-2">Renew before your membership expires to keep access to members-only resources &mdash; if it lapses, your account simply reverts to the Free plan (still unlimited free downloads) rather than being locked out.</li>
             </ol>
         </div>

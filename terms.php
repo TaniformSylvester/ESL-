@@ -20,13 +20,13 @@ require_once __DIR__ . '/includes/header.php';
             </ul>
 
             <h2 class="h5 fw-bold mt-4">2. Membership Activation &amp; Expiry</h2>
-            <p>Membership is currently activated manually after payment is confirmed: a Monthly plan runs for 30 days and an Annual plan for 365 days from the date of approval. If a membership is not renewed before it expires, the account automatically reverts to the Free plan (still unlimited downloads of free resources) rather than being suspended.</p>
+            <p>Membership activates automatically as soon as payment is confirmed by Stripe: a Monthly plan runs for 30 days and an Annual plan for 365 days from the date of payment. If a membership is not renewed before it expires, the account automatically reverts to the Free plan (still unlimited downloads of free resources) rather than being suspended.</p>
 
             <h2 class="h5 fw-bold mt-4">3. Use of Resources (Licensing)</h2>
             <p>Resources downloaded from <?= e(SITE_NAME) ?>, whether under the Free or Pro plan, are licensed for use by the downloading teacher in their own classroom(s) only. Redistributing, reselling, sharing account access, or publicly re-hosting downloaded files is not permitted.</p>
 
-            <h2 class="h5 fw-bold mt-4">4. Payments &amp; Approval</h2>
-            <p>Membership payments are currently processed manually via bank transfer or PromptPay. Submitting a payment does not guarantee approval; our team reviews each submission (including the selected plan, amount, and reference number) before activating or extending membership. A rejected or still-pending payment does not grant Pro access.</p>
+            <h2 class="h5 fw-bold mt-4">4. Payments</h2>
+            <p>Membership payments are processed securely by Stripe, by card or PromptPay. We do not process or store your card details. Membership activates automatically once Stripe confirms your payment was successful.</p>
 
             <h2 class="h5 fw-bold mt-4">5. Account Responsibility</h2>
             <p>You are responsible for keeping your account credentials confidential and for all activity under your account, including download activity counted against your plan's limits.</p>

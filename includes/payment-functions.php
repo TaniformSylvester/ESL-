@@ -17,7 +17,11 @@ const PAYMENT_METHODS = [
 /** For displaying any payment row's method, including the gateway-only 'stripe' value PAYMENT_METHODS excludes. */
 function payment_method_label(string $method): string
 {
-    return $method === 'stripe' ? 'Stripe (Card)' : (PAYMENT_METHODS[$method] ?? $method);
+    // Stripe Checkout offers both card and PromptPay (see
+    // create_stripe_checkout_session()) — the payments table doesn't
+    // distinguish which one a teacher actually chose, so this stays
+    // generic rather than claiming "Card" for what might be PromptPay.
+    return $method === 'stripe' ? 'Stripe' : (PAYMENT_METHODS[$method] ?? $method);
 }
 
 /**
@@ -97,9 +101,16 @@ function submit_payment(int $userId, array $input, array $file): array
  * once Stripe confirms the charge actually succeeded. Idempotent against
  * Stripe's at-least-once webhook delivery: a session already recorded
  * (checked via gateway_reference) is a no-op, not a duplicate extension.
+ * $plan comes from the Checkout Session's own metadata (see
+ * create_stripe_checkout_session()), not assumed — Stripe charges are
+ * always THB (config.php's CURRENCY) since PromptPay only supports THB.
  */
-function record_stripe_payment(int $userId, float $amount, string $sessionId, string $currency = 'usd'): void
+function record_stripe_payment(int $userId, float $amount, string $sessionId, string $plan = 'monthly'): void
 {
+    if (!array_key_exists($plan, PLAN_DAYS)) {
+        $plan = 'monthly';
+    }
+
     $db = getDB();
 
     $existing = $db->prepare('SELECT id FROM payments WHERE gateway_reference = ? LIMIT 1');
@@ -108,17 +119,14 @@ function record_stripe_payment(int $userId, float $amount, string $sessionId, st
         return;
     }
 
-    // Stripe charges can be USD or THB (see create_stripe_checkout_session)
-    // — $currency comes from the actual Checkout Session Stripe confirmed,
-    // not assumed. Stripe only ever offers the monthly plan (config/stripe.php).
     $db->prepare(
         "INSERT INTO payments (user_id, amount, currency, method, plan, reference_number, payment_date, status, gateway_reference, reviewed_at)
-         VALUES (?, ?, ?, 'stripe', 'monthly', ?, CURDATE(), 'approved', ?, NOW())"
-    )->execute([$userId, $amount, strtoupper($currency), $sessionId, $sessionId]);
+         VALUES (?, ?, ?, 'stripe', ?, ?, CURDATE(), 'approved', ?, NOW())"
+    )->execute([$userId, $amount, CURRENCY, $plan, $sessionId, $sessionId]);
 
     $paymentId = (int)$db->lastInsertId();
 
-    extend_membership_for_plan($userId, 'monthly');
+    extend_membership_for_plan($userId, $plan);
 
     $db->prepare('UPDATE memberships SET last_payment_id = ? WHERE user_id = ?')
         ->execute([$paymentId, $userId]);

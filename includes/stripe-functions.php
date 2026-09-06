@@ -41,42 +41,50 @@ function stripe_api_request(string $method, string $endpoint, array $params = []
 }
 
 /**
- * Creates a one-time (mode=payment) Checkout Session for one month of
- * membership, in either USD (STRIPE_PRICE_USD, the default — card payments
- * from anywhere) or THB (PRICE_MONTHLY, config.php — added so Thai-issued
- * cards that reject foreign-currency charges have a card option too;
- * bank transfer/PromptPay remain available as the non-card THB option
- * regardless). $currency is 'usd' or 'thb'; anything else falls back to
- * 'usd'. Returns ['success' => bool, 'url' => ?string, 'error' => ?string].
- * The caller redirects the browser to the returned url — Stripe hosts the
- * actual payment page, so card details never touch this server.
+ * Creates a one-time (mode=payment) Checkout Session for the given plan
+ * (monthly or annual), priced in THB using config.php's PRICE_MONTHLY /
+ * PRICE_ANNUAL — the same prices already shown on pricing.php, so a
+ * teacher never sees a different amount at checkout than what was
+ * advertised. Offers both 'card' and 'promptpay' as payment methods, so a
+ * Thai customer can scan and pay via PromptPay directly inside Stripe's
+ * hosted checkout, with no separate manual-transfer step. PromptPay is a
+ * delayed-confirmation method — see stripe/webhook.php's payment_status
+ * check, which already only credits membership once Stripe confirms the
+ * PromptPay payment actually cleared, not just that checkout was opened.
+ * Returns ['success' => bool, 'url' => ?string, 'error' => ?string]. The
+ * caller redirects the browser to the returned url — Stripe hosts the
+ * actual payment page, so card/bank details never touch this server.
  */
-function create_stripe_checkout_session(array $user, string $currency = 'usd'): array
+function create_stripe_checkout_session(array $user, string $plan = 'monthly'): array
 {
-    $currency = $currency === 'thb' ? 'thb' : 'usd';
-    $unitAmount = $currency === 'thb'
-        ? (int)round(PRICE_MONTHLY * 100)
-        : (int)round(STRIPE_PRICE_USD * 100);
+    if (!array_key_exists($plan, PLAN_DAYS)) {
+        $plan = 'monthly';
+    }
+
+    $price = $plan === 'annual' ? PRICE_ANNUAL : PRICE_MONTHLY;
+    $planLabel = PLAN_LABELS[$plan] ?? (ucfirst($plan) . ' Plan');
 
     $params = [
-        'mode'                        => 'payment',
-        'customer_email'              => $user['email'],
-        'success_url'                 => base_url('member/subscription.php?stripe=success&session_id={CHECKOUT_SESSION_ID}'),
-        'cancel_url'                  => base_url('member/subscription.php?stripe=cancelled'),
+        'mode'                 => 'payment',
+        'payment_method_types' => ['card', 'promptpay'],
+        'customer_email'       => $user['email'],
+        'success_url'          => base_url('member/subscription.php?stripe=success&session_id={CHECKOUT_SESSION_ID}'),
+        'cancel_url'           => base_url('member/subscription.php?stripe=cancelled'),
         'line_items' => [
             [
                 'quantity'   => 1,
                 'price_data' => [
-                    'currency'     => $currency,
-                    'unit_amount'  => $unitAmount,
+                    'currency'     => 'thb',
+                    'unit_amount'  => (int)round($price * 100),
                     'product_data' => [
-                        'name' => SITE_NAME . ' Membership — 1 Month',
+                        'name' => SITE_NAME . ' ' . $planLabel,
                     ],
                 ],
             ],
         ],
         'metadata' => [
             'user_id' => (string)$user['id'],
+            'plan'    => $plan,
         ],
     ];
 

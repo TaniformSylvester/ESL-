@@ -54,11 +54,7 @@ $faqItems = [
     ],
     [
         'question' => 'How do I pay?',
-        'answer'   => 'Currently, TeachLuma uses manual PromptPay or bank-transfer payment. After submitting your payment details, our team reviews and approves your membership.',
-    ],
-    [
-        'question' => 'How long does approval take?',
-        'answer'   => 'Usually within a day.',
+        'answer'   => 'Pay securely by card or scan to pay with PromptPay — handled by Stripe. Your Teacher Pro membership activates automatically the moment payment is confirmed, no waiting for approval.',
     ],
     [
         'question' => 'Can I cancel anytime?',

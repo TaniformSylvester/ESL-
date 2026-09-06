@@ -15,7 +15,7 @@ require_once __DIR__ . '/includes/header.php';
             <h2 class="h5 fw-bold mt-4">Information We Collect</h2>
             <ul>
                 <li>Account details you provide: name, email, school, country, and optional phone number.</li>
-                <li>Payment submission details you provide for manual membership approval (amount, date, reference number, optional screenshot). We do not process or store card details.</li>
+                <li>Payment confirmation details from Stripe when you upgrade to Teacher Pro (amount, plan, and a payment reference). We do not process or store your card details — Stripe handles payment directly and securely.</li>
                 <li>Basic usage information such as which resources you download, used to maintain your download history and improve the resource library.</li>
                 <li>Messages you send us through the contact form.</li>
             </ul>
@@ -25,6 +25,9 @@ require_once __DIR__ . '/includes/header.php';
 
             <h2 class="h5 fw-bold mt-4">Data Security</h2>
             <p>Passwords are stored using industry-standard hashing and are never stored or visible in plain text, including to our own team.</p>
+
+            <h2 class="h5 fw-bold mt-4">Payment Processing</h2>
+            <p>Teacher Pro payments are processed by <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Stripe</a>, a third-party payment processor. When you pay by card or PromptPay, your payment details are sent directly to Stripe &mdash; we never see or store your card number or bank details. Stripe shares back with us only what we need to activate your membership: your email, the plan and amount paid, and a payment reference.</p>
 
             <h2 class="h5 fw-bold mt-4">Advertising &amp; Cookies</h2>
             <p><?= e(SITE_NAME) ?> shows ads served by Google AdSense to visitors and free-tier members (never to paying members with an active subscription). Google and its partners may use cookies or similar technologies to serve ads based on your prior visits to this or other websites. You can opt out of personalized advertising by visiting <a href="https://adssettings.google.com" target="_blank" rel="noopener">Google Ads Settings</a>, and you can learn more about how Google uses data at <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">policies.google.com/technologies/partner-sites</a>. Where required, a consent banner lets you choose whether to allow personalized advertising.</p>
