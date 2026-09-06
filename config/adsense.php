@@ -22,6 +22,11 @@
  * Do NOT commit a real publisher ID to a public repository.
  */
 
-define('ADSENSE_ENABLED', false); // set to true once the value below is filled in
+define('ADSENSE_ENABLED', true);
 
-define('ADSENSE_PUBLISHER_ID', ''); // e.g. 'ca-pub-1234567890123456'
+define('ADSENSE_PUBLISHER_ID', 'ca-pub-3295948699568799');
+
+// Ad unit slot IDs, from AdSense > Ads > By ad unit. One responsive
+// display unit per placement — see includes/ad-unit.php.
+define('ADSENSE_SLOT_HOMEPAGE', '2296873696');
+define('ADSENSE_SLOT_RESOURCE_PAGE', '4211861649');

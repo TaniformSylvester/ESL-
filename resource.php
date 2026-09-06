@@ -500,6 +500,9 @@ require_once __DIR__ . '/includes/header.php';
         </div>
     <?php endif; ?>
 </div>
+
+<?php $adSlot = ADSENSE_SLOT_RESOURCE_PAGE; require __DIR__ . '/includes/ad-unit.php'; ?>
+
 <script>
 (function () {
     var copyBtn = document.getElementById('copyResourceLink');

@@ -117,6 +117,8 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 </section>
 
+<?php $adSlot = ADSENSE_SLOT_HOMEPAGE; require __DIR__ . '/includes/ad-unit.php'; ?>
+
 <?php if (!empty($subjects)): ?>
 <section class="py-5">
     <div class="container">

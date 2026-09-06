@@ -6,4 +6,4 @@
 # the exact line format Google expects. This file must be reachable at
 # https://teachluma.com/ads.txt (no extra folders).
 #
-# google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
+google.com, pub-3295948699568799, DIRECT, f08c47fec0942fa0
