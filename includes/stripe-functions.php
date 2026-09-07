@@ -83,6 +83,7 @@ function create_stripe_checkout_session(array $user, string $plan = 'monthly'): 
             ],
         ],
         'metadata' => [
+            'type'    => 'membership',
             'user_id' => (string)$user['id'],
             'plan'    => $plan,
         ],
@@ -93,6 +94,50 @@ function create_stripe_checkout_session(array $user, string $plan = 'monthly'): 
     if (!$result || isset($result['error'])) {
         error_log('Stripe checkout session creation failed: ' . ($result['error']['message'] ?? 'unknown error'));
         return ['success' => false, 'url' => null, 'error' => 'Could not start the Stripe checkout. Please try again or use another payment method.'];
+    }
+
+    return ['success' => true, 'url' => $result['url'] ?? null, 'error' => null];
+}
+
+/**
+ * Creates a one-time Checkout Session for a resource bundle — same card +
+ * PromptPay setup as the membership checkout, priced at the bundle's own
+ * price (THB). metadata.type = 'bundle' is how stripe/webhook.php tells
+ * this apart from a membership payment on the same shared endpoint.
+ * Returns ['success' => bool, 'url' => ?string, 'error' => ?string].
+ */
+function create_bundle_checkout_session(array $user, array $bundle): array
+{
+    $params = [
+        'mode'                 => 'payment',
+        'payment_method_types' => ['card', 'promptpay'],
+        'customer_email'       => $user['email'],
+        'success_url'          => base_url('bundle.php?slug=' . rawurlencode($bundle['slug']) . '&stripe=success'),
+        'cancel_url'           => base_url('bundle.php?slug=' . rawurlencode($bundle['slug']) . '&stripe=cancelled'),
+        'line_items' => [
+            [
+                'quantity'   => 1,
+                'price_data' => [
+                    'currency'     => 'thb',
+                    'unit_amount'  => (int)round((float)$bundle['price'] * 100),
+                    'product_data' => [
+                        'name' => SITE_NAME . ' Bundle — ' . $bundle['title'],
+                    ],
+                ],
+            ],
+        ],
+        'metadata' => [
+            'type'      => 'bundle',
+            'user_id'   => (string)$user['id'],
+            'bundle_id' => (string)$bundle['id'],
+        ],
+    ];
+
+    $result = stripe_api_request('POST', 'checkout/sessions', $params);
+
+    if (!$result || isset($result['error'])) {
+        error_log('Stripe bundle checkout session creation failed: ' . ($result['error']['message'] ?? 'unknown error'));
+        return ['success' => false, 'url' => null, 'error' => 'Could not start the Stripe checkout. Please try again.'];
     }
 
     return ['success' => true, 'url' => $result['url'] ?? null, 'error' => null];

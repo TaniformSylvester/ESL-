@@ -4,6 +4,7 @@ require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/membership.php';
 require_once __DIR__ . '/includes/resource-functions.php';
 require_once __DIR__ . '/includes/download-functions.php';
+require_once __DIR__ . '/includes/bundle-functions.php';
 require_once __DIR__ . '/includes/favorites-functions.php';
 require_once __DIR__ . '/includes/review-functions.php';
 require_once __DIR__ . '/includes/seo-functions.php';
@@ -73,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 $isLoggedIn = is_logged_in();
 $canDownload = can_download_resource($resource);
+$availableBundles = !$canDownload ? get_published_bundles_containing_resource((int)$resource['id']) : [];
 $isPro = $isLoggedIn && isMemberActive();
 $gaAccountState = !$isLoggedIn ? 'guest' : (is_admin() ? 'admin' : ($isPro ? 'pro' : 'free'));
 $isFavorited = $isLoggedIn && is_favorited((int)$_SESSION['user_id'], (int)$resource['id']);
@@ -323,6 +325,15 @@ require_once __DIR__ . '/includes/header.php';
                                 <a href="<?= e(base_url('login.php')) ?>" class="btn btn-outline-secondary">Login</a>
                             <?php endif; ?>
                         </div>
+                        <?php if (!empty($availableBundles)): ?>
+                            <hr>
+                            <p class="mb-2 small">Only need a few resources, not a full subscription? This one's also included in:</p>
+                            <?php foreach ($availableBundles as $bundleOption): ?>
+                                <a href="<?= e(base_url('bundle.php?slug=' . urlencode($bundleOption['slug']))) ?>" class="btn btn-outline-primary btn-sm mb-1">
+                                    <?= e($bundleOption['title']) ?> &mdash; <?= e(format_currency($bundleOption['price'])) ?> one-time
+                                </a>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 <?php endif; ?>
             </div>

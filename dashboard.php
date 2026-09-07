@@ -61,6 +61,7 @@ require_once __DIR__ . '/includes/header.php';
                         <a href="<?= e(base_url('resources.php')) ?>">Browse Resources</a>
                         <a href="<?= e(base_url('member/favorites.php')) ?>">My Favorites</a>
                         <a href="<?= e(base_url('member/downloads.php')) ?>">My Downloads</a>
+                        <a href="<?= e(base_url('member/bundles.php')) ?>">My Bundles</a>
                         <a href="<?= e(base_url('member/reviews.php')) ?>">My Reviews</a>
                         <a href="<?= e(base_url('member/profile.php')) ?>">Edit Profile</a>
                     </div>

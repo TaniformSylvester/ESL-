@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/init.php';
+require_once __DIR__ . '/includes/bundle-functions.php';
 
 header('Content-Type: application/xml; charset=UTF-8');
 
@@ -8,6 +9,7 @@ $staticPages = [
     ['loc' => base_url('resources.php'), 'priority' => '0.9'],
     ['loc' => base_url('teacher-hub.php'), 'priority' => '0.8'],
     ['loc' => base_url('teacher-tools.php'), 'priority' => '0.6'],
+    ['loc' => base_url('bundles.php'), 'priority' => '0.6'],
     ['loc' => base_url('pricing.php'), 'priority' => '0.8'],
     ['loc' => base_url('about.php'), 'priority' => '0.5'],
     ['loc' => base_url('contact.php'), 'priority' => '0.5'],
@@ -23,6 +25,8 @@ $resources = $stmt->fetchAll();
 
 $stmt = getDB()->query('SELECT slug, updated_at FROM guides WHERE is_published = 1 ORDER BY updated_at DESC');
 $guides = $stmt->fetchAll();
+
+$bundlePages = get_published_bundles();
 
 // Subject and category listing pages (resources.php?subject_id=/?category_id=)
 // are real, uniquely-titled landing pages (see generate_resources_listing_seo())
@@ -80,6 +84,13 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         <loc><?= e(base_url('teacher-hub-guide.php?slug=' . urlencode($guide['slug']))) ?></loc>
         <lastmod><?= e(date('Y-m-d', strtotime($guide['updated_at']))) ?></lastmod>
         <priority>0.6</priority>
+    </url>
+<?php endforeach; ?>
+<?php foreach ($bundlePages as $bundlePage): ?>
+    <url>
+        <loc><?= e(base_url('bundle.php?slug=' . urlencode($bundlePage['slug']))) ?></loc>
+        <lastmod><?= e(date('Y-m-d', strtotime($bundlePage['updated_at']))) ?></lastmod>
+        <priority>0.5</priority>
     </url>
 <?php endforeach; ?>
 </urlset>

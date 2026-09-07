@@ -246,6 +246,67 @@ CREATE TABLE IF NOT EXISTS resource_related_resources (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------------------------
+-- bundles — a fixed-price, one-time-purchase collection of resources, sold
+-- via Stripe (see includes/stripe-functions.php) alongside the Teacher Pro
+-- subscription, not instead of it. No delete action exists in the admin —
+-- only publish/unpublish — the same archive-don't-delete philosophy already
+-- used for resources, since deleting a bundle a teacher already paid for
+-- would retroactively break their access.
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS bundles (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    title VARCHAR(200) NOT NULL,
+    slug VARCHAR(220) NOT NULL,
+    description TEXT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    is_published TINYINT(1) NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_bundles_slug (slug),
+    KEY idx_bundles_published (is_published)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
+-- bundle_resources (which resources a bundle includes)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS bundle_resources (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    bundle_id INT UNSIGNED NOT NULL,
+    resource_id INT UNSIGNED NOT NULL,
+    sort_order INT UNSIGNED NOT NULL DEFAULT 0,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_bundle_resource (bundle_id, resource_id),
+    KEY idx_bundle_resources_resource (resource_id),
+    CONSTRAINT fk_bundle_resources_bundle FOREIGN KEY (bundle_id) REFERENCES bundles (id) ON DELETE CASCADE,
+    CONSTRAINT fk_bundle_resources_resource FOREIGN KEY (resource_id) REFERENCES resources (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
+-- bundle_purchases (a permanent purchase record and access grant — no
+-- expiry, unlike Pro membership. user_id is nullable with ON DELETE SET
+-- NULL, mirroring downloads.user_id, so the purchase/revenue record
+-- survives even if the account is later removed. bundle_id is deliberately
+-- ON DELETE RESTRICT, not CASCADE: a bundle with real purchases against it
+-- must never be deletable at the database level either.)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS bundle_purchases (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    user_id INT UNSIGNED NULL,
+    bundle_id INT UNSIGNED NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    currency VARCHAR(10) NOT NULL DEFAULT 'THB',
+    gateway_reference VARCHAR(255) NOT NULL,
+    purchased_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_bundle_purchases_reference (gateway_reference),
+    KEY idx_bundle_purchases_user (user_id),
+    KEY idx_bundle_purchases_bundle (bundle_id),
+    CONSTRAINT fk_bundle_purchases_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL,
+    CONSTRAINT fk_bundle_purchases_bundle FOREIGN KEY (bundle_id) REFERENCES bundles (id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
 -- favorites
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS favorites (

@@ -8,11 +8,11 @@
 /**
  * The single source of truth for "can this resource be downloaded right
  * now" — used by both resource.php and member/download.php so they never
- * drift apart. Members-only resources (is_free = 0) always require an
- * active Pro membership, with no exception. Free resources are always
- * downloadable — unlimited, no login required — per the TeachLuma
- * free-access model: account creation is reserved for reviews/community
- * features and Pro content, never a prerequisite for a free download.
+ * drift apart. Free resources are always downloadable — unlimited, no
+ * login required. A members-only resource (is_free = 0) needs either an
+ * active Pro membership or a one-time bundle purchase that includes it
+ * (see includes/bundle-functions.php) — bundle access never expires, since
+ * it's a purchase, not a subscription.
  */
 function can_download_resource(array $resource): bool
 {
@@ -20,7 +20,11 @@ function can_download_resource(array $resource): bool
         return true;
     }
 
-    return (bool)$resource['is_free'];
+    if (!empty($resource['is_free'])) {
+        return true;
+    }
+
+    return is_logged_in() && has_bundle_access((int)$_SESSION['user_id'], (int)$resource['id']);
 }
 
 /**

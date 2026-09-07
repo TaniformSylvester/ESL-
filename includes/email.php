@@ -99,6 +99,17 @@ function send_payment_approved_email(array $user, string $expiryDate): bool
     return send_email($user['email'], $subject, $body);
 }
 
+function send_bundle_purchase_email(array $user, array $bundle): bool
+{
+    $subject = 'Your ' . SITE_NAME . ' bundle purchase — ' . $bundle['title'];
+
+    $body = '<p>Hi ' . e($user['first_name']) . ',</p>'
+        . '<p>Thanks for your purchase! You now have permanent access to every resource in <strong>' . e($bundle['title']) . '</strong>.</p>'
+        . '<p><a href="' . e(base_url('bundle.php?slug=' . rawurlencode($bundle['slug']))) . '">View your bundle</a></p>';
+
+    return send_email($user['email'], $subject, $body);
+}
+
 function send_payment_rejected_email(array $user, string $note): bool
 {
     $subject = 'About your recent ' . SITE_NAME . ' payment';

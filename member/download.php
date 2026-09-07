@@ -4,6 +4,7 @@ require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/membership.php';
 require_once __DIR__ . '/../includes/resource-functions.php';
 require_once __DIR__ . '/../includes/download-functions.php';
+require_once __DIR__ . '/../includes/bundle-functions.php';
 
 $id = (int)($_GET['id'] ?? 0);
 $resource = $id > 0 ? get_resource_by_id($id) : null;

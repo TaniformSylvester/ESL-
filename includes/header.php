@@ -105,6 +105,7 @@ $websiteSchema = [
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('resources.php')) ?>">Resources</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('teacher-hub.php')) ?>">Teacher Hub</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('teacher-tools.php')) ?>">Teacher Tools</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= e(base_url('bundles.php')) ?>">Bundles</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('pricing.php')) ?>">Pricing</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('about.php')) ?>">About</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('contact.php')) ?>">Contact</a></li>

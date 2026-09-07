@@ -9,6 +9,7 @@ require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/admin-functions.php';
 require_once __DIR__ . '/../includes/membership.php';
 require_once __DIR__ . '/../includes/payment-functions.php';
+require_once __DIR__ . '/../includes/bundle-functions.php';
 require_once __DIR__ . '/../includes/stripe-functions.php';
 require_once __DIR__ . '/../includes/email.php';
 
@@ -35,19 +36,28 @@ if (!is_array($event) || !isset($event['type'])) {
 
 if ($event['type'] === 'checkout.session.completed') {
     $session = $event['data']['object'] ?? [];
+    $type = (string)($session['metadata']['type'] ?? 'membership');
     $userId = (int)($session['metadata']['user_id'] ?? 0);
-    $plan = (string)($session['metadata']['plan'] ?? 'monthly');
     $sessionId = (string)($session['id'] ?? '');
     $paymentStatus = (string)($session['payment_status'] ?? '');
     $amountTotal = (int)($session['amount_total'] ?? 0);
 
     // payment_status may be "unpaid" for delayed payment methods (PromptPay
-    // included) even once this event first fires — only credit membership
+    // included) even once this event first fires — only credit access
     // once Stripe confirms the payment actually cleared.
     if ($userId > 0 && $sessionId !== '' && $paymentStatus === 'paid') {
         $user = get_user_by_id($userId);
 
-        if ($user) {
+        if ($user && $type === 'bundle') {
+            $bundleId = (int)($session['metadata']['bundle_id'] ?? 0);
+            $bundle = $bundleId > 0 ? get_bundle_by_id($bundleId) : null;
+
+            if ($bundle) {
+                record_bundle_purchase($userId, $bundleId, $amountTotal / 100, $sessionId);
+                send_bundle_purchase_email($user, $bundle);
+            }
+        } elseif ($user) {
+            $plan = (string)($session['metadata']['plan'] ?? 'monthly');
             record_stripe_payment($userId, $amountTotal / 100, $sessionId, $plan);
 
             $membership = get_membership($userId);
