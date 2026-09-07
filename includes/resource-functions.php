@@ -661,6 +661,10 @@ function validate_resource_input(array $input): array
         $errors['topic'] = 'Topic is too long.';
     }
 
+    if (!empty($input['activity_slug']) && !array_key_exists($input['activity_slug'], PRACTICE_ACTIVITIES)) {
+        $errors['activity_slug'] = 'Please choose a valid practice activity.';
+    }
+
     if (!empty($input['seo_title']) && mb_strlen($input['seo_title']) > 255) {
         $errors['seo_title'] = 'SEO title is too long (255 characters max).';
     }
@@ -781,9 +785,9 @@ function create_resource(array $input, array $files): array
                                  learning_objectives, recommended_level, suggested_duration, skills_practiced,
                                  how_to_use, activity_ideas, teacher_tips, differentiation_notes, assessment_notes,
                                  overview, whats_included, qc_confirmed_at,
-                                 resource_type, subject_id, category_id, grade_level, topic,
+                                 resource_type, subject_id, category_id, grade_level, topic, activity_slug,
                                  thumbnail, preview_image, file_path, file_name, file_size, file_type, is_free, is_published)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     );
     $stmt->execute([
         $title,
@@ -808,6 +812,7 @@ function create_resource(array $input, array $files): array
         !empty($input['category_id']) ? (int)$input['category_id'] : null,
         $input['grade_level'] !== '' ? $input['grade_level'] : null,
         $topic !== '' ? $topic : null,
+        !empty($input['activity_slug']) ? $input['activity_slug'] : null,
         $uploadedThumbnail['filename'] ?? null,
         $uploadedPreview['filename'] ?? null,
         $uploadedResourceFile['filename'],
@@ -944,7 +949,7 @@ function update_resource(int $id, array $input, array $files): array
                                how_to_use = ?, activity_ideas = ?, teacher_tips = ?, differentiation_notes = ?, assessment_notes = ?,
                                overview = ?, whats_included = ?, qc_confirmed_at = ?,
                                resource_type = ?, subject_id = ?, category_id = ?, grade_level = ?,
-                               topic = ?, thumbnail = ?, preview_image = ?, file_path = ?, file_name = ?,
+                               topic = ?, activity_slug = ?, thumbnail = ?, preview_image = ?, file_path = ?, file_name = ?,
                                file_size = ?, file_type = ?, is_free = ?, is_published = ? WHERE id = ?'
     )->execute([
         $title,
@@ -973,6 +978,7 @@ function update_resource(int $id, array $input, array $files): array
         !empty($input['category_id']) ? (int)$input['category_id'] : null,
         $input['grade_level'] !== '' ? $input['grade_level'] : null,
         $topic !== '' ? $topic : null,
+        !empty($input['activity_slug']) ? $input['activity_slug'] : null,
         $thumbnail,
         $preview,
         $filePath,

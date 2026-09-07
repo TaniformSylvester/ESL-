@@ -185,6 +185,11 @@ CREATE TABLE IF NOT EXISTS resources (
     -- used by the TeachLuma 2.0 library rebuild instead of deleting resources.
     status ENUM('active', 'archived') NOT NULL DEFAULT 'active',
     redirect_resource_id INT UNSIGNED NULL,
+    -- Points at a key in config.php's PRACTICE_ACTIVITIES (a static
+    -- assets/games/<slug>/index.html bundle, embedded on resource.php) —
+    -- NULL for the vast majority of resources; only hand-picked ones where
+    -- a genuine in-browser practice activity reinforces the specific skill.
+    activity_slug VARCHAR(100) NULL,
     archived_at DATETIME NULL,
     download_count INT UNSIGNED NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

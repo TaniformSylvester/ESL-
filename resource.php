@@ -400,6 +400,19 @@ require_once __DIR__ . '/includes/header.php';
     </div>
     <?php endif; ?>
 
+    <?php if (!empty($resource['activity_slug']) && isset(PRACTICE_ACTIVITIES[$resource['activity_slug']])): ?>
+        <hr class="my-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="h4 fw-bold mb-3">Practice This Skill</h2>
+                <p class="text-secondary mb-3">A free, in-browser activity to reinforce this topic &mdash; no download, no login required.</p>
+                <iframe src="<?= e(asset_url('games/' . rawurlencode($resource['activity_slug']) . '/index.html')) ?>"
+                        title="<?= e(PRACTICE_ACTIVITIES[$resource['activity_slug']]) ?>"
+                        loading="lazy" class="w-100 border-0 rounded shadow-sm" style="min-height:520px;"></iframe>
+            </div>
+        </div>
+    <?php endif; ?>
+
     <hr class="my-5">
 
     <div id="reviews" class="row">

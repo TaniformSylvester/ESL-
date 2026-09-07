@@ -109,6 +109,17 @@ foreach ($subjects as $subjectRow) {
                             </select>
                             <?php if (isset($errors['category_id'])): ?><div class="invalid-feedback"><?= e($errors['category_id']) ?></div><?php endif; ?>
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="activity_slug">Practice Activity <span class="text-secondary fw-normal">(optional)</span></label>
+                            <select class="form-select <?= isset($errors['activity_slug']) ? 'is-invalid' : '' ?>" id="activity_slug" name="activity_slug">
+                                <option value="">None</option>
+                                <?php foreach (PRACTICE_ACTIVITIES as $slug => $label): ?>
+                                    <option value="<?= e($slug) ?>" <?= $field('activity_slug') === $slug ? 'selected' : '' ?>><?= e($label) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <p class="form-text mb-0">Adds a free, in-browser practice game to this resource's page. Only attach one where it genuinely reinforces this resource's specific skill — most resources shouldn't have one.</p>
+                            <?php if (isset($errors['activity_slug'])): ?><div class="invalid-feedback"><?= e($errors['activity_slug']) ?></div><?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>

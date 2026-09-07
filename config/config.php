@@ -146,6 +146,16 @@ define('RESOURCE_TYPES', [
     'Classroom Activity', 'Test', 'Poster', 'Teacher Resource',
 ]);
 
+// Free, in-browser practice activities a resource can optionally be linked
+// to (resources.activity_slug — see database.sql). Each key is a static,
+// self-contained bundle at assets/games/<slug>/index.html, embedded on
+// resource.php. Deliberately a small, hand-built list, not a database
+// table — these are genuinely bespoke per skill, not admin-generated.
+define('PRACTICE_ACTIVITIES', [
+    'addition-within-20'    => 'Addition Within 20 — Practice Drill',
+    'subtraction-within-20' => 'Subtraction Within 20 — Practice Drill',
+]);
+
 // -----------------------------------------------------------------------
 // PAGINATION
 // -----------------------------------------------------------------------
