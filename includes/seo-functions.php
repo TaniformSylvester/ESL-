@@ -109,6 +109,103 @@ function generate_guide_seo_description(array $guide): string
     return seo_truncate_at_word($guide['title'] . ' — practical teaching guidance from ' . SITE_NAME . '.', 160);
 }
 
+/** "[Title] | Grade [X] [Subject] Video" — mirrors generate_resource_seo_title()'s override-first pattern. */
+function generate_video_seo_title(array $video): string
+{
+    if (!empty($video['seo_title'])) {
+        return $video['seo_title'];
+    }
+
+    $context = [];
+    if (!empty($video['grade_level'])) {
+        $context[] = $video['grade_level'];
+    }
+    if (!empty($video['subject_name'])) {
+        $context[] = $video['subject_name'];
+    }
+
+    if (empty($context)) {
+        return $video['title'];
+    }
+
+    return $video['title'] . ' | ' . implode(' ', $context) . ' Video';
+}
+
+/** Unique, ~150-160 character meta description built from real video fields — mirrors generate_resource_seo_description(). */
+function generate_video_seo_description(array $video): string
+{
+    if (!empty($video['meta_description'])) {
+        return $video['meta_description'];
+    }
+
+    $subjectGrade = trim(($video['grade_level'] ?? '') . ' ' . ($video['subject_name'] ?? ''));
+    $focus = $video['topic'] ?? '';
+
+    $lead = 'Watch this educational video';
+    if ($focus !== '') {
+        $lead .= ' on ' . $focus;
+    }
+    if ($subjectGrade !== '') {
+        $lead .= ' for ' . $subjectGrade;
+    }
+    $lead .= ' from ' . SITE_NAME . '.';
+
+    $body = trim((string)($video['description'] ?? ''));
+    if ($body === '') {
+        return seo_truncate_at_word($lead, 160);
+    }
+
+    return seo_truncate_at_word($lead . ' ' . $body, 160);
+}
+
+/**
+ * Dynamic title/description/H1 for videos.php's filtered views — mirrors
+ * generate_resources_listing_seo(). $noindex is true for free-text search
+ * results and empty-result pages, matching the same reasoning.
+ */
+function generate_videos_listing_seo(array $filters, ?array $subject, int $resultCount): array
+{
+    $labelParts = [];
+
+    if (!empty($filters['grade'])) {
+        $labelParts[] = $filters['grade'];
+    }
+    if ($subject) {
+        $labelParts[] = $subject['name'];
+    }
+
+    $isSearch = trim((string)($filters['search'] ?? '')) !== '';
+    $label = implode(' ', $labelParts);
+
+    if ($isSearch) {
+        $query = trim((string)$filters['search']);
+        return [
+            'title'       => 'Search results for "' . $query . '"',
+            'description' => 'Videos matching "' . $query . '" on ' . SITE_NAME . '.',
+            'h1'          => 'Search Results for "' . $query . '"',
+            'noindex'     => true,
+        ];
+    }
+
+    if ($label === '') {
+        return [
+            'title'       => 'Educational Videos',
+            'description' => 'Browse ' . SITE_NAME . '\'s library of educational videos — English/ESL, Math and Science lessons for classrooms across Southeast Asia.',
+            'h1'          => 'Educational Videos',
+            'noindex'     => $resultCount === 0,
+        ];
+    }
+
+    $title = $label . ' Videos';
+
+    return [
+        'title'       => $title,
+        'description' => seo_truncate_at_word('Watch ' . $label . ' educational videos on ' . SITE_NAME . '.', 160),
+        'h1'          => $title,
+        'noindex'     => $resultCount === 0,
+    ];
+}
+
 /**
  * Dynamic title/description/H1/intro for resources.php's filtered views —
  * these filters (subject, grade, resource type, category) are TeachLuma's

@@ -160,6 +160,7 @@ define('PRACTICE_ACTIVITIES', [
 // PAGINATION
 // -----------------------------------------------------------------------
 define('RESOURCES_PER_PAGE', 12);
+define('VIDEOS_PER_PAGE', 12);
 define('ADMIN_ROWS_PER_PAGE', 20);
 
 // -----------------------------------------------------------------------

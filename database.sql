@@ -307,6 +307,85 @@ CREATE TABLE IF NOT EXISTS bundle_purchases (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------------------------
+-- videos — educational videos hosted on YouTube and embedded on TeachLuma.
+-- Only the YouTube video ID is stored, never the iframe/embed HTML, so the
+-- embed markup lives in one place (includes/video-card.php, video.php,
+-- resource.php) and stays easy to change. subject_id/grade_level reuse the
+-- same taxonomy as resources (subjects table / GRADE_LEVELS) rather than a
+-- duplicate video-specific taxonomy. No delete action exists in the admin
+-- — only publish/unpublish — the same archive-don't-delete philosophy
+-- already used for resources and bundles, since a video may already be
+-- embedded on a resource page or indexed by Google.
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS videos (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    title VARCHAR(200) NOT NULL,
+    slug VARCHAR(220) NOT NULL,
+    description TEXT NULL,
+    youtube_video_id VARCHAR(20) NOT NULL,
+    subject_id INT UNSIGNED NOT NULL,
+    grade_level VARCHAR(30) NULL,
+    topic VARCHAR(150) NULL,
+    -- Free-text display duration (e.g. "4:32"), same convention as
+    -- resources.suggested_duration — not seconds, never computed.
+    duration VARCHAR(20) NULL,
+    -- Optional custom TeachLuma-branded thumbnail, same storage convention
+    -- as resources.thumbnail (uploads/thumbnails, served via
+    -- UPLOAD_THUMBNAIL_URL). NULL falls back to YouTube's own thumbnail
+    -- (https://i.ytimg.com/vi/{youtube_video_id}/hqdefault.jpg), computed
+    -- at render time rather than stored.
+    thumbnail VARCHAR(255) NULL,
+    -- One per line, same convention as resources.learning_objectives.
+    learning_objectives TEXT NULL,
+    key_concepts TEXT NULL,
+    transcript TEXT NULL,
+    seo_title VARCHAR(255) NULL,
+    meta_description VARCHAR(300) NULL,
+    is_published TINYINT(1) NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_videos_slug (slug),
+    KEY idx_videos_subject (subject_id),
+    KEY idx_videos_grade (grade_level),
+    KEY idx_videos_published (is_published),
+    CONSTRAINT fk_videos_subject FOREIGN KEY (subject_id) REFERENCES subjects (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
+-- video_resources (which resources a video is associated with — read both
+-- directions: a video's "Practice This Skill" list, and a resource's
+-- "Watch the Lesson" video, via the same junction table.)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS video_resources (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    video_id INT UNSIGNED NOT NULL,
+    resource_id INT UNSIGNED NOT NULL,
+    sort_order INT UNSIGNED NOT NULL DEFAULT 0,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_video_resource (video_id, resource_id),
+    KEY idx_video_resources_resource (resource_id),
+    CONSTRAINT fk_video_resources_video FOREIGN KEY (video_id) REFERENCES videos (id) ON DELETE CASCADE,
+    CONSTRAINT fk_video_resources_resource FOREIGN KEY (resource_id) REFERENCES resources (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
+-- video_related_videos (admin-picked "More Videos" — same manual-first,
+-- automatic-fallback pattern as resource_related_resources.)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS video_related_videos (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    video_id INT UNSIGNED NOT NULL,
+    related_video_id INT UNSIGNED NOT NULL,
+    sort_order INT UNSIGNED NOT NULL DEFAULT 0,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_video_related (video_id, related_video_id),
+    KEY idx_video_related_target (related_video_id),
+    CONSTRAINT fk_video_related_source FOREIGN KEY (video_id) REFERENCES videos (id) ON DELETE CASCADE,
+    CONSTRAINT fk_video_related_target FOREIGN KEY (related_video_id) REFERENCES videos (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
 -- favorites
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS favorites (

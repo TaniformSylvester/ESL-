@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/init.php';
 require_once __DIR__ . '/includes/bundle-functions.php';
+require_once __DIR__ . '/includes/video-functions.php';
 
 header('Content-Type: application/xml; charset=UTF-8');
 
@@ -10,6 +11,7 @@ $staticPages = [
     ['loc' => base_url('teacher-hub.php'), 'priority' => '0.8'],
     ['loc' => base_url('teacher-tools.php'), 'priority' => '0.6'],
     ['loc' => base_url('bundles.php'), 'priority' => '0.6'],
+    ['loc' => base_url('videos.php'), 'priority' => '0.6'],
     ['loc' => base_url('pricing.php'), 'priority' => '0.8'],
     ['loc' => base_url('about.php'), 'priority' => '0.5'],
     ['loc' => base_url('contact.php'), 'priority' => '0.5'],
@@ -27,6 +29,7 @@ $stmt = getDB()->query('SELECT slug, updated_at FROM guides WHERE is_published =
 $guides = $stmt->fetchAll();
 
 $bundlePages = get_published_bundles();
+$videoPages = get_all_published_videos();
 
 // Subject and category listing pages (resources.php?subject_id=/?category_id=)
 // are real, uniquely-titled landing pages (see generate_resources_listing_seo())
@@ -90,6 +93,13 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     <url>
         <loc><?= e(base_url('bundle.php?slug=' . urlencode($bundlePage['slug']))) ?></loc>
         <lastmod><?= e(date('Y-m-d', strtotime($bundlePage['updated_at']))) ?></lastmod>
+        <priority>0.5</priority>
+    </url>
+<?php endforeach; ?>
+<?php foreach ($videoPages as $videoPage): ?>
+    <url>
+        <loc><?= e(base_url('video.php?slug=' . urlencode($videoPage['slug']))) ?></loc>
+        <lastmod><?= e(date('Y-m-d', strtotime($videoPage['updated_at']))) ?></lastmod>
         <priority>0.5</priority>
     </url>
 <?php endforeach; ?>

@@ -6,8 +6,10 @@ require_once __DIR__ . '/includes/favorites-functions.php';
 require_once __DIR__ . '/includes/subject-functions.php';
 require_once __DIR__ . '/includes/review-functions.php';
 require_once __DIR__ . '/includes/teaching-demos.php';
+require_once __DIR__ . '/includes/video-functions.php';
 
 $freeResources = attach_rating_summaries(get_free_resources(6));
+$featuredVideos = get_featured_videos(3);
 $subjects = get_all_subjects();
 $mathSubject = get_subject_by_slug('math');
 $featuredReviews = get_featured_site_reviews(3);
@@ -188,6 +190,25 @@ require_once __DIR__ . '/includes/header.php';
         </div>
         <?php $demo = $featuredDemo; // teaching-demo-card.php expects $demo in scope ?>
         <?php require __DIR__ . '/includes/teaching-demo-card.php'; ?>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php if (!empty($featuredVideos)): ?>
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="h3 fw-bold mb-2">Learn with TeachLuma</h2>
+                <p class="text-secondary mb-0" style="max-width:600px;">Short educational videos to introduce a lesson before using the matching resources.</p>
+            </div>
+            <a href="<?= e(base_url('videos.php')) ?>" class="small text-nowrap">View All Videos &rarr;</a>
+        </div>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+            <?php foreach ($featuredVideos as $video): ?>
+                <?php include __DIR__ . '/includes/video-card.php'; ?>
+            <?php endforeach; ?>
+        </div>
     </div>
 </section>
 <?php endif; ?>

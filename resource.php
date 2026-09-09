@@ -5,6 +5,7 @@ require_once __DIR__ . '/includes/membership.php';
 require_once __DIR__ . '/includes/resource-functions.php';
 require_once __DIR__ . '/includes/download-functions.php';
 require_once __DIR__ . '/includes/bundle-functions.php';
+require_once __DIR__ . '/includes/video-functions.php';
 require_once __DIR__ . '/includes/favorites-functions.php';
 require_once __DIR__ . '/includes/review-functions.php';
 require_once __DIR__ . '/includes/seo-functions.php';
@@ -75,6 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 $isLoggedIn = is_logged_in();
 $canDownload = can_download_resource($resource);
 $availableBundles = !$canDownload ? get_published_bundles_containing_resource((int)$resource['id']) : [];
+$resourceVideos = get_published_videos_for_resource((int)$resource['id']);
+$primaryVideo = $resourceVideos[0] ?? null;
 $isPro = $isLoggedIn && isMemberActive();
 $gaAccountState = !$isLoggedIn ? 'guest' : (is_admin() ? 'admin' : ($isPro ? 'pro' : 'free'));
 $isFavorited = $isLoggedIn && is_favorited((int)$_SESSION['user_id'], (int)$resource['id']);
@@ -350,6 +353,20 @@ require_once __DIR__ . '/includes/header.php';
             </div>
         </div>
     </div>
+
+    <?php if ($primaryVideo && !empty($primaryVideo['youtube_video_id'])): ?>
+    <hr class="my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h2 class="h4 fw-bold mb-3">Watch the Lesson</h2>
+            <?php $video = $primaryVideo; require __DIR__ . '/includes/video-embed-player.php'; ?>
+            <p class="text-secondary mt-3 mb-0">
+                <?= !empty($primaryVideo['description']) ? e(truncate_text($primaryVideo['description'], 200)) : 'A short video walkthrough to introduce this lesson before using the resource below.' ?>
+                <a href="<?= e(base_url('video.php?slug=' . urlencode($primaryVideo['slug']))) ?>">Watch full lesson &rarr;</a>
+            </p>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <?php if (!empty($teachingSections) || !empty($skillsList) || !empty($resource['recommended_level']) || !empty($resource['suggested_duration']) || !empty($whatsIncludedList) || !empty($additionalFiles)): ?>
     <hr class="my-5">

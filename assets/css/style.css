@@ -92,6 +92,40 @@ footer a:hover {
    Homepage Teaching Demo section
    ------------------------------------------------------------------- */
 
+.video-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.video-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+}
+
+.video-card .card-img-top {
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+}
+
+.video-embed-play-btn {
+    width: 4.5rem;
+    height: 4.5rem;
+    background-color: rgba(255, 255, 255, 0.92);
+    color: var(--brand-primary);
+    font-size: 1.5rem;
+    box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.25);
+    border: none;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.video-embed-play-btn:hover,
+.video-embed-play-btn:focus {
+    background-color: #fff;
+    color: var(--brand-primary-dark);
+    transform: translate(-50%, -50%) scale(1.08);
+}
+
 .teaching-demo-play-btn {
     width: 4.5rem;
     height: 4.5rem;

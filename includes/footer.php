@@ -42,6 +42,7 @@
 <script src="<?= e(asset_url('js/reviews.js')) ?>"></script>
 <script src="<?= e(asset_url('js/downloads.js')) ?>"></script>
 <script src="<?= e(asset_url('js/teaching-demo.js')) ?>"></script>
+<script src="<?= e(asset_url('js/video-embed.js')) ?>"></script>
 <script src="<?= e(asset_url('js/number-challenge.js')) ?>"></script>
 <script src="<?= e(asset_url('js/teacher-tools.js')) ?>"></script>
 <?php if (GA_ENABLED && GA_MEASUREMENT_ID !== ''): ?>
