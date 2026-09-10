@@ -2,6 +2,7 @@
 require_once __DIR__ . '/includes/init.php';
 require_once __DIR__ . '/includes/bundle-functions.php';
 require_once __DIR__ . '/includes/video-functions.php';
+require_once __DIR__ . '/includes/games-functions.php';
 
 header('Content-Type: application/xml; charset=UTF-8');
 
@@ -12,6 +13,7 @@ $staticPages = [
     ['loc' => base_url('teacher-tools.php'), 'priority' => '0.6'],
     ['loc' => base_url('bundles.php'), 'priority' => '0.6'],
     ['loc' => base_url('videos.php'), 'priority' => '0.6'],
+    ['loc' => base_url('games.php'), 'priority' => '0.8'],
     ['loc' => base_url('pricing.php'), 'priority' => '0.8'],
     ['loc' => base_url('about.php'), 'priority' => '0.5'],
     ['loc' => base_url('contact.php'), 'priority' => '0.5'],
@@ -101,6 +103,12 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         <loc><?= e(base_url('video.php?slug=' . urlencode($videoPage['slug']))) ?></loc>
         <lastmod><?= e(date('Y-m-d', strtotime($videoPage['updated_at']))) ?></lastmod>
         <priority>0.5</priority>
+    </url>
+<?php endforeach; ?>
+<?php foreach (get_all_games() as $gamePage): ?>
+    <url>
+        <loc><?= e(base_url('game.php?slug=' . urlencode($gamePage['slug']))) ?></loc>
+        <priority>0.7</priority>
     </url>
 <?php endforeach; ?>
 </urlset>

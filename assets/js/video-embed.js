@@ -1,8 +1,7 @@
 // Click-to-play for embedded educational videos (video.php, and resource.php's
-// "Watch the Lesson" section). Same technique as assets/js/teaching-demo.js:
-// nothing loads (no YouTube iframe) until the visitor actually clicks — the
-// poster thumbnail is the only thing fetched up front, and the embed never
-// autoplays on page load.
+// "Watch the Lesson" section). Nothing loads (no YouTube iframe) until the
+// visitor actually clicks — the poster thumbnail is the only thing fetched
+// up front, and the embed never autoplays on page load.
 
 document.addEventListener('DOMContentLoaded', function () {
     document.body.addEventListener('click', function (event) {

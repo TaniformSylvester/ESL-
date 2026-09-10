@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Number Challenge — TeachLuma Games</title>
+<style>
+  :root {
+    --brand-primary: #2563eb;
+    --brand-primary-dark: #1d4ed8;
+    --brand-secondary: #f59e0b;
+    --brand-success: #16a34a;
+    --brand-danger: #dc2626;
+    --brand-bg-soft: #f8fafc;
+    --ink: #1f2937;
+    --ink-soft: #64748b;
+    --border: #e2e8f0;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    color: var(--ink);
+    background: var(--brand-bg-soft);
+    overflow-x: hidden;
+  }
+
+  #app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Fullscreen mode: fill all available space, no page scroll needed */
+  #app:fullscreen,
+  #app:-webkit-full-screen {
+    background: var(--brand-bg-soft);
+  }
+
+  .hidden { display: none !important; }
+
+  /* -----------------------------------------------------------------
+     Top bar — always visible, minimal: title + mute + fullscreen
+     ----------------------------------------------------------------- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.9rem;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .topbar-title {
+    font-weight: 700;
+    font-size: clamp(0.9rem, 2vw, 1.15rem);
+    color: var(--brand-primary-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: clamp(0.85rem, 1.6vw, 1rem);
+    font-weight: 600;
+    padding: 0.5rem 0.8rem;
+    border-radius: 0.5rem;
+    border: 2px solid var(--border);
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+    line-height: 1;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  .icon-btn:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
+  .icon-btn:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+
+  .topbar-actions { display: flex; gap: 0.5rem; }
+
+  /* -----------------------------------------------------------------
+     Shared "screen" layout
+     ----------------------------------------------------------------- */
+  .screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem 1rem 2rem;
+    width: 100%;
+  }
+
+  .screen-inner {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  /* -----------------------------------------------------------------
+     Start screen
+     ----------------------------------------------------------------- */
+  .start-hero {
+    text-align: center;
+    margin-bottom: 1.75rem;
+  }
+
+  .start-hero h1 {
+    font-size: clamp(1.75rem, 5vw, 2.75rem);
+    font-weight: 800;
+    margin: 0 0 0.35rem;
+    color: var(--brand-primary-dark);
+    letter-spacing: -0.01em;
+  }
+
+  .start-hero p {
+    font-size: clamp(1rem, 2.2vw, 1.2rem);
+    color: var(--ink-soft);
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .option-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .option-group-label {
+    display: block;
+    font-size: clamp(0.85rem, 1.8vw, 1rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    margin-bottom: 0.6rem;
+  }
+
+  .option-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+  }
+
+  .option-btn {
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    font-weight: 700;
+    padding: 0.9rem 0.5rem;
+    border-radius: 0.65rem;
+    border: 2.5px solid var(--border);
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+    min-height: 56px;
+    touch-action: manipulation;
+    transition: border-color 0.12s ease, background-color 0.12s ease, color 0.12s ease;
+  }
+
+  .option-btn:hover { border-color: var(--brand-primary); }
+  .option-btn:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+
+  .option-btn[aria-pressed="true"] {
+    background: var(--brand-primary);
+    border-color: var(--brand-primary);
+    color: #fff;
+  }
+
+  .start-btn {
+    display: block;
+    width: 100%;
+    font-size: clamp(1.15rem, 3vw, 1.5rem);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    padding: 1.1rem 1rem;
+    border-radius: 0.75rem;
+    border: none;
+    background: var(--brand-primary);
+    color: #fff;
+    cursor: pointer;
+    min-height: 64px;
+    touch-action: manipulation;
+    transition: background-color 0.12s ease, transform 0.08s ease;
+  }
+
+  .start-btn:hover { background: var(--brand-primary-dark); }
+  .start-btn:active { transform: scale(0.98); }
+  .start-btn:focus-visible { outline: 3px solid var(--brand-primary-dark); outline-offset: 3px; }
+
+  /* -----------------------------------------------------------------
+     Play screen — HUD
+     ----------------------------------------------------------------- */
+  .hud {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .hud-stat {
+    font-size: clamp(0.95rem, 2vw, 1.2rem);
+    font-weight: 700;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
+  .hud-stat strong { color: var(--ink); }
+
+  .progress-track {
+    width: 100%;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--border);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--brand-primary);
+    border-radius: 999px;
+    transition: width 0.25s ease;
+  }
+
+  .timer-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .timer-track {
+    flex: 1;
+    height: 14px;
+    border-radius: 999px;
+    background: var(--border);
+    overflow: hidden;
+  }
+
+  .timer-fill {
+    height: 100%;
+    background: var(--brand-secondary);
+    border-radius: 999px;
+    transition: width 1s linear;
+  }
+
+  .timer-fill.urgent { background: var(--brand-danger); }
+
+  .timer-label {
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
+    font-weight: 800;
+    color: var(--ink-soft);
+    min-width: 2.2ch;
+    text-align: right;
+  }
+
+  .question {
+    text-align: center;
+    font-size: clamp(2.5rem, 9vw, 5rem);
+    font-weight: 800;
+    color: var(--ink);
+    margin: 0.5rem 0 1.75rem;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+
+  .answers {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.85rem;
+    margin-bottom: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .answers { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  .answer-btn {
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    font-weight: 800;
+    padding: 1rem 0.5rem;
+    min-height: clamp(4.5rem, 14vw, 6.5rem);
+    border-radius: 0.85rem;
+    border: 3px solid var(--brand-primary);
+    background: #fff;
+    color: var(--brand-primary);
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: background-color 0.12s ease, color 0.12s ease, transform 0.08s ease;
+  }
+
+  .answer-btn:hover:not(:disabled) { background: var(--brand-primary); color: #fff; }
+  .answer-btn:active:not(:disabled) { transform: scale(0.97); }
+  .answer-btn:focus-visible { outline: 3px solid var(--brand-primary-dark); outline-offset: 3px; }
+  .answer-btn:disabled { cursor: default; }
+
+  .answer-btn.correct {
+    background: var(--brand-success);
+    border-color: var(--brand-success);
+    color: #fff;
+    opacity: 1;
+  }
+
+  .answer-btn.incorrect {
+    background: var(--brand-danger);
+    border-color: var(--brand-danger);
+    color: #fff;
+    opacity: 1;
+  }
+
+  .answer-btn.dimmed { opacity: 0.45; }
+
+  .feedback {
+    text-align: center;
+    font-size: clamp(1.15rem, 3vw, 1.6rem);
+    font-weight: 800;
+    min-height: 2.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .feedback.correct { color: var(--brand-success); }
+  .feedback.incorrect { color: var(--brand-danger); }
+
+  /* -----------------------------------------------------------------
+     Results screen
+     ----------------------------------------------------------------- */
+  .results-emoji { font-size: clamp(3rem, 8vw, 4.5rem); margin-bottom: 0.5rem; }
+
+  .results-score {
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 800;
+    color: var(--brand-primary-dark);
+    margin: 0 0 0.25rem;
+  }
+
+  .results-detail {
+    font-size: clamp(1rem, 2.2vw, 1.2rem);
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin: 0 0 1.75rem;
+    text-align: center;
+  }
+
+  .results-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 480px) {
+    .results-actions { flex-direction: row; }
+  }
+
+  .btn-secondary {
+    flex: 1;
+    font-size: clamp(1rem, 2.4vw, 1.2rem);
+    font-weight: 700;
+    padding: 0.9rem 1rem;
+    border-radius: 0.75rem;
+    border: 2.5px solid var(--brand-primary);
+    background: #fff;
+    color: var(--brand-primary);
+    cursor: pointer;
+    min-height: 56px;
+    touch-action: manipulation;
+  }
+
+  .btn-secondary:hover { background: var(--brand-bg-soft); }
+  .btn-secondary:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+
+  .btn-primary-lg {
+    flex: 1;
+    font-size: clamp(1rem, 2.4vw, 1.2rem);
+    font-weight: 700;
+    padding: 0.9rem 1rem;
+    border-radius: 0.75rem;
+    border: none;
+    background: var(--brand-primary);
+    color: #fff;
+    cursor: pointer;
+    min-height: 56px;
+    touch-action: manipulation;
+  }
+
+  .btn-primary-lg:hover { background: var(--brand-primary-dark); }
+  .btn-primary-lg:focus-visible { outline: 3px solid var(--brand-primary-dark); outline-offset: 2px; }
+
+  .center-text { text-align: center; }
+
+  /* -----------------------------------------------------------------
+     Short landscape (phones lying flat) — vertical space is the scarce
+     resource here, not horizontal, so the three start-screen option
+     groups sit side by side instead of stacking, and every vertical gap
+     shrinks. Goal: the whole start screen fits without scrolling even at
+     a 360px-tall viewport.
+     ----------------------------------------------------------------- */
+  @media (max-height: 480px) and (orientation: landscape) {
+    .topbar { padding: 0.25rem 0.75rem; }
+    .icon-btn { min-height: 32px; padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+    .screen { padding: 0.4rem 1rem; justify-content: flex-start; }
+
+    .start-hero { margin-bottom: 0.4rem; }
+    .start-hero h1 { font-size: clamp(1.1rem, 3vw, 1.6rem); margin-bottom: 0.1rem; }
+    .start-hero p { font-size: clamp(0.7rem, 1.8vw, 0.85rem); }
+
+    .option-groups-wrap {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 0.4rem;
+    }
+    .option-group { flex: 1; margin-bottom: 0; }
+    .option-group-label { font-size: 0.65rem; margin-bottom: 0.2rem; }
+    .option-row { grid-template-columns: 1fr; gap: 0.25rem; }
+    .option-btn { min-height: 30px; padding: 0.25rem; font-size: 0.75rem; border-width: 2px; }
+
+    .start-btn { min-height: 38px; padding: 0.45rem 1rem; font-size: 1rem; }
+
+    .hud { margin-bottom: 0.4rem; }
+    .progress-track { margin-bottom: 0.5rem; }
+    .timer-wrap { margin-bottom: 0.5rem; }
+    .question { margin: 0.15rem 0 0.6rem; font-size: clamp(1.5rem, 5vw, 2.5rem); }
+    .answers { gap: 0.5rem; margin-bottom: 0.6rem; }
+    .answer-btn { min-height: clamp(2.5rem, 10vw, 3.5rem); font-size: clamp(1.1rem, 3.5vw, 1.6rem); }
+    .feedback { min-height: 1.6rem; font-size: 1.1rem; }
+
+    .results-emoji { font-size: 2rem; margin-bottom: 0.25rem; }
+    .results-score { font-size: 1.5rem; margin-bottom: 0.15rem; }
+    .results-detail { margin-bottom: 0.75rem; }
+  }
+
+  /* Three side-by-side option groups need at least ~3 answer-row-widths
+     of horizontal space to stay readable — below that (a short landscape
+     phone that's also narrow, e.g. a small phone), fall back to stacking
+     but keep the tightened spacing from above. */
+  @media (max-height: 480px) and (orientation: landscape) and (max-width: 560px) {
+    .option-groups-wrap { flex-direction: column; gap: 0.2rem; }
+    .option-group-label { margin-bottom: 0.1rem; }
+    .option-row { grid-template-columns: repeat(3, 1fr); }
+    .option-btn { min-height: 26px; padding: 0.15rem; }
+  }
+
+  /* Large screens / projectors: give everything more breathing room */
+  @media (min-width: 1200px) {
+    .screen-inner { max-width: 900px; }
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <span class="topbar-title">🔢 Number Challenge</span>
+    <div class="topbar-actions">
+      <button type="button" class="icon-btn" id="muteBtn" aria-pressed="false" aria-label="Mute sound">🔊<span class="sr-only"> Sound on</span></button>
+      <button type="button" class="icon-btn" id="fullscreenBtn" aria-label="Enter fullscreen">⛶ Fullscreen</button>
+    </div>
+  </div>
+
+  <!-- START SCREEN -->
+  <section class="screen" id="screenStart" aria-label="Number Challenge setup">
+    <div class="screen-inner">
+      <div class="start-hero">
+        <h1>Number Challenge</h1>
+        <p>Grade 1&ndash;2 Math &middot; Addition &amp; Subtraction Within 20</p>
+      </div>
+
+      <div class="option-groups-wrap">
+        <div class="option-group" role="group" aria-labelledby="modeLabel">
+          <span class="option-group-label" id="modeLabel">Choose your game</span>
+          <div class="option-row" id="modeGroup">
+            <button type="button" class="option-btn" data-value="addition" aria-pressed="true">Addition</button>
+            <button type="button" class="option-btn" data-value="subtraction" aria-pressed="false">Subtraction</button>
+            <button type="button" class="option-btn" data-value="mixed" aria-pressed="false">Mixed</button>
+          </div>
+        </div>
+
+        <div class="option-group" role="group" aria-labelledby="countLabel">
+          <span class="option-group-label" id="countLabel">Questions</span>
+          <div class="option-row" id="countGroup">
+            <button type="button" class="option-btn" data-value="10" aria-pressed="true">10</button>
+            <button type="button" class="option-btn" data-value="15" aria-pressed="false">15</button>
+            <button type="button" class="option-btn" data-value="20" aria-pressed="false">20</button>
+          </div>
+        </div>
+
+        <div class="option-group" role="group" aria-labelledby="timerLabel">
+          <span class="option-group-label" id="timerLabel">Timer per question</span>
+          <div class="option-row" id="timerGroup">
+            <button type="button" class="option-btn" data-value="0" aria-pressed="true">Off</button>
+            <button type="button" class="option-btn" data-value="10">10 sec</button>
+            <button type="button" class="option-btn" data-value="20">20 sec</button>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="start-btn" id="startBtn">Start Game</button>
+    </div>
+  </section>
+
+  <!-- PLAY SCREEN -->
+  <section class="screen hidden" id="screenPlay" aria-label="Number Challenge gameplay">
+    <div class="screen-inner">
+      <div class="hud">
+        <span class="hud-stat" id="hudCounter" aria-live="polite">Question <strong>1</strong> / 10</span>
+        <span class="hud-stat">Score: <strong id="hudScore">0</strong></span>
+      </div>
+      <div class="progress-track" role="progressbar" aria-label="Progress" aria-valuemin="0" aria-valuemax="100" id="progressTrack">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+
+      <div class="timer-wrap hidden" id="timerWrap">
+        <div class="timer-track" role="progressbar" aria-label="Time remaining" aria-valuemin="0" aria-valuemax="100" id="timerTrack">
+          <div class="timer-fill" id="timerFill" style="width:100%"></div>
+        </div>
+        <span class="timer-label" id="timerLabelText">10</span>
+      </div>
+
+      <p class="question" id="questionText" aria-live="polite">&nbsp;</p>
+
+      <div class="answers" id="answersGrid">
+        <button type="button" class="answer-btn" data-index="0"></button>
+        <button type="button" class="answer-btn" data-index="1"></button>
+        <button type="button" class="answer-btn" data-index="2"></button>
+        <button type="button" class="answer-btn" data-index="3"></button>
+      </div>
+
+      <p class="feedback" id="feedbackText" aria-live="assertive">&nbsp;</p>
+    </div>
+  </section>
+
+  <!-- RESULTS SCREEN -->
+  <section class="screen hidden" id="screenResults" aria-label="Number Challenge results">
+    <div class="screen-inner center-text">
+      <p class="results-emoji" id="resultsEmoji">🎉</p>
+      <p class="results-score" id="resultsScore">8 / 10</p>
+      <p class="results-detail" id="resultsDetail">Great job! That's 80% correct.</p>
+      <div class="results-actions">
+        <button type="button" class="btn-secondary" id="changeSettingsBtn">Change Settings</button>
+        <button type="button" class="btn-primary-lg" id="playAgainBtn">Play Again</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // -------------------------------------------------------------------
+  // Question generators — keyed by mode. Adding a future mode (Number
+  // Recognition, Missing Number, Number Bonds, etc.) means adding one
+  // function here and one option button in the start-screen markup above;
+  // nothing else in this file needs to change.
+  // -------------------------------------------------------------------
+  function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function buildChoices(correct, min, max) {
+    var choices = [correct];
+    var offsets = [-4, -3, -2, -1, 1, 2, 3, 4, 5, -5];
+    for (var i = 0; i < offsets.length && choices.length < 4; i++) {
+      var candidate = correct + offsets[i];
+      if (candidate >= min && candidate <= max && choices.indexOf(candidate) === -1) {
+        choices.push(candidate);
+      }
+    }
+    // Fallback in the unlikely event the loop above couldn't fill 4 unique
+    // in-range choices (e.g. correct is at the very edge of the range).
+    var guard = 0;
+    while (choices.length < 4 && guard < 50) {
+      var extra = randInt(min, max);
+      if (choices.indexOf(extra) === -1) {
+        choices.push(extra);
+      }
+      guard++;
+    }
+    for (var j = choices.length - 1; j > 0; j--) {
+      var k = Math.floor(Math.random() * (j + 1));
+      var tmp = choices[j];
+      choices[j] = choices[k];
+      choices[k] = tmp;
+    }
+    return choices;
+  }
+
+  var QUESTION_GENERATORS = {
+    addition: function () {
+      var a = randInt(1, 19);
+      var b = randInt(1, Math.max(1, 20 - a));
+      var correct = a + b;
+      return { text: a + ' + ' + b + ' = ?', correct: correct, choices: buildChoices(correct, 0, 25) };
+    },
+    subtraction: function () {
+      var a = randInt(1, 20);
+      var b = randInt(1, a);
+      var correct = a - b;
+      return { text: a + ' − ' + b + ' = ?', correct: correct, choices: buildChoices(correct, 0, 20) };
+    },
+    mixed: function () {
+      return Math.random() < 0.5 ? QUESTION_GENERATORS.addition() : QUESTION_GENERATORS.subtraction();
+    }
+  };
+
+  // -------------------------------------------------------------------
+  // Sound — tiny WebAudio-generated tones, no audio files, muted state
+  // persisted locally. Never plays automatically; only ever triggered by
+  // a direct user action (answering, finishing).
+  // -------------------------------------------------------------------
+  var AudioCtx = window.AudioContext || window.webkitAudioContext;
+  var audioCtx = null;
+  var soundOn = true;
+  try {
+    soundOn = localStorage.getItem('nc_sound_on') !== '0';
+  } catch (e) { /* localStorage unavailable — default to on, non-fatal */ }
+
+  function getAudioCtx() {
+    if (!AudioCtx) { return null; }
+    if (!audioCtx) { audioCtx = new AudioCtx(); }
+    return audioCtx;
+  }
+
+  function playTone(freq, durationMs, delayMs) {
+    if (!soundOn) { return; }
+    var ctx = getAudioCtx();
+    if (!ctx) { return; }
+    var start = ctx.currentTime + (delayMs || 0) / 1000;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, start);
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(0.18, start + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + durationMs / 1000);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(start);
+    osc.stop(start + durationMs / 1000 + 0.02);
+  }
+
+  function soundCorrect() { playTone(660, 120, 0); playTone(880, 160, 110); }
+  function soundIncorrect() { playTone(220, 220, 0); }
+  function soundComplete() { playTone(523, 140, 0); playTone(659, 140, 130); playTone(784, 220, 260); }
+
+  // -------------------------------------------------------------------
+  // Fullscreen — feature-detected; hidden entirely on browsers/devices
+  // (notably iPhone Safari) with no Fullscreen API support at all.
+  // -------------------------------------------------------------------
+  var appEl = document.getElementById('app');
+  var fullscreenBtn = document.getElementById('fullscreenBtn');
+
+  function requestFs(el) {
+    var fn = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (fn) { fn.call(el).catch(function () {}); }
+  }
+  function exitFs() {
+    var fn = document.exitFullscreen || document.webkitExitFullscreen;
+    if (fn) { fn.call(document); }
+  }
+  function currentFsElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement || null;
+  }
+  var fsSupported = !!(appEl.requestFullscreen || appEl.webkitRequestFullscreen);
+
+  if (!fsSupported) {
+    fullscreenBtn.classList.add('hidden');
+  } else {
+    fullscreenBtn.addEventListener('click', function () {
+      if (currentFsElement()) {
+        exitFs();
+      } else {
+        requestFs(appEl);
+      }
+    });
+    ['fullscreenchange', 'webkitfullscreenchange'].forEach(function (evt) {
+      document.addEventListener(evt, function () {
+        var active = !!currentFsElement();
+        fullscreenBtn.textContent = active ? '⤢ Exit Fullscreen' : '⛶ Fullscreen';
+        fullscreenBtn.setAttribute('aria-label', active ? 'Exit fullscreen' : 'Enter fullscreen');
+      });
+    });
+  }
+
+  // -------------------------------------------------------------------
+  // Mute toggle
+  // -------------------------------------------------------------------
+  var muteBtn = document.getElementById('muteBtn');
+  function renderMuteBtn() {
+    muteBtn.textContent = soundOn ? '🔊' : '🔇';
+    muteBtn.setAttribute('aria-pressed', soundOn ? 'false' : 'true');
+    muteBtn.setAttribute('aria-label', soundOn ? 'Mute sound' : 'Unmute sound');
+  }
+  renderMuteBtn();
+  muteBtn.addEventListener('click', function () {
+    soundOn = !soundOn;
+    renderMuteBtn();
+    try { localStorage.setItem('nc_sound_on', soundOn ? '1' : '0'); } catch (e) { /* non-fatal */ }
+  });
+
+  // -------------------------------------------------------------------
+  // Screens
+  // -------------------------------------------------------------------
+  var screenStart = document.getElementById('screenStart');
+  var screenPlay = document.getElementById('screenPlay');
+  var screenResults = document.getElementById('screenResults');
+
+  function showScreen(el) {
+    [screenStart, screenPlay, screenResults].forEach(function (s) {
+      s.classList.toggle('hidden', s !== el);
+    });
+  }
+
+  // -------------------------------------------------------------------
+  // Start-screen option groups (mode / question count / timer)
+  // -------------------------------------------------------------------
+  var settings = { mode: 'addition', totalQuestions: 10, timerSeconds: 0 };
+
+  function wireOptionGroup(groupId, settingKey, parse) {
+    var group = document.getElementById(groupId);
+    var buttons = Array.prototype.slice.call(group.querySelectorAll('.option-btn'));
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        buttons.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+        btn.setAttribute('aria-pressed', 'true');
+        settings[settingKey] = parse(btn.dataset.value);
+      });
+    });
+  }
+
+  wireOptionGroup('modeGroup', 'mode', function (v) { return v; });
+  wireOptionGroup('countGroup', 'totalQuestions', function (v) { return parseInt(v, 10); });
+  wireOptionGroup('timerGroup', 'timerSeconds', function (v) { return parseInt(v, 10); });
+
+  // -------------------------------------------------------------------
+  // Gameplay state
+  // -------------------------------------------------------------------
+  var state = {
+    index: 0,
+    score: 0,
+    questions: [],
+    locked: false,
+    timerHandle: null,
+    timeLeft: 0
+  };
+
+  var hudCounter = document.getElementById('hudCounter');
+  var hudScore = document.getElementById('hudScore');
+  var progressFill = document.getElementById('progressFill');
+  var progressTrack = document.getElementById('progressTrack');
+  var timerWrap = document.getElementById('timerWrap');
+  var timerFill = document.getElementById('timerFill');
+  var timerTrack = document.getElementById('timerTrack');
+  var timerLabelText = document.getElementById('timerLabelText');
+  var questionText = document.getElementById('questionText');
+  var feedbackText = document.getElementById('feedbackText');
+  var answerButtons = Array.prototype.slice.call(document.querySelectorAll('.answer-btn'));
+
+  function clearTimer() {
+    if (state.timerHandle) {
+      window.clearInterval(state.timerHandle);
+      state.timerHandle = null;
+    }
+  }
+
+  function startQuestionTimer() {
+    clearTimer();
+    if (!settings.timerSeconds) {
+      timerWrap.classList.add('hidden');
+      return;
+    }
+    timerWrap.classList.remove('hidden');
+    state.timeLeft = settings.timerSeconds;
+    timerLabelText.textContent = String(state.timeLeft);
+    timerFill.style.width = '100%';
+    timerFill.classList.remove('urgent');
+    timerTrack.setAttribute('aria-valuenow', '100');
+
+    state.timerHandle = window.setInterval(function () {
+      state.timeLeft--;
+      var pct = Math.max(0, (state.timeLeft / settings.timerSeconds) * 100);
+      timerFill.style.width = pct + '%';
+      timerTrack.setAttribute('aria-valuenow', String(Math.round(pct)));
+      timerLabelText.textContent = String(Math.max(0, state.timeLeft));
+      if (state.timeLeft <= 3) {
+        timerFill.classList.add('urgent');
+      }
+      if (state.timeLeft <= 0) {
+        clearTimer();
+        handleTimeout();
+      }
+    }, 1000);
+  }
+
+  function renderQuestion() {
+    var q = state.questions[state.index];
+    questionText.textContent = q.text;
+    hudCounter.innerHTML = 'Question <strong>' + (state.index + 1) + '</strong> / ' + settings.totalQuestions;
+    var progressPct = (state.index / settings.totalQuestions) * 100;
+    progressFill.style.width = progressPct + '%';
+    progressTrack.setAttribute('aria-valuenow', String(Math.round(progressPct)));
+    feedbackText.textContent = ' ';
+    feedbackText.className = 'feedback';
+    state.locked = false;
+
+    answerButtons.forEach(function (btn, i) {
+      btn.textContent = String(q.choices[i]);
+      btn.disabled = false;
+      btn.className = 'answer-btn';
+    });
+
+    startQuestionTimer();
+  }
+
+  function buildQuestions() {
+    var generator = QUESTION_GENERATORS[settings.mode] || QUESTION_GENERATORS.addition;
+    var list = [];
+    for (var i = 0; i < settings.totalQuestions; i++) {
+      list.push(generator());
+    }
+    return list;
+  }
+
+  function startGame() {
+    state.index = 0;
+    state.score = 0;
+    state.questions = buildQuestions();
+    hudScore.textContent = '0';
+    showScreen(screenPlay);
+    renderQuestion();
+  }
+
+  function lockButtons() {
+    answerButtons.forEach(function (b) { b.disabled = true; });
+  }
+
+  function revealCorrect(correct) {
+    answerButtons.forEach(function (b) {
+      if (parseInt(b.textContent, 10) === correct) {
+        b.classList.add('correct');
+      } else {
+        b.classList.add('dimmed');
+      }
+    });
+  }
+
+  function advance() {
+    window.setTimeout(function () {
+      state.index++;
+      if (state.index < settings.totalQuestions) {
+        renderQuestion();
+      } else {
+        finishGame();
+      }
+    }, 1100);
+  }
+
+  function handleTimeout() {
+    if (state.locked) { return; }
+    state.locked = true;
+    lockButtons();
+    var q = state.questions[state.index];
+    revealCorrect(q.correct);
+    feedbackText.textContent = "⏰ Time's Up!";
+    feedbackText.className = 'feedback incorrect';
+    soundIncorrect();
+    advance();
+  }
+
+  function handleAnswer(btn) {
+    if (state.locked) { return; }
+    state.locked = true;
+    clearTimer();
+    lockButtons();
+
+    var chosen = parseInt(btn.textContent, 10);
+    var q = state.questions[state.index];
+    var isCorrect = chosen === q.correct;
+
+    if (isCorrect) {
+      state.score++;
+      hudScore.textContent = String(state.score);
+      btn.classList.add('correct');
+      feedbackText.textContent = '✓ Correct!';
+      feedbackText.className = 'feedback correct';
+      soundCorrect();
+    } else {
+      btn.classList.add('incorrect');
+      answerButtons.forEach(function (b) {
+        if (b !== btn && parseInt(b.textContent, 10) === q.correct) {
+          b.classList.add('correct');
+        } else if (b !== btn) {
+          b.classList.add('dimmed');
+        }
+      });
+      feedbackText.textContent = '✗ Try Again!';
+      feedbackText.className = 'feedback incorrect';
+      soundIncorrect();
+    }
+
+    advance();
+  }
+
+  answerButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () { handleAnswer(btn); });
+  });
+
+  // Keyboard support during gameplay: number keys 1-4 pick an answer.
+  document.addEventListener('keydown', function (event) {
+    if (screenPlay.classList.contains('hidden')) { return; }
+    var num = parseInt(event.key, 10);
+    if (num >= 1 && num <= 4) {
+      var target = answerButtons[num - 1];
+      if (target && !target.disabled) {
+        target.click();
+      }
+    }
+  });
+
+  function finishGame() {
+    clearTimer();
+    var total = settings.totalQuestions;
+    var pct = Math.round((state.score / total) * 100);
+    var emoji = pct >= 80 ? '🎉' : (pct >= 50 ? '👍' : '💪');
+    var message = pct >= 80
+      ? 'Excellent work!'
+      : (pct >= 50 ? 'Good effort!' : 'Keep practicing — you\'ll get faster!');
+
+    document.getElementById('resultsEmoji').textContent = emoji;
+    document.getElementById('resultsScore').textContent = state.score + ' / ' + total;
+    document.getElementById('resultsDetail').textContent = message + ' That\'s ' + pct + '% correct.';
+
+    showScreen(screenResults);
+    soundComplete();
+  }
+
+  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('playAgainBtn').addEventListener('click', startGame);
+  document.getElementById('changeSettingsBtn').addEventListener('click', function () {
+    clearTimer();
+    showScreen(screenStart);
+  });
+
+  // Enter on the results screen replays immediately — a fast whole-class
+  // "again!" flow without reaching for the mouse/trackpad.
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter' && !screenResults.classList.contains('hidden')) {
+      startGame();
+    }
+  });
+})();
+</script>
+</body>
+</html>

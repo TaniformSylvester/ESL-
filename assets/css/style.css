@@ -89,7 +89,7 @@ footer a:hover {
 }
 
 /* ---------------------------------------------------------------------
-   Homepage Teaching Demo section
+   Video cards & embedded video player (video.php, resource.php, homepage)
    ------------------------------------------------------------------- */
 
 .video-card {
@@ -121,24 +121,6 @@ footer a:hover {
 
 .video-embed-play-btn:hover,
 .video-embed-play-btn:focus {
-    background-color: #fff;
-    color: var(--brand-primary-dark);
-    transform: translate(-50%, -50%) scale(1.08);
-}
-
-.teaching-demo-play-btn {
-    width: 4.5rem;
-    height: 4.5rem;
-    background-color: rgba(255, 255, 255, 0.92);
-    color: var(--brand-primary);
-    font-size: 1.5rem;
-    box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.25);
-    border: none;
-    transition: transform 0.15s ease, background-color 0.15s ease;
-}
-
-.teaching-demo-play-btn:hover,
-.teaching-demo-play-btn:focus {
     background-color: #fff;
     color: var(--brand-primary-dark);
     transform: translate(-50%, -50%) scale(1.08);
@@ -195,16 +177,37 @@ footer a:hover {
 }
 
 /* ---------------------------------------------------------------------
-   Homepage "Play & Learn" — Number Challenge game
+   TeachLuma Games — hub cards (games.php, homepage, game.php "More Games")
    ------------------------------------------------------------------- */
 
-.number-challenge {
+.game-card {
+    border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.nc-answer-btn {
-    font-weight: 600;
-    min-height: 3.25rem;
+.game-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+}
+
+.game-card-thumb {
+    aspect-ratio: 16 / 9;
+    background-color: var(--brand-primary);
+}
+
+.game-embed-frame {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border: 0;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 768px) {
+    .game-embed-frame {
+        aspect-ratio: 16 / 10;
+    }
 }
 
 /* ---------------------------------------------------------------------
