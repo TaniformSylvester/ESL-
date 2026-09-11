@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Vocabulary Match — TeachLuma Games</title>
+<style>
+  :root {
+    --brand-primary: #2563eb;
+    --brand-primary-dark: #1d4ed8;
+    --brand-secondary: #f59e0b;
+    --brand-success: #16a34a;
+    --brand-danger: #dc2626;
+    --brand-bg-soft: #f8fafc;
+    --ink: #1f2937;
+    --ink-soft: #64748b;
+    --border: #e2e8f0;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    color: var(--ink);
+    background: var(--brand-bg-soft);
+    overflow-x: hidden;
+  }
+
+  #app { min-height: 100vh; display: flex; flex-direction: column; }
+  .hidden { display: none !important; }
+
+  /* -----------------------------------------------------------------
+     Top bar
+     ----------------------------------------------------------------- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.9rem;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .topbar-title {
+    font-weight: 700;
+    font-size: clamp(0.9rem, 2vw, 1.15rem);
+    color: var(--brand-primary-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: clamp(0.85rem, 1.6vw, 1rem);
+    font-weight: 600;
+    padding: 0.5rem 0.8rem;
+    border-radius: 0.5rem;
+    border: 2px solid var(--border);
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+    line-height: 1;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  .icon-btn:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
+  .icon-btn:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+  .topbar-actions { display: flex; gap: 0.5rem; }
+
+  /* -----------------------------------------------------------------
+     Shared screen layout
+     ----------------------------------------------------------------- */
+  .screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem 1rem 2rem;
+    width: 100%;
+  }
+
+  .screen-inner { width: 100%; max-width: 720px; margin: 0 auto; }
+  .screen-inner.wide { max-width: 900px; }
+
+  /* -----------------------------------------------------------------
+     Start screen
+     ----------------------------------------------------------------- */
+  .start-hero { text-align: center; margin-bottom: 1.75rem; }
+
+  .start-hero h1 {
+    font-size: clamp(1.75rem, 5vw, 2.75rem);
+    font-weight: 800;
+    margin: 0 0 0.35rem;
+    color: var(--brand-primary-dark);
+    letter-spacing: -0.01em;
+  }
+
+  .start-hero p {
+    font-size: clamp(1rem, 2.2vw, 1.2rem);
+    color: var(--ink-soft);
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .option-groups-wrap { margin-bottom: 0; }
+  .option-group { margin-bottom: 1.5rem; }
+
+  .option-group-label {
+    display: block;
+    font-size: clamp(0.85rem, 1.8vw, 1rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    margin-bottom: 0.6rem;
+  }
+
+  .option-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+  }
+
+  .option-row.cols-2 { grid-template-columns: repeat(2, 1fr); }
+
+  .option-hint {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    margin: 0.5rem 0 0;
+  }
+
+  .option-btn {
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    font-weight: 700;
+    padding: 0.9rem 0.5rem;
+    border-radius: 0.65rem;
+    border: 2.5px solid var(--border);
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+    min-height: 56px;
+    touch-action: manipulation;
+    transition: border-color 0.12s ease, background-color 0.12s ease, color 0.12s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+
+  .option-btn .opt-emoji { font-size: 1.4em; }
+
+  .option-btn-stacked { flex-direction: column; gap: 0.15rem; line-height: 1.15; }
+  .option-btn-stacked .opt-sub { font-size: 0.7em; font-weight: 600; opacity: 0.8; }
+
+  .option-btn:hover { border-color: var(--brand-primary); }
+  .option-btn:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+
+  .option-btn[aria-pressed="true"] {
+    background: var(--brand-primary);
+    border-color: var(--brand-primary);
+    color: #fff;
+  }
+
+  .start-btn {
+    display: block;
+    width: 100%;
+    font-size: clamp(1.15rem, 3vw, 1.5rem);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    padding: 1.1rem 1rem;
+    border-radius: 0.75rem;
+    border: none;
+    background: var(--brand-primary);
+    color: #fff;
+    cursor: pointer;
+    min-height: 64px;
+    touch-action: manipulation;
+    transition: background-color 0.12s ease, transform 0.08s ease;
+  }
+
+  .start-btn:hover { background: var(--brand-primary-dark); }
+  .start-btn:active { transform: scale(0.98); }
+  .start-btn:focus-visible { outline: 3px solid var(--brand-primary-dark); outline-offset: 3px; }
+
+  /* -----------------------------------------------------------------
+     Play screen — HUD
+     ----------------------------------------------------------------- */
+  .hud {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1.1rem;
+    flex-wrap: wrap;
+  }
+
+  .hud-stat {
+    font-size: clamp(0.95rem, 2vw, 1.2rem);
+    font-weight: 700;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
+  .hud-stat strong { color: var(--ink); }
+
+  .match-prompt {
+    text-align: center;
+    font-size: clamp(1rem, 2.4vw, 1.3rem);
+    font-weight: 700;
+    color: var(--ink-soft);
+    margin: 0 0 1rem;
+  }
+
+  /* -----------------------------------------------------------------
+     Card grid — sized entirely by JS (fitCardGrid()) via the --cols,
+     --card-gap and --card-size custom properties below, so cards are
+     always as large as possible while fitting BOTH the available width
+     AND the actual remaining vertical space. A fixed aspect-ratio-only
+     approach (width-driven, height just following) overflows the
+     bottom of the screen once there are enough rows — this doesn't.
+     The px fallbacks only matter for the first instant before JS runs.
+     ----------------------------------------------------------------- */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 4), var(--card-size, 80px));
+    grid-auto-rows: var(--card-size, 80px);
+    gap: var(--card-gap, 0.75rem);
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  .match-card {
+    width: 100%;
+    height: 100%;
+    border-radius: 0.75rem;
+    border: none;
+    background: var(--brand-primary);
+    color: #fff;
+    cursor: pointer;
+    touch-action: manipulation;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(var(--card-size, 80px) * 0.34);
+    font-weight: 800;
+    padding: 6%;
+    text-align: center;
+    line-height: 1.1;
+    word-break: break-word;
+    box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.12);
+    transition: transform 0.1s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .match-card .card-back-icon { font-size: calc(var(--card-size, 80px) * 0.3); opacity: 0.85; }
+
+  .match-card:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.18); }
+  .match-card:focus-visible { outline: 3px solid var(--brand-primary-dark); outline-offset: 3px; }
+  .match-card:disabled { cursor: default; }
+
+  .match-card.revealed {
+    background: #fff;
+    color: var(--ink);
+    border: 3px solid var(--brand-secondary);
+  }
+
+  @keyframes cardPop {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
+  .match-card.matched {
+    background: #f0fdf4;
+    color: var(--brand-success);
+    border: 3px solid var(--brand-success);
+    box-shadow: none;
+    opacity: 0.9;
+    animation: cardPop 0.35s ease;
+  }
+
+  .match-card.mismatch {
+    background: #fef2f2;
+    color: var(--brand-danger);
+    border: 3px solid var(--brand-danger);
+  }
+
+  .word-card { font-size: calc(var(--card-size, 80px) * 0.17) !important; text-transform: uppercase; letter-spacing: 0.02em; }
+
+  .feedback-banner {
+    margin: 0;
+    text-align: center;
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    font-weight: 800;
+    min-height: 2.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .feedback-banner.correct { color: var(--brand-success); }
+  .feedback-banner.incorrect { color: var(--brand-danger); }
+
+  /* -----------------------------------------------------------------
+     Results screen
+     ----------------------------------------------------------------- */
+  .results-emoji { font-size: clamp(3rem, 8vw, 4.5rem); margin-bottom: 0.5rem; }
+
+  .results-score {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    font-weight: 800;
+    color: var(--brand-primary-dark);
+    margin: 0 0 0.25rem;
+  }
+
+  .results-detail {
+    font-size: clamp(1rem, 2.2vw, 1.2rem);
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin: 0 0 1.75rem;
+    text-align: center;
+  }
+
+  .results-actions { display: flex; flex-direction: column; gap: 0.75rem; }
+
+  @media (min-width: 480px) { .results-actions { flex-direction: row; } }
+
+  .btn-secondary {
+    flex: 1;
+    font-size: clamp(1rem, 2.4vw, 1.2rem);
+    font-weight: 700;
+    padding: 0.9rem 1rem;
+    border-radius: 0.75rem;
+    border: 2.5px solid var(--brand-primary);
+    background: #fff;
+    color: var(--brand-primary);
+    cursor: pointer;
+    min-height: 56px;
+    touch-action: manipulation;
+  }
+
+  .btn-secondary:hover { background: var(--brand-bg-soft); }
+  .btn-secondary:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+
+  .btn-primary-lg {
+    flex: 1;
+    font-size: clamp(1rem, 2.4vw, 1.2rem);
+    font-weight: 700;
+    padding: 0.9rem 1rem;
+    border-radius: 0.75rem;
+    border: none;
+    background: var(--brand-primary);
+    color: #fff;
+    cursor: pointer;
+    min-height: 56px;
+    touch-action: manipulation;
+  }
+
+  .btn-primary-lg:hover { background: var(--brand-primary-dark); }
+  .btn-primary-lg:focus-visible { outline: 3px solid var(--brand-primary-dark); outline-offset: 2px; }
+
+  .center-text { text-align: center; }
+
+  /* -----------------------------------------------------------------
+     Short landscape (phones lying flat)
+     ----------------------------------------------------------------- */
+  @media (max-height: 480px) and (orientation: landscape) {
+    .topbar { padding: 0.25rem 0.75rem; }
+    .icon-btn { min-height: 32px; padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+    .screen { padding: 0.4rem 1rem; justify-content: flex-start; }
+
+    .start-hero { margin-bottom: 0.4rem; }
+    .start-hero h1 { font-size: clamp(1.1rem, 3vw, 1.6rem); margin-bottom: 0.1rem; }
+    .start-hero p { font-size: clamp(0.7rem, 1.8vw, 0.85rem); }
+
+    .option-group { margin-bottom: 0.5rem; }
+    .option-group-label { font-size: 0.65rem; margin-bottom: 0.2rem; }
+    .option-btn { min-height: 34px; padding: 0.3rem; font-size: 0.75rem; }
+    .option-hint { font-size: 0.65rem; margin-top: 0.25rem; }
+    .start-btn { min-height: 38px; padding: 0.45rem 1rem; font-size: 1rem; }
+
+    .hud { margin-bottom: 0.25rem; }
+    .match-prompt { margin-bottom: 0.35rem; font-size: 0.8rem; }
+    .card-grid { margin-bottom: 0.35rem; }
+    .match-card { border-width: 2px; }
+    .feedback-banner { min-height: 1.2rem; font-size: 0.9rem; }
+
+    .results-emoji { font-size: 2rem; margin-bottom: 0.2rem; }
+    .results-score { font-size: 1.3rem; }
+    .results-detail { margin-bottom: 0.6rem; }
+  }
+
+  @media (min-width: 1200px) {
+    .screen-inner { max-width: 900px; }
+    .screen-inner.wide { max-width: 1080px; }
+  }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <span class="topbar-title">🃏 Vocabulary Match</span>
+    <div class="topbar-actions">
+      <button type="button" class="icon-btn" id="muteBtn" aria-pressed="false" aria-label="Mute sound">🔊<span class="sr-only"> Sound on</span></button>
+      <button type="button" class="icon-btn" id="fullscreenBtn" aria-label="Enter fullscreen">⛶ Fullscreen</button>
+    </div>
+  </div>
+
+  <!-- START SCREEN -->
+  <section class="screen" id="screenStart" aria-label="Vocabulary Match setup">
+    <div class="screen-inner">
+      <div class="start-hero">
+        <h1>Vocabulary Match</h1>
+        <p>Kindergarten&ndash;Grade 2 ESL &middot; Picture &amp; Word Matching</p>
+      </div>
+
+      <div class="option-group" role="group" aria-labelledby="categoryLabel">
+        <span class="option-group-label" id="categoryLabel">Choose a category</span>
+        <div class="option-row" id="categoryGroup">
+          <button type="button" class="option-btn" data-value="animals" aria-pressed="true"><span class="opt-emoji">🐶</span> Animals</button>
+          <button type="button" class="option-btn" data-value="food" aria-pressed="false"><span class="opt-emoji">🍎</span> Food</button>
+          <button type="button" class="option-btn" data-value="colors" aria-pressed="false"><span class="opt-emoji">🎨</span> Colors</button>
+        </div>
+      </div>
+
+      <div class="option-group" role="group" aria-labelledby="difficultyLabel">
+        <span class="option-group-label" id="difficultyLabel">Difficulty</span>
+        <div class="option-row" id="difficultyGroup">
+          <button type="button" class="option-btn option-btn-stacked" data-value="easy" aria-pressed="true">
+            <span>Easy</span><span class="opt-sub">6 pairs &middot; peek first</span>
+          </button>
+          <button type="button" class="option-btn option-btn-stacked" data-value="medium" aria-pressed="false">
+            <span>Medium</span><span class="opt-sub">8 pairs</span>
+          </button>
+          <button type="button" class="option-btn option-btn-stacked" data-value="hard" aria-pressed="false">
+            <span>Hard</span><span class="opt-sub">8 pairs &middot; 2 topics</span>
+          </button>
+        </div>
+        <p class="option-hint">Hard mixes your chosen category with another one, for extra challenge.</p>
+      </div>
+
+      <button type="button" class="start-btn" id="startBtn">Start Game</button>
+    </div>
+  </section>
+
+  <!-- PLAY SCREEN -->
+  <section class="screen hidden" id="screenPlay" aria-label="Vocabulary Match gameplay">
+    <div class="screen-inner wide">
+      <div class="hud">
+        <span class="hud-stat">Moves: <strong id="hudMoves">0</strong></span>
+        <span class="hud-stat">Matched: <strong id="hudMatched">0</strong> / <strong id="hudTotal">6</strong></span>
+        <span class="hud-stat">Time: <strong id="hudTime">0:00</strong></span>
+      </div>
+      <p class="match-prompt">Tap two cards to find each picture's matching word.</p>
+
+      <div class="card-grid" id="cardGrid" role="group" aria-label="Matching cards"></div>
+
+      <p class="feedback-banner" id="feedbackBanner" aria-live="assertive">&nbsp;</p>
+    </div>
+  </section>
+
+  <!-- RESULTS SCREEN -->
+  <section class="screen hidden" id="screenResults" aria-label="Vocabulary Match results">
+    <div class="screen-inner center-text">
+      <p class="results-emoji" id="resultsEmoji">🎉</p>
+      <p class="results-score" id="resultsScore">Finished in 24 moves</p>
+      <p class="results-detail" id="resultsDetail">That took 0:38 &mdash; great matching!</p>
+      <div class="results-actions">
+        <button type="button" class="btn-secondary" id="changeSettingsBtn">Change Settings</button>
+        <button type="button" class="btn-primary-lg" id="playAgainBtn">Play Again</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // -------------------------------------------------------------------
+  // Vocabulary sets — keyed by category. Adding a future category means
+  // adding one array here plus one button in the start-screen markup
+  // above; nothing else in this file needs to change.
+  // -------------------------------------------------------------------
+  var CATEGORIES = {
+    animals: [
+      { emoji: '🐶', word: 'DOG' }, { emoji: '🐱', word: 'CAT' },
+      { emoji: '🐘', word: 'ELEPHANT' }, { emoji: '🦁', word: 'LION' },
+      { emoji: '🐸', word: 'FROG' }, { emoji: '🐟', word: 'FISH' },
+      { emoji: '🐦', word: 'BIRD' }, { emoji: '🐴', word: 'HORSE' }
+    ],
+    food: [
+      { emoji: '🍎', word: 'APPLE' }, { emoji: '🍌', word: 'BANANA' },
+      { emoji: '🍕', word: 'PIZZA' }, { emoji: '🍔', word: 'BURGER' },
+      { emoji: '🍩', word: 'DONUT' }, { emoji: '🥕', word: 'CARROT' },
+      { emoji: '🍞', word: 'BREAD' }, { emoji: '🥛', word: 'MILK' }
+    ],
+    colors: [
+      { emoji: '🔴', word: 'RED' }, { emoji: '🔵', word: 'BLUE' },
+      { emoji: '🟢', word: 'GREEN' }, { emoji: '🟡', word: 'YELLOW' },
+      { emoji: '🟣', word: 'PURPLE' }, { emoji: '🟠', word: 'ORANGE' },
+      { emoji: '⚫', word: 'BLACK' }, { emoji: '⚪', word: 'WHITE' }
+    ]
+  };
+
+  // Difficulty changes real gameplay parameters, not just a label: more
+  // pairs, a shorter (or no) "memorize the cards" preview, less forgiving
+  // pacing on a wrong pair, and — on Hard — two categories mixed together
+  // so matching pictures to words is genuinely harder, not just longer.
+  var DIFFICULTIES = {
+    easy:   { pairCount: 6, categoryCount: 1, previewMs: 2500, mismatchDelayMs: 1000 },
+    medium: { pairCount: 8, categoryCount: 1, previewMs: 1500, mismatchDelayMs: 900 },
+    hard:   { pairCount: 8, categoryCount: 2, previewMs: 750,  mismatchDelayMs: 600 }
+  };
+
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+
+  // -------------------------------------------------------------------
+  // Sound — tiny WebAudio-generated tones, no audio files, muted state
+  // persisted locally. Only ever triggered by a direct user action.
+  // -------------------------------------------------------------------
+  var AudioCtx = window.AudioContext || window.webkitAudioContext;
+  var audioCtx = null;
+  var soundOn = true;
+  try { soundOn = localStorage.getItem('vm_sound_on') !== '0'; } catch (e) { /* non-fatal */ }
+
+  function getAudioCtx() {
+    if (!AudioCtx) { return null; }
+    if (!audioCtx) { audioCtx = new AudioCtx(); }
+    return audioCtx;
+  }
+
+  function playTone(freq, durationMs, delayMs) {
+    if (!soundOn) { return; }
+    var ctx = getAudioCtx();
+    if (!ctx) { return; }
+    var start = ctx.currentTime + (delayMs || 0) / 1000;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, start);
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(0.16, start + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + durationMs / 1000);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(start);
+    osc.stop(start + durationMs / 1000 + 0.02);
+  }
+
+  function soundFlip() { playTone(440, 80, 0); }
+  function soundMatch() { playTone(660, 120, 0); playTone(880, 160, 110); }
+  function soundMismatch() { playTone(220, 220, 0); }
+  function soundComplete() { playTone(523, 140, 0); playTone(659, 140, 130); playTone(784, 220, 260); }
+
+  // -------------------------------------------------------------------
+  // Play tracking — lets the TeachLuma admin dashboard show real usage
+  // counts. Fire-and-forget: a network failure here must never block or
+  // break gameplay, so every error is swallowed silently. Uses a relative
+  // path (not an absolute URL) so this same file works unmodified no
+  // matter what path the site is hosted under.
+  // -------------------------------------------------------------------
+  function trackPlay(eventType) {
+    try {
+      fetch('../../../api/game-track.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: 'vocabulary-match', event: eventType })
+      }).catch(function () {});
+    } catch (e) { /* non-fatal */ }
+  }
+
+  // -------------------------------------------------------------------
+  // Fullscreen
+  // -------------------------------------------------------------------
+  var appEl = document.getElementById('app');
+  var fullscreenBtn = document.getElementById('fullscreenBtn');
+
+  function requestFs(el) {
+    var fn = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (fn) { fn.call(el).catch(function () {}); }
+  }
+  function exitFs() {
+    var fn = document.exitFullscreen || document.webkitExitFullscreen;
+    if (fn) { fn.call(document); }
+  }
+  function currentFsElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement || null;
+  }
+  var fsSupported = !!(appEl.requestFullscreen || appEl.webkitRequestFullscreen);
+
+  if (!fsSupported) {
+    fullscreenBtn.classList.add('hidden');
+  } else {
+    fullscreenBtn.addEventListener('click', function () {
+      if (currentFsElement()) { exitFs(); } else { requestFs(appEl); }
+    });
+    ['fullscreenchange', 'webkitfullscreenchange'].forEach(function (evt) {
+      document.addEventListener(evt, function () {
+        var active = !!currentFsElement();
+        fullscreenBtn.textContent = active ? '⤢ Exit Fullscreen' : '⛶ Fullscreen';
+        fullscreenBtn.setAttribute('aria-label', active ? 'Exit fullscreen' : 'Enter fullscreen');
+      });
+    });
+  }
+
+  // -------------------------------------------------------------------
+  // Mute toggle
+  // -------------------------------------------------------------------
+  var muteBtn = document.getElementById('muteBtn');
+  function renderMuteBtn() {
+    muteBtn.textContent = soundOn ? '🔊' : '🔇';
+    muteBtn.setAttribute('aria-pressed', soundOn ? 'false' : 'true');
+    muteBtn.setAttribute('aria-label', soundOn ? 'Mute sound' : 'Unmute sound');
+  }
+  renderMuteBtn();
+  muteBtn.addEventListener('click', function () {
+    soundOn = !soundOn;
+    renderMuteBtn();
+    try { localStorage.setItem('vm_sound_on', soundOn ? '1' : '0'); } catch (e) { /* non-fatal */ }
+  });
+
+  // -------------------------------------------------------------------
+  // Screens
+  // -------------------------------------------------------------------
+  var screenStart = document.getElementById('screenStart');
+  var screenPlay = document.getElementById('screenPlay');
+  var screenResults = document.getElementById('screenResults');
+
+  function showScreen(el) {
+    [screenStart, screenPlay, screenResults].forEach(function (s) {
+      s.classList.toggle('hidden', s !== el);
+    });
+  }
+
+  // -------------------------------------------------------------------
+  // Start-screen option groups
+  // -------------------------------------------------------------------
+  var settings = { category: 'animals', difficulty: 'easy' };
+
+  function wireOptionGroup(groupId, settingKey, parse) {
+    var group = document.getElementById(groupId);
+    var buttons = Array.prototype.slice.call(group.querySelectorAll('.option-btn'));
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        buttons.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+        btn.setAttribute('aria-pressed', 'true');
+        settings[settingKey] = parse(btn.dataset.value);
+      });
+    });
+  }
+
+  wireOptionGroup('categoryGroup', 'category', function (v) { return v; });
+  wireOptionGroup('difficultyGroup', 'difficulty', function (v) { return v; });
+
+  // -------------------------------------------------------------------
+  // Gameplay state
+  // -------------------------------------------------------------------
+  var cardGrid = document.getElementById('cardGrid');
+  var hudMoves = document.getElementById('hudMoves');
+  var hudMatched = document.getElementById('hudMatched');
+  var hudTotal = document.getElementById('hudTotal');
+  var hudTime = document.getElementById('hudTime');
+  var feedbackBanner = document.getElementById('feedbackBanner');
+
+  var state = {
+    cards: [],
+    flipped: [],
+    matchedCount: 0,
+    moves: 0,
+    locked: false,
+    startTime: 0,
+    timerHandle: null,
+    pairCount: 6,
+    mismatchDelayMs: 900
+  };
+
+  function formatTime(seconds) {
+    var m = Math.floor(seconds / 60);
+    var s = seconds % 60;
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function startClock() {
+    state.startTime = Date.now();
+    hudTime.textContent = '0:00';
+    state.timerHandle = window.setInterval(function () {
+      var elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+      hudTime.textContent = formatTime(elapsed);
+    }, 1000);
+  }
+
+  function stopClock() {
+    if (state.timerHandle) {
+      window.clearInterval(state.timerHandle);
+      state.timerHandle = null;
+    }
+  }
+
+  function buildDeck(difficultyKey) {
+    var config = DIFFICULTIES[difficultyKey];
+    var sourceWords = CATEGORIES[settings.category].slice();
+
+    if (config.categoryCount === 2) {
+      var keys = Object.keys(CATEGORIES);
+      var secondaryKey = keys[(keys.indexOf(settings.category) + 1) % keys.length];
+      sourceWords = sourceWords.concat(CATEGORIES[secondaryKey]);
+    }
+
+    var pool = shuffle(sourceWords).slice(0, config.pairCount);
+    var deck = [];
+    pool.forEach(function (item, i) {
+      deck.push({ pairId: i, kind: 'emoji', content: item.emoji, word: item.word });
+      deck.push({ pairId: i, kind: 'word', content: item.word, word: item.word });
+    });
+    return shuffle(deck);
+  }
+
+  // -------------------------------------------------------------------
+  // Dynamic card sizing — cards are made as large as possible while
+  // fitting BOTH the available width and the actual remaining vertical
+  // space, recalculated on resize/orientation change. This is what
+  // prevents the bottom row of cards from being cut off on a real
+  // desktop browser window (not fullscreen) once there are enough rows,
+  // which a fixed aspect-ratio-only approach can't account for.
+  // -------------------------------------------------------------------
+  function fitCardGrid() {
+    var totalCards = state.cards.length;
+    if (!totalCards) { return; }
+
+    var isShortLandscape = window.innerHeight <= 480 && window.innerWidth > window.innerHeight;
+    var cols = isShortLandscape
+      ? (totalCards <= 12 ? 6 : 8)
+      : (window.innerWidth >= 480 ? 4 : 3);
+    var rows = Math.max(1, Math.ceil(totalCards / cols));
+    var gap = window.innerWidth >= 900 ? 16 : (window.innerWidth >= 480 ? 12 : 10);
+
+    cardGrid.style.setProperty('--cols', String(cols));
+    cardGrid.style.setProperty('--card-gap', gap + 'px');
+
+    var containerWidth = cardGrid.parentElement.clientWidth;
+    var gridTop = cardGrid.getBoundingClientRect().top;
+
+    // Precisely measured, not guessed: everything real that sits between
+    // the grid and the bottom of the viewport — the grid's own
+    // margin-bottom, the feedback banner, and the screen's own bottom
+    // padding. Guessing this (e.g. a flat "+24px") is exactly what
+    // under-reserved space and let the grid overflow past the fold before.
+    var screenEl = cardGrid.closest('.screen');
+    var screenPaddingBottom = parseFloat(getComputedStyle(screenEl).paddingBottom) || 0;
+    var gridMarginBottom = parseFloat(getComputedStyle(cardGrid).marginBottom) || 0;
+    var feedbackHeight = feedbackBanner.getBoundingClientRect().height || 0;
+    var safetyMargin = 16;
+    var reserveBelow = gridMarginBottom + feedbackHeight + screenPaddingBottom + safetyMargin;
+    var availableHeight = window.innerHeight - gridTop - reserveBelow;
+
+    var sizeByWidth = (containerWidth - gap * (cols - 1)) / cols;
+    var sizeByHeight = (availableHeight - gap * (rows - 1)) / rows;
+    var size = Math.max(40, Math.floor(Math.min(sizeByWidth, sizeByHeight)));
+
+    cardGrid.style.setProperty('--card-size', size + 'px');
+  }
+
+  var fitResizeTimer = null;
+  window.addEventListener('resize', function () {
+    if (screenPlay.classList.contains('hidden')) { return; }
+    window.clearTimeout(fitResizeTimer);
+    fitResizeTimer = window.setTimeout(fitCardGrid, 150);
+  });
+  window.addEventListener('orientationchange', function () {
+    if (screenPlay.classList.contains('hidden')) { return; }
+    window.setTimeout(fitCardGrid, 200);
+  });
+
+  function renderGrid() {
+    cardGrid.innerHTML = '';
+    state.cards.forEach(function (card, index) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'match-card' + (card.kind === 'word' ? ' word-card' : '');
+      btn.dataset.index = String(index);
+      btn.innerHTML = '<span class="card-back-icon">❓</span>';
+      btn.setAttribute('aria-label', 'Hidden card ' + (index + 1));
+      btn.addEventListener('click', function () { flipCard(index); });
+      cardGrid.appendChild(btn);
+    });
+  }
+
+  function cardEl(index) {
+    return cardGrid.querySelector('[data-index="' + index + '"]');
+  }
+
+  function flipCard(index) {
+    if (state.locked) { return; }
+    var card = state.cards[index];
+    if (card.matched || state.flipped.indexOf(index) !== -1) { return; }
+
+    var el = cardEl(index);
+    el.classList.add('revealed');
+    el.textContent = card.content;
+    el.setAttribute('aria-label', card.kind === 'emoji' ? 'Picture card' : ('Word card: ' + card.content));
+    soundFlip();
+
+    state.flipped.push(index);
+
+    if (state.flipped.length === 2) {
+      state.moves++;
+      hudMoves.textContent = String(state.moves);
+      state.locked = true;
+      evaluatePair();
+    }
+  }
+
+  function evaluatePair() {
+    var i1 = state.flipped[0];
+    var i2 = state.flipped[1];
+    var c1 = state.cards[i1];
+    var c2 = state.cards[i2];
+    var isMatch = c1.pairId === c2.pairId && c1.kind !== c2.kind;
+
+    if (isMatch) {
+      window.setTimeout(function () {
+        [i1, i2].forEach(function (i) {
+          state.cards[i].matched = true;
+          var el = cardEl(i);
+          el.classList.remove('revealed');
+          el.classList.add('matched');
+          el.disabled = true;
+        });
+        state.matchedCount++;
+        hudMatched.textContent = String(state.matchedCount);
+        feedbackBanner.textContent = '✓ Match!';
+        feedbackBanner.className = 'feedback-banner correct';
+        soundMatch();
+        state.flipped = [];
+        state.locked = false;
+
+        if (state.matchedCount === state.pairCount) {
+          finishGame();
+        }
+      }, 500);
+    } else {
+      feedbackBanner.textContent = '✗ Try Again!';
+      feedbackBanner.className = 'feedback-banner incorrect';
+      soundMismatch();
+      [i1, i2].forEach(function (i) { cardEl(i).classList.add('mismatch'); });
+
+      window.setTimeout(function () {
+        [i1, i2].forEach(function (i) {
+          var el = cardEl(i);
+          el.classList.remove('revealed', 'mismatch');
+          el.innerHTML = '<span class="card-back-icon">❓</span>';
+          el.setAttribute('aria-label', 'Hidden card ' + (i + 1));
+        });
+        feedbackBanner.textContent = ' ';
+        feedbackBanner.className = 'feedback-banner';
+        state.flipped = [];
+        state.locked = false;
+      }, state.mismatchDelayMs);
+    }
+  }
+
+  function startGame() {
+    var config = DIFFICULTIES[settings.difficulty];
+
+    state.cards = buildDeck(settings.difficulty);
+    state.flipped = [];
+    state.matchedCount = 0;
+    state.moves = 0;
+    state.locked = true; // stays locked through the memorize-preview below
+    state.pairCount = config.pairCount;
+    state.mismatchDelayMs = config.mismatchDelayMs;
+
+    hudMoves.textContent = '0';
+    hudMatched.textContent = '0';
+    hudTotal.textContent = String(config.pairCount);
+
+    renderGrid();
+    showScreen(screenPlay);
+    fitCardGrid();
+    stopClock();
+    trackPlay('started');
+
+    // Memorize-preview: every card shows face-up briefly before real play
+    // begins — classic memory-game convention, and difficulty-driven
+    // (longer on Easy, barely any time on Hard) rather than a fixed delay.
+    feedbackBanner.textContent = 'Memorize the cards!';
+    feedbackBanner.className = 'feedback-banner';
+    state.cards.forEach(function (card, i) {
+      var el = cardEl(i);
+      el.classList.add('revealed');
+      el.textContent = card.content;
+      el.setAttribute('aria-label', card.kind === 'emoji' ? 'Picture card' : ('Word card: ' + card.content));
+    });
+
+    window.setTimeout(function () {
+      state.cards.forEach(function (card, i) {
+        var el = cardEl(i);
+        el.classList.remove('revealed');
+        el.innerHTML = '<span class="card-back-icon">❓</span>';
+        el.setAttribute('aria-label', 'Hidden card ' + (i + 1));
+      });
+      feedbackBanner.textContent = ' ';
+      state.locked = false;
+      startClock();
+    }, config.previewMs);
+  }
+
+  function finishGame() {
+    stopClock();
+    var elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+    var perfect = state.moves === state.pairCount;
+    var efficient = state.moves <= state.pairCount * 1.6;
+
+    var emoji = perfect ? '🏆' : (efficient ? '🎉' : '👍');
+    var tier = perfect ? 'Perfect game — every match on the first try!' : (efficient ? 'Great matching!' : 'Nicely done — keep practicing to find pairs faster!');
+
+    document.getElementById('resultsEmoji').textContent = emoji;
+    document.getElementById('resultsScore').textContent = 'Finished in ' + state.moves + ' move' + (state.moves === 1 ? '' : 's');
+    document.getElementById('resultsDetail').textContent = 'That took ' + formatTime(elapsed) + '. ' + tier;
+
+    showScreen(screenResults);
+    soundComplete();
+    trackPlay('completed');
+  }
+
+  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('playAgainBtn').addEventListener('click', startGame);
+  document.getElementById('changeSettingsBtn').addEventListener('click', function () {
+    stopClock();
+    showScreen(screenStart);
+  });
+
+  // Enter on the results screen replays immediately.
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter' && !screenResults.classList.contains('hidden')) {
+      startGame();
+    }
+  });
+})();
+</script>
+</body>
+</html>
