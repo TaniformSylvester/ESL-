@@ -49,6 +49,29 @@ function get_all_games(): array
             'thumbnail' => null,
             'featured'  => true,
         ],
+        [
+            'slug'                   => 'vocabulary-match',
+            'title'                  => 'Vocabulary Match',
+            'subject'                => 'ESL',
+            'grade'                  => 'Kindergarten–Grade 2',
+            'topic'                  => 'Vocabulary',
+            'difficulty'             => 'Easy',
+            'short_description'      => 'A picture-and-word memory matching game covering animals, food and colors vocabulary.',
+            'what_students_practice' => [
+                'Matching pictures to their English word',
+                'Core vocabulary: animals, food and colors',
+                'Visual memory and turn-taking',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Choose a category and number of pairs on the start screen.',
+                'Call on students to pick two cards and say the word aloud.',
+                'Keep going until every picture is matched with its word.',
+            ],
+            'thumbnail' => null,
+            'featured'  => true,
+        ],
         // Future games (see get_related_games() and the Number Challenge
         // architecture for how a new mode/game slots in without rebuilding
         // the hub): Number Recognition, Missing Number, Number Bonds, etc.
