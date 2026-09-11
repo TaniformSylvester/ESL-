@@ -10,7 +10,7 @@ require_once __DIR__ . '/includes/games-functions.php';
 
 $freeResources = attach_rating_summaries(get_free_resources(6));
 $featuredVideos = get_featured_videos(3);
-$featuredGames = get_featured_games(3);
+$featuredGames = get_featured_games(4);
 $subjects = get_all_subjects();
 $featuredReviews = get_featured_site_reviews(3);
 
