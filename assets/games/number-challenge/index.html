@@ -174,6 +174,9 @@
     color: #fff;
   }
 
+  .option-btn-stacked { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; line-height: 1.15; }
+  .option-btn-stacked .opt-sub { font-size: 0.7em; font-weight: 600; opacity: 0.8; }
+
   .start-btn {
     display: block;
     width: 100%;
@@ -215,6 +218,22 @@
   }
 
   .hud-stat strong { color: var(--ink); }
+
+  .hud-streak { color: var(--brand-secondary); }
+
+  @keyframes streakPop {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.25); }
+    100% { transform: scale(1); }
+  }
+
+  .hud-streak.pop { animation: streakPop 0.4s ease; }
+
+  @keyframes cardCorrectPop {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
 
   .progress-track {
     width: 100%;
@@ -309,6 +328,7 @@
     border-color: var(--brand-success);
     color: #fff;
     opacity: 1;
+    animation: cardCorrectPop 0.3s ease;
   }
 
   .answer-btn.incorrect {
@@ -400,6 +420,32 @@
 
   .center-text { text-align: center; }
 
+  /* Moderate-height desktop/laptop windows (not phone-landscape, which is
+     handled separately below at <=480px): the 4th "Difficulty" option
+     group added extra vertical height, enough to overflow a plain, common
+     un-maximized browser window (e.g. 1280x720). Trim vertical spacing a
+     little so everything still fits without scrolling. */
+  @media (max-height: 760px) and (min-height: 481px) {
+    .screen { padding: 0.9rem 1rem 1.25rem; }
+    .start-hero { margin-bottom: 1.1rem; }
+    .option-group { margin-bottom: 1rem; }
+    .option-btn { padding: 0.7rem 0.5rem; min-height: 48px; }
+    .start-btn { padding: 0.85rem 1rem; min-height: 56px; }
+  }
+
+  /* Shorter still (e.g. a netbook-sized or un-maximized 1024x600 window):
+     stacking all 4 option groups no longer fits even with tighter spacing.
+     There's plenty of width in these cases, so lay the groups out 2x2
+     instead of one long vertical stack. */
+  @media (max-height: 760px) and (min-height: 481px) and (min-width: 700px) {
+    .option-groups-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.2rem 1.5rem;
+    }
+    .option-group { margin-bottom: 0.85rem; }
+  }
+
   /* -----------------------------------------------------------------
      Short landscape (phones lying flat) — vertical space is the scarce
      resource here, not horizontal, so the three start-screen option
@@ -483,7 +529,7 @@
     <div class="screen-inner">
       <div class="start-hero">
         <h1>Number Challenge</h1>
-        <p>Grade 1&ndash;2 Math &middot; Addition &amp; Subtraction Within 20</p>
+        <p>Grade 1&ndash;2 Math &middot; Addition &amp; Subtraction</p>
       </div>
 
       <div class="option-groups-wrap">
@@ -493,6 +539,21 @@
             <button type="button" class="option-btn" data-value="addition" aria-pressed="true">Addition</button>
             <button type="button" class="option-btn" data-value="subtraction" aria-pressed="false">Subtraction</button>
             <button type="button" class="option-btn" data-value="mixed" aria-pressed="false">Mixed</button>
+          </div>
+        </div>
+
+        <div class="option-group" role="group" aria-labelledby="difficultyLabel">
+          <span class="option-group-label" id="difficultyLabel">Difficulty</span>
+          <div class="option-row" id="difficultyGroup">
+            <button type="button" class="option-btn option-btn-stacked" data-value="easy" aria-pressed="false">
+              <span>Easy</span><span class="opt-sub">within 10</span>
+            </button>
+            <button type="button" class="option-btn option-btn-stacked" data-value="medium" aria-pressed="true">
+              <span>Medium</span><span class="opt-sub">within 20</span>
+            </button>
+            <button type="button" class="option-btn option-btn-stacked" data-value="hard" aria-pressed="false">
+              <span>Hard</span><span class="opt-sub">within 50</span>
+            </button>
           </div>
         </div>
 
@@ -524,6 +585,7 @@
     <div class="screen-inner">
       <div class="hud">
         <span class="hud-stat" id="hudCounter" aria-live="polite">Question <strong>1</strong> / 10</span>
+        <span class="hud-stat hud-streak hidden" id="hudStreak">🔥 <strong id="hudStreakCount">0</strong> streak</span>
         <span class="hud-stat">Score: <strong id="hudScore">0</strong></span>
       </div>
       <div class="progress-track" role="progressbar" aria-label="Progress" aria-valuemin="0" aria-valuemax="100" id="progressTrack">
@@ -606,21 +668,27 @@
     return choices;
   }
 
+  // Difficulty changes the actual number range questions are drawn from,
+  // not just a label — Easy/Medium/Hard all reuse the same generators
+  // below, parameterized by range, so adding a future difficulty tier is
+  // a one-line addition to DIFFICULTY_RANGES rather than new generators.
+  var DIFFICULTY_RANGES = { easy: 10, medium: 20, hard: 50 };
+
   var QUESTION_GENERATORS = {
-    addition: function () {
-      var a = randInt(1, 19);
-      var b = randInt(1, Math.max(1, 20 - a));
+    addition: function (range) {
+      var a = randInt(1, range - 1);
+      var b = randInt(1, Math.max(1, range - a));
       var correct = a + b;
-      return { text: a + ' + ' + b + ' = ?', correct: correct, choices: buildChoices(correct, 0, 25) };
+      return { text: a + ' + ' + b + ' = ?', correct: correct, choices: buildChoices(correct, 0, range + 5) };
     },
-    subtraction: function () {
-      var a = randInt(1, 20);
+    subtraction: function (range) {
+      var a = randInt(1, range);
       var b = randInt(1, a);
       var correct = a - b;
-      return { text: a + ' − ' + b + ' = ?', correct: correct, choices: buildChoices(correct, 0, 20) };
+      return { text: a + ' − ' + b + ' = ?', correct: correct, choices: buildChoices(correct, 0, range) };
     },
-    mixed: function () {
-      return Math.random() < 0.5 ? QUESTION_GENERATORS.addition() : QUESTION_GENERATORS.subtraction();
+    mixed: function (range) {
+      return Math.random() < 0.5 ? QUESTION_GENERATORS.addition(range) : QUESTION_GENERATORS.subtraction(range);
     }
   };
 
@@ -662,6 +730,7 @@
 
   function soundCorrect() { playTone(660, 120, 0); playTone(880, 160, 110); }
   function soundIncorrect() { playTone(220, 220, 0); }
+  function soundStreak() { playTone(660, 100, 0); playTone(784, 100, 90); playTone(988, 180, 180); }
   function soundComplete() { playTone(523, 140, 0); playTone(659, 140, 130); playTone(784, 220, 260); }
 
   // -------------------------------------------------------------------
@@ -752,7 +821,7 @@
   // -------------------------------------------------------------------
   // Start-screen option groups (mode / question count / timer)
   // -------------------------------------------------------------------
-  var settings = { mode: 'addition', totalQuestions: 10, timerSeconds: 0 };
+  var settings = { mode: 'addition', difficulty: 'medium', totalQuestions: 10, timerSeconds: 0 };
 
   function wireOptionGroup(groupId, settingKey, parse) {
     var group = document.getElementById(groupId);
@@ -767,6 +836,7 @@
   }
 
   wireOptionGroup('modeGroup', 'mode', function (v) { return v; });
+  wireOptionGroup('difficultyGroup', 'difficulty', function (v) { return v; });
   wireOptionGroup('countGroup', 'totalQuestions', function (v) { return parseInt(v, 10); });
   wireOptionGroup('timerGroup', 'timerSeconds', function (v) { return parseInt(v, 10); });
 
@@ -776,6 +846,8 @@
   var state = {
     index: 0,
     score: 0,
+    streak: 0,
+    bestStreak: 0,
     questions: [],
     locked: false,
     timerHandle: null,
@@ -784,6 +856,23 @@
 
   var hudCounter = document.getElementById('hudCounter');
   var hudScore = document.getElementById('hudScore');
+  var hudStreak = document.getElementById('hudStreak');
+  var hudStreakCount = document.getElementById('hudStreakCount');
+
+  // A streak only shows once it's genuinely something to notice (2+ in a
+  // row) — surfacing "1 streak" after the very first question would just
+  // be noise, not a real interactive reward.
+  function updateStreakDisplay() {
+    hudStreakCount.textContent = String(state.streak);
+    if (state.streak >= 2) {
+      hudStreak.classList.remove('hidden');
+      hudStreak.classList.remove('pop');
+      void hudStreak.offsetWidth; // restart the animation on every increment
+      hudStreak.classList.add('pop');
+    } else {
+      hudStreak.classList.add('hidden');
+    }
+  }
   var progressFill = document.getElementById('progressFill');
   var progressTrack = document.getElementById('progressTrack');
   var timerWrap = document.getElementById('timerWrap');
@@ -852,9 +941,10 @@
 
   function buildQuestions() {
     var generator = QUESTION_GENERATORS[settings.mode] || QUESTION_GENERATORS.addition;
+    var range = DIFFICULTY_RANGES[settings.difficulty] || 20;
     var list = [];
     for (var i = 0; i < settings.totalQuestions; i++) {
-      list.push(generator());
+      list.push(generator(range));
     }
     return list;
   }
@@ -862,8 +952,11 @@
   function startGame() {
     state.index = 0;
     state.score = 0;
+    state.streak = 0;
+    state.bestStreak = 0;
     state.questions = buildQuestions();
     hudScore.textContent = '0';
+    updateStreakDisplay();
     showScreen(screenPlay);
     renderQuestion();
     trackPlay('started');
@@ -903,6 +996,8 @@
     feedbackText.textContent = "⏰ Time's Up!";
     feedbackText.className = 'feedback incorrect';
     soundIncorrect();
+    state.streak = 0;
+    updateStreakDisplay();
     advance();
   }
 
@@ -918,11 +1013,20 @@
 
     if (isCorrect) {
       state.score++;
+      state.streak++;
+      state.bestStreak = Math.max(state.bestStreak, state.streak);
       hudScore.textContent = String(state.score);
       btn.classList.add('correct');
-      feedbackText.textContent = '✓ Correct!';
+      updateStreakDisplay();
+
+      if (state.streak >= 3 && state.streak % 3 === 0) {
+        feedbackText.textContent = '🔥 ' + state.streak + ' in a row!';
+        soundStreak();
+      } else {
+        feedbackText.textContent = '✓ Correct!';
+        soundCorrect();
+      }
       feedbackText.className = 'feedback correct';
-      soundCorrect();
     } else {
       btn.classList.add('incorrect');
       answerButtons.forEach(function (b) {
@@ -935,6 +1039,8 @@
       feedbackText.textContent = '✗ Try Again!';
       feedbackText.className = 'feedback incorrect';
       soundIncorrect();
+      state.streak = 0;
+      updateStreakDisplay();
     }
 
     advance();
@@ -965,9 +1071,11 @@
       ? 'Excellent work!'
       : (pct >= 50 ? 'Good effort!' : 'Keep practicing — you\'ll get faster!');
 
+    var streakNote = state.bestStreak >= 3 ? (' Best streak: ' + state.bestStreak + '.') : '';
+
     document.getElementById('resultsEmoji').textContent = emoji;
     document.getElementById('resultsScore').textContent = state.score + ' / ' + total;
-    document.getElementById('resultsDetail').textContent = message + ' That\'s ' + pct + '% correct.';
+    document.getElementById('resultsDetail').textContent = message + ' That\'s ' + pct + '% correct.' + streakNote;
 
     showScreen(screenResults);
     soundComplete();

@@ -46,7 +46,7 @@ function get_all_games(): array
                 'Show each question and let students discuss the answer.',
                 'Select the answer together, then move to the next question.',
             ],
-            'thumbnail' => null,
+            'thumbnail' => asset_url('images/games/number-challenge-thumb.svg'),
             'featured'  => true,
         ],
         [
@@ -69,7 +69,7 @@ function get_all_games(): array
                 'Call on students to pick two cards and say the word aloud.',
                 'Keep going until every picture is matched with its word.',
             ],
-            'thumbnail' => null,
+            'thumbnail' => asset_url('images/games/vocabulary-match-thumb.svg'),
             'featured'  => true,
         ],
         // Future games (see get_related_games() and the Number Challenge

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" role="img" aria-label="Vocabulary Match">
+  <defs>
+    <linearGradient id="vmBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="225" fill="url(#vmBg)"/>
+
+  <!-- soft background texture -->
+  <circle cx="30" cy="25" r="60" fill="#ffffff" opacity="0.06"/>
+  <circle cx="375" cy="205" r="70" fill="#ffffff" opacity="0.06"/>
+
+  <!-- dashed matching line -->
+  <path d="M 140 112 Q 200 70 260 112" fill="none" stroke="#ffffff" stroke-width="3" stroke-dasharray="6 7" opacity="0.55"/>
+
+  <!-- left card: picture -->
+  <g transform="translate(122,120) rotate(-6)">
+    <rect x="-55" y="-58" width="110" height="116" rx="14" fill="#f8fafc"/>
+    <!-- flat cat face -->
+    <g transform="translate(0,-4)">
+      <polygon points="-30,-22 -14,-40 -2,-16" fill="#1e3a8a"/>
+      <polygon points="30,-22 14,-40 2,-16" fill="#1e3a8a"/>
+      <circle cx="0" cy="6" r="30" fill="#1e3a8a"/>
+      <circle cx="-11" cy="2" r="4" fill="#f8fafc"/>
+      <circle cx="11" cy="2" r="4" fill="#f8fafc"/>
+      <path d="M -6 14 Q 0 20 6 14" fill="none" stroke="#f8fafc" stroke-width="3" stroke-linecap="round"/>
+      <path d="M -34 12 L -14 8 M -34 22 L -14 16 M 34 12 L 14 8 M 34 22 L 14 16" stroke="#1e3a8a" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- right card: word -->
+  <g transform="translate(268,116) rotate(5)">
+    <rect x="-58" y="-46" width="116" height="92" rx="14" fill="#ffffff"/>
+    <text x="0" y="12" font-family="Arial, sans-serif" font-size="34" font-weight="800" fill="#2563eb" text-anchor="middle">CAT</text>
+  </g>
+
+  <!-- match checkmark badge -->
+  <g transform="translate(200,72)">
+    <circle r="19" fill="#16a34a"/>
+    <path d="M -8 0 L -2 7 L 9 -7" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- sparkle accents -->
+  <g fill="#f59e0b">
+    <polygon points="330,60 333,68 341,71 333,74 330,82 327,74 319,71 327,68"/>
+    <polygon points="70,150 72,155 77,157 72,159 70,164 68,159 63,157 68,155"/>
+  </g>
+</svg>

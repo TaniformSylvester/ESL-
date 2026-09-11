@@ -131,6 +131,12 @@
 
   .option-row.cols-2 { grid-template-columns: repeat(2, 1fr); }
 
+  .option-hint {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    margin: 0.5rem 0 0;
+  }
+
   .option-btn {
     font-size: clamp(0.95rem, 2vw, 1.1rem);
     font-weight: 700;
@@ -150,6 +156,9 @@
   }
 
   .option-btn .opt-emoji { font-size: 1.4em; }
+
+  .option-btn-stacked { flex-direction: column; gap: 0.15rem; line-height: 1.15; }
+  .option-btn-stacked .opt-sub { font-size: 0.7em; font-weight: 600; opacity: 0.8; }
 
   .option-btn:hover { border-color: var(--brand-primary); }
   .option-btn:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
@@ -211,25 +220,26 @@
   }
 
   /* -----------------------------------------------------------------
-     Card grid
+     Card grid — sized entirely by JS (fitCardGrid()) via the --cols,
+     --card-gap and --card-size custom properties below, so cards are
+     always as large as possible while fitting BOTH the available width
+     AND the actual remaining vertical space. A fixed aspect-ratio-only
+     approach (width-driven, height just following) overflows the
+     bottom of the screen once there are enough rows — this doesn't.
+     The px fallbacks only matter for the first instant before JS runs.
      ----------------------------------------------------------------- */
   .card-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.6rem;
+    grid-template-columns: repeat(var(--cols, 4), var(--card-size, 80px));
+    grid-auto-rows: var(--card-size, 80px);
+    gap: var(--card-gap, 0.75rem);
+    justify-content: center;
     margin-bottom: 1rem;
   }
 
-  @media (min-width: 480px) {
-    .card-grid { grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
-  }
-
-  @media (min-width: 900px) {
-    .card-grid { gap: 1rem; }
-  }
-
   .match-card {
-    aspect-ratio: 1;
+    width: 100%;
+    height: 100%;
     border-radius: 0.75rem;
     border: none;
     background: var(--brand-primary);
@@ -239,17 +249,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(1.5rem, 6vw, 2.75rem);
+    font-size: calc(var(--card-size, 80px) * 0.34);
     font-weight: 800;
-    padding: 0.35rem;
+    padding: 6%;
     text-align: center;
-    line-height: 1.15;
+    line-height: 1.1;
     word-break: break-word;
     box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.12);
     transition: transform 0.1s ease, background-color 0.15s ease, box-shadow 0.15s ease;
   }
 
-  .match-card .card-back-icon { font-size: 0.55em; opacity: 0.85; }
+  .match-card .card-back-icon { font-size: calc(var(--card-size, 80px) * 0.3); opacity: 0.85; }
 
   .match-card:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.18); }
   .match-card:focus-visible { outline: 3px solid var(--brand-primary-dark); outline-offset: 3px; }
@@ -261,13 +271,19 @@
     border: 3px solid var(--brand-secondary);
   }
 
+  @keyframes cardPop {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
   .match-card.matched {
     background: #f0fdf4;
     color: var(--brand-success);
     border: 3px solid var(--brand-success);
     box-shadow: none;
-    transform: none;
     opacity: 0.9;
+    animation: cardPop 0.35s ease;
   }
 
   .match-card.mismatch {
@@ -276,9 +292,10 @@
     border: 3px solid var(--brand-danger);
   }
 
-  .word-card { font-size: clamp(1rem, 4vw, 1.6rem); text-transform: uppercase; letter-spacing: 0.03em; }
+  .word-card { font-size: calc(var(--card-size, 80px) * 0.17) !important; text-transform: uppercase; letter-spacing: 0.02em; }
 
   .feedback-banner {
+    margin: 0;
     text-align: center;
     font-size: clamp(1.1rem, 3vw, 1.5rem);
     font-weight: 800;
@@ -367,14 +384,13 @@
     .option-group { margin-bottom: 0.5rem; }
     .option-group-label { font-size: 0.65rem; margin-bottom: 0.2rem; }
     .option-btn { min-height: 34px; padding: 0.3rem; font-size: 0.75rem; }
+    .option-hint { font-size: 0.65rem; margin-top: 0.25rem; }
     .start-btn { min-height: 38px; padding: 0.45rem 1rem; font-size: 1rem; }
 
     .hud { margin-bottom: 0.25rem; }
     .match-prompt { margin-bottom: 0.35rem; font-size: 0.8rem; }
-    .card-grid { grid-template-columns: repeat(8, 1fr); gap: 0.3rem; margin-bottom: 0.35rem; }
-    .match-card { aspect-ratio: unset; height: 46px; font-size: 0.95rem; border-width: 2px; }
-    .match-card .card-back-icon { font-size: 1rem; }
-    .word-card { font-size: 0.55rem; }
+    .card-grid { margin-bottom: 0.35rem; }
+    .match-card { border-width: 2px; }
     .feedback-banner { min-height: 1.2rem; font-size: 0.9rem; }
 
     .results-emoji { font-size: 2rem; margin-bottom: 0.2rem; }
@@ -421,12 +437,20 @@
         </div>
       </div>
 
-      <div class="option-group" role="group" aria-labelledby="pairsLabel">
-        <span class="option-group-label" id="pairsLabel">Number of pairs</span>
-        <div class="option-row cols-2" id="pairsGroup">
-          <button type="button" class="option-btn" data-value="6" aria-pressed="true">6 Pairs (Easy)</button>
-          <button type="button" class="option-btn" data-value="8" aria-pressed="false">8 Pairs (Medium)</button>
+      <div class="option-group" role="group" aria-labelledby="difficultyLabel">
+        <span class="option-group-label" id="difficultyLabel">Difficulty</span>
+        <div class="option-row" id="difficultyGroup">
+          <button type="button" class="option-btn option-btn-stacked" data-value="easy" aria-pressed="true">
+            <span>Easy</span><span class="opt-sub">6 pairs &middot; peek first</span>
+          </button>
+          <button type="button" class="option-btn option-btn-stacked" data-value="medium" aria-pressed="false">
+            <span>Medium</span><span class="opt-sub">8 pairs</span>
+          </button>
+          <button type="button" class="option-btn option-btn-stacked" data-value="hard" aria-pressed="false">
+            <span>Hard</span><span class="opt-sub">8 pairs &middot; 2 topics</span>
+          </button>
         </div>
+        <p class="option-hint">Hard mixes your chosen category with another one, for extra challenge.</p>
       </div>
 
       <button type="button" class="start-btn" id="startBtn">Start Game</button>
@@ -491,6 +515,16 @@
       { emoji: '🟣', word: 'PURPLE' }, { emoji: '🟠', word: 'ORANGE' },
       { emoji: '⚫', word: 'BLACK' }, { emoji: '⚪', word: 'WHITE' }
     ]
+  };
+
+  // Difficulty changes real gameplay parameters, not just a label: more
+  // pairs, a shorter (or no) "memorize the cards" preview, less forgiving
+  // pacing on a wrong pair, and — on Hard — two categories mixed together
+  // so matching pictures to words is genuinely harder, not just longer.
+  var DIFFICULTIES = {
+    easy:   { pairCount: 6, categoryCount: 1, previewMs: 2500, mismatchDelayMs: 1000 },
+    medium: { pairCount: 8, categoryCount: 1, previewMs: 1500, mismatchDelayMs: 900 },
+    hard:   { pairCount: 8, categoryCount: 2, previewMs: 750,  mismatchDelayMs: 600 }
   };
 
   function shuffle(arr) {
@@ -622,7 +656,7 @@
   // -------------------------------------------------------------------
   // Start-screen option groups
   // -------------------------------------------------------------------
-  var settings = { category: 'animals', pairCount: 6 };
+  var settings = { category: 'animals', difficulty: 'easy' };
 
   function wireOptionGroup(groupId, settingKey, parse) {
     var group = document.getElementById(groupId);
@@ -637,7 +671,7 @@
   }
 
   wireOptionGroup('categoryGroup', 'category', function (v) { return v; });
-  wireOptionGroup('pairsGroup', 'pairCount', function (v) { return parseInt(v, 10); });
+  wireOptionGroup('difficultyGroup', 'difficulty', function (v) { return v; });
 
   // -------------------------------------------------------------------
   // Gameplay state
@@ -656,7 +690,9 @@
     moves: 0,
     locked: false,
     startTime: 0,
-    timerHandle: null
+    timerHandle: null,
+    pairCount: 6,
+    mismatchDelayMs: 900
   };
 
   function formatTime(seconds) {
@@ -681,8 +717,17 @@
     }
   }
 
-  function buildDeck(pairCount) {
-    var pool = shuffle(CATEGORIES[settings.category].slice()).slice(0, pairCount);
+  function buildDeck(difficultyKey) {
+    var config = DIFFICULTIES[difficultyKey];
+    var sourceWords = CATEGORIES[settings.category].slice();
+
+    if (config.categoryCount === 2) {
+      var keys = Object.keys(CATEGORIES);
+      var secondaryKey = keys[(keys.indexOf(settings.category) + 1) % keys.length];
+      sourceWords = sourceWords.concat(CATEGORIES[secondaryKey]);
+    }
+
+    var pool = shuffle(sourceWords).slice(0, config.pairCount);
     var deck = [];
     pool.forEach(function (item, i) {
       deck.push({ pairId: i, kind: 'emoji', content: item.emoji, word: item.word });
@@ -690,6 +735,62 @@
     });
     return shuffle(deck);
   }
+
+  // -------------------------------------------------------------------
+  // Dynamic card sizing — cards are made as large as possible while
+  // fitting BOTH the available width and the actual remaining vertical
+  // space, recalculated on resize/orientation change. This is what
+  // prevents the bottom row of cards from being cut off on a real
+  // desktop browser window (not fullscreen) once there are enough rows,
+  // which a fixed aspect-ratio-only approach can't account for.
+  // -------------------------------------------------------------------
+  function fitCardGrid() {
+    var totalCards = state.cards.length;
+    if (!totalCards) { return; }
+
+    var isShortLandscape = window.innerHeight <= 480 && window.innerWidth > window.innerHeight;
+    var cols = isShortLandscape
+      ? (totalCards <= 12 ? 6 : 8)
+      : (window.innerWidth >= 480 ? 4 : 3);
+    var rows = Math.max(1, Math.ceil(totalCards / cols));
+    var gap = window.innerWidth >= 900 ? 16 : (window.innerWidth >= 480 ? 12 : 10);
+
+    cardGrid.style.setProperty('--cols', String(cols));
+    cardGrid.style.setProperty('--card-gap', gap + 'px');
+
+    var containerWidth = cardGrid.parentElement.clientWidth;
+    var gridTop = cardGrid.getBoundingClientRect().top;
+
+    // Precisely measured, not guessed: everything real that sits between
+    // the grid and the bottom of the viewport — the grid's own
+    // margin-bottom, the feedback banner, and the screen's own bottom
+    // padding. Guessing this (e.g. a flat "+24px") is exactly what
+    // under-reserved space and let the grid overflow past the fold before.
+    var screenEl = cardGrid.closest('.screen');
+    var screenPaddingBottom = parseFloat(getComputedStyle(screenEl).paddingBottom) || 0;
+    var gridMarginBottom = parseFloat(getComputedStyle(cardGrid).marginBottom) || 0;
+    var feedbackHeight = feedbackBanner.getBoundingClientRect().height || 0;
+    var safetyMargin = 16;
+    var reserveBelow = gridMarginBottom + feedbackHeight + screenPaddingBottom + safetyMargin;
+    var availableHeight = window.innerHeight - gridTop - reserveBelow;
+
+    var sizeByWidth = (containerWidth - gap * (cols - 1)) / cols;
+    var sizeByHeight = (availableHeight - gap * (rows - 1)) / rows;
+    var size = Math.max(40, Math.floor(Math.min(sizeByWidth, sizeByHeight)));
+
+    cardGrid.style.setProperty('--card-size', size + 'px');
+  }
+
+  var fitResizeTimer = null;
+  window.addEventListener('resize', function () {
+    if (screenPlay.classList.contains('hidden')) { return; }
+    window.clearTimeout(fitResizeTimer);
+    fitResizeTimer = window.setTimeout(fitCardGrid, 150);
+  });
+  window.addEventListener('orientationchange', function () {
+    if (screenPlay.classList.contains('hidden')) { return; }
+    window.setTimeout(fitCardGrid, 200);
+  });
 
   function renderGrid() {
     cardGrid.innerHTML = '';
@@ -754,7 +855,7 @@
         state.flipped = [];
         state.locked = false;
 
-        if (state.matchedCount === settings.pairCount) {
+        if (state.matchedCount === state.pairCount) {
           finishGame();
         }
       }, 500);
@@ -775,35 +876,61 @@
         feedbackBanner.className = 'feedback-banner';
         state.flipped = [];
         state.locked = false;
-      }, 900);
+      }, state.mismatchDelayMs);
     }
   }
 
   function startGame() {
-    state.cards = buildDeck(settings.pairCount);
+    var config = DIFFICULTIES[settings.difficulty];
+
+    state.cards = buildDeck(settings.difficulty);
     state.flipped = [];
     state.matchedCount = 0;
     state.moves = 0;
-    state.locked = false;
+    state.locked = true; // stays locked through the memorize-preview below
+    state.pairCount = config.pairCount;
+    state.mismatchDelayMs = config.mismatchDelayMs;
 
     hudMoves.textContent = '0';
     hudMatched.textContent = '0';
-    hudTotal.textContent = String(settings.pairCount);
-    feedbackBanner.textContent = ' ';
-    feedbackBanner.className = 'feedback-banner';
+    hudTotal.textContent = String(config.pairCount);
 
     renderGrid();
     showScreen(screenPlay);
+    fitCardGrid();
     stopClock();
-    startClock();
     trackPlay('started');
+
+    // Memorize-preview: every card shows face-up briefly before real play
+    // begins — classic memory-game convention, and difficulty-driven
+    // (longer on Easy, barely any time on Hard) rather than a fixed delay.
+    feedbackBanner.textContent = 'Memorize the cards!';
+    feedbackBanner.className = 'feedback-banner';
+    state.cards.forEach(function (card, i) {
+      var el = cardEl(i);
+      el.classList.add('revealed');
+      el.textContent = card.content;
+      el.setAttribute('aria-label', card.kind === 'emoji' ? 'Picture card' : ('Word card: ' + card.content));
+    });
+
+    window.setTimeout(function () {
+      state.cards.forEach(function (card, i) {
+        var el = cardEl(i);
+        el.classList.remove('revealed');
+        el.innerHTML = '<span class="card-back-icon">❓</span>';
+        el.setAttribute('aria-label', 'Hidden card ' + (i + 1));
+      });
+      feedbackBanner.textContent = ' ';
+      state.locked = false;
+      startClock();
+    }, config.previewMs);
   }
 
   function finishGame() {
     stopClock();
     var elapsed = Math.floor((Date.now() - state.startTime) / 1000);
-    var perfect = state.moves === settings.pairCount;
-    var efficient = state.moves <= settings.pairCount * 1.6;
+    var perfect = state.moves === state.pairCount;
+    var efficient = state.moves <= state.pairCount * 1.6;
 
     var emoji = perfect ? '🏆' : (efficient ? '🎉' : '👍');
     var tier = perfect ? 'Perfect game — every match on the first try!' : (efficient ? 'Great matching!' : 'Nicely done — keep practicing to find pairs faster!');
