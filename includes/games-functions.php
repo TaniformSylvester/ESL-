@@ -95,6 +95,30 @@ function get_all_games(): array
             'thumbnail' => asset_url('images/games/phonics-sound-match-thumb.svg'),
             'featured'  => true,
         ],
+        [
+            'slug'                   => 'daily-routines-adventure',
+            'title'                  => 'Daily Routines Adventure',
+            'subject'                => 'ESL',
+            'grade'                  => 'Grade 1–3',
+            'topic'                  => 'Daily Routines & Sentences',
+            'difficulty'             => 'Easy',
+            'short_description'      => 'Five mini-activities covering daily routines vocabulary — ordering, matching, sentence building, telling time and reading comprehension.',
+            'what_students_practice' => [
+                'Daily routine vocabulary and sequencing',
+                'Building simple sentences from words',
+                'Telling time and matching it to routines',
+                'Reading short stories and answering questions',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Work through the five activities in any order using the tabs.',
+                'Discuss each answer as a class before moving to the next question.',
+                'Complete all five activities to finish the game.',
+            ],
+            'thumbnail' => asset_url('images/games/daily-routines-adventure-thumb.svg'),
+            'featured'  => true,
+        ],
         // Future games (see get_related_games() and the Number Challenge
         // architecture for how a new mode/game slots in without rebuilding
         // the hub): Number Recognition, Missing Number, Number Bonds, etc.
