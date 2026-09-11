@@ -117,3 +117,74 @@ function game_embed_url(array $game): string
 {
     return asset_url('games/' . rawurlencode($game['slug']) . '/index.html');
 }
+
+// -----------------------------------------------------------------------
+// PLAY TRACKING — real usage counts for the admin dashboard, recorded by
+// api/game-track.php whenever a game's own JS fires a "started"/"completed"
+// event. game_slug is validated against get_all_games() before anything is
+// written, so a bad or made-up slug can never pollute the table.
+// -----------------------------------------------------------------------
+
+/** Records one real play event. Silently a no-op for an unknown slug/event — the caller (api/game-track.php) already validates, this is just a second line of defense. */
+function record_game_play(string $slug, string $eventType): void
+{
+    if (!in_array($eventType, ['started', 'completed'], true) || !get_game_by_slug($slug)) {
+        return;
+    }
+
+    $userId = is_logged_in() ? (int)$_SESSION['user_id'] : null;
+
+    getDB()->prepare('INSERT INTO game_plays (game_slug, event_type, user_id) VALUES (?, ?, ?)')
+        ->execute([$slug, $eventType, $userId]);
+}
+
+/** Total "started" plays across every game, all time — the admin dashboard's headline number. */
+function get_total_game_plays(): int
+{
+    return (int)getDB()->query("SELECT COUNT(*) FROM game_plays WHERE event_type = 'started'")->fetchColumn();
+}
+
+/** "started" plays so far this calendar month. */
+function get_game_plays_this_month(): int
+{
+    $stmt = getDB()->prepare(
+        "SELECT COUNT(*) FROM game_plays WHERE event_type = 'started' AND DATE_FORMAT(played_at, '%Y-%m') = ?"
+    );
+    $stmt->execute([date('Y-m')]);
+
+    return (int)$stmt->fetchColumn();
+}
+
+/**
+ * Per-game play stats for the admin dashboard breakdown table — every
+ * configured game is listed even with zero real plays (never omitted,
+ * never fabricated), ordered by most-played first.
+ */
+function get_game_play_stats(): array
+{
+    $stmt = getDB()->prepare(
+        "SELECT
+            SUM(CASE WHEN event_type = 'started' THEN 1 ELSE 0 END) AS started,
+            SUM(CASE WHEN event_type = 'completed' THEN 1 ELSE 0 END) AS completed
+         FROM game_plays
+         WHERE game_slug = ?"
+    );
+
+    $rows = [];
+    foreach (get_all_games() as $game) {
+        $stmt->execute([$game['slug']]);
+        $counts = $stmt->fetch();
+
+        $rows[] = [
+            'slug'      => $game['slug'],
+            'title'     => $game['title'],
+            'subject'   => $game['subject'],
+            'started'   => (int)($counts['started'] ?? 0),
+            'completed' => (int)($counts['completed'] ?? 0),
+        ];
+    }
+
+    usort($rows, static fn(array $a, array $b): int => $b['started'] <=> $a['started']);
+
+    return $rows;
+}

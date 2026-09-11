@@ -540,6 +540,23 @@
   function soundComplete() { playTone(523, 140, 0); playTone(659, 140, 130); playTone(784, 220, 260); }
 
   // -------------------------------------------------------------------
+  // Play tracking — lets the TeachLuma admin dashboard show real usage
+  // counts. Fire-and-forget: a network failure here must never block or
+  // break gameplay, so every error is swallowed silently. Uses a relative
+  // path (not an absolute URL) so this same file works unmodified no
+  // matter what path the site is hosted under.
+  // -------------------------------------------------------------------
+  function trackPlay(eventType) {
+    try {
+      fetch('../../../api/game-track.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: 'vocabulary-match', event: eventType })
+      }).catch(function () {});
+    } catch (e) { /* non-fatal */ }
+  }
+
+  // -------------------------------------------------------------------
   // Fullscreen
   // -------------------------------------------------------------------
   var appEl = document.getElementById('app');
@@ -779,6 +796,7 @@
     showScreen(screenPlay);
     stopClock();
     startClock();
+    trackPlay('started');
   }
 
   function finishGame() {
@@ -796,6 +814,7 @@
 
     showScreen(screenResults);
     soundComplete();
+    trackPlay('completed');
   }
 
   document.getElementById('startBtn').addEventListener('click', startGame);

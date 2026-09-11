@@ -4,6 +4,7 @@ require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/admin-functions.php';
 require_once __DIR__ . '/../includes/review-functions.php';
 require_once __DIR__ . '/../includes/subject-functions.php';
+require_once __DIR__ . '/../includes/games-functions.php';
 
 require_admin();
 $stats = get_dashboard_stats();
@@ -14,6 +15,9 @@ $topRatedResources = get_top_rated_resources(5);
 $mostReviewedResources = get_most_reviewed_resources(5);
 $downloadsBySubjectGrade = get_downloads_by_subject_grade();
 $topTopics = get_top_topics_by_downloads(10);
+$totalGamePlays = get_total_game_plays();
+$gamePlaysThisMonth = get_game_plays_this_month();
+$gamePlayStats = get_game_play_stats();
 
 $pageTitle = 'Dashboard';
 require_once __DIR__ . '/../includes/admin-header.php';
@@ -182,6 +186,52 @@ require_once __DIR__ . '/../includes/admin-header.php';
                 <?php endforeach; ?>
             </ol>
         <?php endif; ?>
+    </div>
+</div>
+
+<h2 class="h6 fw-bold text-secondary text-uppercase mb-3">Games</h2>
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="card shadow-sm border-0 stat-card h-100"><div class="card-body">
+            <p class="text-secondary small text-uppercase mb-1">Total Plays</p>
+            <p class="stat-value mb-0"><?= (int)$totalGamePlays ?></p>
+        </div></div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card shadow-sm border-0 stat-card h-100"><div class="card-body">
+            <p class="text-secondary small text-uppercase mb-1">Plays This Month</p>
+            <p class="stat-value mb-0"><?= (int)$gamePlaysThisMonth ?></p>
+        </div></div>
+    </div>
+</div>
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <p class="small text-secondary mb-3">"Played" counts a real Start Game click, not just a page view of the game's landing page. "Completed" is how many of those plays were finished rather than abandoned partway through.</p>
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Game</th>
+                        <th>Subject</th>
+                        <th class="text-end">Played</th>
+                        <th class="text-end">Completed</th>
+                        <th class="text-end">Completion Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($gamePlayStats as $row): ?>
+                        <?php $completionRate = $row['started'] > 0 ? ($row['completed'] / $row['started']) * 100 : 0; ?>
+                        <tr<?= $row['started'] === 0 ? ' class="table-warning"' : '' ?>>
+                            <td><a href="<?= e(base_url('game.php?slug=' . urlencode($row['slug']))) ?>" target="_blank"><?= e($row['title']) ?></a></td>
+                            <td><?= e($row['subject']) ?></td>
+                            <td class="text-end"><?= (int)$row['started'] ?></td>
+                            <td class="text-end"><?= (int)$row['completed'] ?></td>
+                            <td class="text-end"><?= $row['started'] > 0 ? number_format($completionRate, 0) . '%' : '&mdash;' ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

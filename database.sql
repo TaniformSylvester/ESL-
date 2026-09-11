@@ -543,6 +543,28 @@ CREATE TABLE IF NOT EXISTS contact_messages (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------------------------
+-- game_plays — one row per real play of a TeachLuma Game. game_slug is a
+-- plain string, not a foreign key, since games are a small hand-maintained
+-- config array (includes/games-functions.php), not a database table — the
+-- same loose-reference pattern already used by resources.activity_slug
+-- against config.php's PRACTICE_ACTIVITIES. user_id is nullable (games
+-- require no login) with ON DELETE SET NULL so the play record survives
+-- even if the account is later removed.
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS game_plays (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    game_slug VARCHAR(100) NOT NULL,
+    event_type ENUM('started', 'completed') NOT NULL DEFAULT 'started',
+    user_id INT UNSIGNED NULL,
+    played_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_game_plays_slug (game_slug),
+    KEY idx_game_plays_event (event_type),
+    KEY idx_game_plays_played_at (played_at),
+    CONSTRAINT fk_game_plays_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
 -- admin_logs
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS admin_logs (
