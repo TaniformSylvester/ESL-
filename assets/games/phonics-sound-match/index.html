@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Phonics Sound Match — TeachLuma Games</title>
+<style>
+  :root {
+    --brand-primary: #2563eb;
+    --brand-primary-dark: #1d4ed8;
+    --brand-secondary: #f59e0b;
+    --brand-success: #16a34a;
+    --brand-danger: #dc2626;
+    --brand-bg-soft: #f8fafc;
+    --ink: #1f2937;
+    --ink-soft: #64748b;
+    --border: #e2e8f0;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    color: var(--ink);
+    background: var(--brand-bg-soft);
+    overflow-x: hidden;
+  }
+
+  #app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #app:fullscreen,
+  #app:-webkit-full-screen {
+    background: var(--brand-bg-soft);
+  }
+
+  .hidden { display: none !important; }
+
+  /* -----------------------------------------------------------------
+     Top bar — matches Number Challenge / Vocabulary Match
+     ----------------------------------------------------------------- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.9rem;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .topbar-title {
+    font-weight: 700;
+    font-size: clamp(0.9rem, 2vw, 1.15rem);
+    color: var(--brand-primary-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: clamp(0.85rem, 1.6vw, 1rem);
+    font-weight: 600;
+    padding: 0.5rem 0.8rem;
+    border-radius: 0.5rem;
+    border: 2px solid var(--border);
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+    line-height: 1;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  .icon-btn:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
+  .icon-btn:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+
+  .topbar-actions { display: flex; gap: 0.5rem; }
+
+  /* -----------------------------------------------------------------
+     Shared screen layout
+     ----------------------------------------------------------------- */
+  .screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem 1rem 2rem;
+    width: 100%;
+  }
+
+  .screen-inner {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .start-hero {
+    text-align: center;
+    margin-bottom: 1.75rem;
+  }
+
+  .start-hero h1 {
+    font-size: clamp(1.6rem, 5vw, 2.5rem);
+    font-weight: 800;
+    margin: 0 0 0.35rem;
+    color: var(--brand-primary-dark);
+    letter-spacing: -0.01em;
+  }
+
+  .start-hero p {
+    font-size: clamp(0.95rem, 2.2vw, 1.15rem);
+    color: var(--ink-soft);
+    margin: 0;
+    font-weight: 600;
+  }
+
+  /* -----------------------------------------------------------------
+     Level menu — same look as a difficulty option-row
+     ----------------------------------------------------------------- */
+  .option-group-label {
+    display: block;
+    font-size: clamp(0.85rem, 1.8vw, 1rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    margin-bottom: 0.6rem;
+    text-align: center;
+  }
+
+  .level-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 500px) {
+    .level-row { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .level-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    font-size: clamp(1rem, 2.2vw, 1.2rem);
+    font-weight: 700;
+    padding: 1.25rem 0.75rem;
+    border-radius: 0.75rem;
+    border: 2.5px solid var(--border);
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+    min-height: 96px;
+    touch-action: manipulation;
+    transition: border-color 0.12s ease, background-color 0.12s ease, transform 0.08s ease;
+  }
+
+  .level-btn:hover { border-color: var(--brand-primary); background: var(--brand-bg-soft); transform: translateY(-2px); }
+  .level-btn:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+
+  .level-btn .level-sub { font-size: 0.75em; font-weight: 600; color: var(--ink-soft); }
+
+  /* -----------------------------------------------------------------
+     Play screen header
+     ----------------------------------------------------------------- */
+  .play-header { text-align: center; margin-bottom: 1rem; }
+
+  .level-badge {
+    display: inline-block;
+    background: #dbeafe;
+    color: var(--brand-primary-dark);
+    padding: 0.3rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+  }
+
+  .progress-bar {
+    display: flex;
+    gap: 0.4rem;
+    justify-content: center;
+    margin-bottom: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .progress-dot {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--ink-soft);
+    flex-shrink: 0;
+  }
+
+  .progress-dot.completed { background: var(--brand-success); color: #fff; border-color: var(--brand-success); }
+  .progress-dot.current { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); transform: scale(1.12); }
+
+  .score-display {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  /* -----------------------------------------------------------------
+     Round card
+     ----------------------------------------------------------------- */
+  .round-content {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 0.9rem;
+    padding: 1.75rem 1.25rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  .target-sound { text-align: center; margin-bottom: 1.5rem; }
+
+  .target-sound-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4rem;
+  }
+
+  .target-letter {
+    font-size: clamp(2.5rem, 8vw, 3.75rem);
+    font-weight: 800;
+    color: var(--brand-primary);
+    margin-bottom: 0.75rem;
+    line-height: 1;
+  }
+
+  .target-instruction {
+    font-size: clamp(0.85rem, 2vw, 1rem);
+    color: var(--ink);
+    line-height: 1.5;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  /* Always at least 2 columns, even on narrow phones — stacking 3 or 4
+     cards in a single column runs taller than a 2-column grid does. */
+  .answer-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  @media (min-width: 500px) {
+    .answer-cards { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (min-width: 640px) {
+    .answer-cards.four-col { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  .answer-card {
+    background: var(--brand-bg-soft);
+    border: 3px solid var(--border);
+    border-radius: 0.65rem;
+    padding: 1rem 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    min-height: 100px;
+    touch-action: manipulation;
+    font-family: inherit;
+  }
+
+  .answer-card:hover:not(:disabled) { background: #dbeafe; border-color: var(--brand-primary); transform: translateY(-2px); }
+  .answer-card:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+  .answer-card:disabled { cursor: default; }
+
+  .answer-card.correct { background: var(--brand-success); border-color: var(--brand-success); color: #fff; }
+  .answer-card.incorrect { background: var(--brand-danger); border-color: var(--brand-danger); color: #fff; }
+
+  .card-emoji { font-size: clamp(1.75rem, 5vw, 2.25rem); line-height: 1; }
+  .card-word { font-size: clamp(0.95rem, 2.5vw, 1.15rem); font-weight: 700; letter-spacing: 0.02em; }
+
+  .feedback-message {
+    text-align: center;
+    font-size: clamp(1rem, 2.5vw, 1.1rem);
+    font-weight: 700;
+    margin: 0 0 1rem;
+    min-height: 1.6rem;
+  }
+
+  .feedback-message.feedback-correct { color: var(--brand-success); }
+  .feedback-message.feedback-incorrect { color: var(--brand-danger); }
+
+  .correct-answer-hint {
+    background: #dbeafe;
+    border-left: 4px solid var(--brand-primary);
+    padding: 0.85rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--ink);
+    margin-bottom: 1rem;
+  }
+
+  .next-btn {
+    display: block;
+    width: 100%;
+    font-size: clamp(1rem, 2.6vw, 1.25rem);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    padding: 0.9rem 1rem;
+    border-radius: 0.65rem;
+    border: none;
+    background: var(--brand-primary);
+    color: #fff;
+    cursor: pointer;
+    min-height: 56px;
+    touch-action: manipulation;
+    transition: background-color 0.12s ease, transform 0.08s ease;
+  }
+
+  .next-btn:hover { background: var(--brand-primary-dark); }
+  .next-btn:active { transform: scale(0.98); }
+  .next-btn:focus-visible { outline: 3px solid var(--brand-primary-dark); outline-offset: 3px; }
+
+  /* -----------------------------------------------------------------
+     End screen
+     ----------------------------------------------------------------- */
+  .end-screen { text-align: center; }
+
+  .stars { font-size: clamp(1.6rem, 5vw, 2.25rem); margin: 0.5rem 0; letter-spacing: 0.2rem; }
+
+  .final-score {
+    font-size: clamp(2.25rem, 7vw, 3rem);
+    font-weight: 800;
+    color: var(--brand-primary);
+    margin: 0.5rem 0;
+  }
+
+  .end-message {
+    font-size: clamp(1rem, 2.5vw, 1.15rem);
+    color: var(--ink);
+    margin: 1rem 0 1.5rem;
+    line-height: 1.6;
+  }
+
+  .results-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 480px) {
+    .results-actions { flex-direction: row; }
+  }
+
+  .btn-secondary {
+    flex: 1;
+    font-size: clamp(1rem, 2.4vw, 1.2rem);
+    font-weight: 700;
+    padding: 0.9rem 1rem;
+    border-radius: 0.75rem;
+    border: 2.5px solid var(--brand-primary);
+    background: #fff;
+    color: var(--brand-primary);
+    cursor: pointer;
+    min-height: 56px;
+    touch-action: manipulation;
+  }
+
+  .btn-secondary:hover { background: var(--brand-bg-soft); }
+  .btn-secondary:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+
+  .btn-primary-lg {
+    flex: 1;
+    font-size: clamp(1rem, 2.4vw, 1.2rem);
+    font-weight: 700;
+    padding: 0.9rem 1rem;
+    border-radius: 0.75rem;
+    border: none;
+    background: var(--brand-primary);
+    color: #fff;
+    cursor: pointer;
+    min-height: 56px;
+    touch-action: manipulation;
+  }
+
+  .btn-primary-lg:hover { background: var(--brand-primary-dark); }
+  .btn-primary-lg:focus-visible { outline: 3px solid var(--brand-primary-dark); outline-offset: 2px; }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.4rem 0;
+    margin-bottom: 0.75rem;
+  }
+
+  .back-btn:hover { color: var(--brand-primary); }
+  .back-btn:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* -----------------------------------------------------------------
+     Moderate-height desktop windows: trim vertical spacing a little so
+     the play screen's card + 4-choice grid still fits without scrolling.
+     ----------------------------------------------------------------- */
+  @media (max-height: 700px) and (min-height: 481px) {
+    .topbar { padding: 0.4rem 0.9rem; }
+    .icon-btn { min-height: 36px; padding: 0.4rem 0.7rem; }
+    .screen { padding: 0.6rem 1rem 0.9rem; }
+    .start-hero { margin-bottom: 1rem; }
+    .back-btn { margin-bottom: 0.4rem; padding: 0.25rem 0; }
+    .level-badge { margin-bottom: 0.4rem; }
+    .progress-bar { margin-bottom: 0.4rem; }
+    .round-content { padding: 0.9rem 1rem; }
+    .target-sound { margin-bottom: 0.6rem; }
+    .target-letter { font-size: clamp(2rem, 6vw, 3rem); margin-bottom: 0.5rem; }
+    .target-instruction { font-size: 0.85rem; }
+    .answer-cards { margin-bottom: 0.85rem; }
+    .answer-card { min-height: 76px; padding: 0.65rem 0.5rem; }
+    .feedback-message { min-height: 1.4rem; margin-bottom: 0.75rem; }
+  }
+
+  /* -----------------------------------------------------------------
+     Short landscape (phones lying flat) — vertical space is scarce, so
+     answer cards always sit in a compact multi-column row regardless of
+     width, and every element shrinks. Mirrors Number Challenge and
+     Vocabulary Match's short-landscape treatment.
+     ----------------------------------------------------------------- */
+  @media (max-height: 480px) and (orientation: landscape) {
+    .topbar { padding: 0.25rem 0.75rem; }
+    .icon-btn { min-height: 32px; padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+    .screen { padding: 0.4rem 1rem; justify-content: flex-start; }
+
+    .start-hero { margin-bottom: 0.4rem; }
+    .start-hero h1 { font-size: clamp(1.1rem, 3vw, 1.5rem); margin-bottom: 0.1rem; }
+    .start-hero p { font-size: clamp(0.7rem, 1.8vw, 0.85rem); }
+    .level-row { grid-template-columns: repeat(3, 1fr); gap: 0.4rem; }
+    .level-btn { min-height: 56px; padding: 0.5rem 0.4rem; font-size: 0.8rem; }
+    .level-btn .level-sub { font-size: 0.65em; }
+
+    .back-btn { margin-bottom: 0.2rem; padding: 0.1rem 0; font-size: 0.75rem; }
+    .play-header { margin-bottom: 0.4rem; }
+    .level-badge { padding: 0.15rem 0.6rem; margin-bottom: 0.3rem; font-size: 0.7rem; }
+    .progress-bar { gap: 0.25rem; margin-bottom: 0.3rem; }
+    .progress-dot { width: 1.3rem; height: 1.3rem; font-size: 0.6rem; }
+    .score-display { font-size: 0.85rem; }
+
+    .round-content { padding: 0.45rem 0.6rem; }
+    .target-sound { margin-bottom: 0.35rem; }
+    .target-sound-label { font-size: 0.65rem; margin-bottom: 0.1rem; }
+    .target-letter { font-size: clamp(1.5rem, 6vw, 2.25rem); margin-bottom: 0.25rem; }
+    .target-instruction { font-size: 0.75rem; }
+
+    .answer-cards,
+    .answer-cards.four-col {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.4rem;
+      margin-bottom: 0.5rem;
+    }
+    .answer-card { min-height: 56px; padding: 0.35rem 0.25rem; gap: 0.15rem; border-width: 2px; }
+    .card-emoji { font-size: 1.1rem; }
+    .card-word { font-size: 0.65rem; }
+
+    .feedback-message { font-size: 0.85rem; margin-bottom: 0.25rem; min-height: 1rem; }
+    .correct-answer-hint { padding: 0.35rem 0.55rem; font-size: 0.7rem; margin-bottom: 0.35rem; }
+    .next-btn { min-height: 34px; padding: 0.35rem 1rem; font-size: 0.85rem; }
+
+    .stars { font-size: 1.4rem; margin: 0.25rem 0; }
+    .final-score { font-size: 1.75rem; margin: 0.25rem 0; }
+    .end-message { margin: 0.5rem 0 0.75rem; font-size: 0.85rem; }
+    .btn-secondary, .btn-primary-lg { min-height: 42px; padding: 0.5rem 1rem; font-size: 0.9rem; }
+  }
+
+  /* A short landscape phone that's also very narrow: 4 columns of answer
+     cards get too cramped — fall back to 2 columns instead. */
+  @media (max-height: 480px) and (orientation: landscape) and (max-width: 420px) {
+    .answer-cards,
+    .answer-cards.four-col {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.3rem;
+    }
+    .answer-card { min-height: 44px; padding: 0.2rem 0.2rem; }
+    .card-emoji { font-size: 0.9rem; }
+    .card-word { font-size: 0.6rem; }
+    .round-content { padding: 0.35rem 0.5rem; }
+    .target-sound { margin-bottom: 0.2rem; }
+    .target-sound-label { display: none; }
+    .target-letter { font-size: clamp(1.2rem, 6vw, 1.75rem); margin-bottom: 0.15rem; }
+    .target-instruction { font-size: 0.65rem; }
+
+    .back-btn { display: none; }
+    .play-header { margin-bottom: 0.2rem; }
+    .level-badge { padding: 0.05rem 0.4rem; margin-bottom: 0.15rem; font-size: 0.6rem; }
+    .progress-bar { gap: 0.15rem; margin-bottom: 0.15rem; }
+    .progress-dot { width: 1rem; height: 1rem; font-size: 0.5rem; }
+    .score-display { font-size: 0.7rem; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <span class="topbar-title">🔤 Phonics Sound Match</span>
+    <div class="topbar-actions">
+      <button type="button" class="icon-btn" id="muteBtn" aria-pressed="false" aria-label="Mute sound">🔊<span class="sr-only"> Sound on</span></button>
+      <button type="button" class="icon-btn" id="fullscreenBtn" aria-label="Enter fullscreen">⛶ Fullscreen</button>
+    </div>
+  </div>
+
+  <!-- LEVEL MENU SCREEN -->
+  <section class="screen" id="screenMenu" aria-label="Phonics Sound Match setup">
+    <div class="screen-inner">
+      <div class="start-hero">
+        <h1>Phonics Sound Match</h1>
+        <p>Kindergarten&ndash;Grade 1 &middot; Beginning, Middle &amp; Ending Sounds</p>
+      </div>
+      <span class="option-group-label" id="levelLabel">Choose a level</span>
+      <div class="level-row" id="levelGroup" role="group" aria-labelledby="levelLabel">
+        <button type="button" class="level-btn" data-level="easy">
+          <span>Easy</span><span class="level-sub">Beginning sounds</span>
+        </button>
+        <button type="button" class="level-btn" data-level="medium">
+          <span>Medium</span><span class="level-sub">Ending sounds</span>
+        </button>
+        <button type="button" class="level-btn" data-level="hard">
+          <span>Hard</span><span class="level-sub">Middle sounds</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLAY SCREEN -->
+  <section class="screen hidden" id="screenPlay" aria-label="Phonics Sound Match gameplay">
+    <div class="screen-inner">
+      <button type="button" class="back-btn" id="backToMenuBtn">&larr; Back to Menu</button>
+
+      <div class="play-header">
+        <span class="level-badge" id="levelBadge">Easy</span>
+        <div class="progress-bar" id="progressBar" aria-live="polite"></div>
+        <div class="score-display" id="scoreDisplay">Score: 0/0</div>
+      </div>
+
+      <div class="round-content">
+        <div class="target-sound">
+          <div class="target-sound-label" id="targetLabel">Listen to the sound</div>
+          <div class="target-letter" id="targetLetter">B</div>
+          <p class="target-instruction" id="targetInstruction">&nbsp;</p>
+        </div>
+
+        <div class="answer-cards" id="answerCards"></div>
+
+        <div class="feedback-message" id="feedbackMessage"></div>
+        <div class="correct-answer-hint hidden" id="correctHint"></div>
+        <button type="button" class="next-btn hidden" id="nextBtn">Next Round</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- END SCREEN -->
+  <section class="screen hidden" id="screenEnd" aria-label="Phonics Sound Match results">
+    <div class="screen-inner">
+      <div class="round-content end-screen">
+        <h2 style="font-size: clamp(1.4rem, 4vw, 1.75rem); margin: 0 0 0.5rem;">Game Complete!</h2>
+        <span class="level-badge" id="endLevelBadge">Easy</span>
+        <p class="stars" id="endStars">&#11088;</p>
+        <p class="final-score" id="endScore">8/10</p>
+        <p class="end-message" id="endMessage">Great job!</p>
+        <div class="results-actions">
+          <button type="button" class="btn-secondary" id="backToMenuBtn2">Level Menu</button>
+          <button type="button" class="btn-primary-lg" id="playAgainBtn">Play Again</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // -------------------------------------------------------------------
+  // Level data — Easy (beginning sounds), Medium (ending sounds),
+  // Hard (middle vowel sounds). Each question names the target sound,
+  // the correct word, and a small set of picture+word choices.
+  // -------------------------------------------------------------------
+  var LEVELS = {
+    easy: {
+      name: 'Easy',
+      prompt: 'Listen to the sound. Say its sound. Click the word that starts with that sound.',
+      choiceCount: 3,
+      questions: [
+        { letter: 'B', correct: 'ball', options: ['ball', 'sun', 'moon'], emojis: { ball: '\u{1F534}', sun: '☀️', moon: '\u{1F319}' } },
+        { letter: 'M', correct: 'moon', options: ['cat', 'moon', 'fish'], emojis: { cat: '\u{1F431}', moon: '\u{1F319}', fish: '\u{1F420}' } },
+        { letter: 'S', correct: 'sun', options: ['sun', 'pig', 'dog'], emojis: { sun: '☀️', pig: '\u{1F437}', dog: '\u{1F415}' } },
+        { letter: 'T', correct: 'top', options: ['top', 'map', 'van'], emojis: { top: '\u{1F3AF}', map: '\u{1F5FA}️', van: '\u{1F690}' } },
+        { letter: 'C', correct: 'cat', options: ['cat', 'bed', 'rug'], emojis: { cat: '\u{1F431}', bed: '\u{1F6CF}️', rug: '\u{1F9F6}' } },
+        { letter: 'F', correct: 'fish', options: ['fish', 'log', 'jam'], emojis: { fish: '\u{1F420}', log: '\u{1FAB5}', jam: '\u{1F353}' } },
+        { letter: 'P', correct: 'pig', options: ['pig', 'sun', 'cup'], emojis: { pig: '\u{1F437}', sun: '☀️', cup: '☕' } },
+        { letter: 'D', correct: 'dog', options: ['dog', 'fan', 'box'], emojis: { dog: '\u{1F415}', fan: '\u{1F300}', box: '\u{1F4E6}' } }
+      ]
+    },
+    medium: {
+      name: 'Medium',
+      prompt: 'Listen to the ending sound. Click the word that ends with that sound.',
+      choiceCount: 4,
+      questions: [
+        { letter: 't', correct: 'cat', options: ['cat', 'dog', 'map', 'sun'], emojis: { cat: '\u{1F431}', dog: '\u{1F415}', map: '\u{1F5FA}️', sun: '☀️' } },
+        { letter: 'g', correct: 'dog', options: ['dog', 'cat', 'pig', 'log'], emojis: { dog: '\u{1F415}', cat: '\u{1F431}', pig: '\u{1F437}', log: '\u{1FAB5}' } },
+        { letter: 'n', correct: 'sun', options: ['sun', 'cat', 'fan', 'cup'], emojis: { sun: '☀️', cat: '\u{1F431}', fan: '\u{1F300}', cup: '☕' } },
+        { letter: 'p', correct: 'cup', options: ['cup', 'cat', 'map', 'dog'], emojis: { cup: '☕', cat: '\u{1F431}', map: '\u{1F5FA}️', dog: '\u{1F415}' } },
+        { letter: 'd', correct: 'bed', options: ['bed', 'pig', 'cat', 'map'], emojis: { bed: '\u{1F6CF}️', pig: '\u{1F437}', cat: '\u{1F431}', map: '\u{1F5FA}️' } },
+        { letter: 'x', correct: 'box', options: ['box', 'sun', 'cat', 'fan'], emojis: { box: '\u{1F4E6}', sun: '☀️', cat: '\u{1F431}', fan: '\u{1F300}' } }
+      ]
+    },
+    hard: {
+      name: 'Hard',
+      prompt: 'Listen for the middle sound. Click the word with that middle sound.',
+      choiceCount: 4,
+      questions: [
+        { letter: 'a', correct: 'cat', options: ['cat', 'dog', 'pig', 'cup'], emojis: { cat: '\u{1F431}', dog: '\u{1F415}', pig: '\u{1F437}', cup: '☕' } },
+        { letter: 'o', correct: 'dog', options: ['dog', 'cat', 'cup', 'pig'], emojis: { dog: '\u{1F415}', cat: '\u{1F431}', cup: '☕', pig: '\u{1F437}' } },
+        { letter: 'i', correct: 'pig', options: ['pig', 'cat', 'dog', 'cup'], emojis: { pig: '\u{1F437}', cat: '\u{1F431}', dog: '\u{1F415}', cup: '☕' } },
+        { letter: 'u', correct: 'cup', options: ['cup', 'cat', 'dog', 'pig'], emojis: { cup: '☕', cat: '\u{1F431}', dog: '\u{1F415}', pig: '\u{1F437}' } },
+        { letter: 'a', correct: 'map', options: ['map', 'sun', 'box', 'log'], emojis: { map: '\u{1F5FA}️', sun: '☀️', box: '\u{1F4E6}', log: '\u{1FAB5}' } },
+        { letter: 'o', correct: 'log', options: ['log', 'cat', 'map', 'sun'], emojis: { log: '\u{1FAB5}', cat: '\u{1F431}', map: '\u{1F5FA}️', sun: '☀️' } }
+      ]
+    }
+  };
+
+  // -------------------------------------------------------------------
+  // Sound — tiny WebAudio-generated tones (no audio files) plus the
+  // existing spoken feedback via the Web Speech API. Muted state
+  // persisted locally; never plays automatically.
+  // -------------------------------------------------------------------
+  var AudioCtx = window.AudioContext || window.webkitAudioContext;
+  var audioCtx = null;
+  var soundOn = true;
+  try {
+    soundOn = localStorage.getItem('psm_sound_on') !== '0';
+  } catch (e) { /* localStorage unavailable — default to on, non-fatal */ }
+
+  function getAudioCtx() {
+    if (!AudioCtx) { return null; }
+    if (!audioCtx) { audioCtx = new AudioCtx(); }
+    return audioCtx;
+  }
+
+  function playTone(freq, durationMs, delayMs) {
+    if (!soundOn) { return; }
+    var ctx = getAudioCtx();
+    if (!ctx) { return; }
+    var start = ctx.currentTime + (delayMs || 0) / 1000;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, start);
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(0.18, start + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + durationMs / 1000);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(start);
+    osc.stop(start + durationMs / 1000 + 0.02);
+  }
+
+  function soundCorrect() { playTone(660, 120, 0); playTone(880, 160, 110); }
+  function soundIncorrect() { playTone(220, 220, 0); }
+  function soundComplete() { playTone(523, 140, 0); playTone(659, 140, 130); playTone(784, 220, 260); }
+
+  function speak(text) {
+    if (!soundOn || !('speechSynthesis' in window)) { return; }
+    try {
+      var utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.9;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utterance);
+    } catch (e) { /* non-fatal */ }
+  }
+
+  // -------------------------------------------------------------------
+  // Play tracking — relative path so this file works unmodified no
+  // matter what path the site is hosted under. Fire-and-forget.
+  // -------------------------------------------------------------------
+  function trackPlay(eventType) {
+    try {
+      fetch('../../../api/game-track.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: 'phonics-sound-match', event: eventType })
+      }).catch(function () {});
+    } catch (e) { /* non-fatal */ }
+  }
+
+  // -------------------------------------------------------------------
+  // Fullscreen
+  // -------------------------------------------------------------------
+  var appEl = document.getElementById('app');
+  var fullscreenBtn = document.getElementById('fullscreenBtn');
+
+  function requestFs(el) {
+    var fn = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (fn) { fn.call(el).catch(function () {}); }
+  }
+  function exitFs() {
+    var fn = document.exitFullscreen || document.webkitExitFullscreen;
+    if (fn) { fn.call(document); }
+  }
+  function currentFsElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement || null;
+  }
+  var fsSupported = !!(appEl.requestFullscreen || appEl.webkitRequestFullscreen);
+
+  if (!fsSupported) {
+    fullscreenBtn.classList.add('hidden');
+  } else {
+    fullscreenBtn.addEventListener('click', function () {
+      if (currentFsElement()) {
+        exitFs();
+      } else {
+        requestFs(appEl);
+      }
+    });
+    ['fullscreenchange', 'webkitfullscreenchange'].forEach(function (evt) {
+      document.addEventListener(evt, function () {
+        var active = !!currentFsElement();
+        fullscreenBtn.textContent = active ? '⤢ Exit Fullscreen' : '⛶ Fullscreen';
+        fullscreenBtn.setAttribute('aria-label', active ? 'Exit fullscreen' : 'Enter fullscreen');
+      });
+    });
+  }
+
+  // -------------------------------------------------------------------
+  // Mute toggle
+  // -------------------------------------------------------------------
+  var muteBtn = document.getElementById('muteBtn');
+  function renderMuteBtn() {
+    muteBtn.textContent = soundOn ? '\u{1F50A}' : '\u{1F507}';
+    muteBtn.setAttribute('aria-pressed', soundOn ? 'false' : 'true');
+    muteBtn.setAttribute('aria-label', soundOn ? 'Mute sound' : 'Unmute sound');
+  }
+  renderMuteBtn();
+  muteBtn.addEventListener('click', function () {
+    soundOn = !soundOn;
+    renderMuteBtn();
+    if (!soundOn && 'speechSynthesis' in window) { speechSynthesis.cancel(); }
+    try { localStorage.setItem('psm_sound_on', soundOn ? '1' : '0'); } catch (e) { /* non-fatal */ }
+  });
+
+  // -------------------------------------------------------------------
+  // Screens
+  // -------------------------------------------------------------------
+  var screenMenu = document.getElementById('screenMenu');
+  var screenPlay = document.getElementById('screenPlay');
+  var screenEnd = document.getElementById('screenEnd');
+
+  function showScreen(el) {
+    [screenMenu, screenPlay, screenEnd].forEach(function (s) {
+      s.classList.toggle('hidden', s !== el);
+    });
+  }
+
+  // -------------------------------------------------------------------
+  // Game state
+  // -------------------------------------------------------------------
+  var state = { levelKey: null, round: 0, score: 0, answered: false, selected: null };
+
+  var levelGroup = document.getElementById('levelGroup');
+  var backToMenuBtn = document.getElementById('backToMenuBtn');
+  var backToMenuBtn2 = document.getElementById('backToMenuBtn2');
+  var playAgainBtn = document.getElementById('playAgainBtn');
+  var nextBtn = document.getElementById('nextBtn');
+
+  var levelBadge = document.getElementById('levelBadge');
+  var progressBar = document.getElementById('progressBar');
+  var scoreDisplay = document.getElementById('scoreDisplay');
+  var targetLetter = document.getElementById('targetLetter');
+  var targetInstruction = document.getElementById('targetInstruction');
+  var answerCards = document.getElementById('answerCards');
+  var feedbackMessage = document.getElementById('feedbackMessage');
+  var correctHint = document.getElementById('correctHint');
+
+  levelGroup.addEventListener('click', function (event) {
+    var btn = event.target.closest('.level-btn');
+    if (!btn) { return; }
+    startLevel(btn.getAttribute('data-level'));
+  });
+
+  backToMenuBtn.addEventListener('click', goToMenu);
+  backToMenuBtn2.addEventListener('click', goToMenu);
+  playAgainBtn.addEventListener('click', function () {
+    startLevel(state.levelKey);
+  });
+  nextBtn.addEventListener('click', nextRound);
+
+  function goToMenu() {
+    showScreen(screenMenu);
+  }
+
+  function startLevel(levelKey) {
+    state.levelKey = levelKey;
+    state.round = 0;
+    state.score = 0;
+    state.answered = false;
+    state.selected = null;
+    levelBadge.textContent = LEVELS[levelKey].name;
+    showScreen(screenPlay);
+    renderRound();
+    trackPlay('started');
+  }
+
+  function renderProgress() {
+    var levelData = LEVELS[state.levelKey];
+    progressBar.innerHTML = '';
+    levelData.questions.forEach(function (_, i) {
+      var dot = document.createElement('div');
+      dot.className = 'progress-dot' + (i < state.round ? ' completed' : i === state.round ? ' current' : '');
+      dot.textContent = i < state.round ? '✓' : String(i + 1);
+      progressBar.appendChild(dot);
+    });
+    scoreDisplay.textContent = 'Score: ' + state.score + '/' + levelData.questions.length;
+  }
+
+  function renderRound() {
+    var levelData = LEVELS[state.levelKey];
+    var q = levelData.questions[state.round];
+
+    state.answered = false;
+    state.selected = null;
+
+    renderProgress();
+    targetLetter.textContent = q.letter;
+    targetInstruction.textContent = levelData.prompt;
+    feedbackMessage.textContent = '';
+    feedbackMessage.className = 'feedback-message';
+    correctHint.classList.add('hidden');
+    nextBtn.classList.add('hidden');
+
+    answerCards.className = 'answer-cards' + (levelData.choiceCount === 4 ? ' four-col' : '');
+    answerCards.innerHTML = '';
+    q.options.forEach(function (word) {
+      var card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'answer-card';
+      card.setAttribute('data-word', word);
+      var emojiSpan = document.createElement('span');
+      emojiSpan.className = 'card-emoji';
+      emojiSpan.textContent = q.emojis[word];
+      var wordSpan = document.createElement('span');
+      wordSpan.className = 'card-word';
+      wordSpan.textContent = word;
+      card.appendChild(emojiSpan);
+      card.appendChild(wordSpan);
+      card.addEventListener('click', function () { handleAnswer(word); });
+      answerCards.appendChild(card);
+    });
+  }
+
+  function handleAnswer(word) {
+    if (state.answered) { return; }
+    var levelData = LEVELS[state.levelKey];
+    var q = levelData.questions[state.round];
+    var isCorrect = word === q.correct;
+
+    state.answered = true;
+    state.selected = word;
+
+    Array.prototype.forEach.call(answerCards.querySelectorAll('.answer-card'), function (card) {
+      var cardWord = card.getAttribute('data-word');
+      card.disabled = true;
+      if (cardWord === word) {
+        card.classList.add(isCorrect ? 'correct' : 'incorrect');
+      } else if (cardWord === q.correct) {
+        card.classList.add('correct');
+      }
+    });
+
+    if (isCorrect) {
+      state.score++;
+      feedbackMessage.textContent = '✓ Correct!';
+      feedbackMessage.className = 'feedback-message feedback-correct';
+      soundCorrect();
+      speak('Correct! ' + word + '.');
+    } else {
+      feedbackMessage.textContent = '✗ Not quite!';
+      feedbackMessage.className = 'feedback-message feedback-incorrect';
+      correctHint.innerHTML = 'The word <strong>' + q.correct + '</strong> is the correct answer.';
+      correctHint.classList.remove('hidden');
+      soundIncorrect();
+      speak('Try again. The correct answer is ' + q.correct + '.');
+    }
+
+    renderProgress();
+    nextBtn.textContent = state.round < levelData.questions.length - 1 ? 'Next Round' : 'See Results';
+    nextBtn.classList.remove('hidden');
+  }
+
+  function nextRound() {
+    var levelData = LEVELS[state.levelKey];
+    if (state.round < levelData.questions.length - 1) {
+      state.round++;
+      renderRound();
+    } else {
+      finishGame();
+    }
+  }
+
+  function finishGame() {
+    var levelData = LEVELS[state.levelKey];
+    var total = levelData.questions.length;
+    var starCount = Math.max(1, Math.floor((state.score / total) * 5));
+
+    document.getElementById('endLevelBadge').textContent = levelData.name;
+    document.getElementById('endStars').textContent = '⭐'.repeat(starCount);
+    document.getElementById('endScore').textContent = state.score + '/' + total;
+
+    var message;
+    if (state.score === total) {
+      message = 'Perfect! You are a phonics superstar! \u{1F31F}';
+    } else if (state.score >= Math.ceil(total * 0.75)) {
+      message = 'Great job! You are doing wonderfully!';
+    } else if (state.score >= Math.ceil(total * 0.5)) {
+      message = 'Good work! Keep practicing those sounds!';
+    } else {
+      message = 'Nice try! Keep learning and you will get better!';
+    }
+    document.getElementById('endMessage').textContent = message;
+
+    soundComplete();
+    trackPlay('completed');
+    showScreen(screenEnd);
+  }
+
+  showScreen(screenMenu);
+})();
+</script>
+</body>
+</html>

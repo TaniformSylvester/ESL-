@@ -72,6 +72,29 @@ function get_all_games(): array
             'thumbnail' => asset_url('images/games/vocabulary-match-thumb.svg'),
             'featured'  => true,
         ],
+        [
+            'slug'                   => 'phonics-sound-match',
+            'title'                  => 'Phonics Sound Match',
+            'subject'                => 'ESL',
+            'grade'                  => 'Kindergarten–Grade 1',
+            'topic'                  => 'Phonics',
+            'difficulty'             => 'Easy',
+            'short_description'      => 'Practice beginning, ending and middle sounds by matching a sound to a picture and word.',
+            'what_students_practice' => [
+                'Identifying beginning, middle and ending sounds',
+                'Matching a sound to a picture and its word',
+                'Phonemic awareness for early reading',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Choose a level: Easy, Medium or Hard.',
+                'Say the target sound aloud and let students think of the answer.',
+                'Click the picture-word that matches, then move to the next round.',
+            ],
+            'thumbnail' => asset_url('images/games/phonics-sound-match-thumb.svg'),
+            'featured'  => true,
+        ],
         // Future games (see get_related_games() and the Number Challenge
         // architecture for how a new mode/game slots in without rebuilding
         // the hub): Number Recognition, Missing Number, Number Bonds, etc.
