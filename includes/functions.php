@@ -165,6 +165,16 @@ function current_url_with_params(array $params): string
  * into the middle of the list rather than showing page 1. Windowing keeps
  * the control to a small, fixed number of items regardless of how many
  * pages exist, so it can never overflow.
+ *
+ * Previous/Next are deliberately their own separate <ul class="pagination">
+ * groups (not part of the same flex line as the page numbers), pinned to
+ * the far left/right of the outer flex <nav> via justify-content-between.
+ * The page-number window's width varies by page (e.g. "1 2 … 9" near the
+ * start vs "1 … 4 5 6 … 9" in the middle vs "1 … 8 9" near the end) — if
+ * Previous/Next shared one centered row with the numbers, that changing
+ * width shifted the whole centered block sideways on every click,
+ * visibly relocating Next (and Previous) each time. Pinning them to fixed
+ * edges keeps both stationary regardless of how many numbers are shown.
  */
 function render_pagination(int $currentPage, int $totalPages): string
 {
@@ -172,11 +182,9 @@ function render_pagination(int $currentPage, int $totalPages): string
         return '';
     }
 
-    $html = '<nav aria-label="Page navigation"><ul class="pagination justify-content-center flex-wrap">';
-
     $prevDisabled = $currentPage <= 1 ? ' disabled' : '';
-    $html .= '<li class="page-item' . $prevDisabled . '">'
-        . '<a class="page-link" href="' . e(current_url_with_params(['page' => max(1, $currentPage - 1)])) . '">Previous</a></li>';
+    $prevHtml = '<ul class="pagination mb-0"><li class="page-item' . $prevDisabled . '">'
+        . '<a class="page-link" href="' . e(current_url_with_params(['page' => max(1, $currentPage - 1)])) . '">Previous</a></li></ul>';
 
     $pagesToShow = array_unique(array_filter(
         [1, $currentPage - 1, $currentPage, $currentPage + 1, $totalPages],
@@ -184,22 +192,23 @@ function render_pagination(int $currentPage, int $totalPages): string
     ));
     sort($pagesToShow);
 
+    $numbersHtml = '<ul class="pagination pagination-numbers mb-0 flex-wrap justify-content-center">';
     $previousShown = 0;
     foreach ($pagesToShow as $i) {
         if ($i - $previousShown > 1) {
-            $html .= '<li class="page-item disabled"><span class="page-link">&hellip;</span></li>';
+            $numbersHtml .= '<li class="page-item disabled"><span class="page-link">&hellip;</span></li>';
         }
         $active = $i === $currentPage ? ' active' : '';
-        $html .= '<li class="page-item' . $active . '">'
+        $numbersHtml .= '<li class="page-item' . $active . '">'
             . '<a class="page-link" href="' . e(current_url_with_params(['page' => $i])) . '">' . $i . '</a></li>';
         $previousShown = $i;
     }
+    $numbersHtml .= '</ul>';
 
     $nextDisabled = $currentPage >= $totalPages ? ' disabled' : '';
-    $html .= '<li class="page-item' . $nextDisabled . '">'
-        . '<a class="page-link" href="' . e(current_url_with_params(['page' => min($totalPages, $currentPage + 1)])) . '">Next</a></li>';
+    $nextHtml = '<ul class="pagination mb-0"><li class="page-item' . $nextDisabled . '">'
+        . '<a class="page-link" href="' . e(current_url_with_params(['page' => min($totalPages, $currentPage + 1)])) . '">Next</a></li></ul>';
 
-    $html .= '</ul></nav>';
-
-    return $html;
+    return '<nav aria-label="Page navigation" class="d-flex justify-content-between align-items-start flex-nowrap gap-2">'
+        . $prevHtml . $numbersHtml . $nextHtml . '</nav>';
 }

@@ -146,6 +146,18 @@ footer a:hover {
     color: #fff !important;
 }
 
+/* Lets the page-number group in render_pagination() (includes/functions.php)
+   shrink and wrap its own numbers onto a second line when they don't fit,
+   while Previous/Next — siblings in the same flex-nowrap row — stay put on
+   the first line pinned to their edges. Flex items default to
+   min-width:auto, which would otherwise stop this group from shrinking
+   below its content size and force the whole row (Previous and Next
+   included) to overflow instead of this group alone wrapping. */
+.pagination-numbers {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
 .subject-card {
     border-top: 3px solid transparent;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
