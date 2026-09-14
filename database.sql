@@ -258,13 +258,17 @@ CREATE TABLE IF NOT EXISTS bundles (
     title VARCHAR(200) NOT NULL,
     slug VARCHAR(220) NOT NULL,
     description TEXT NULL,
+    cover_image VARCHAR(255) NULL,
     price DECIMAL(10, 2) NOT NULL,
+    original_price DECIMAL(10, 2) NULL,
     is_published TINYINT(1) NOT NULL DEFAULT 0,
+    is_featured TINYINT(1) NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY uq_bundles_slug (slug),
-    KEY idx_bundles_published (is_published)
+    KEY idx_bundles_published (is_published),
+    KEY idx_bundles_featured (is_featured)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------------------------
@@ -280,6 +284,25 @@ CREATE TABLE IF NOT EXISTS bundle_resources (
     KEY idx_bundle_resources_resource (resource_id),
     CONSTRAINT fk_bundle_resources_bundle FOREIGN KEY (bundle_id) REFERENCES bundles (id) ON DELETE CASCADE,
     CONSTRAINT fk_bundle_resources_resource FOREIGN KEY (resource_id) REFERENCES resources (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
+-- bundle_gallery_images — the "browse before you buy" preview gallery shown
+-- on the bundle detail page (thumbnail rail + large preview + lightbox).
+-- Deliberately separate from bundles.cover_image: the cover image is the
+-- single small image used everywhere a bundle appears as a card (homepage,
+-- bundles listing); the gallery is the multi-image, purchase-page-only
+-- preview experience.
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS bundle_gallery_images (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    bundle_id INT UNSIGNED NOT NULL,
+    image VARCHAR(255) NOT NULL,
+    sort_order INT UNSIGNED NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_bundle_gallery_bundle (bundle_id),
+    CONSTRAINT fk_bundle_gallery_bundle FOREIGN KEY (bundle_id) REFERENCES bundles (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------------------------

@@ -7,6 +7,7 @@
 /uploads/thumbnails/*
 /uploads/previews/*
 /uploads/payment-proofs/*
+/uploads/bundles/*
 !/uploads/protected/.gitkeep
 !/uploads/protected/.htaccess
 !/uploads/thumbnails/.gitkeep
@@ -15,6 +16,8 @@
 !/uploads/previews/.htaccess
 !/uploads/payment-proofs/.gitkeep
 !/uploads/payment-proofs/.htaccess
+!/uploads/bundles/.gitkeep
+!/uploads/bundles/.htaccess
 
 # OS / editor cruft
 .DS_Store

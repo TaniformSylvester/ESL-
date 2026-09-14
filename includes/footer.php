@@ -43,6 +43,7 @@
 <script src="<?= e(asset_url('js/downloads.js')) ?>"></script>
 <script src="<?= e(asset_url('js/video-embed.js')) ?>"></script>
 <script src="<?= e(asset_url('js/teacher-tools.js')) ?>"></script>
+<script src="<?= e(asset_url('js/bundle-gallery.js')) ?>"></script>
 <?php if (GA_ENABLED && GA_MEASUREMENT_ID !== ''): ?>
 <script src="<?= e(asset_url('js/analytics.js')) ?>"></script>
 <?php endif; ?>

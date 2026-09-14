@@ -54,6 +54,118 @@ function get_published_bundles(): array
     )->fetchAll();
 }
 
+/**
+ * The single bundle the homepage's "Featured Bundle" section shows, or null
+ * if no published bundle is currently marked featured. Only ever one is
+ * shown at a time (matching the homepage's one-hero-section design) — if an
+ * admin marks more than one featured, the most recently updated wins.
+ */
+function get_featured_bundle(): ?array
+{
+    $stmt = getDB()->query(
+        "SELECT b.*, COUNT(br.resource_id) AS resource_count
+         FROM bundles b
+         LEFT JOIN bundle_resources br ON br.bundle_id = b.id
+         WHERE b.is_published = 1 AND b.is_featured = 1
+         GROUP BY b.id
+         ORDER BY b.updated_at DESC
+         LIMIT 1"
+    );
+    $bundle = $stmt->fetch();
+
+    return $bundle ?: null;
+}
+
+/** Public URL for a bundle's cover image (homepage feature, bundle cards), or null if none is set. */
+function bundle_cover_image_url(array $bundle): ?string
+{
+    return !empty($bundle['cover_image']) ? UPLOAD_BUNDLE_URL . '/' . rawurlencode($bundle['cover_image']) : null;
+}
+
+/** A bundle's preview gallery images, in display order — the "browse before you buy" experience on the bundle page. */
+function get_bundle_gallery_images(int $bundleId): array
+{
+    $stmt = getDB()->prepare('SELECT * FROM bundle_gallery_images WHERE bundle_id = ? ORDER BY sort_order, id');
+    $stmt->execute([$bundleId]);
+
+    return $stmt->fetchAll();
+}
+
+function get_bundle_gallery_image_by_id(int $id): ?array
+{
+    $stmt = getDB()->prepare('SELECT * FROM bundle_gallery_images WHERE id = ?');
+    $stmt->execute([$id]);
+    $image = $stmt->fetch();
+
+    return $image ?: null;
+}
+
+/** Removes one gallery image's file and DB row. Caller is responsible for authorization. */
+function delete_bundle_gallery_image(int $id): void
+{
+    $image = get_bundle_gallery_image_by_id($id);
+    if (!$image) {
+        return;
+    }
+
+    getDB()->prepare('DELETE FROM bundle_gallery_images WHERE id = ?')->execute([$id]);
+    @unlink(UPLOAD_BUNDLE_PATH . '/' . $image['image']);
+}
+
+/**
+ * Uploads and attaches any gallery images present in $files['gallery_images']
+ * (a standard PHP multi-file input array) to a bundle, continuing the sort
+ * order after whatever images already exist. Skips (rather than fails on)
+ * any individual file that isn't a valid image — one bad file shouldn't
+ * block the rest of a bundle save. Returns an error message string, or null
+ * if every provided file (if any) uploaded successfully.
+ */
+function add_bundle_gallery_images(int $bundleId, array $files): ?string
+{
+    if (empty($files['gallery_images']['name']) || !is_array($files['gallery_images']['name'])) {
+        return null;
+    }
+
+    $count = count($files['gallery_images']['name']);
+    $stmt = getDB()->prepare('INSERT INTO bundle_gallery_images (bundle_id, image, sort_order) VALUES (?, ?, ?)');
+
+    $existing = getDB()->prepare('SELECT COALESCE(MAX(sort_order), -1) FROM bundle_gallery_images WHERE bundle_id = ?');
+    $existing->execute([$bundleId]);
+    $nextOrder = (int)$existing->fetchColumn() + 1;
+
+    $skipped = 0;
+    for ($i = 0; $i < $count; $i++) {
+        if (($files['gallery_images']['error'][$i] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+            continue;
+        }
+
+        $file = [
+            'name'     => $files['gallery_images']['name'][$i],
+            'type'     => $files['gallery_images']['type'][$i],
+            'tmp_name' => $files['gallery_images']['tmp_name'][$i],
+            'error'    => $files['gallery_images']['error'][$i],
+            'size'     => $files['gallery_images']['size'][$i],
+        ];
+
+        $upload = handle_upload($file, UPLOAD_BUNDLE_PATH, ALLOWED_IMAGE_MIME_TYPES, MAX_IMAGE_SIZE_BYTES);
+        if (!$upload['success'] || $upload['filename'] === null) {
+            $skipped++;
+            continue;
+        }
+
+        $stmt->execute([$bundleId, $upload['filename'], $nextOrder]);
+        $nextOrder++;
+    }
+
+    if ($skipped > 0) {
+        return $skipped === 1
+            ? 'One gallery image could not be uploaded (invalid type or too large) and was skipped.'
+            : "{$skipped} gallery images could not be uploaded (invalid type or too large) and were skipped.";
+    }
+
+    return null;
+}
+
 function get_bundle_by_id(int $id): ?array
 {
     $stmt = getDB()->prepare('SELECT * FROM bundles WHERE id = ?');
@@ -113,64 +225,122 @@ function get_published_bundles_containing_resource(int $resourceId): array
     return $stmt->fetchAll();
 }
 
-/** Returns ['success' => bool, 'errors' => array<string,string>, 'id' => ?int] */
-function create_bundle(array $input): array
+/**
+ * Returns ['success' => bool, 'errors' => array<string,string>, 'id' => ?int, 'warning' => ?string]
+ * $files is the raw $_FILES array — 'cover_image' (single) and
+ * 'gallery_images' (multi) are read from it if present.
+ */
+function create_bundle(array $input, array $files = []): array
 {
     $errors = validate_bundle_input($input);
+
+    $uploadedCover = null;
+    if (empty($errors) && !empty($files['cover_image']['name'])) {
+        $upload = handle_upload($files['cover_image'], UPLOAD_BUNDLE_PATH, ALLOWED_IMAGE_MIME_TYPES, MAX_IMAGE_SIZE_BYTES);
+        if (!$upload['success']) {
+            $errors['cover_image'] = $upload['error'];
+        } else {
+            $uploadedCover = $upload;
+        }
+    }
+
     if (!empty($errors)) {
-        return ['success' => false, 'errors' => $errors, 'id' => null];
+        if ($uploadedCover) {
+            @unlink(UPLOAD_BUNDLE_PATH . '/' . $uploadedCover['filename']);
+        }
+        return ['success' => false, 'errors' => $errors, 'id' => null, 'warning' => null];
     }
 
     $title = clean_input($input['title']);
     $description = clean_input($input['description'] ?? '');
     $price = (float)$input['price'];
+    $originalPrice = trim((string)($input['original_price'] ?? ''));
     $isPublished = !empty($input['is_published']) ? 1 : 0;
+    $isFeatured = !empty($input['is_featured']) ? 1 : 0;
 
     $stmt = getDB()->prepare(
-        'INSERT INTO bundles (title, slug, description, price, is_published) VALUES (?, ?, ?, ?, ?)'
+        'INSERT INTO bundles (title, slug, description, cover_image, price, original_price, is_published, is_featured)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
     );
     $stmt->execute([
         $title,
         generate_unique_bundle_slug($title),
         $description !== '' ? $description : null,
+        $uploadedCover['filename'] ?? null,
         $price,
+        $originalPrice !== '' ? (float)$originalPrice : null,
         $isPublished,
+        $isFeatured,
     ]);
 
     $newId = (int)getDB()->lastInsertId();
     set_bundle_resources($newId, $input['resource_ids'] ?? []);
+    $warning = add_bundle_gallery_images($newId, $files);
 
-    return ['success' => true, 'errors' => [], 'id' => $newId];
+    return ['success' => true, 'errors' => [], 'id' => $newId, 'warning' => $warning];
 }
 
-/** Returns ['success' => bool, 'errors' => array<string,string>] */
-function update_bundle(int $id, array $input): array
+/** Returns ['success' => bool, 'errors' => array<string,string>, 'warning' => ?string] */
+function update_bundle(int $id, array $input, array $files = []): array
 {
     $errors = validate_bundle_input($input);
+
+    $uploadedCover = null;
+    if (empty($errors) && !empty($files['cover_image']['name'])) {
+        $upload = handle_upload($files['cover_image'], UPLOAD_BUNDLE_PATH, ALLOWED_IMAGE_MIME_TYPES, MAX_IMAGE_SIZE_BYTES);
+        if (!$upload['success']) {
+            $errors['cover_image'] = $upload['error'];
+        } else {
+            $uploadedCover = $upload;
+        }
+    }
+
     if (!empty($errors)) {
-        return ['success' => false, 'errors' => $errors];
+        if ($uploadedCover) {
+            @unlink(UPLOAD_BUNDLE_PATH . '/' . $uploadedCover['filename']);
+        }
+        return ['success' => false, 'errors' => $errors, 'warning' => null];
     }
 
     $title = clean_input($input['title']);
     $description = clean_input($input['description'] ?? '');
     $price = (float)$input['price'];
+    $originalPrice = trim((string)($input['original_price'] ?? ''));
     $isPublished = !empty($input['is_published']) ? 1 : 0;
+    $isFeatured = !empty($input['is_featured']) ? 1 : 0;
 
-    getDB()->prepare(
-        // slug is deliberately not regenerated on edit, same reasoning as
-        // resources: a published bundle's URL may already be shared/paid for.
-        'UPDATE bundles SET title = ?, description = ?, price = ?, is_published = ? WHERE id = ?'
-    )->execute([
+    if ($uploadedCover) {
+        $existing = get_bundle_by_id($id);
+        if ($existing && !empty($existing['cover_image'])) {
+            @unlink(UPLOAD_BUNDLE_PATH . '/' . $existing['cover_image']);
+        }
+    }
+
+    $sql = 'UPDATE bundles SET title = ?, description = ?, price = ?, original_price = ?, is_published = ?, is_featured = ?'
+         . ($uploadedCover ? ', cover_image = ?' : '')
+         // slug is deliberately not regenerated on edit, same reasoning as
+         // resources: a published bundle's URL may already be shared/paid for.
+         . ' WHERE id = ?';
+
+    $params = [
         $title,
         $description !== '' ? $description : null,
         $price,
+        $originalPrice !== '' ? (float)$originalPrice : null,
         $isPublished,
-        $id,
-    ]);
+        $isFeatured,
+    ];
+    if ($uploadedCover) {
+        $params[] = $uploadedCover['filename'];
+    }
+    $params[] = $id;
+
+    getDB()->prepare($sql)->execute($params);
 
     set_bundle_resources($id, $input['resource_ids'] ?? []);
+    $warning = add_bundle_gallery_images($id, $files);
 
-    return ['success' => true, 'errors' => []];
+    return ['success' => true, 'errors' => [], 'warning' => $warning];
 }
 
 function validate_bundle_input(array $input): array
@@ -185,6 +355,15 @@ function validate_bundle_input(array $input): array
     $price = $input['price'] ?? '';
     if ($price === '' || !is_numeric($price) || (float)$price <= 0 || (float)$price > 999999) {
         $errors['price'] = 'Please enter a valid price.';
+    }
+
+    $originalPrice = trim((string)($input['original_price'] ?? ''));
+    if ($originalPrice !== '') {
+        if (!is_numeric($originalPrice) || (float)$originalPrice > 999999) {
+            $errors['original_price'] = 'Please enter a valid original price.';
+        } elseif (is_numeric($price) && (float)$originalPrice <= (float)$price) {
+            $errors['original_price'] = 'The original price must be higher than the current price for savings to make sense.';
+        }
     }
 
     $resourceIds = array_filter(array_map('intval', $input['resource_ids'] ?? []));

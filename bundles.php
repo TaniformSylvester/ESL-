@@ -19,19 +19,7 @@ require_once __DIR__ . '/includes/header.php';
     <?php else: ?>
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             <?php foreach ($bundles as $bundle): ?>
-                <div class="col">
-                    <div class="card shadow-sm border-0 h-100">
-                        <div class="card-body d-flex flex-column">
-                            <h2 class="h5 fw-bold mb-1"><?= e($bundle['title']) ?></h2>
-                            <p class="small text-secondary mb-2"><?= (int)$bundle['resource_count'] ?> resource<?= (int)$bundle['resource_count'] === 1 ? '' : 's' ?> included</p>
-                            <?php if (!empty($bundle['description'])): ?>
-                                <p class="text-secondary flex-grow-1"><?= e(truncate_text($bundle['description'], 120)) ?></p>
-                            <?php endif; ?>
-                            <p class="h4 fw-bold mt-2 mb-3"><?= e(format_currency($bundle['price'])) ?> <span class="fs-6 fw-normal text-secondary">one-time</span></p>
-                            <a href="<?= e(base_url('bundle.php?slug=' . urlencode($bundle['slug']))) ?>" class="btn btn-primary mt-auto">View Bundle</a>
-                        </div>
-                    </div>
-                </div>
+                <?php include __DIR__ . '/includes/bundle-card.php'; ?>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>

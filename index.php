@@ -7,10 +7,12 @@ require_once __DIR__ . '/includes/subject-functions.php';
 require_once __DIR__ . '/includes/review-functions.php';
 require_once __DIR__ . '/includes/video-functions.php';
 require_once __DIR__ . '/includes/games-functions.php';
+require_once __DIR__ . '/includes/bundle-functions.php';
 
 $freeResources = attach_rating_summaries(get_free_resources(6));
 $featuredVideos = get_featured_videos(3);
 $featuredGames = get_featured_games(4);
+$featuredBundle = get_featured_bundle();
 $subjects = get_all_subjects();
 $featuredReviews = get_featured_site_reviews(3);
 
@@ -131,6 +133,62 @@ require_once __DIR__ . '/includes/header.php';
         <?php endif; ?>
     </div>
 </section>
+
+<?php if ($featuredBundle):
+    $featuredBundleCoverUrl = bundle_cover_image_url($featuredBundle);
+    $featuredBundleHasSavings = !empty($featuredBundle['original_price']) && (float)$featuredBundle['original_price'] > (float)$featuredBundle['price'];
+    $featuredBundleSavingsPct = $featuredBundleHasSavings
+        ? (int)round((((float)$featuredBundle['original_price'] - (float)$featuredBundle['price']) / (float)$featuredBundle['original_price']) * 100)
+        : 0;
+?>
+<section class="py-5">
+    <div class="container">
+        <div class="featured-bundle-section">
+            <div class="row g-0 align-items-stretch">
+                <div class="col-lg-6 order-1">
+                    <div class="featured-bundle-cover">
+                        <?php if ($featuredBundleCoverUrl): ?>
+                            <img src="<?= e($featuredBundleCoverUrl) ?>" alt="<?= e($featuredBundle['title']) ?>" loading="lazy">
+                        <?php else: ?>
+                            <i class="fa-solid fa-box-open fa-4x text-white"></i>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div class="col-lg-6 order-2">
+                    <div class="p-4 p-lg-5 h-100 d-flex flex-column justify-content-center">
+                        <div class="mb-3">
+                            <span class="badge featured-bundle-badge">
+                                <i class="fa-solid fa-star me-1"></i>Featured Bundle
+                            </span>
+                        </div>
+                        <h2 class="h3 fw-bold mb-3"><?= e($featuredBundle['title']) ?></h2>
+                        <?php if (!empty($featuredBundle['description'])): ?>
+                            <p class="text-secondary mb-3"><?= e(truncate_text($featuredBundle['description'], 180)) ?></p>
+                        <?php endif; ?>
+                        <p class="mb-4 text-secondary">
+                            <i class="fa-solid fa-layer-group me-1"></i>
+                            <?= (int)$featuredBundle['resource_count'] ?> resource<?= (int)$featuredBundle['resource_count'] === 1 ? '' : 's' ?> included
+                        </p>
+                        <div class="d-flex align-items-center flex-wrap gap-2 mb-4">
+                            <span class="h3 fw-bold mb-0"><?= e(format_currency($featuredBundle['price'])) ?></span>
+                            <span class="text-secondary">one-time</span>
+                            <?php if ($featuredBundleHasSavings): ?>
+                                <span class="text-secondary text-decoration-line-through"><?= e(format_currency($featuredBundle['original_price'])) ?></span>
+                                <span class="badge bg-danger">Save <?= $featuredBundleSavingsPct ?>%</span>
+                            <?php endif; ?>
+                        </div>
+                        <div>
+                            <a href="<?= e(base_url('bundle.php?slug=' . urlencode($featuredBundle['slug']))) ?>" class="btn btn-primary btn-lg px-4">
+                                Explore Bundle <i class="fa-solid fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
 
 <?php $adSlot = ADSENSE_SLOT_HOMEPAGE; require __DIR__ . '/includes/ad-unit.php'; ?>
 

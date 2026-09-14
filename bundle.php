@@ -19,6 +19,23 @@ $isLoggedIn = is_logged_in();
 $alreadyOwned = $isLoggedIn && has_purchased_bundle((int)$_SESSION['user_id'], (int)$bundle['id']);
 $bundleResources = attach_rating_summaries(get_bundle_resources((int)$bundle['id']));
 
+// The preview gallery: the cover image (if any) always comes first — it's
+// the fallback "at least something to show" image — followed by the
+// dedicated gallery images an admin uploaded for browsing before purchase.
+$galleryImages = [];
+$bundleCoverUrl = bundle_cover_image_url($bundle);
+if ($bundleCoverUrl) {
+    $galleryImages[] = $bundleCoverUrl;
+}
+foreach (get_bundle_gallery_images((int)$bundle['id']) as $galleryImage) {
+    $galleryImages[] = UPLOAD_BUNDLE_URL . '/' . rawurlencode($galleryImage['image']);
+}
+
+$bundleHasSavings = !empty($bundle['original_price']) && (float)$bundle['original_price'] > (float)$bundle['price'];
+$bundleSavingsPct = $bundleHasSavings
+    ? (int)round((((float)$bundle['original_price'] - (float)$bundle['price']) / (float)$bundle['original_price']) * 100)
+    : 0;
+
 $pageTitle = $bundle['title'];
 $pageDescription = !empty($bundle['description'])
     ? seo_truncate_at_word($bundle['description'], 160)
@@ -45,18 +62,86 @@ require_once __DIR__ . '/includes/header.php';
         </div>
     <?php endif; ?>
 
+    <div class="bundle-gallery" id="bundleGallery">
+        <?php if (count($galleryImages) > 1): ?>
+            <div class="bundle-gallery-thumbs" role="listbox" aria-label="<?= e($bundle['title']) ?> preview images">
+                <?php foreach ($galleryImages as $imgIndex => $imgUrl): ?>
+                    <button type="button" class="bundle-gallery-thumb<?= $imgIndex === 0 ? ' active' : '' ?>"
+                            data-full="<?= e($imgUrl) ?>" role="option" aria-selected="<?= $imgIndex === 0 ? 'true' : 'false' ?>"
+                            aria-label="View preview <?= $imgIndex + 1 ?> of <?= count($galleryImages) ?>">
+                        <img src="<?= e($imgUrl) ?>" alt="Preview <?= $imgIndex + 1 ?> of <?= e($bundle['title']) ?>" loading="lazy">
+                    </button>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+        <div class="bundle-gallery-main">
+            <div class="bundle-gallery-main-frame">
+                <?php if (!empty($galleryImages)): ?>
+                    <img src="<?= e($galleryImages[0]) ?>" alt="<?= e($bundle['title']) ?> preview" id="bundleGalleryMainImage">
+                <?php else: ?>
+                    <i class="fa-solid fa-box-open fa-4x text-secondary"></i>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mt-3 mb-5">
+        <?php if (!empty($galleryImages)): ?>
+            <button type="button" class="btn btn-outline-primary" id="bundleViewPreviewBtn">
+                <i class="fa-regular fa-eye me-1"></i>View Preview
+            </button>
+        <?php else: ?>
+            <span></span>
+        <?php endif; ?>
+        <div class="d-flex align-items-center gap-2 small text-secondary">
+            <span>Share:</span>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=<?= rawurlencode(base_url('bundle.php?slug=' . $bundle['slug'])) ?>"
+               target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary" title="Share on Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://social-plugins.line.me/lineit/share?url=<?= rawurlencode(base_url('bundle.php?slug=' . $bundle['slug'])) ?>"
+               target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary" title="Share on LINE"><i class="fa-brands fa-line"></i></a>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="copyBundleLink" title="Copy Link" data-url="<?= e(base_url('bundle.php?slug=' . rawurlencode($bundle['slug']))) ?>">
+                <i class="fa-solid fa-link"></i>
+            </button>
+        </div>
+    </div>
+
+    <?php if (count($galleryImages) > 0): ?>
+    <div class="bundle-lightbox" id="bundleLightbox" hidden role="dialog" aria-modal="true" aria-label="<?= e($bundle['title']) ?> preview">
+        <div class="bundle-lightbox-figure">
+            <img src="" alt="<?= e($bundle['title']) ?> preview, large view" class="bundle-lightbox-image" id="bundleLightboxImage">
+            <?php if (count($galleryImages) > 1): ?>
+                <button type="button" class="bundle-lightbox-nav bundle-lightbox-nav-prev" id="bundleLightboxPrev" aria-label="Previous image"><i class="fa-solid fa-chevron-left"></i></button>
+                <button type="button" class="bundle-lightbox-nav bundle-lightbox-nav-next" id="bundleLightboxNext" aria-label="Next image"><i class="fa-solid fa-chevron-right"></i></button>
+            <?php endif; ?>
+            <button type="button" class="bundle-lightbox-close" id="bundleLightboxClose" aria-label="Close preview"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <div class="row g-4 g-lg-5">
         <div class="col-lg-7">
             <h1 class="fw-bold mb-3"><?= e($bundle['title']) ?></h1>
             <?php if (!empty($bundle['description'])): ?>
                 <p class="text-secondary"><?= nl2br(e($bundle['description'])) ?></p>
             <?php endif; ?>
+            <p class="text-secondary mb-0">
+                <i class="fa-solid fa-layer-group me-1"></i>
+                <?= count($bundleResources) ?> resource<?= count($bundleResources) === 1 ? '' : 's' ?> included
+            </p>
         </div>
 
         <div class="col-lg-5">
             <div class="card shadow-sm border-0">
                 <div class="card-body p-4 text-center">
-                    <p class="h3 fw-bold mb-1"><?= e(format_currency($bundle['price'])) ?></p>
+                    <p class="h3 fw-bold mb-1">
+                        <?= e(format_currency($bundle['price'])) ?>
+                        <?php if ($bundleHasSavings): ?>
+                            <span class="fs-6 fw-normal text-secondary text-decoration-line-through"><?= e(format_currency($bundle['original_price'])) ?></span>
+                        <?php endif; ?>
+                    </p>
+                    <?php if ($bundleHasSavings): ?>
+                        <p class="mb-2"><span class="badge bg-danger">Save <?= $bundleSavingsPct ?>%</span></p>
+                    <?php endif; ?>
                     <p class="text-secondary small mb-4">One-time payment &mdash; no subscription, no expiry.</p>
 
                     <?php if ($alreadyOwned): ?>

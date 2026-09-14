@@ -85,10 +85,16 @@ define('UPLOAD_BASE_PATH', ROOT_PATH . '/uploads');
 define('UPLOAD_PROTECTED_PATH', UPLOAD_BASE_PATH . '/protected');
 define('UPLOAD_THUMBNAIL_PATH', UPLOAD_BASE_PATH . '/thumbnails');
 define('UPLOAD_PREVIEW_PATH', UPLOAD_BASE_PATH . '/previews');
+define('UPLOAD_BUNDLE_PATH', UPLOAD_BASE_PATH . '/bundles');
 
 define('UPLOAD_BASE_URL', rtrim(SITE_URL, '/') . '/uploads');
 define('UPLOAD_THUMBNAIL_URL', UPLOAD_BASE_URL . '/thumbnails');
 define('UPLOAD_PREVIEW_URL', UPLOAD_BASE_URL . '/previews');
+define('UPLOAD_BUNDLE_URL', UPLOAD_BASE_URL . '/bundles');
+
+// Bundle cover image + gallery preview images share resources' image
+// upload constraints (ALLOWED_IMAGE_MIME_TYPES, MAX_IMAGE_SIZE_BYTES).
+define('BUNDLE_GALLERY_MAX_IMAGES', 8);
 
 define('MAX_UPLOAD_SIZE_MB', 25);
 define('MAX_UPLOAD_SIZE_BYTES', MAX_UPLOAD_SIZE_MB * 1024 * 1024);
