@@ -3,6 +3,7 @@ require_once __DIR__ . '/includes/init.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/bundle-functions.php';
 require_once __DIR__ . '/includes/resource-functions.php';
+require_once __DIR__ . '/includes/favorites-functions.php';
 require_once __DIR__ . '/includes/seo-functions.php';
 
 $slug = trim((string)($_GET['slug'] ?? ''));
@@ -16,7 +17,7 @@ if (!$bundle) {
 
 $isLoggedIn = is_logged_in();
 $alreadyOwned = $isLoggedIn && has_purchased_bundle((int)$_SESSION['user_id'], (int)$bundle['id']);
-$bundleResources = get_bundle_resources((int)$bundle['id']);
+$bundleResources = attach_rating_summaries(get_bundle_resources((int)$bundle['id']));
 
 $pageTitle = $bundle['title'];
 $pageDescription = !empty($bundle['description'])
@@ -50,22 +51,6 @@ require_once __DIR__ . '/includes/header.php';
             <?php if (!empty($bundle['description'])): ?>
                 <p class="text-secondary"><?= nl2br(e($bundle['description'])) ?></p>
             <?php endif; ?>
-
-            <h2 class="h5 fw-bold mt-4 mb-3">What's Included (<?= count($bundleResources) ?>)</h2>
-            <?php if (empty($bundleResources)): ?>
-                <p class="text-secondary">Resources are being finalized for this bundle &mdash; check back soon.</p>
-            <?php else: ?>
-                <ul class="list-group">
-                    <?php foreach ($bundleResources as $bundleResource): ?>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <a href="<?= e(base_url('resource.php?slug=' . urlencode($bundleResource['slug']))) ?>" class="text-decoration-none">
-                                <?= e($bundleResource['title']) ?>
-                            </a>
-                            <span class="badge bg-light text-dark border"><?= e($bundleResource['resource_type']) ?></span>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            <?php endif; ?>
         </div>
 
         <div class="col-lg-5">
@@ -75,7 +60,7 @@ require_once __DIR__ . '/includes/header.php';
                     <p class="text-secondary small mb-4">One-time payment &mdash; no subscription, no expiry.</p>
 
                     <?php if ($alreadyOwned): ?>
-                        <p class="alert alert-success mb-0"><i class="fa-solid fa-circle-check me-1"></i>You own this bundle. Every resource above is unlocked for you.</p>
+                        <p class="alert alert-success mb-0"><i class="fa-solid fa-circle-check me-1"></i>You own this bundle. Every resource below is unlocked for you.</p>
                     <?php elseif (!STRIPE_ENABLED): ?>
                         <p class="alert alert-warning mb-0">Purchases are temporarily unavailable. Please contact <a href="mailto:<?= e(CONTACT_EMAIL) ?>"><?= e(CONTACT_EMAIL) ?></a>.</p>
                     <?php elseif ($isLoggedIn): ?>
@@ -92,6 +77,19 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="mt-5">
+        <h2 class="h5 fw-bold mb-3">What's Included (<?= count($bundleResources) ?>)</h2>
+        <?php if (empty($bundleResources)): ?>
+            <p class="text-secondary">Resources are being finalized for this bundle &mdash; check back soon.</p>
+        <?php else: ?>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
+                <?php foreach ($bundleResources as $resource): ?>
+                    <?php include __DIR__ . '/includes/resource-card.php'; ?>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
