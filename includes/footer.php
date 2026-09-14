@@ -4,11 +4,11 @@
     <div class="container">
         <div class="row gy-4">
             <div class="col-md-4">
-                <h5 class="fw-bold"><i class="fa-solid fa-graduation-cap me-1"></i> <?= e(SITE_NAME) ?></h5>
+                <h2 class="h5 fw-bold"><i class="fa-solid fa-graduation-cap me-1"></i> <?= e(SITE_NAME) ?></h2>
                 <p class="text-secondary small"><?= e(SITE_DESCRIPTION) ?></p>
             </div>
             <div class="col-md-4">
-                <h6 class="fw-bold">Quick Links</h6>
+                <h2 class="h6 fw-bold">Quick Links</h2>
                 <ul class="list-unstyled small">
                     <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('resources.php')) ?>">Resources</a></li>
                     <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('games.php')) ?>">Games</a></li>
@@ -23,7 +23,7 @@
                 </ul>
             </div>
             <div class="col-md-4">
-                <h6 class="fw-bold">Contact</h6>
+                <h2 class="h6 fw-bold">Contact</h2>
                 <p class="text-secondary small mb-1">
                     <i class="fa-solid fa-envelope me-1"></i>
                     <a class="text-secondary text-decoration-none" href="mailto:<?= e(CONTACT_EMAIL) ?>"><?= e(CONTACT_EMAIL) ?></a>

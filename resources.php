@@ -81,10 +81,12 @@ require_once __DIR__ . '/includes/header.php';
 
     <form method="get" action="<?= e(base_url('resources.php')) ?>" class="row g-2 mb-4">
         <div class="col-lg-2 col-md-6">
-            <input type="text" name="search" class="form-control" placeholder="Search title, topic&hellip;" value="<?= e($filters['search']) ?>">
+            <label for="filter-search" class="visually-hidden">Search resources</label>
+            <input type="text" id="filter-search" name="search" class="form-control" placeholder="Search title, topic&hellip;" value="<?= e($filters['search']) ?>">
         </div>
         <div class="col-lg-2 col-md-6">
-            <select name="subject_id" class="form-select" onchange="this.form.submit()">
+            <label for="filter-subject" class="visually-hidden">Subject</label>
+            <select id="filter-subject" name="subject_id" class="form-select" onchange="this.form.submit()">
                 <option value="">All Subjects</option>
                 <?php foreach ($subjects as $subjectOption): ?>
                     <option value="<?= (int)$subjectOption['id'] ?>" <?= $filters['subject_id'] === (int)$subjectOption['id'] ? 'selected' : '' ?>><?= e($subjectOption['name']) ?></option>
@@ -92,7 +94,8 @@ require_once __DIR__ . '/includes/header.php';
             </select>
         </div>
         <div class="col-lg-2 col-md-6">
-            <select name="grade" class="form-select">
+            <label for="filter-grade" class="visually-hidden">Grade level</label>
+            <select id="filter-grade" name="grade" class="form-select">
                 <option value="">All Grades</option>
                 <?php foreach (GRADE_LEVELS as $grade): ?>
                     <option value="<?= e($grade) ?>" <?= $filters['grade'] === $grade ? 'selected' : '' ?>><?= e($grade) ?></option>
@@ -100,7 +103,8 @@ require_once __DIR__ . '/includes/header.php';
             </select>
         </div>
         <div class="col-lg-2 col-md-6">
-            <select name="resource_type" class="form-select">
+            <label for="filter-type" class="visually-hidden">Resource type</label>
+            <select id="filter-type" name="resource_type" class="form-select">
                 <option value="">All Types</option>
                 <?php foreach (RESOURCE_TYPES as $type): ?>
                     <option value="<?= e($type) ?>" <?= $filters['resource_type'] === $type ? 'selected' : '' ?>><?= e($type) ?></option>
@@ -108,7 +112,8 @@ require_once __DIR__ . '/includes/header.php';
             </select>
         </div>
         <div class="col-lg-2 col-md-6">
-            <select name="category_id" class="form-select">
+            <label for="filter-category" class="visually-hidden">Category</label>
+            <select id="filter-category" name="category_id" class="form-select">
                 <option value="">All Categories</option>
                 <?php foreach ($categoriesGrouped as $groupName => $categories): ?>
                     <optgroup label="<?= e($groupName) ?>">
@@ -122,14 +127,15 @@ require_once __DIR__ . '/includes/header.php';
             </select>
         </div>
         <div class="col-lg-1 col-md-6">
-            <select name="access" class="form-select">
+            <label for="filter-access" class="visually-hidden">Access</label>
+            <select id="filter-access" name="access" class="form-select">
                 <option value="">All Access</option>
                 <option value="free" <?= $filters['access'] === 'free' ? 'selected' : '' ?>>Free</option>
                 <option value="members" <?= $filters['access'] === 'members' ? 'selected' : '' ?>>Members Only</option>
             </select>
         </div>
         <div class="col-lg-1 col-md-6 d-grid">
-            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <button type="submit" class="btn btn-primary" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
     </form>
 
