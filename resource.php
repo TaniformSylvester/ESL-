@@ -218,8 +218,28 @@ require_once __DIR__ . '/includes/header.php';
 
     <div class="row g-4 g-lg-5">
         <div class="col-lg-6">
-            <?php if ($displayImage): ?>
-                <img src="<?= e($displayImage) ?>" alt="<?= e($resource['title']) ?>" class="img-fluid rounded shadow-sm">
+            <?php if ($previewUrl): ?>
+                <div class="position-relative">
+                    <span class="badge bg-dark bg-opacity-75 position-absolute top-0 start-0 m-2"><i class="fa-solid fa-eye me-1"></i>Preview</span>
+                    <button type="button" class="btn p-0 border-0 w-100" data-bs-toggle="modal" data-bs-target="#resourcePreviewModal" aria-label="View larger preview">
+                        <img src="<?= e($previewUrl) ?>" alt="Preview of <?= e($resource['title']) ?>" class="img-fluid rounded shadow-sm">
+                    </button>
+                </div>
+                <div class="modal fade" id="resourcePreviewModal" tabindex="-1" aria-labelledby="resourcePreviewModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="modal-title h6 fw-bold" id="resourcePreviewModalLabel">Preview &mdash; <?= e($resource['title']) ?></h2>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img src="<?= e($previewUrl) ?>" alt="Preview of <?= e($resource['title']) ?>" class="img-fluid rounded">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php elseif ($thumbUrl): ?>
+                <img src="<?= e($thumbUrl) ?>" alt="<?= e($resource['title']) ?>" class="img-fluid rounded shadow-sm">
             <?php else: ?>
                 <div class="bg-light rounded d-flex align-items-center justify-content-center text-primary" style="aspect-ratio: 4/3;">
                     <i class="fa-solid <?= e(resource_type_icon($resource['resource_type'])) ?> fa-5x"></i>
@@ -287,7 +307,7 @@ require_once __DIR__ . '/includes/header.php';
                     <dt class="col-4">Category</dt><dd class="col-8"><?= e($resource['category_name']) ?></dd>
                 <?php endif; ?>
                 <?php if (!empty($resource['file_type'])): ?>
-                    <dt class="col-4">File Type</dt><dd class="col-8"><?= e(strtoupper($resource['file_type'])) ?></dd>
+                    <dt class="col-4">File Type</dt><dd class="col-8"><i class="fa-solid <?= e(file_type_icon($resource['file_type'])) ?> text-secondary me-1"></i><?= e(strtoupper($resource['file_type'])) ?></dd>
                 <?php endif; ?>
                 <?php if (!empty($resource['file_size'])): ?>
                     <dt class="col-4">File Size</dt><dd class="col-8"><?= e(format_file_size((int)$resource['file_size'])) ?></dd>
@@ -415,10 +435,11 @@ require_once __DIR__ . '/includes/header.php';
                         <li class="mb-2">
                             <?php if ($canDownload): ?>
                                 <a href="<?= e(base_url('member/download-extra.php?id=' . (int)$extraFile['id'])) ?>" class="btn btn-sm btn-outline-primary">
-                                    <i class="fa-solid fa-download me-1"></i><?= e($extraFile['label'] ?: $extraFile['file_name']) ?>
+                                    <i class="fa-solid <?= e(file_type_icon($extraFile['file_type'])) ?> me-1"></i><?= e($extraFile['label'] ?: $extraFile['file_name']) ?>
+                                    <span class="text-secondary">(<?= e(strtoupper($extraFile['file_type'])) ?>)</span>
                                 </a>
                             <?php else: ?>
-                                <span class="text-secondary"><i class="fa-solid fa-lock me-1"></i><?= e($extraFile['label'] ?: $extraFile['file_name']) ?></span>
+                                <span class="text-secondary"><i class="fa-solid fa-lock me-1"></i><?= e($extraFile['label'] ?: $extraFile['file_name']) ?> (<?= e(strtoupper($extraFile['file_type'])) ?>)</span>
                             <?php endif; ?>
                         </li>
                     <?php endforeach; ?>

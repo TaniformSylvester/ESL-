@@ -212,6 +212,21 @@ function resource_type_icon(string $resourceType): string
     };
 }
 
+/** A small FontAwesome icon matching a resource's actual file extension — never invents a type the resource doesn't have. */
+function file_type_icon(string $fileType): string
+{
+    return match (strtolower($fileType)) {
+        'pdf'          => 'fa-file-pdf',
+        'doc', 'docx'  => 'fa-file-word',
+        'ppt', 'pptx'  => 'fa-file-powerpoint',
+        'xls', 'xlsx'  => 'fa-file-excel',
+        'zip'          => 'fa-file-zipper',
+        'html', 'htm'  => 'fa-file-code',
+        'jpg', 'jpeg', 'png', 'webp' => 'fa-file-image',
+        default        => 'fa-file',
+    };
+}
+
 /**
  * Fetches a page of published resources matching the given filters.
  * $filters may contain: search, subject_id, grade, resource_type, category_id, access ('free'|'members'|'all')
