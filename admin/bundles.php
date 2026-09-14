@@ -105,6 +105,20 @@ require_once __DIR__ . '/../includes/admin-header.php';
             <div class="card-body">
                 <h2 class="h5 fw-bold mb-3"><?= $isEditing ? 'Edit Bundle' : 'Add Bundle' ?></h2>
 
+                <?php if ($isEditing && !empty($existingGalleryImages)): ?>
+                <!-- Kept outside the main edit form below: an HTML <form> cannot be
+                     nested inside another <form> (browsers silently close the outer
+                     form early when they hit a nested one, which corrupted the real
+                     "Save Changes" submission's own hidden "id" field). This one
+                     shared, hidden form is reused for whichever image's Remove
+                     button was clicked (see the script at the bottom of this file),
+                     rather than one nested form per image. -->
+                <form method="post" action="<?= e(base_url('admin/bundle-gallery-image-delete.php')) ?>" id="removeGalleryImageForm" class="d-none">
+                    <?php csrf_field(); ?>
+                    <input type="hidden" name="id" id="removeGalleryImageId">
+                    <input type="hidden" name="bundle_id" value="<?= (int)$editing['id'] ?>">
+                </form>
+                <?php endif; ?>
                 <form method="post" action="<?= e(base_url('admin/bundles.php')) ?>" enctype="multipart/form-data" novalidate>
                     <?php csrf_field(); ?>
                     <input type="hidden" name="action" value="<?= $isEditing ? 'update' : 'create' ?>">
@@ -174,15 +188,10 @@ require_once __DIR__ . '/../includes/admin-header.php';
                                     <div class="position-relative">
                                         <img src="<?= e(UPLOAD_BUNDLE_URL . '/' . rawurlencode($galleryImage['image'])) ?>" alt=""
                                              style="width:80px;height:80px;object-fit:cover;border-radius:0.5rem;border:1px solid #e5e7eb;">
-                                        <form method="post" action="<?= e(base_url('admin/bundle-gallery-image-delete.php')) ?>"
-                                              onsubmit="return confirm('Remove this preview image?');" class="position-absolute top-0 end-0 m-1">
-                                            <?php csrf_field(); ?>
-                                            <input type="hidden" name="id" value="<?= (int)$galleryImage['id'] ?>">
-                                            <input type="hidden" name="bundle_id" value="<?= (int)$editing['id'] ?>">
-                                            <button type="submit" class="btn btn-sm btn-danger py-0 px-1" title="Remove" aria-label="Remove this preview image">
-                                                <i class="fa-solid fa-xmark"></i>
-                                            </button>
-                                        </form>
+                                        <button type="button" class="btn btn-sm btn-danger py-0 px-1 position-absolute top-0 end-0 m-1 js-remove-gallery-image"
+                                                data-image-id="<?= (int)$galleryImage['id'] ?>" title="Remove" aria-label="Remove this preview image">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
@@ -213,4 +222,23 @@ require_once __DIR__ . '/../includes/admin-header.php';
         <?php endif; ?>
     </div>
 </div>
+<script>
+(function () {
+    // "Remove" on an existing gallery image: fills in and submits the shared
+    // #removeGalleryImageForm declared above the main form (can't be a form
+    // nested inside this page's main form — see that form's comment).
+    var removeGalleryImageForm = document.getElementById('removeGalleryImageForm');
+    if (removeGalleryImageForm) {
+        document.querySelectorAll('.js-remove-gallery-image').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                if (!confirm('Remove this preview image?')) {
+                    return;
+                }
+                document.getElementById('removeGalleryImageId').value = btn.dataset.imageId;
+                removeGalleryImageForm.submit();
+            });
+        });
+    }
+})();
+</script>
 <?php require_once __DIR__ . '/../includes/admin-footer.php'; ?>
