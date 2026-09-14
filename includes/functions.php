@@ -154,22 +154,45 @@ function current_url_with_params(array $params): string
     return $path . '?' . http_build_query($query);
 }
 
+/**
+ * Renders a windowed pagination control: always the first and last page,
+ * plus a small window around the current page, with an ellipsis for any
+ * gap in between. A resource/user/review list with many pages used to
+ * render EVERY page number in one unwrapped row (Bootstrap's .pagination
+ * is display:flex with no wrap) — fine with a handful of pages, but with
+ * enough of them it overflowed the viewport horizontally on mobile,
+ * centered by justify-content-center so the page even loaded scrolled
+ * into the middle of the list rather than showing page 1. Windowing keeps
+ * the control to a small, fixed number of items regardless of how many
+ * pages exist, so it can never overflow.
+ */
 function render_pagination(int $currentPage, int $totalPages): string
 {
     if ($totalPages <= 1) {
         return '';
     }
 
-    $html = '<nav aria-label="Page navigation"><ul class="pagination justify-content-center">';
+    $html = '<nav aria-label="Page navigation"><ul class="pagination justify-content-center flex-wrap">';
 
     $prevDisabled = $currentPage <= 1 ? ' disabled' : '';
     $html .= '<li class="page-item' . $prevDisabled . '">'
         . '<a class="page-link" href="' . e(current_url_with_params(['page' => max(1, $currentPage - 1)])) . '">Previous</a></li>';
 
-    for ($i = 1; $i <= $totalPages; $i++) {
+    $pagesToShow = array_unique(array_filter(
+        [1, $currentPage - 1, $currentPage, $currentPage + 1, $totalPages],
+        static fn(int $p): bool => $p >= 1 && $p <= $totalPages
+    ));
+    sort($pagesToShow);
+
+    $previousShown = 0;
+    foreach ($pagesToShow as $i) {
+        if ($i - $previousShown > 1) {
+            $html .= '<li class="page-item disabled"><span class="page-link">&hellip;</span></li>';
+        }
         $active = $i === $currentPage ? ' active' : '';
         $html .= '<li class="page-item' . $active . '">'
             . '<a class="page-link" href="' . e(current_url_with_params(['page' => $i])) . '">' . $i . '</a></li>';
+        $previousShown = $i;
     }
 
     $nextDisabled = $currentPage >= $totalPages ? ' disabled' : '';
