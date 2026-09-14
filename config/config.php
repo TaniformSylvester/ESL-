@@ -38,8 +38,8 @@ define('SITE_DESCRIPTION', 'Ready-to-teach English/ESL, Math and Science resourc
 
 define('SITE_URL', 'https://teachluma.com');
 
-define('CONTACT_EMAIL', 'contact@example.com');
-define('ADMIN_EMAIL', 'admin@example.com');
+define('CONTACT_EMAIL', 'info@teachluma.com');
+define('ADMIN_EMAIL', 'info@teachluma.com');
 
 // -----------------------------------------------------------------------
 // LOCALE / CURRENCY / SUBSCRIPTION
