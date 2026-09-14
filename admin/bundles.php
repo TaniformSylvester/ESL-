@@ -207,7 +207,7 @@ require_once __DIR__ . '/../includes/admin-header.php';
 
                     <div class="form-check mb-3">
                         <input type="checkbox" class="form-check-input" id="is_featured" name="is_featured" value="1" <?= !empty($editing['is_featured']) ? 'checked' : '' ?>>
-                        <label class="form-check-label" for="is_featured">Featured on homepage <span class="text-secondary fw-normal">(only one shows at a time — the most recently updated featured bundle wins)</span></label>
+                        <label class="form-check-label" for="is_featured">Featured on homepage <span class="text-secondary fw-normal">(shown in the homepage's Featured Bundles section, alongside any other featured bundles)</span></label>
                     </div>
 
                     <button type="submit" class="btn btn-primary"><?= $isEditing ? 'Save Changes' : 'Add Bundle' ?></button>

@@ -12,7 +12,7 @@ require_once __DIR__ . '/includes/bundle-functions.php';
 $freeResources = attach_rating_summaries(get_free_resources(6));
 $featuredVideos = get_featured_videos(3);
 $featuredGames = get_featured_games(4);
-$featuredBundle = get_featured_bundle();
+$featuredBundles = get_featured_bundles(6);
 $subjects = get_all_subjects();
 $featuredReviews = get_featured_site_reviews(3);
 
@@ -134,57 +134,18 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 </section>
 
-<?php if ($featuredBundle):
-    $featuredBundleCoverUrl = bundle_cover_image_url($featuredBundle);
-    $featuredBundleHasSavings = !empty($featuredBundle['original_price']) && (float)$featuredBundle['original_price'] > (float)$featuredBundle['price'];
-    $featuredBundleSavingsPct = $featuredBundleHasSavings
-        ? (int)round((((float)$featuredBundle['original_price'] - (float)$featuredBundle['price']) / (float)$featuredBundle['original_price']) * 100)
-        : 0;
-?>
-<section class="py-5">
+<?php if (!empty($featuredBundles)): ?>
+<section class="py-5 section-soft">
     <div class="container">
-        <div class="featured-bundle-section">
-            <div class="row g-0 align-items-stretch">
-                <div class="col-lg-6 order-1">
-                    <div class="featured-bundle-cover">
-                        <?php if ($featuredBundleCoverUrl): ?>
-                            <img src="<?= e($featuredBundleCoverUrl) ?>" alt="<?= e($featuredBundle['title']) ?>" loading="lazy">
-                        <?php else: ?>
-                            <i class="fa-solid fa-box-open fa-4x text-white"></i>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                <div class="col-lg-6 order-2">
-                    <div class="p-4 p-lg-5 h-100 d-flex flex-column justify-content-center">
-                        <div class="mb-3">
-                            <span class="badge featured-bundle-badge">
-                                <i class="fa-solid fa-star me-1"></i>Featured Bundle
-                            </span>
-                        </div>
-                        <h2 class="h3 fw-bold mb-3"><?= e($featuredBundle['title']) ?></h2>
-                        <?php if (!empty($featuredBundle['description'])): ?>
-                            <p class="text-secondary mb-3"><?= e(truncate_text($featuredBundle['description'], 180)) ?></p>
-                        <?php endif; ?>
-                        <p class="mb-4 text-secondary">
-                            <i class="fa-solid fa-layer-group me-1"></i>
-                            <?= (int)$featuredBundle['resource_count'] ?> resource<?= (int)$featuredBundle['resource_count'] === 1 ? '' : 's' ?> included
-                        </p>
-                        <div class="d-flex align-items-center flex-wrap gap-2 mb-4">
-                            <span class="h3 fw-bold mb-0"><?= e(format_currency($featuredBundle['price'])) ?></span>
-                            <span class="text-secondary">one-time</span>
-                            <?php if ($featuredBundleHasSavings): ?>
-                                <span class="text-secondary text-decoration-line-through"><?= e(format_currency($featuredBundle['original_price'])) ?></span>
-                                <span class="badge bg-danger">Save <?= $featuredBundleSavingsPct ?>%</span>
-                            <?php endif; ?>
-                        </div>
-                        <div>
-                            <a href="<?= e(base_url('bundle.php?slug=' . urlencode($featuredBundle['slug']))) ?>" class="btn btn-primary btn-lg px-4">
-                                Explore Bundle <i class="fa-solid fa-arrow-right ms-1"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h2 class="h3 fw-bold mb-0">Featured Bundles</h2>
+            <a href="<?= e(base_url('bundles.php')) ?>" class="small">View All Bundles &rarr;</a>
+        </div>
+        <p class="text-secondary mb-4" style="max-width:640px;">Save money bundling related resources together in one purchase.</p>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+            <?php foreach ($featuredBundles as $bundle): ?>
+                <?php include __DIR__ . '/includes/bundle-card.php'; ?>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>

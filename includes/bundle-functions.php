@@ -55,25 +55,25 @@ function get_published_bundles(): array
 }
 
 /**
- * The single bundle the homepage's "Featured Bundle" section shows, or null
- * if no published bundle is currently marked featured. Only ever one is
- * shown at a time (matching the homepage's one-hero-section design) — if an
- * admin marks more than one featured, the most recently updated wins.
+ * Published, admin-marked-featured bundles for the homepage's "Featured
+ * Bundles" grid — same idea as get_free_resources(), shown the same way
+ * (a card grid), not a single hero. Every bundle an admin checks "Featured
+ * on homepage" appears, newest-updated first, up to $limit.
  */
-function get_featured_bundle(): ?array
+function get_featured_bundles(int $limit = 6): array
 {
-    $stmt = getDB()->query(
+    $stmt = getDB()->prepare(
         "SELECT b.*, COUNT(br.resource_id) AS resource_count
          FROM bundles b
          LEFT JOIN bundle_resources br ON br.bundle_id = b.id
          WHERE b.is_published = 1 AND b.is_featured = 1
          GROUP BY b.id
          ORDER BY b.updated_at DESC
-         LIMIT 1"
+         LIMIT " . max(1, $limit)
     );
-    $bundle = $stmt->fetch();
+    $stmt->execute();
 
-    return $bundle ?: null;
+    return $stmt->fetchAll();
 }
 
 /** Public URL for a bundle's cover image (homepage feature, bundle cards), or null if none is set. */

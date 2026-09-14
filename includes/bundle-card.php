@@ -1,7 +1,7 @@
 <?php
 /**
  * Renders one bundle card. Expects $bundle (assoc array from
- * get_published_bundles()/get_featured_bundle(), which both include a live
+ * get_published_bundles()/get_featured_bundles(), which both include a live
  * resource_count) to be set before this file is included.
  */
 $cardBundleCoverUrl = bundle_cover_image_url($bundle);
