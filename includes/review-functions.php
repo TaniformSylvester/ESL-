@@ -302,16 +302,27 @@ function get_review_stats(): array
 }
 
 /** Real approved reviews with text, for homepage display — never fabricated, pulled straight from the reviews table. */
+/**
+ * One review per reviewer, at most — without this, a single teacher who
+ * left several good reviews could fill every homepage testimonial slot,
+ * making genuine feedback look like repeated/fake social proof.
+ */
 function get_featured_site_reviews(int $limit = 6): array
 {
     $stmt = getDB()->prepare(
-        "SELECT rv.rating, rv.review_text, rv.created_at, u.first_name, r.title AS resource_title, r.slug AS resource_slug
-         FROM reviews rv
-         INNER JOIN users u ON u.id = rv.user_id
-         INNER JOIN resources r ON r.id = rv.resource_id
-         WHERE rv.status = 'approved' AND rv.rating >= 4 AND rv.review_text IS NOT NULL AND rv.review_text != ''
-           AND r.status = 'active'
-         ORDER BY rv.helpful_count DESC, rv.created_at DESC
+        "SELECT rating, review_text, created_at, first_name, resource_title, resource_slug
+         FROM (
+             SELECT rv.rating, rv.review_text, rv.created_at, rv.helpful_count,
+                    u.first_name, r.title AS resource_title, r.slug AS resource_slug,
+                    ROW_NUMBER() OVER (PARTITION BY rv.user_id ORDER BY rv.helpful_count DESC, rv.created_at DESC) AS rn
+             FROM reviews rv
+             INNER JOIN users u ON u.id = rv.user_id
+             INNER JOIN resources r ON r.id = rv.resource_id
+             WHERE rv.status = 'approved' AND rv.rating >= 4 AND rv.review_text IS NOT NULL AND rv.review_text != ''
+               AND r.status = 'active'
+         ) per_reviewer
+         WHERE rn = 1
+         ORDER BY helpful_count DESC, created_at DESC
          LIMIT " . max(1, $limit)
     );
     $stmt->execute();

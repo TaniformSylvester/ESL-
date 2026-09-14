@@ -48,6 +48,7 @@ a {
     border-radius: 0.75rem;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
     height: 100%;
+    overflow: hidden;
 }
 
 .resource-card:hover {
@@ -56,8 +57,20 @@ a {
 }
 
 .resource-card .card-img-top {
+    width: 100%;
     aspect-ratio: 4 / 3;
     object-fit: cover;
+    display: block;
+}
+
+.resource-card .card-body {
+    min-width: 0;
+}
+
+.resource-card .card-body h3,
+.resource-card .card-body p {
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .section-soft {

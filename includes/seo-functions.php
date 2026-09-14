@@ -13,6 +13,32 @@
  * generated string rather than replaced with a placeholder.
  */
 
+/**
+ * Pluralizes a RESOURCE_TYPES label for listing-page SEO copy and headings
+ * (e.g. "Quiz" -> "Quizzes", "Classroom Activity" -> "Classroom Activities").
+ * A plain "+ s" concatenation used to run here, producing "Flashcardss",
+ * "Quizs" and "Classroom Activitys" wherever a type filter was applied.
+ */
+function pluralize_resource_type(string $type): string
+{
+    static $irregular = [
+        'Quiz' => 'Quizzes',
+    ];
+    if (isset($irregular[$type])) {
+        return $irregular[$type];
+    }
+    if (substr($type, -1) === 's') {
+        // Already plural/uncountable as a type name (e.g. "Flashcards").
+        return $type;
+    }
+    if (preg_match('/[^aeiou]y$/i', $type)) {
+        // Consonant + "y" -> "ies", covers every "<X> Activity" type.
+        return substr($type, 0, -1) . 'ies';
+    }
+
+    return $type . 's';
+}
+
 /** "[Title] | Grade [X] [Subject] Resource" — SITE_NAME is appended separately by includes/header.php's <title> tag, matching every other page. */
 function generate_resource_seo_title(array $resource): string
 {
@@ -228,7 +254,7 @@ function generate_resources_listing_seo(array $filters, ?array $subject, ?array 
         $labelParts[] = $category['name'];
     }
     if (!empty($filters['resource_type'])) {
-        $labelParts[] = $filters['resource_type'] . 's';
+        $labelParts[] = pluralize_resource_type($filters['resource_type']);
     }
 
     $isSearch = trim((string)($filters['search'] ?? '')) !== '';
