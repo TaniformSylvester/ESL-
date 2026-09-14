@@ -26,16 +26,7 @@ require_once __DIR__ . '/includes/header.php';
             <h2 class="h4 fw-bold mb-4"><?= e(GUIDE_CATEGORIES[$category]) ?></h2>
             <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
                 <?php foreach ($guides as $guide): ?>
-                    <div class="col">
-                        <a href="<?= e(base_url('teacher-hub-guide.php?slug=' . urlencode($guide['slug']))) ?>" class="card shadow-sm border-0 h-100 text-decoration-none text-reset">
-                            <div class="card-body">
-                                <h3 class="h6 fw-bold"><?= e($guide['title']) ?></h3>
-                                <?php if (!empty($guide['summary'])): ?>
-                                    <p class="small text-secondary mb-0"><?= e($guide['summary']) ?></p>
-                                <?php endif; ?>
-                            </div>
-                        </a>
-                    </div>
+                    <?php include __DIR__ . '/includes/guide-card.php'; ?>
                 <?php endforeach; ?>
             </div>
         </section>

@@ -103,8 +103,9 @@ $websiteSchema = [
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url()) ?>">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('resources.php')) ?>">Resources</a></li>
-                <li class="nav-item"><a class="nav-link" href="<?= e(base_url('teacher-hub.php')) ?>">Teacher Hub</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('games.php')) ?>">Games</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= e(base_url('teacher-tools.php')) ?>">Teacher Tools</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= e(base_url('teacher-hub.php')) ?>">Teacher Hub</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('bundles.php')) ?>">Bundles</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('pricing.php')) ?>">Pricing</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('about.php')) ?>">About</a></li>

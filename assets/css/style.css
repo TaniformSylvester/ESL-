@@ -7,6 +7,13 @@
     --brand-secondary: #f59e0b;
     --brand-success: #16a34a;
     --brand-bg-soft: #f8fafc;
+
+    /* Subtle per-subject accents (icons + a thin top border on subject
+       cards only) — intentionally muted so the site stays professional
+       rather than turning into a rainbow of category colors. */
+    --subject-esl: #2563eb;
+    --subject-math: #7c3aed;
+    --subject-science: #0d9488;
 }
 
 body {
@@ -77,6 +84,20 @@ a {
     background-color: var(--brand-bg-soft);
 }
 
+/* Reserves stable space for an AdSense unit before the ad script loads,
+   so it never causes a layout shift (CLS) as content jumps around it.
+   Mobile auto-format ads tend to render as a taller rectangle; wider
+   viewports tend to get a shorter, full-width banner instead. */
+.ad-slot {
+    min-height: 16rem;
+}
+
+@media (min-width: 768px) {
+    .ad-slot {
+        min-height: 7rem;
+    }
+}
+
 .hero {
     background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%);
     color: #fff;
@@ -84,6 +105,34 @@ a {
 
 footer a:hover {
     color: #fff !important;
+}
+
+.subject-card {
+    border-top: 3px solid transparent;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.subject-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+}
+
+.subject-card.subject-esl { border-top-color: var(--subject-esl); }
+.subject-card.subject-math { border-top-color: var(--subject-math); }
+.subject-card.subject-science { border-top-color: var(--subject-science); }
+
+.subject-esl .subject-icon { color: var(--subject-esl); }
+.subject-math .subject-icon { color: var(--subject-math); }
+.subject-science .subject-icon { color: var(--subject-science); }
+
+.guide-card {
+    border-radius: 0.75rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.guide-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
 }
 
 .favorite-btn {

@@ -8,21 +8,33 @@ require_once __DIR__ . '/includes/review-functions.php';
 require_once __DIR__ . '/includes/video-functions.php';
 require_once __DIR__ . '/includes/games-functions.php';
 require_once __DIR__ . '/includes/bundle-functions.php';
+require_once __DIR__ . '/includes/guide-functions.php';
 
-$freeResources = attach_rating_summaries(get_free_resources(6));
 $featuredVideos = get_featured_videos(3);
 $featuredGames = get_featured_games(4);
 $featuredBundles = get_featured_bundles(6);
 $subjects = get_all_subjects();
+$subjectCounts = get_resource_counts_by_subject();
 $featuredReviews = get_featured_site_reviews(3);
+$recentGuides = get_recent_guides(3);
+
+// Real, live counts for the homepage trust strip — nothing here is ever
+// hardcoded or estimated, so the numbers stay accurate as the site grows.
+$statResourceCount = get_published_resource_count();
+$statSubjectCount = count($subjects);
+$statGameCount = count(get_all_games());
+$statGuideCount = get_published_guide_count();
 
 // Real download data decides which section we show — never fabricated.
 // A small minimum threshold avoids calling a couple of stray downloads
-// "Popular"; below that, real recency ("Latest Resources") is the
-// honest thing to show instead.
+// "Popular"; below that, real recency ("New Resources") is the honest
+// thing to show instead. This is the homepage's one resource-discovery
+// grid — free-resource access is still front and center via the hero's
+// CTA and every card's Free/Members badge, without a second overlapping
+// section repeating the same resources.
 $popularCandidates = get_popular_resources(6);
 $showPopular = !empty($popularCandidates) && (int)$popularCandidates[0]['download_count'] >= 5;
-$secondaryResourcesTitle = $showPopular ? 'Popular Resources' : 'Latest Resources';
+$secondaryResourcesTitle = $showPopular ? 'Popular Resources' : 'New Resources';
 $secondaryResources = attach_rating_summaries($showPopular ? $popularCandidates : get_featured_resources(6));
 
 $subjectIcons = [
@@ -90,61 +102,45 @@ require_once __DIR__ . '/includes/header.php';
                     <a href="<?= e(base_url('resources.php?access=free')) ?>" class="btn btn-light btn-lg px-4 fw-semibold">Browse Free Resources</a>
                     <a href="<?= e(base_url('games.php')) ?>" class="btn btn-outline-light btn-lg px-4">Explore Games</a>
                 </div>
-                <p class="small mb-0" style="opacity:0.85;">Free resources &bull; Easy downloads &bull; Classroom-ready materials</p>
+                <p class="small mb-0" style="opacity:0.85;">Free resources &bull; No login required &bull; Classroom-ready materials</p>
             </div>
         </div>
     </div>
 </section>
 
-<?php if (!empty($featuredGames)): ?>
-<section class="py-5" id="games">
+<section class="py-4 border-bottom">
     <div class="container">
-        <div class="text-center mb-4">
-            <h2 class="h3 fw-bold mb-2">🎮 Play &amp; Learn</h2>
-            <p class="text-secondary mx-auto" style="max-width:640px;">Interactive classroom games you can play on a projector, interactive board, tablet or phone &mdash; no login required.</p>
-        </div>
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 justify-content-center mb-4">
-            <?php foreach ($featuredGames as $game): ?>
-                <?php include __DIR__ . '/includes/game-card.php'; ?>
-            <?php endforeach; ?>
-        </div>
-        <div class="text-center">
-            <a href="<?= e(base_url('games.php')) ?>" class="btn btn-outline-primary">Explore All Games &rarr;</a>
-        </div>
-    </div>
-</section>
-<?php endif; ?>
-
-<section class="py-5 section-soft">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-5">
-            <h2 class="h3 fw-bold mb-0">Free Teaching Resources</h2>
-            <a href="<?= e(base_url('resources.php?access=free')) ?>" class="small">View All Free Resources &rarr;</a>
-        </div>
-        <p class="text-secondary mb-4" style="max-width:640px;">Ready-to-use classroom materials you can download and use today.</p>
-        <?php if (empty($freeResources)): ?>
-            <p class="text-secondary">New free resources are being added — check back soon!</p>
-        <?php else: ?>
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
-                <?php foreach ($freeResources as $resource): ?>
-                    <?php include __DIR__ . '/includes/resource-card.php'; ?>
-                <?php endforeach; ?>
+        <div class="row g-3 text-center">
+            <div class="col-6 col-md-3">
+                <div class="fw-bold h4 mb-0 text-primary"><?= (int)$statResourceCount ?>+</div>
+                <p class="small text-secondary mb-0">Teaching Resources</p>
             </div>
-        <?php endif; ?>
+            <div class="col-6 col-md-3">
+                <div class="fw-bold h4 mb-0 text-primary"><?= (int)$statSubjectCount ?></div>
+                <p class="small text-secondary mb-0">Subjects Covered</p>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="fw-bold h4 mb-0 text-primary"><?= (int)$statGameCount ?></div>
+                <p class="small text-secondary mb-0">Learning Games</p>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="fw-bold h4 mb-0 text-primary"><?= (int)$statGuideCount ?></div>
+                <p class="small text-secondary mb-0">Teacher Hub Guides</p>
+            </div>
+        </div>
     </div>
 </section>
 
-<?php if (!empty($featuredBundles)): ?>
-<section class="py-5 section-soft">
+<?php if (!empty($secondaryResources)): ?>
+<section class="py-5">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-5">
-            <h2 class="h3 fw-bold mb-0">Featured Bundles</h2>
-            <a href="<?= e(base_url('bundles.php')) ?>" class="small">View All Bundles &rarr;</a>
+            <h2 class="h3 fw-bold mb-0"><?= e($secondaryResourcesTitle) ?></h2>
+            <a href="<?= e(base_url('resources.php')) ?>" class="small">View All Resources &rarr;</a>
         </div>
-        <p class="text-secondary mb-4" style="max-width:640px;">Save money bundling related resources together in one purchase.</p>
         <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
-            <?php foreach ($featuredBundles as $bundle): ?>
-                <?php include __DIR__ . '/includes/bundle-card.php'; ?>
+            <?php foreach ($secondaryResources as $resource): ?>
+                <?php include __DIR__ . '/includes/resource-card.php'; ?>
             <?php endforeach; ?>
         </div>
     </div>
@@ -154,21 +150,62 @@ require_once __DIR__ . '/includes/header.php';
 <?php $adSlot = ADSENSE_SLOT_HOMEPAGE; require __DIR__ . '/includes/ad-unit.php'; ?>
 
 <?php if (!empty($subjects)): ?>
-<section class="py-5">
+<section class="py-5 section-soft">
     <div class="container">
         <h2 class="h3 fw-bold text-center mb-5">Browse by Subject</h2>
         <div class="row g-4 justify-content-center">
             <?php foreach ($subjects as $subject): ?>
                 <div class="col-md-4">
-                    <a href="<?= e(base_url('resources.php?subject_id=' . (int)$subject['id'])) ?>" class="card shadow-sm border-0 text-center text-decoration-none h-100">
+                    <a href="<?= e(base_url('resources.php?subject_id=' . (int)$subject['id'])) ?>" class="card subject-card shadow-sm border-0 text-center text-decoration-none h-100 subject-<?= e($subject['slug']) ?>">
                         <div class="card-body p-4">
-                            <i class="fa-solid <?= e($subjectIcons[$subject['slug']] ?? 'fa-book') ?> fa-2x text-primary mb-3"></i>
+                            <i class="fa-solid <?= e($subjectIcons[$subject['slug']] ?? 'fa-book') ?> fa-2x mb-3 subject-icon"></i>
                             <h3 class="h5 fw-bold text-dark mb-1"><?= e($subject['name']) ?></h3>
-                            <p class="small text-secondary mb-0"><?= e($subjectDescriptions[$subject['slug']] ?? ($subject['min_grade'] . ' - ' . $subject['max_grade'])) ?></p>
+                            <p class="small text-secondary mb-1"><?= e($subjectDescriptions[$subject['slug']] ?? ($subject['min_grade'] . ' - ' . $subject['max_grade'])) ?></p>
+                            <?php if (!empty($subjectCounts[$subject['name']])): ?>
+                                <p class="small fw-semibold mb-0 subject-icon"><?= (int)$subjectCounts[$subject['name']] ?> resources</p>
+                            <?php endif; ?>
                         </div>
                     </a>
                 </div>
             <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php if (!empty($featuredGames)): ?>
+<section class="py-5" id="games">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="h3 fw-bold mb-2">Make Learning More Interactive</h2>
+            <p class="text-secondary mx-auto" style="max-width:640px;">Classroom-friendly learning games &mdash; projector-ready, and playable on computers, tablets and phones. No login required.</p>
+        </div>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 justify-content-center mb-4">
+            <?php foreach ($featuredGames as $game): ?>
+                <?php include __DIR__ . '/includes/game-card.php'; ?>
+            <?php endforeach; ?>
+        </div>
+        <div class="text-center">
+            <a href="<?= e(base_url('games.php')) ?>" class="btn btn-outline-primary">View All Games &rarr;</a>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php if (!empty($recentGuides)): ?>
+<section class="py-5 section-soft">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="h3 fw-bold mb-2">Practical Teaching Ideas &amp; Guides</h2>
+            <p class="text-secondary mx-auto" style="max-width:640px;">The Teacher Hub: how-to-teach guidance, classroom activities and differentiation ideas alongside our downloadable resources.</p>
+        </div>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 mb-4">
+            <?php foreach ($recentGuides as $guide): ?>
+                <?php include __DIR__ . '/includes/guide-card.php'; ?>
+            <?php endforeach; ?>
+        </div>
+        <div class="text-center">
+            <a href="<?= e(base_url('teacher-hub.php')) ?>" class="btn btn-outline-primary">Visit the Teacher Hub &rarr;</a>
         </div>
     </div>
 </section>
@@ -193,65 +230,22 @@ require_once __DIR__ . '/includes/header.php';
 </section>
 <?php endif; ?>
 
-<section class="py-5">
-    <div class="container">
-        <h2 class="h3 fw-bold text-center mb-5">Why Teachers Use <?= e(SITE_NAME) ?></h2>
-        <div class="row g-4 text-center">
-            <div class="col-md-3">
-                <i class="fa-solid fa-clock fa-2x text-primary mb-3"></i>
-                <h3 class="h6 fw-bold">Ready to Use</h3>
-                <p class="small text-secondary">Download classroom-ready materials without spending hours creating everything from scratch.</p>
-            </div>
-            <div class="col-md-3">
-                <i class="fa-solid fa-chalkboard-user fa-2x text-primary mb-3"></i>
-                <h3 class="h6 fw-bold">Teacher-Friendly</h3>
-                <p class="small text-secondary">Resources are designed to be practical, clear and easy to use.</p>
-            </div>
-            <div class="col-md-3">
-                <i class="fa-solid fa-gamepad fa-2x text-primary mb-3"></i>
-                <h3 class="h6 fw-bold">Learn Through Play</h3>
-                <p class="small text-secondary">Interactive activities and educational games help make learning more engaging.</p>
-            </div>
-            <div class="col-md-3">
-                <i class="fa-solid fa-arrows-rotate fa-2x text-primary mb-3"></i>
-                <h3 class="h6 fw-bold">Growing Library</h3>
-                <p class="small text-secondary">New ESL, Mathematics and Science resources are continually being added.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<?php if (!empty($secondaryResources)): ?>
+<?php if (!empty($featuredBundles)): ?>
 <section class="py-5 section-soft">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-5">
-            <h2 class="h3 fw-bold mb-0"><?= e($secondaryResourcesTitle) ?></h2>
-            <a href="<?= e(base_url('resources.php')) ?>" class="small">View All Resources &rarr;</a>
+            <h2 class="h3 fw-bold mb-0">Featured Bundles</h2>
+            <a href="<?= e(base_url('bundles.php')) ?>" class="small">View All Bundles &rarr;</a>
         </div>
+        <p class="text-secondary mb-4" style="max-width:640px;">Save money bundling related resources together in one purchase.</p>
         <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
-            <?php foreach ($secondaryResources as $resource): ?>
-                <?php include __DIR__ . '/includes/resource-card.php'; ?>
+            <?php foreach ($featuredBundles as $bundle): ?>
+                <?php include __DIR__ . '/includes/bundle-card.php'; ?>
             <?php endforeach; ?>
         </div>
     </div>
 </section>
 <?php endif; ?>
-
-<section class="py-5">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card border-0 shadow-sm text-center">
-                    <div class="card-body p-4 p-md-5">
-                        <h2 class="h4 fw-bold mb-2">More Resources for Teachers</h2>
-                        <p class="text-secondary mb-4">Need more classroom-ready materials? Explore TeachLuma Pro resources for even more teaching options.</p>
-                        <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-primary px-4">Explore Pro Resources</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
 <?php if (!empty($featuredReviews)): ?>
 <section class="py-5 section-soft">
@@ -282,6 +276,22 @@ require_once __DIR__ . '/includes/header.php';
 <?php endif; ?>
 
 <section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body p-4 p-md-5">
+                        <h2 class="h4 fw-bold mb-2">Free to Start. Affordable to Grow.</h2>
+                        <p class="text-secondary mb-4">Every free resource is unlimited, no account required. When you're ready for the full members-only library, Teacher Pro is <?= e(format_currency(PRICE_MONTHLY)) ?>/month or <?= e(format_currency(PRICE_ANNUAL)) ?>/year.</p>
+                        <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-primary px-4">See Pricing &amp; Plans</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 section-soft">
     <div class="container">
         <h2 class="h3 fw-bold text-center mb-5">Frequently Asked Questions</h2>
         <div class="row justify-content-center">
