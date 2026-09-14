@@ -80,11 +80,11 @@ require_once __DIR__ . '/includes/header.php';
     </p>
 
     <form method="get" action="<?= e(base_url('resources.php')) ?>" class="row g-2 mb-4">
-        <div class="col-lg-2 col-md-6">
+        <div class="col-12 col-lg-2 col-md-6">
             <label for="filter-search" class="visually-hidden">Search resources</label>
             <input type="text" id="filter-search" name="search" class="form-control" placeholder="Search title, topic&hellip;" value="<?= e($filters['search']) ?>">
         </div>
-        <div class="col-lg-2 col-md-6">
+        <div class="col-12 col-lg-2 col-md-6">
             <label for="filter-subject" class="visually-hidden">Subject</label>
             <select id="filter-subject" name="subject_id" class="form-select" onchange="this.form.submit()">
                 <option value="">All Subjects</option>
@@ -93,7 +93,7 @@ require_once __DIR__ . '/includes/header.php';
                 <?php endforeach; ?>
             </select>
         </div>
-        <div class="col-lg-2 col-md-6">
+        <div class="col-12 col-lg-2 col-md-6">
             <label for="filter-grade" class="visually-hidden">Grade level</label>
             <select id="filter-grade" name="grade" class="form-select">
                 <option value="">All Grades</option>
@@ -102,7 +102,7 @@ require_once __DIR__ . '/includes/header.php';
                 <?php endforeach; ?>
             </select>
         </div>
-        <div class="col-lg-2 col-md-6">
+        <div class="col-12 col-lg-2 col-md-6">
             <label for="filter-type" class="visually-hidden">Resource type</label>
             <select id="filter-type" name="resource_type" class="form-select">
                 <option value="">All Types</option>
@@ -111,7 +111,7 @@ require_once __DIR__ . '/includes/header.php';
                 <?php endforeach; ?>
             </select>
         </div>
-        <div class="col-lg-2 col-md-6">
+        <div class="col-12 col-lg-2 col-md-6">
             <label for="filter-category" class="visually-hidden">Category</label>
             <select id="filter-category" name="category_id" class="form-select">
                 <option value="">All Categories</option>
@@ -126,7 +126,7 @@ require_once __DIR__ . '/includes/header.php';
                 <?php endforeach; ?>
             </select>
         </div>
-        <div class="col-lg-1 col-md-6">
+        <div class="col-12 col-lg-1 col-md-6">
             <label for="filter-access" class="visually-hidden">Access</label>
             <select id="filter-access" name="access" class="form-select">
                 <option value="">All Access</option>
@@ -134,7 +134,7 @@ require_once __DIR__ . '/includes/header.php';
                 <option value="members" <?= $filters['access'] === 'members' ? 'selected' : '' ?>>Members Only</option>
             </select>
         </div>
-        <div class="col-lg-1 col-md-6 d-grid">
+        <div class="col-12 col-lg-1 col-md-6 d-grid">
             <button type="submit" class="btn btn-primary" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
     </form>
