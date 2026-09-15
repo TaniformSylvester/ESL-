@@ -155,26 +155,32 @@ function current_url_with_params(array $params): string
 }
 
 /**
- * Renders a windowed pagination control: always the first and last page,
- * plus a small window around the current page, with an ellipsis for any
- * gap in between. A resource/user/review list with many pages used to
- * render EVERY page number in one unwrapped row (Bootstrap's .pagination
- * is display:flex with no wrap) — fine with a handful of pages, but with
- * enough of them it overflowed the viewport horizontally on mobile,
- * centered by justify-content-center so the page even loaded scrolled
- * into the middle of the list rather than showing page 1. Windowing keeps
- * the control to a small, fixed number of items regardless of how many
- * pages exist, so it can never overflow.
+ * Renders pagination — the original full page-number list unchanged on
+ * tablet/desktop (>= md, 768px), and a windowed, position-stable version
+ * on mobile only (< md).
  *
- * Previous/Next are deliberately their own separate <ul class="pagination">
- * groups (not part of the same flex line as the page numbers), pinned to
- * the far left/right of the outer flex <nav> via justify-content-between.
- * The page-number window's width varies by page (e.g. "1 2 … 9" near the
- * start vs "1 … 4 5 6 … 9" in the middle vs "1 … 8 9" near the end) — if
- * Previous/Next shared one centered row with the numbers, that changing
- * width shifted the whole centered block sideways on every click,
- * visibly relocating Next (and Previous) each time. Pinning them to fixed
- * edges keeps both stationary regardless of how many numbers are shown.
+ * A resource/user/review list with many pages used to render EVERY page
+ * number in one unwrapped row (Bootstrap's .pagination is display:flex
+ * with no wrap) everywhere, including mobile — fine on desktop where
+ * there's room, but on narrow viewports with enough pages it overflowed
+ * the screen horizontally, and being centered, the page even loaded
+ * scrolled into the middle of the list rather than showing page 1. There
+ * was no reason to change the desktop/tablet experience to fix a
+ * mobile-only problem, so it's kept exactly as it was and only the
+ * mobile markup differs.
+ *
+ * The mobile version windows the numbers (first, last, and a small range
+ * around the current page, with an ellipsis for any gap) so it can never
+ * overflow regardless of how many total pages exist. Previous/Next are
+ * their own separate <ul class="pagination"> groups (not part of the
+ * same flex line as the numbers), pinned to the far left/right of the
+ * outer flex row via justify-content-between — the page-number window's
+ * width varies by page (e.g. "1 2 … 9" near the start vs "1 … 4 5 6 … 9"
+ * in the middle vs "1 … 8 9" near the end), and if Previous/Next shared
+ * one centered row with the numbers, that changing width shifted the
+ * whole centered block sideways on every click, visibly relocating Next
+ * (and Previous) each time. Pinning them to fixed edges keeps both
+ * stationary regardless of how many numbers are shown.
  */
 function render_pagination(int $currentPage, int $totalPages): string
 {
@@ -183,8 +189,23 @@ function render_pagination(int $currentPage, int $totalPages): string
     }
 
     $prevDisabled = $currentPage <= 1 ? ' disabled' : '';
+    $nextDisabled = $currentPage >= $totalPages ? ' disabled' : '';
+    $prevUrl = e(current_url_with_params(['page' => max(1, $currentPage - 1)]));
+    $nextUrl = e(current_url_with_params(['page' => min($totalPages, $currentPage + 1)]));
+
+    // --- Desktop/tablet (>= md): the original, unwindowed full list ---
+    $desktopHtml = '<ul class="pagination justify-content-center d-none d-md-flex">'
+        . '<li class="page-item' . $prevDisabled . '"><a class="page-link" href="' . $prevUrl . '">Previous</a></li>';
+    for ($i = 1; $i <= $totalPages; $i++) {
+        $active = $i === $currentPage ? ' active' : '';
+        $desktopHtml .= '<li class="page-item' . $active . '">'
+            . '<a class="page-link" href="' . e(current_url_with_params(['page' => $i])) . '">' . $i . '</a></li>';
+    }
+    $desktopHtml .= '<li class="page-item' . $nextDisabled . '"><a class="page-link" href="' . $nextUrl . '">Next</a></li></ul>';
+
+    // --- Mobile (< md): windowed, with Previous/Next pinned to fixed edges ---
     $prevHtml = '<ul class="pagination mb-0"><li class="page-item' . $prevDisabled . '">'
-        . '<a class="page-link" href="' . e(current_url_with_params(['page' => max(1, $currentPage - 1)])) . '">Previous</a></li></ul>';
+        . '<a class="page-link" href="' . $prevUrl . '">Previous</a></li></ul>';
 
     $pagesToShow = array_unique(array_filter(
         [1, $currentPage - 1, $currentPage, $currentPage + 1, $totalPages],
@@ -205,10 +226,11 @@ function render_pagination(int $currentPage, int $totalPages): string
     }
     $numbersHtml .= '</ul>';
 
-    $nextDisabled = $currentPage >= $totalPages ? ' disabled' : '';
     $nextHtml = '<ul class="pagination mb-0"><li class="page-item' . $nextDisabled . '">'
-        . '<a class="page-link" href="' . e(current_url_with_params(['page' => min($totalPages, $currentPage + 1)])) . '">Next</a></li></ul>';
+        . '<a class="page-link" href="' . $nextUrl . '">Next</a></li></ul>';
 
-    return '<nav aria-label="Page navigation" class="d-flex justify-content-between align-items-start flex-nowrap gap-2">'
-        . $prevHtml . $numbersHtml . $nextHtml . '</nav>';
+    $mobileHtml = '<div class="d-flex d-md-none justify-content-between align-items-start flex-nowrap gap-2">'
+        . $prevHtml . $numbersHtml . $nextHtml . '</div>';
+
+    return '<nav aria-label="Page navigation">' . $desktopHtml . $mobileHtml . '</nav>';
 }
