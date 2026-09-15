@@ -1,0 +1,11 @@
+# Files placed directly here (e.g. the PromptPay QR code) are public images,
+# but block any script file from ever being executed — defense in depth.
+<FilesMatch "\.(php|php\d|phtml|pht|phar|cgi|pl|py|sh)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>

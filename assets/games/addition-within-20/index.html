@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Addition Within 20 — Practice Drill</title>
+<style>
+  :root {
+    --brand-primary: #2563eb;
+    --brand-primary-dark: #1d4ed8;
+    --brand-bg-soft: #f8fafc;
+    --brand-success: #16a34a;
+    --brand-danger: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    color: #1f2937;
+    background-color: #ffffff;
+    padding: 1.25rem;
+  }
+  .wrap { max-width: 420px; margin: 0 auto; }
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 1.25rem;
+  }
+  .question {
+    text-align: center;
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin: 0 0 1.5rem;
+    color: #111827;
+  }
+  .answers {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .answer-btn {
+    font-size: 1.15rem;
+    font-weight: 600;
+    padding: 0.75rem 0.5rem;
+    border-radius: 0.5rem;
+    border: 2px solid var(--brand-primary);
+    background: #fff;
+    color: var(--brand-primary);
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .answer-btn:hover:not(:disabled) {
+    background-color: var(--brand-primary);
+    color: #fff;
+  }
+  .answer-btn:disabled { cursor: default; opacity: 0.6; }
+  .answer-btn.correct { background-color: var(--brand-success); border-color: var(--brand-success); color: #fff; opacity: 1; }
+  .answer-btn.incorrect { background-color: var(--brand-danger); border-color: var(--brand-danger); color: #fff; opacity: 1; }
+  .feedback {
+    text-align: center;
+    font-weight: 700;
+    min-height: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .result { text-align: center; }
+  .result .big { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; }
+  .btn {
+    display: inline-block;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.6rem 1.5rem;
+    border-radius: 0.5rem;
+    border: 2px solid var(--brand-primary);
+    background: var(--brand-primary);
+    color: #fff;
+    cursor: pointer;
+  }
+  .btn:hover { background-color: var(--brand-primary-dark); border-color: var(--brand-primary-dark); }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="meta">
+    <span id="qCounter">Question 1/10</span>
+    <span>Score: <span id="score">0</span></span>
+  </div>
+
+  <div id="gameArea">
+    <p class="question" id="question">&nbsp;</p>
+    <div class="answers">
+      <button type="button" class="answer-btn" id="ans0"></button>
+      <button type="button" class="answer-btn" id="ans1"></button>
+      <button type="button" class="answer-btn" id="ans2"></button>
+    </div>
+    <p class="feedback" id="feedback">&nbsp;</p>
+  </div>
+
+  <div id="result" class="result hidden">
+    <p style="font-size:2rem;margin-bottom:0.5rem;">🎉</p>
+    <p class="big" id="resultText">&nbsp;</p>
+    <button type="button" class="btn" id="playAgain">Play Again</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var TOTAL_QUESTIONS = 10;
+  var qCounterEl = document.getElementById('qCounter');
+  var scoreEl = document.getElementById('score');
+  var questionEl = document.getElementById('question');
+  var feedbackEl = document.getElementById('feedback');
+  var gameArea = document.getElementById('gameArea');
+  var resultEl = document.getElementById('result');
+  var resultTextEl = document.getElementById('resultText');
+  var answerButtons = [document.getElementById('ans0'), document.getElementById('ans1'), document.getElementById('ans2')];
+  var playAgainBtn = document.getElementById('playAgain');
+
+  var currentIndex = 0;
+  var score = 0;
+  var currentAnswer = 0;
+  var locked = false;
+
+  function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function buildQuestion() {
+    var a = randInt(1, 15);
+    var b = randInt(1, 20 - a);
+    var answer = a + b;
+
+    var options = [answer];
+    while (options.length < 3) {
+      var offset = randInt(-4, 4);
+      var candidate = answer + offset;
+      if (offset !== 0 && candidate >= 0 && candidate <= 20 && options.indexOf(candidate) === -1) {
+        options.push(candidate);
+      }
+    }
+    options.sort(function () { return Math.random() - 0.5; });
+
+    currentAnswer = answer;
+    questionEl.textContent = a + ' + ' + b + ' = ?';
+    answerButtons.forEach(function (btn, i) {
+      btn.textContent = String(options[i]);
+      btn.className = 'answer-btn';
+      btn.disabled = false;
+    });
+    feedbackEl.textContent = ' ';
+    locked = false;
+  }
+
+  function showQuestion() {
+    if (currentIndex >= TOTAL_QUESTIONS) {
+      gameArea.classList.add('hidden');
+      resultEl.classList.remove('hidden');
+      resultTextEl.textContent = 'You scored ' + score + ' out of ' + TOTAL_QUESTIONS + '!';
+      return;
+    }
+    qCounterEl.textContent = 'Question ' + (currentIndex + 1) + '/' + TOTAL_QUESTIONS;
+    buildQuestion();
+  }
+
+  answerButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (locked) { return; }
+      locked = true;
+      var chosen = parseInt(btn.textContent, 10);
+      var isCorrect = chosen === currentAnswer;
+
+      answerButtons.forEach(function (b) {
+        b.disabled = true;
+        if (parseInt(b.textContent, 10) === currentAnswer) {
+          b.classList.add('correct');
+        } else if (b === btn) {
+          b.classList.add('incorrect');
+        }
+      });
+
+      if (isCorrect) {
+        score++;
+        scoreEl.textContent = String(score);
+        feedbackEl.textContent = 'Correct!';
+        feedbackEl.style.color = '#16a34a';
+      } else {
+        feedbackEl.textContent = 'The answer was ' + currentAnswer + '.';
+        feedbackEl.style.color = '#dc2626';
+      }
+
+      window.setTimeout(function () {
+        currentIndex++;
+        showQuestion();
+      }, 1000);
+    });
+  });
+
+  playAgainBtn.addEventListener('click', function () {
+    currentIndex = 0;
+    score = 0;
+    scoreEl.textContent = '0';
+    resultEl.classList.add('hidden');
+    gameArea.classList.remove('hidden');
+    showQuestion();
+  });
+
+  showQuestion();
+})();
+</script>
+</body>
+</html>
