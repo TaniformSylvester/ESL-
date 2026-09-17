@@ -25,17 +25,12 @@ $statSubjectCount = count($subjects);
 $statGameCount = count(get_all_games());
 $statGuideCount = get_published_guide_count();
 
-// Real download data decides which section we show — never fabricated.
-// A small minimum threshold avoids calling a couple of stray downloads
-// "Popular"; below that, real recency ("New Resources") is the honest
-// thing to show instead. This is the homepage's one resource-discovery
-// grid — free-resource access is still front and center via the hero's
-// CTA and every card's Free/Members badge, without a second overlapping
-// section repeating the same resources.
-$popularCandidates = get_popular_resources(6);
-$showPopular = !empty($popularCandidates) && (int)$popularCandidates[0]['download_count'] >= 5;
-$secondaryResourcesTitle = $showPopular ? 'Popular Resources' : 'New Resources';
-$secondaryResources = attach_rating_summaries($showPopular ? $popularCandidates : get_featured_resources(6));
+// The homepage's one resource-discovery grid: the most recently
+// published resources — free-resource access is still front and center
+// via the hero's CTA and every card's Free/Members badge, without a
+// second overlapping section repeating the same resources.
+$secondaryResourcesTitle = 'Featured Resources';
+$secondaryResources = attach_rating_summaries(get_featured_resources(6));
 
 $subjectIcons = [
     'esl'     => 'fa-comments',
