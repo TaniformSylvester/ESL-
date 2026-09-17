@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Daily Routines Adventure — TeachLuma Games</title>
+<style>
+  :root {
+    --brand-primary: #2563eb;
+    --brand-primary-dark: #1d4ed8;
+    --brand-secondary: #f59e0b;
+    --brand-success: #16a34a;
+    --brand-danger: #dc2626;
+    --brand-bg-soft: #f8fafc;
+    --ink: #1f2937;
+    --ink-soft: #64748b;
+    --border: #e2e8f0;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    color: var(--ink);
+    background: linear-gradient(135deg, #fef3c7 0%, #fce7f3 50%, #dbeafe 100%);
+    overflow: hidden;
+  }
+
+  #app {
+    min-height: 100vh;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #app:fullscreen,
+  #app:-webkit-full-screen {
+    background: linear-gradient(135deg, #fef3c7 0%, #fce7f3 50%, #dbeafe 100%);
+  }
+
+  .hidden { display: none !important; }
+
+  /* -----------------------------------------------------------------
+     Top bar — matches the other TeachLuma games
+     ----------------------------------------------------------------- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.9rem;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .topbar-title {
+    font-weight: 700;
+    font-size: clamp(0.9rem, 2vw, 1.15rem);
+    color: var(--brand-primary-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: clamp(0.85rem, 1.6vw, 1rem);
+    font-weight: 600;
+    padding: 0.5rem 0.8rem;
+    border-radius: 0.5rem;
+    border: 2px solid var(--border);
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+    line-height: 1;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  .icon-btn:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
+  .icon-btn:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+
+  .topbar-actions { display: flex; gap: 0.5rem; }
+
+  /* -----------------------------------------------------------------
+     Scrollable game body — this game packs five activities with rich
+     content (stories, word banks, multi-step instructions), so unlike
+     the shorter quiz-style games, the card scrolls internally when it
+     doesn't fit rather than trying to shrink everything to fit exactly.
+     The topbar above always stays put; this is the only scrolling
+     surface, so there's never a double scrollbar.
+     ----------------------------------------------------------------- */
+  .game-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    padding: 0.75rem;
+  }
+
+  .screen {
+    width: 100%;
+    max-width: 900px;
+    height: fit-content;
+    background: #fff;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .header { text-align: center; margin-bottom: 0.5rem; }
+
+  .title {
+    font-size: clamp(1.4rem, 5vw, 2.25rem);
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+    color: var(--ink);
+  }
+
+  .subtitle {
+    font-size: clamp(0.875rem, 3vw, 1.1rem);
+    color: var(--ink-soft);
+    margin: 0;
+    font-weight: 400;
+  }
+
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--brand-bg-soft);
+    border-radius: 8px;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .score-badge {
+    background: var(--brand-secondary);
+    color: #78350f;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: clamp(0.875rem, 2vw, 1.1rem);
+    white-space: nowrap;
+  }
+
+  .progress-container { flex: 1; min-width: 120px; }
+
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--brand-primary), var(--brand-success));
+    transition: width 0.3s ease;
+  }
+
+  .home-content { text-align: center; display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .instructions {
+    background: #eff6ff;
+    border-left: 4px solid var(--brand-primary);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: left;
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    color: var(--brand-primary-dark);
+    line-height: 1.6;
+  }
+
+  .instructions ul { margin: 0.5rem 0; padding-left: 1.5rem; }
+  .instructions li { margin: 0.25rem 0; }
+
+  .start-button {
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-dark));
+    color: #fff;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+    min-height: 56px;
+    touch-action: manipulation;
+  }
+
+  .start-button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4); }
+  .start-button:focus-visible { outline: 3px solid var(--brand-primary-dark); outline-offset: 2px; }
+
+  .activity-tabs {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+  }
+
+  .tab-button {
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--border);
+    background: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: clamp(0.8rem, 2vw, 0.95rem);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    min-height: 40px;
+    touch-action: manipulation;
+  }
+
+  .tab-button.active { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); }
+  .tab-button:hover { border-color: #d1d5db; }
+  .tab-button:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+
+  .order-container { display: flex; flex-direction: column; gap: 0.75rem; }
+  .order-container > p { text-align: center; color: var(--ink-soft); margin: 0; font-size: clamp(0.8rem, 2vw, 0.95rem); }
+
+  .routine-card {
+    background: #fff;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    flex-wrap: wrap;
+  }
+
+  .routine-card:hover { border-color: var(--brand-primary); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+  .routine-card:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+  .routine-card.selected { background: #eff6ff; border-color: var(--brand-primary); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+  .routine-card.correct { background: #ecfdf5; border-color: var(--brand-success); }
+  .routine-card.incorrect { background: #fef2f2; border-color: var(--brand-danger); }
+
+  .routine-emoji { font-size: clamp(1.75rem, 5vw, 2.5rem); min-width: 50px; text-align: center; flex-shrink: 0; }
+  .routine-text { flex: 1; font-size: clamp(0.95rem, 2vw, 1.1rem); font-weight: 500; color: var(--ink); min-width: 120px; }
+
+  .routine-controls { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; justify-content: center; width: 100%; }
+
+  .control-button {
+    background: #fff;
+    border: 1px solid #d1d5db;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    color: #374151;
+    min-width: 40px;
+    min-height: 40px;
+    touch-action: manipulation;
+  }
+
+  .control-button:hover:not(:disabled) { background: var(--brand-bg-soft); border-color: #9ca3af; }
+  .control-button:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+  .control-button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .hear-button {
+    background: var(--brand-secondary);
+    border: none;
+    color: #78350f;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    font-weight: 600;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    min-height: 40px;
+    touch-action: manipulation;
+  }
+
+  .hear-button:hover { background: #d97706; }
+  .hear-button:focus-visible { outline: 3px solid #78350f; outline-offset: 2px; }
+
+  .check-button {
+    background: linear-gradient(135deg, var(--brand-success), #15803d);
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 48px;
+    touch-action: manipulation;
+  }
+
+  .check-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3); }
+  .check-button:focus-visible { outline: 3px solid #15803d; outline-offset: 2px; }
+  .check-button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .feedback {
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+    text-align: center;
+    animation: slideIn 0.3s ease;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+  }
+
+  .feedback.success { background: #ecfdf5; color: #065f46; border-left: 4px solid var(--brand-success); }
+  .feedback.error { background: #fef2f2; color: #7f1d1d; border-left: 4px solid var(--brand-danger); }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .match-container { display: flex; flex-direction: column; gap: 1rem; }
+
+  .word-helper { background: #f0fdf4; border: 2px solid #86efac; border-radius: 12px; padding: 1rem; text-align: center; }
+  .helper-label { font-size: clamp(0.65rem, 1.5vw, 0.75rem); font-weight: 600; color: #4b5563; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
+  .helper-phrase { font-size: clamp(1.3rem, 4vw, 1.8rem); font-weight: 700; color: #15803d; margin-bottom: 0.75rem; word-wrap: break-word; }
+  .helper-hint { font-size: clamp(0.85rem, 2vw, 0.95rem); color: #4b5563; line-height: 1.5; }
+
+  .sentence-display {
+    background: #fffbeb;
+    border: 2px solid #fcd34d;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    font-size: clamp(1rem, 3vw, 1.3rem);
+    font-weight: 600;
+    color: #78350f;
+    word-wrap: break-word;
+  }
+
+  .choices-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; }
+
+  .choice-card {
+    background: #fff;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 120px;
+    justify-content: center;
+    font-family: inherit;
+    touch-action: manipulation;
+  }
+
+  .choice-card:hover:not(:disabled) { border-color: var(--brand-primary); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+  .choice-card:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+  .choice-card.selected { background: #eff6ff; border-color: var(--brand-primary); }
+  .choice-card.correct { background: #ecfdf5; border-color: var(--brand-success); }
+  .choice-card.incorrect { background: #fef2f2; border-color: var(--brand-danger); }
+  .choice-card:disabled { cursor: default; }
+
+  .choice-emoji { font-size: clamp(1.75rem, 5vw, 2.5rem); }
+  .choice-text { font-size: clamp(0.8rem, 2vw, 0.95rem); font-weight: 500; color: var(--ink); word-wrap: break-word; }
+
+  .completion-screen { text-align: center; display: flex; flex-direction: column; gap: 1.5rem; }
+  .completion-emoji { font-size: clamp(3rem, 10vw, 4rem); animation: bounce 0.6s ease infinite; }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .completion-text { font-size: clamp(1.25rem, 4vw, 1.5rem); font-weight: 700; color: var(--ink); }
+  .completion-score { font-size: clamp(1.5rem, 5vw, 2rem); font-weight: 700; color: var(--brand-secondary); }
+  .completion-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+  .play-again-button {
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-dark));
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 48px;
+    touch-action: manipulation;
+  }
+
+  .play-again-button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+  .play-again-button:focus-visible { outline: 3px solid var(--brand-primary-dark); outline-offset: 2px; }
+
+  .next-button {
+    background: var(--brand-primary);
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 48px;
+    touch-action: manipulation;
+  }
+
+  .next-button:hover { background: var(--brand-primary-dark); }
+  .next-button:focus-visible { outline: 3px solid var(--brand-primary-dark); outline-offset: 2px; }
+
+  .try-again-button {
+    background: var(--brand-secondary);
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 48px;
+    touch-action: manipulation;
+  }
+
+  .try-again-button:hover { background: #d97706; }
+  .try-again-button:focus-visible { outline: 3px solid #b45309; outline-offset: 2px; }
+
+  .sentence-builder-container { display: flex; flex-direction: column; gap: 1rem; }
+
+  .target-sentence {
+    background: #f0fdf4;
+    border: 2px solid #86efac;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    font-weight: 600;
+    color: #15803d;
+    word-wrap: break-word;
+  }
+
+  .builder-hint { text-align: center; color: var(--ink-soft); margin: 0 0 0.5rem; font-size: clamp(0.8rem, 2vw, 0.95rem); }
+
+  .word-bank { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; padding: 0.75rem; background: var(--brand-bg-soft); border-radius: 12px; }
+
+  .word-chip {
+    background: #fff;
+    border: 2px solid var(--border);
+    padding: 0.5rem 0.75rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: clamp(0.8rem, 2vw, 0.95rem);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    color: var(--ink);
+    white-space: nowrap;
+    font-family: inherit;
+    min-height: 40px;
+    touch-action: manipulation;
+  }
+
+  .word-chip:hover:not(:disabled) { border-color: var(--brand-primary); background: #eff6ff; }
+  .word-chip:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+  .word-chip:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .sentence-builder-output {
+    background: #fffbeb;
+    border: 2px solid #fcd34d;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    color: #78350f;
+  }
+
+  .builder-placeholder { color: #9ca3af; font-style: italic; }
+
+  .built-word {
+    background: var(--brand-secondary);
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .remove-word-btn {
+    background: none;
+    border: none;
+    color: #78350f;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0;
+    font-weight: bold;
+    min-width: 20px;
+  }
+
+  .remove-word-btn:focus-visible { outline: 2px solid #78350f; outline-offset: 1px; }
+
+  .time-match-container { display: flex; flex-direction: column; gap: 1rem; }
+
+  .time-display {
+    background: #ede9fe;
+    border: 2px solid #c4b5fd;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    font-size: clamp(1rem, 3vw, 1.3rem);
+    font-weight: 600;
+    color: #6d28d9;
+  }
+
+  .time-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.75rem; }
+
+  .time-choice {
+    background: #fff;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 80px;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    font-weight: 600;
+    color: var(--ink);
+    word-wrap: break-word;
+    font-family: inherit;
+    touch-action: manipulation;
+  }
+
+  .time-choice:hover:not(:disabled) { border-color: var(--brand-primary); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+  .time-choice:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+  .time-choice.selected { background: #eff6ff; border-color: var(--brand-primary); }
+  .time-choice.correct { background: #ecfdf5; border-color: var(--brand-success); }
+  .time-choice.incorrect { background: #fef2f2; border-color: var(--brand-danger); }
+  .time-choice:disabled { cursor: default; }
+
+  .read-choose-container { display: flex; flex-direction: column; gap: 1rem; }
+
+  .story-box {
+    background: #f0f9ff;
+    border: 2px solid #7dd3fc;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    color: #0c4a6e;
+    line-height: 1.8;
+    word-wrap: break-word;
+  }
+
+  .question-box {
+    background: #fef3c7;
+    border: 2px solid #fcd34d;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    font-weight: 600;
+    color: #78350f;
+    word-wrap: break-word;
+  }
+
+  .answer-choices { display: flex; flex-direction: column; gap: 0.75rem; }
+
+  .answer-choice {
+    background: #fff;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 0.75rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    font-weight: 500;
+    color: var(--ink);
+    word-wrap: break-word;
+    font-family: inherit;
+    min-height: 48px;
+    touch-action: manipulation;
+  }
+
+  .answer-choice:hover:not(:disabled) { border-color: var(--brand-primary); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+  .answer-choice:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+  .answer-choice.selected { background: #eff6ff; border-color: var(--brand-primary); }
+  .answer-choice.correct { background: #ecfdf5; border-color: var(--brand-success); }
+  .answer-choice.incorrect { background: #fef2f2; border-color: var(--brand-danger); }
+  .answer-choice:disabled { cursor: default; }
+
+  .activity-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.75rem; margin: 0.5rem 0; }
+
+  .summary-card { background: var(--brand-bg-soft); border: 2px solid var(--border); border-radius: 12px; padding: 0.75rem; text-align: center; }
+  .summary-title { font-size: clamp(0.75rem, 2vw, 0.9rem); font-weight: 600; color: var(--ink-soft); margin-bottom: 0.5rem; word-wrap: break-word; }
+  .summary-score { font-size: clamp(1.4rem, 4vw, 1.8rem); font-weight: 700; color: var(--brand-secondary); }
+
+  .button-group { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+
+  .completion-status { color: var(--brand-success); font-weight: 600; font-size: clamp(0.95rem, 2vw, 1.1rem); }
+
+  .time-action { text-align: center; }
+  .time-action-emoji { font-size: clamp(1.5rem, 5vw, 2rem); margin-bottom: 0.5rem; }
+  .time-action-text { font-size: clamp(0.95rem, 2vw, 1.2rem); font-weight: 600; color: var(--ink); word-wrap: break-word; }
+
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Short landscape (phones lying flat): tighten the topbar and body
+     padding — the game-body's own scrolling handles the rest, so this
+     mainly reclaims a little vertical room rather than fitting exactly. */
+  @media (max-height: 480px) and (orientation: landscape) {
+    .topbar { padding: 0.25rem 0.75rem; }
+    .icon-btn { min-height: 32px; padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+    .game-body { padding: 0.4rem; }
+    .screen { padding: 0.6rem; gap: 0.6rem; }
+    .header { margin-bottom: 0; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <span class="topbar-title">🌞 Daily Routines Adventure</span>
+    <div class="topbar-actions">
+      <button type="button" class="icon-btn" id="muteBtn" aria-pressed="false" aria-label="Mute sound">🔊<span class="sr-only"> Sound on</span></button>
+      <button type="button" class="icon-btn" id="fullscreenBtn" aria-label="Enter fullscreen">⛶ Fullscreen</button>
+    </div>
+  </div>
+  <div class="game-body">
+    <div class="screen" id="screenRoot"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // -------------------------------------------------------------------
+  // Content data — unchanged from the original design.
+  // -------------------------------------------------------------------
+  var ROUTINES = [
+    { id: 1, phrase: 'wake up', emoji: '🌅' },
+    { id: 2, phrase: 'brush my teeth', emoji: '🪥' },
+    { id: 3, phrase: 'get dressed', emoji: '👕' },
+    { id: 4, phrase: 'eat breakfast', emoji: '🥣' },
+    { id: 5, phrase: 'go to school', emoji: '🏫' },
+    { id: 6, phrase: 'go to bed', emoji: '🛏️' }
+  ];
+
+  var CORRECT_ORDER = [1, 2, 3, 4, 5, 6];
+
+  var MATCH_QUESTIONS = [
+    { id: 1, sentence: 'I wake up.', correctId: 1, distractorIds: [4, 6] },
+    { id: 2, sentence: 'I brush my teeth.', correctId: 2, distractorIds: [1, 3] },
+    { id: 3, sentence: 'I get dressed.', correctId: 3, distractorIds: [2, 5] },
+    { id: 4, sentence: 'I eat breakfast.', correctId: 4, distractorIds: [3, 6] },
+    { id: 5, sentence: 'I go to school.', correctId: 5, distractorIds: [1, 4] }
+  ];
+
+  var SENTENCE_BUILDER_QUESTIONS = [
+    { id: 1, targetSentence: 'I wake up in the morning.', words: ['I', 'wake', 'up', 'in', 'the', 'morning'], correctOrder: ['I', 'wake', 'up', 'in', 'the', 'morning'] },
+    { id: 2, targetSentence: 'I brush my teeth.', words: ['I', 'brush', 'my', 'teeth'], correctOrder: ['I', 'brush', 'my', 'teeth'] },
+    { id: 3, targetSentence: 'I eat breakfast.', words: ['I', 'eat', 'breakfast'], correctOrder: ['I', 'eat', 'breakfast'] },
+    { id: 4, targetSentence: 'I go to school.', words: ['I', 'go', 'to', 'school'], correctOrder: ['I', 'go', 'to', 'school'] },
+    { id: 5, targetSentence: 'I go to bed at night.', words: ['I', 'go', 'to', 'bed', 'at', 'night'], correctOrder: ['I', 'go', 'to', 'bed', 'at', 'night'] }
+  ];
+
+  var TIME_MATCH_QUESTIONS = [
+    { id: 1, action: 'wake up', emoji: '🌅', correctTime: "7 o'clock", times: ["7 o'clock", "8 o'clock", "12 o'clock"] },
+    { id: 2, action: 'go to school', emoji: '🏫', correctTime: "8 o'clock", times: ["7 o'clock", "8 o'clock", "4 o'clock"] },
+    { id: 3, action: 'eat lunch', emoji: '🍽️', correctTime: "12 o'clock", times: ["12 o'clock", "8 o'clock", "4 o'clock"] },
+    { id: 4, action: 'do homework', emoji: '📚', correctTime: "4 o'clock", times: ["7 o'clock", "12 o'clock", "4 o'clock"] },
+    { id: 5, action: 'go to bed', emoji: '🛏️', correctTime: "8 o'clock", times: ["7 o'clock", "8 o'clock", "12 o'clock"] }
+  ];
+
+  var READ_CHOOSE_QUESTIONS = [
+    { id: 1, story: "My name is Ali. I wake up at 7 o'clock. I eat breakfast. Then I go to school.", question: 'What time does Ali wake up?', choices: ["7 o'clock", "8 o'clock", "12 o'clock"], correctChoice: "7 o'clock" },
+    { id: 2, story: 'I get dressed in the morning. I put on my shirt and pants. I put on my shoes. Then I go to school.', question: 'What does the child do first?', choices: ['put on shoes', 'get dressed', 'go to school'], correctChoice: 'get dressed' },
+    { id: 3, story: 'I eat breakfast. I eat cereal and milk. Then I brush my teeth. After that, I go to school.', question: 'What does the child eat?', choices: ['bread and jam', 'cereal and milk', 'eggs and toast'], correctChoice: 'cereal and milk' }
+  ];
+
+  var ACTIVITY_MAX_SCORES = { order: 10, match: 25, builder: 25, time: 25, read: 15 };
+
+  function shuffleArray(arr) {
+    var result = arr.slice();
+    for (var i = result.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = result[i]; result[i] = result[j]; result[j] = tmp;
+    }
+    return result;
+  }
+
+  function routineById(id) {
+    for (var i = 0; i < ROUTINES.length; i++) { if (ROUTINES[i].id === id) { return ROUTINES[i]; } }
+    return null;
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  // -------------------------------------------------------------------
+  // Sound — WebAudio tones for right/wrong feedback (matching the other
+  // TeachLuma games) plus spoken phrases via the Web Speech API.
+  // -------------------------------------------------------------------
+  var AudioCtx = window.AudioContext || window.webkitAudioContext;
+  var audioCtx = null;
+  var soundOn = true;
+  try {
+    soundOn = localStorage.getItem('dra_sound_on') !== '0';
+  } catch (e) { /* localStorage unavailable — default to on, non-fatal */ }
+
+  function getAudioCtx() {
+    if (!AudioCtx) { return null; }
+    if (!audioCtx) { audioCtx = new AudioCtx(); }
+    return audioCtx;
+  }
+
+  function playTone(freq, durationMs, delayMs) {
+    if (!soundOn) { return; }
+    var ctx = getAudioCtx();
+    if (!ctx) { return; }
+    var start = ctx.currentTime + (delayMs || 0) / 1000;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, start);
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(0.18, start + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + durationMs / 1000);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(start);
+    osc.stop(start + durationMs / 1000 + 0.02);
+  }
+
+  function soundCorrect() { playTone(660, 120, 0); playTone(880, 160, 110); }
+  function soundIncorrect() { playTone(220, 220, 0); }
+  function soundComplete() { playTone(523, 140, 0); playTone(659, 140, 130); playTone(784, 220, 260); }
+
+  // Kept as a module-level reference (not just a local variable) because
+  // some mobile WebKit builds can garbage-collect an utterance mid-speech
+  // if nothing else holds onto it, silently cutting the audio off.
+  var currentUtterance = null;
+
+  function speakPhrase(phrase) {
+    if (!soundOn || !('speechSynthesis' in window)) { return; }
+    try {
+      var utterance = new SpeechSynthesisUtterance(phrase);
+      utterance.rate = 0.9;
+      utterance.lang = 'en-US';
+      currentUtterance = utterance;
+
+      // Calling cancel() immediately before speak() is a well-known trap on
+      // mobile Safari/Chrome: cancel() clears the queue asynchronously, so
+      // the very next speak() often gets silently dropped. Only cancel when
+      // something is actually still speaking, and give the engine a beat to
+      // clear before queuing the new utterance.
+      if (speechSynthesis.speaking || speechSynthesis.pending) {
+        speechSynthesis.cancel();
+        window.setTimeout(function () { speechSynthesis.speak(utterance); }, 50);
+      } else {
+        speechSynthesis.speak(utterance);
+      }
+    } catch (e) { /* non-fatal */ }
+  }
+
+  // -------------------------------------------------------------------
+  // Play tracking
+  // -------------------------------------------------------------------
+  function trackPlay(eventType) {
+    try {
+      fetch('../../../api/game-track.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: 'daily-routines-adventure', event: eventType })
+      }).catch(function () {});
+    } catch (e) { /* non-fatal */ }
+  }
+
+  // -------------------------------------------------------------------
+  // Fullscreen
+  // -------------------------------------------------------------------
+  var appEl = document.getElementById('app');
+  var fullscreenBtn = document.getElementById('fullscreenBtn');
+
+  function requestFs(el) {
+    var fn = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (fn) { fn.call(el).catch(function () {}); }
+  }
+  function exitFs() {
+    var fn = document.exitFullscreen || document.webkitExitFullscreen;
+    if (fn) { fn.call(document); }
+  }
+  function currentFsElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement || null;
+  }
+  var fsSupported = !!(appEl.requestFullscreen || appEl.webkitRequestFullscreen);
+
+  if (!fsSupported) {
+    fullscreenBtn.classList.add('hidden');
+  } else {
+    fullscreenBtn.addEventListener('click', function () {
+      if (currentFsElement()) { exitFs(); } else { requestFs(appEl); }
+    });
+    ['fullscreenchange', 'webkitfullscreenchange'].forEach(function (evt) {
+      document.addEventListener(evt, function () {
+        var active = !!currentFsElement();
+        fullscreenBtn.textContent = active ? '⤢ Exit Fullscreen' : '⛶ Fullscreen';
+        fullscreenBtn.setAttribute('aria-label', active ? 'Exit fullscreen' : 'Enter fullscreen');
+      });
+    });
+  }
+
+  // -------------------------------------------------------------------
+  // Mute toggle
+  // -------------------------------------------------------------------
+  var muteBtn = document.getElementById('muteBtn');
+  function renderMuteBtn() {
+    muteBtn.textContent = soundOn ? '🔊' : '🔇';
+    muteBtn.setAttribute('aria-pressed', soundOn ? 'false' : 'true');
+    muteBtn.setAttribute('aria-label', soundOn ? 'Mute sound' : 'Unmute sound');
+  }
+  renderMuteBtn();
+  muteBtn.addEventListener('click', function () {
+    soundOn = !soundOn;
+    renderMuteBtn();
+    if (!soundOn && 'speechSynthesis' in window) { speechSynthesis.cancel(); }
+    try { localStorage.setItem('dra_sound_on', soundOn ? '1' : '0'); } catch (e) { /* non-fatal */ }
+  });
+
+  // -------------------------------------------------------------------
+  // Game state
+  // -------------------------------------------------------------------
+  var state = null;
+
+  function freshState() {
+    return {
+      screen: 'home',
+      score: 0,
+      currentActivity: 'order',
+      order: { cards: shuffleArray(ROUTINES), selected: null, feedback: null, checked: false, completed: false },
+      match: { index: 0, choices: [], selected: null, feedback: null, answered: false, correct: false, completed: false },
+      builder: { index: 0, built: [], feedback: null, answered: false, correct: false, completed: false },
+      time: { index: 0, choices: [], selected: null, feedback: null, answered: false, correct: false, completed: false },
+      read: { index: 0, selected: null, feedback: null, answered: false, correct: false, completed: false }
+    };
+  }
+
+  state = freshState();
+
+  function allActivitiesCompleted() {
+    return state.order.completed && state.match.completed && state.builder.completed && state.time.completed && state.read.completed;
+  }
+
+  function getActivityProgress() {
+    if (state.currentActivity === 'order') { return state.order.completed ? 100 : 0; }
+    if (state.currentActivity === 'match') { return ((state.match.index + (state.match.correct ? 1 : 0)) / MATCH_QUESTIONS.length) * 100; }
+    if (state.currentActivity === 'builder') { return ((state.builder.index + (state.builder.correct ? 1 : 0)) / SENTENCE_BUILDER_QUESTIONS.length) * 100; }
+    if (state.currentActivity === 'time') { return ((state.time.index + (state.time.correct ? 1 : 0)) / TIME_MATCH_QUESTIONS.length) * 100; }
+    if (state.currentActivity === 'read') { return ((state.read.index + (state.read.correct ? 1 : 0)) / READ_CHOOSE_QUESTIONS.length) * 100; }
+    return 0;
+  }
+
+  // -------------------------------------------------------------------
+  // Activity setup helpers — each (re)rolls whatever needs fresh random
+  // choices for the current question, fixing a bug in the original build
+  // where the Time Match activity's answer choices were only ever
+  // generated once and never updated for questions 2-5.
+  // -------------------------------------------------------------------
+  function setupMatchQuestion() {
+    var q = MATCH_QUESTIONS[state.match.index];
+    var ids = shuffleArray([q.correctId].concat(q.distractorIds));
+    state.match.choices = ids.map(routineById);
+  }
+
+  function setupTimeQuestion() {
+    var q = TIME_MATCH_QUESTIONS[state.time.index];
+    state.time.choices = shuffleArray(q.times);
+  }
+
+  function startGame() {
+    state = freshState();
+    setupMatchQuestion();
+    setupTimeQuestion();
+    state.screen = 'activity';
+    trackPlay('started');
+    render();
+  }
+
+  function switchActivity(activity) {
+    state.currentActivity = activity;
+    render();
+  }
+
+  // ---- Order activity ----
+  function selectOrderCard(index) {
+    state.order.selected = state.order.selected === index ? null : index;
+    render();
+  }
+
+  function moveOrderCard(delta) {
+    var i = state.order.selected;
+    if (i === null) { return; }
+    var j = i + delta;
+    if (j < 0 || j >= state.order.cards.length) { return; }
+    var cards = state.order.cards;
+    var tmp = cards[i]; cards[i] = cards[j]; cards[j] = tmp;
+    state.order.selected = j;
+    render();
+  }
+
+  function checkOrder() {
+    var currentIds = state.order.cards.map(function (c) { return c.id; });
+    var isCorrect = JSON.stringify(currentIds) === JSON.stringify(CORRECT_ORDER);
+    state.order.checked = true;
+    if (isCorrect) {
+      state.order.feedback = { type: 'success', message: 'Perfect! You put the day in order!' };
+      state.order.completed = true;
+      state.score += 10;
+      soundCorrect();
+    } else {
+      state.order.feedback = { type: 'error', message: 'Not quite right. Look at the order again and try again!' };
+      soundIncorrect();
+    }
+    render();
+  }
+
+  function tryAgainOrder() {
+    state.order.feedback = null;
+    state.order.checked = false;
+    render();
+  }
+
+  // ---- Match activity ----
+  function selectMatchChoice(cardId) {
+    if (state.match.answered) { return; }
+    var q = MATCH_QUESTIONS[state.match.index];
+    var isCorrect = cardId === q.correctId;
+    state.match.selected = cardId;
+    state.match.answered = true;
+    state.match.correct = isCorrect;
+    if (isCorrect) {
+      state.match.feedback = { type: 'success', message: 'Great job! You matched it correctly!' };
+      state.score += 5;
+      soundCorrect();
+    } else {
+      state.match.feedback = { type: 'error', message: "Let's try again. Look at the action word." };
+      soundIncorrect();
+    }
+    render();
+  }
+
+  function nextMatchQuestion() {
+    if (state.match.index < MATCH_QUESTIONS.length - 1) {
+      state.match.index++;
+      state.match.selected = null;
+      state.match.feedback = null;
+      state.match.answered = false;
+      state.match.correct = false;
+      setupMatchQuestion();
+    } else {
+      state.match.completed = true;
+    }
+    render();
+  }
+
+  // ---- Sentence Builder activity ----
+  function addWordToSentence(word) {
+    if (state.builder.answered) { return; }
+    state.builder.built.push(word);
+    render();
+  }
+
+  function removeWordFromSentence(index) {
+    if (state.builder.answered) { return; }
+    state.builder.built.splice(index, 1);
+    render();
+  }
+
+  function checkBuilderSentence() {
+    var q = SENTENCE_BUILDER_QUESTIONS[state.builder.index];
+    var isCorrect = JSON.stringify(state.builder.built) === JSON.stringify(q.correctOrder);
+    state.builder.answered = true;
+    state.builder.correct = isCorrect;
+    if (isCorrect) {
+      state.builder.feedback = { type: 'success', message: 'Perfect! You built the sentence correctly!' };
+      state.score += 5;
+      soundCorrect();
+    } else {
+      state.builder.feedback = { type: 'error', message: 'Not quite right. Try again!' };
+      soundIncorrect();
+    }
+    render();
+  }
+
+  function nextBuilderQuestion() {
+    if (state.builder.index < SENTENCE_BUILDER_QUESTIONS.length - 1) {
+      state.builder.index++;
+      state.builder.built = [];
+      state.builder.feedback = null;
+      state.builder.answered = false;
+      state.builder.correct = false;
+    } else {
+      state.builder.completed = true;
+    }
+    render();
+  }
+
+  function tryAgainBuilder() {
+    state.builder.built = [];
+    state.builder.feedback = null;
+    state.builder.answered = false;
+    state.builder.correct = false;
+    render();
+  }
+
+  // ---- Time Match activity ----
+  function selectTimeChoice(time) {
+    if (state.time.answered) { return; }
+    var q = TIME_MATCH_QUESTIONS[state.time.index];
+    var isCorrect = time === q.correctTime;
+    state.time.selected = time;
+    state.time.answered = true;
+    state.time.correct = isCorrect;
+    if (isCorrect) {
+      state.time.feedback = { type: 'success', message: 'Great! You matched the time!' };
+      state.score += 5;
+      soundCorrect();
+    } else {
+      state.time.feedback = { type: 'error', message: 'Not quite right. Try again!' };
+      soundIncorrect();
+    }
+    render();
+  }
+
+  function nextTimeQuestion() {
+    if (state.time.index < TIME_MATCH_QUESTIONS.length - 1) {
+      state.time.index++;
+      state.time.selected = null;
+      state.time.feedback = null;
+      state.time.answered = false;
+      state.time.correct = false;
+      setupTimeQuestion();
+    } else {
+      state.time.completed = true;
+    }
+    render();
+  }
+
+  // ---- Read and Choose activity ----
+  function selectReadChoice(choice) {
+    if (state.read.answered) { return; }
+    var q = READ_CHOOSE_QUESTIONS[state.read.index];
+    var isCorrect = choice === q.correctChoice;
+    state.read.selected = choice;
+    state.read.answered = true;
+    state.read.correct = isCorrect;
+    if (isCorrect) {
+      state.read.feedback = { type: 'success', message: 'Excellent! You understood the story!' };
+      state.score += 5;
+      soundCorrect();
+    } else {
+      state.read.feedback = { type: 'error', message: 'Not quite right. Read the story again.' };
+      soundIncorrect();
+    }
+    render();
+  }
+
+  function nextReadQuestion() {
+    if (state.read.index < READ_CHOOSE_QUESTIONS.length - 1) {
+      state.read.index++;
+      state.read.selected = null;
+      state.read.feedback = null;
+      state.read.answered = false;
+      state.read.correct = false;
+    } else {
+      state.read.completed = true;
+    }
+    render();
+  }
+
+  // -------------------------------------------------------------------
+  // Rendering — plain HTML-string templates rebuilt on every state
+  // change (the same idea as the pasted design's virtual-DOM re-render,
+  // done by hand). Clicks are handled by one delegated listener rather
+  // than inline handlers, since innerHTML strips function references.
+  // -------------------------------------------------------------------
+  function feedbackHtml(feedback) {
+    if (!feedback) { return ''; }
+    return '<div class="feedback ' + feedback.type + '">' + escapeHtml(feedback.message) + '</div>';
+  }
+
+  function renderHome() {
+    return (
+      '<div class="header">' +
+        '<h1 class="title">Daily Routines Adventure</h1>' +
+        '<p class="subtitle">Learn about daily activities and build sentences!</p>' +
+      '</div>' +
+      '<div class="top-bar">' +
+        '<div class="score-badge">Score: ' + state.score + '</div>' +
+      '</div>' +
+      '<div class="instructions">' +
+        '<strong>How to play:</strong>' +
+        '<ul>' +
+          '<li>Put the Day in Order: Arrange the daily routine cards in the correct sequence.</li>' +
+          '<li>Match the Sentence: Click on the picture that matches each sentence.</li>' +
+          '<li>Sentence Builder: Arrange words to make sentences.</li>' +
+          '<li>Time Match: Match routines to times of day.</li>' +
+          '<li>Read and Choose: Answer questions about short stories.</li>' +
+          '<li>Earn points for correct answers!</li>' +
+        '</ul>' +
+      '</div>' +
+      '<button type="button" class="start-button" data-action="start-game">Start Game</button>'
+    );
+  }
+
+  function renderCompletion() {
+    return (
+      '<div class="completion-screen">' +
+        '<div class="completion-emoji">🎉</div>' +
+        '<div class="completion-text">Amazing! You completed all activities!</div>' +
+        '<div class="completion-score">Final Score: ' + state.score + '</div>' +
+        '<div class="activity-summary">' +
+          '<div class="summary-card"><div class="summary-title">Order Activity</div><div class="summary-score">' + ACTIVITY_MAX_SCORES.order + ' pts</div></div>' +
+          '<div class="summary-card"><div class="summary-title">Match Activity</div><div class="summary-score">' + ACTIVITY_MAX_SCORES.match + ' pts</div></div>' +
+          '<div class="summary-card"><div class="summary-title">Sentence Builder</div><div class="summary-score">' + ACTIVITY_MAX_SCORES.builder + ' pts</div></div>' +
+          '<div class="summary-card"><div class="summary-title">Time Match</div><div class="summary-score">' + ACTIVITY_MAX_SCORES.time + ' pts</div></div>' +
+          '<div class="summary-card"><div class="summary-title">Read &amp; Choose</div><div class="summary-score">' + ACTIVITY_MAX_SCORES.read + ' pts</div></div>' +
+        '</div>' +
+        '<div class="completion-buttons">' +
+          '<button type="button" class="play-again-button" data-action="play-again">Play Again</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function renderActivityTabs() {
+    var tabs = [['order', 'Order'], ['match', 'Match'], ['builder', 'Builder'], ['time', 'Time'], ['read', 'Read']];
+    return '<div class="activity-tabs">' + tabs.map(function (t) {
+      var active = state.currentActivity === t[0] ? ' active' : '';
+      return '<button type="button" class="tab-button' + active + '" data-action="switch-activity" data-activity="' + t[0] + '">' + t[1] + '</button>';
+    }).join('') + '</div>';
+  }
+
+  function renderOrder() {
+    var html = '<div class="order-container">';
+    html += '<p>Click a card to select, then use Up/Down buttons to reorder.</p>';
+    state.order.cards.forEach(function (card, index) {
+      var cls = 'routine-card';
+      if (state.order.selected === index) { cls += ' selected'; }
+      if (state.order.checked) { cls += CORRECT_ORDER[index] === card.id ? ' correct' : ' incorrect'; }
+      var upDisabled = state.order.selected !== index || index === 0;
+      var downDisabled = state.order.selected !== index || index === state.order.cards.length - 1;
+      html +=
+        '<div class="' + cls + '" data-action="select-order-card" data-index="' + index + '" role="button" tabindex="0" aria-pressed="' + (state.order.selected === index) + '">' +
+          '<span class="routine-emoji">' + card.emoji + '</span>' +
+          '<span class="routine-text">' + escapeHtml(card.phrase) + '</span>' +
+          '<div class="routine-controls">' +
+            '<button type="button" class="hear-button" data-action="hear-phrase" data-phrase="' + escapeHtml(card.phrase) + '" aria-label="Hear ' + escapeHtml(card.phrase) + '">🔊 Hear</button>' +
+            '<button type="button" class="control-button" data-action="move-order-up" data-index="' + index + '"' + (upDisabled ? ' disabled' : '') + ' aria-label="Move up">↑</button>' +
+            '<button type="button" class="control-button" data-action="move-order-down" data-index="' + index + '"' + (downDisabled ? ' disabled' : '') + ' aria-label="Move down">↓</button>' +
+          '</div>' +
+        '</div>';
+    });
+    html += feedbackHtml(state.order.feedback);
+    html += '<div class="button-group">';
+    if (!state.order.checked) {
+      html += '<button type="button" class="check-button" data-action="check-order">Check Order</button>';
+    }
+    if (state.order.checked && !state.order.completed) {
+      html += '<button type="button" class="try-again-button" data-action="try-again-order">Try Again</button>';
+    }
+    if (state.order.completed) {
+      html += '<div class="completion-status">✓ Activity Complete!</div>';
+    }
+    html += '</div></div>';
+    return html;
+  }
+
+  function renderMatch() {
+    var q = MATCH_QUESTIONS[state.match.index];
+    var routine = routineById(q.correctId);
+    var html = '<div class="match-container">';
+    html +=
+      '<div class="word-helper">' +
+        '<div class="helper-label">Target Phrase</div>' +
+        '<div class="helper-phrase">' + escapeHtml(routine.phrase) + '</div>' +
+        '<button type="button" class="hear-button" data-action="hear-phrase" data-phrase="' + escapeHtml(routine.phrase) + '" style="margin-top:0.5rem;">🔊 Hear phrase</button>' +
+      '</div>' +
+      '<div class="sentence-display">' + escapeHtml(q.sentence) + '</div>' +
+      '<div class="choices-grid">';
+    state.match.choices.forEach(function (card) {
+      var cls = 'choice-card';
+      if (state.match.selected === card.id) { cls += ' selected'; }
+      if (state.match.answered && card.id === q.correctId) { cls += ' correct'; }
+      if (state.match.answered && state.match.selected === card.id && card.id !== q.correctId) { cls += ' incorrect'; }
+      html +=
+        '<button type="button" class="' + cls + '" data-action="select-match-choice" data-id="' + card.id + '"' + (state.match.answered ? ' disabled' : '') + ' aria-pressed="' + (state.match.selected === card.id) + '">' +
+          '<span class="choice-emoji">' + card.emoji + '</span>' +
+          '<span class="choice-text">' + escapeHtml(card.phrase) + '</span>' +
+        '</button>';
+    });
+    html += '</div>';
+    html += feedbackHtml(state.match.feedback);
+    html += '<div class="button-group">';
+    if (state.match.answered) {
+      html += '<button type="button" class="next-button" data-action="next-match">' + (state.match.index < MATCH_QUESTIONS.length - 1 ? 'Next Question →' : 'Activity Complete ✓') + '</button>';
+    }
+    html += '</div></div>';
+    return html;
+  }
+
+  function renderBuilder() {
+    var q = SENTENCE_BUILDER_QUESTIONS[state.builder.index];
+    // Counted (not just indexOf-checked) so a repeated word in the word
+    // bank would disable one chip per use rather than all of them at once.
+    var usedCounts = {};
+    state.builder.built.forEach(function (w) { usedCounts[w] = (usedCounts[w] || 0) + 1; });
+
+    var html = '<div class="sentence-builder-container">';
+    html += '<div class="target-sentence">Target: ' + escapeHtml(q.targetSentence) + '</div>';
+    html += '<div><p class="builder-hint">Click words in order to build the sentence.</p><div class="word-bank">';
+    var seen = {};
+    q.words.forEach(function (word, i) {
+      var used = seen[word] || 0;
+      seen[word] = used + 1;
+      var isUsed = used < (usedCounts[word] || 0);
+      html += '<button type="button" class="word-chip' + (isUsed ? ' used' : '') + '" data-action="add-word" data-word="' + escapeHtml(word) + '" data-word-index="' + i + '"' + ((isUsed || state.builder.answered) ? ' disabled' : '') + ' aria-pressed="' + isUsed + '">' + escapeHtml(word) + '</button>';
+    });
+    html += '</div></div>';
+
+    html += '<div class="sentence-builder-output">';
+    if (state.builder.built.length === 0) {
+      html += '<span class="builder-placeholder">Build your sentence here...</span>';
+    } else {
+      state.builder.built.forEach(function (word, index) {
+        html += '<div class="built-word">' + escapeHtml(word);
+        if (!state.builder.answered) {
+          html += ' <button type="button" class="remove-word-btn" data-action="remove-word" data-index="' + index + '" aria-label="Remove ' + escapeHtml(word) + '">×</button>';
+        }
+        html += '</div>';
+      });
+    }
+    html += '</div>';
+
+    html += feedbackHtml(state.builder.feedback);
+    html += '<div class="button-group">';
+    if (!state.builder.answered) {
+      html += '<button type="button" class="check-button" data-action="check-builder"' + (state.builder.built.length === 0 ? ' disabled' : '') + '>Check Sentence</button>';
+    }
+    if (state.builder.answered && !state.builder.correct) {
+      html += '<button type="button" class="try-again-button" data-action="try-again-builder">Try Again</button>';
+    }
+    if (state.builder.answered && state.builder.correct) {
+      html += '<button type="button" class="next-button" data-action="next-builder">' + (state.builder.index < SENTENCE_BUILDER_QUESTIONS.length - 1 ? 'Next Question →' : 'Activity Complete ✓') + '</button>';
+    }
+    html += '</div></div>';
+    return html;
+  }
+
+  function renderTime() {
+    var q = TIME_MATCH_QUESTIONS[state.time.index];
+    var html = '<div class="time-match-container">';
+    html +=
+      '<div class="time-action">' +
+        '<div class="time-action-emoji">' + q.emoji + '</div>' +
+        '<div class="time-action-text">' + escapeHtml(q.action) + '</div>' +
+      '</div>' +
+      '<div class="time-display">What time?</div>' +
+      '<div class="time-choices">';
+    state.time.choices.forEach(function (time) {
+      var cls = 'time-choice';
+      if (state.time.selected === time) { cls += ' selected'; }
+      if (state.time.answered && time === q.correctTime) { cls += ' correct'; }
+      if (state.time.answered && state.time.selected === time && time !== q.correctTime) { cls += ' incorrect'; }
+      html += '<button type="button" class="' + cls + '" data-action="select-time-choice" data-time="' + escapeHtml(time) + '"' + (state.time.answered ? ' disabled' : '') + ' aria-pressed="' + (state.time.selected === time) + '">' + escapeHtml(time) + '</button>';
+    });
+    html += '</div>';
+    html += feedbackHtml(state.time.feedback);
+    html += '<div class="button-group">';
+    if (state.time.answered) {
+      html += '<button type="button" class="next-button" data-action="next-time">' + (state.time.index < TIME_MATCH_QUESTIONS.length - 1 ? 'Next Question →' : 'Activity Complete ✓') + '</button>';
+    }
+    html += '</div></div>';
+    return html;
+  }
+
+  function renderRead() {
+    var q = READ_CHOOSE_QUESTIONS[state.read.index];
+    var html = '<div class="read-choose-container">';
+    html += '<div class="story-box">' + escapeHtml(q.story) + '</div>';
+    html += '<div class="question-box">' + escapeHtml(q.question) + '</div>';
+    html += '<div class="answer-choices">';
+    q.choices.forEach(function (choice) {
+      var cls = 'answer-choice';
+      if (state.read.selected === choice) { cls += ' selected'; }
+      if (state.read.answered && choice === q.correctChoice) { cls += ' correct'; }
+      if (state.read.answered && state.read.selected === choice && choice !== q.correctChoice) { cls += ' incorrect'; }
+      html += '<button type="button" class="' + cls + '" data-action="select-read-choice" data-choice="' + escapeHtml(choice) + '"' + (state.read.answered ? ' disabled' : '') + ' aria-pressed="' + (state.read.selected === choice) + '">' + escapeHtml(choice) + '</button>';
+    });
+    html += '</div>';
+    html += feedbackHtml(state.read.feedback);
+    html += '<div class="button-group">';
+    if (state.read.answered) {
+      html += '<button type="button" class="next-button" data-action="next-read">' + (state.read.index < READ_CHOOSE_QUESTIONS.length - 1 ? 'Next Question →' : 'Activity Complete ✓') + '</button>';
+    }
+    html += '</div></div>';
+    return html;
+  }
+
+  function renderActivity() {
+    var html = '<div class="header"><h1 class="title">Daily Routines Adventure</h1></div>';
+    html +=
+      '<div class="top-bar">' +
+        '<div class="score-badge">Score: ' + state.score + '</div>' +
+        '<div class="progress-container"><div class="progress-bar"><div class="progress-fill" style="width:' + getActivityProgress() + '%"></div></div></div>' +
+      '</div>';
+    html += renderActivityTabs();
+    if (state.currentActivity === 'order') { html += renderOrder(); }
+    else if (state.currentActivity === 'match') { html += renderMatch(); }
+    else if (state.currentActivity === 'builder') { html += renderBuilder(); }
+    else if (state.currentActivity === 'time') { html += renderTime(); }
+    else if (state.currentActivity === 'read') { html += renderRead(); }
+    return html;
+  }
+
+  var screenRoot = document.getElementById('screenRoot');
+  var trackedCompletion = false;
+
+  // Rebuilding innerHTML on every render replaces every element, which
+  // would otherwise drop keyboard focus after each interaction (a
+  // keyboard user pressing Enter to select a card would land nowhere on
+  // the next press). This captures a description of whatever was focused
+  // right before the rebuild and refocuses its equivalent afterward.
+  var FOCUS_ATTRS = ['data-index', 'data-id', 'data-word', 'data-word-index', 'data-time', 'data-choice', 'data-activity'];
+
+  function captureFocusKey() {
+    var el = document.activeElement;
+    if (!el || !screenRoot.contains(el)) { return null; }
+    var action = el.getAttribute('data-action');
+    if (!action) { return null; }
+    var key = { action: action, attrs: {} };
+    FOCUS_ATTRS.forEach(function (attr) {
+      if (el.hasAttribute(attr)) { key.attrs[attr] = el.getAttribute(attr); }
+    });
+    return key;
+  }
+
+  function restoreFocus(key) {
+    if (!key) { return; }
+    // Moving a routine card changes which index it lives at, so instead
+    // of refocusing its old position, follow the card to wherever it
+    // (and its up/down buttons) ended up after the move.
+    if (key.action === 'move-order-up' || key.action === 'move-order-down') {
+      if (state.order.selected !== null) { key.attrs['data-index'] = String(state.order.selected); }
+    }
+    var selector = '[data-action="' + key.action + '"]';
+    Object.keys(key.attrs).forEach(function (attr) {
+      selector += '[' + attr + '="' + key.attrs[attr].replace(/"/g, '\\"') + '"]';
+    });
+    var el;
+    try { el = screenRoot.querySelector(selector); } catch (e) { el = null; }
+    if (el && !el.disabled) { el.focus(); }
+  }
+
+  function render() {
+    var focusKey = captureFocusKey();
+
+    if (state.screen === 'home') {
+      screenRoot.innerHTML = renderHome();
+    } else if (allActivitiesCompleted()) {
+      if (!trackedCompletion) { trackedCompletion = true; soundComplete(); trackPlay('completed'); }
+      screenRoot.innerHTML = renderCompletion();
+    } else {
+      screenRoot.innerHTML = renderActivity();
+    }
+
+    restoreFocus(focusKey);
+  }
+
+  // -------------------------------------------------------------------
+  // Event delegation — one listener handles every button/card click,
+  // dispatched by the data-action attribute of the nearest matching
+  // ancestor (so a "Hear" button nested inside a routine card is matched
+  // before the card itself, without needing manual stopPropagation).
+  // -------------------------------------------------------------------
+  appEl.addEventListener('click', function (event) {
+    var target = event.target.closest('[data-action]');
+    if (!target) { return; }
+    var action = target.getAttribute('data-action');
+
+    switch (action) {
+      case 'start-game': startGame(); break;
+      case 'play-again': state = freshState(); trackedCompletion = false; setupMatchQuestion(); setupTimeQuestion(); trackPlay('started'); render(); break;
+      case 'switch-activity': switchActivity(target.getAttribute('data-activity')); break;
+      case 'hear-phrase': speakPhrase(target.getAttribute('data-phrase')); break;
+
+      case 'select-order-card': selectOrderCard(parseInt(target.getAttribute('data-index'), 10)); break;
+      case 'move-order-up': moveOrderCard(-1); break;
+      case 'move-order-down': moveOrderCard(1); break;
+      case 'check-order': checkOrder(); break;
+      case 'try-again-order': tryAgainOrder(); break;
+
+      case 'select-match-choice': selectMatchChoice(parseInt(target.getAttribute('data-id'), 10)); break;
+      case 'next-match': nextMatchQuestion(); break;
+
+      case 'add-word': addWordToSentence(target.getAttribute('data-word')); break;
+      case 'remove-word': removeWordFromSentence(parseInt(target.getAttribute('data-index'), 10)); break;
+      case 'check-builder': checkBuilderSentence(); break;
+      case 'try-again-builder': tryAgainBuilder(); break;
+      case 'next-builder': nextBuilderQuestion(); break;
+
+      case 'select-time-choice': selectTimeChoice(target.getAttribute('data-time')); break;
+      case 'next-time': nextTimeQuestion(); break;
+
+      case 'select-read-choice': selectReadChoice(target.getAttribute('data-choice')); break;
+      case 'next-read': nextReadQuestion(); break;
+    }
+  });
+
+  // Only the routine-card div itself needs manual Enter/Space handling —
+  // it's a div with role="button", not a real button. The Hear/Move
+  // up/down controls nested inside it are real <button> elements and
+  // already get native Enter/Space activation from the browser, so this
+  // must match the event's own target exactly (not the nearest matching
+  // ancestor) or pressing Enter on a nested button would also re-toggle
+  // the card's own selection underneath it.
+  appEl.addEventListener('keydown', function (event) {
+    if (event.key !== 'Enter' && event.key !== ' ') { return; }
+    if (!event.target.matches('[data-action="select-order-card"]')) { return; }
+    event.preventDefault();
+    selectOrderCard(parseInt(event.target.getAttribute('data-index'), 10));
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
