@@ -147,3 +147,35 @@ function send_membership_expired_email(array $user): bool
 
     return send_email($user['email'], $subject, $body);
 }
+
+/** Confirms a "Request a Resource" submission — never promises the resource will actually be produced. */
+function send_resource_request_confirmation_email(string $email, array $request): bool
+{
+    $subject = SITE_NAME . ' — Resource Request Received';
+
+    $typeLabel = $request['resource_type'] === 'Other'
+        ? ($request['resource_type_other'] ?: 'Other')
+        : $request['resource_type'];
+
+    $body = '<p>Thanks for helping us improve ' . e(SITE_NAME) . '!</p>'
+        . '<p>We\'ve received your resource request:</p>'
+        . '<p><strong>' . e($request['topic']) . '</strong><br>'
+        . e($request['subject_name'] ?? '') . ' &middot; ' . e($request['grade_level'] ?? '') . ' &middot; ' . e($typeLabel) . '</p>'
+        . '<p>We\'ll consider it when planning future resources. If it becomes a ' . e(SITE_NAME) . ' resource, we\'ll let you know at this email address — but we can\'t promise every request will be produced.</p>'
+        . '<p><a href="' . e(base_url('resources.php')) . '">Browse ' . e(SITE_NAME) . ' resources</a></p>';
+
+    return send_email($email, $subject, $body);
+}
+
+/** Sent to every supporter of a request once it's linked to a published resource. */
+function send_resource_request_published_email(string $email, array $resource): bool
+{
+    $subject = 'Your requested ' . SITE_NAME . ' resource is now available';
+
+    $body = '<p>Good news — a resource you requested is now available on ' . e(SITE_NAME) . ':</p>'
+        . '<p><strong>' . e($resource['title']) . '</strong></p>'
+        . '<p><a href="' . e(base_url('resource.php?slug=' . rawurlencode($resource['slug']))) . '">View the resource</a></p>'
+        . '<p>Thanks for telling us what you needed!</p>';
+
+    return send_email($email, $subject, $body);
+}

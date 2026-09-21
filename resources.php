@@ -139,8 +139,12 @@ require_once __DIR__ . '/includes/header.php';
         </div>
     </form>
 
+    <p class="small text-secondary text-end mb-4">
+        Can't find what you need? <a href="<?= e(base_url('request-resource.php')) ?>">Request a Resource</a>
+    </p>
+
     <?php if (empty($result['items'])): ?>
-        <div class="alert alert-info">No resources match your search yet. Try different filters, or check back soon &mdash; new resources are added regularly.</div>
+        <div class="alert alert-info">No resources match your search yet. Try different filters, or <a href="<?= e(base_url('request-resource.php')) ?>">request the resource you need</a> &mdash; new resources are added regularly.</div>
     <?php else: ?>
         <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 mb-4">
             <?php foreach ($result['items'] as $resource): ?>

@@ -464,6 +464,61 @@ CREATE TABLE IF NOT EXISTS reviews (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------------------------
+-- resource_requests / resource_request_supporters — "Request a Resource".
+-- One row per genuinely distinct request; every teacher who wants it
+-- (including whoever first submitted it) gets a row in the supporters
+-- table, so demand is always COUNT(*) on real data — never a maintained
+-- counter that could drift, matching how bundle_resources counts work.
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS resource_requests (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    user_id INT UNSIGNED NULL,
+    name VARCHAR(150) NULL,
+    email VARCHAR(190) NULL,
+    subject_id INT UNSIGNED NULL,
+    grade_level VARCHAR(30) NULL,
+    topic VARCHAR(200) NOT NULL,
+    resource_type VARCHAR(100) NULL,
+    resource_type_other VARCHAR(150) NULL,
+    description TEXT NOT NULL,
+    difficulty ENUM('beginner', 'intermediate', 'challenging', 'any') NULL,
+    preferred_formats VARCHAR(255) NULL,
+    additional_notes TEXT NULL,
+    status ENUM('new', 'reviewing', 'planned', 'in_progress', 'published', 'declined', 'duplicate') NOT NULL DEFAULT 'new',
+    admin_notes TEXT NULL,
+    assigned_admin_id INT UNSIGNED NULL,
+    linked_resource_id INT UNSIGNED NULL,
+    duplicate_of_id INT UNSIGNED NULL,
+    completed_at DATETIME NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_requests_status (status),
+    KEY idx_requests_subject (subject_id),
+    KEY idx_requests_topic (topic),
+    KEY idx_requests_linked_resource (linked_resource_id),
+    CONSTRAINT fk_requests_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL,
+    CONSTRAINT fk_requests_subject FOREIGN KEY (subject_id) REFERENCES subjects (id) ON DELETE SET NULL,
+    CONSTRAINT fk_requests_admin FOREIGN KEY (assigned_admin_id) REFERENCES users (id) ON DELETE SET NULL,
+    CONSTRAINT fk_requests_resource FOREIGN KEY (linked_resource_id) REFERENCES resources (id) ON DELETE SET NULL,
+    CONSTRAINT fk_requests_duplicate_of FOREIGN KEY (duplicate_of_id) REFERENCES resource_requests (id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS resource_request_supporters (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    request_id INT UNSIGNED NOT NULL,
+    user_id INT UNSIGNED NULL,
+    email VARCHAR(190) NULL,
+    notified_at DATETIME NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_supporters_request (request_id),
+    KEY idx_supporters_user (user_id),
+    CONSTRAINT fk_supporters_request FOREIGN KEY (request_id) REFERENCES resource_requests (id) ON DELETE CASCADE,
+    CONSTRAINT fk_supporters_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
 -- review_helpful (one row per user per review they've marked helpful)
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS review_helpful (

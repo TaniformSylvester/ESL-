@@ -162,6 +162,38 @@ define('PRACTICE_ACTIVITIES', [
 ]);
 
 // -----------------------------------------------------------------------
+// RESOURCE REQUESTS ("Request a Resource")
+// Uses RESOURCE_TYPES above for the type dropdown (plus an "Other" free
+// text field) rather than a separate list, so it can never drift out of
+// sync with the real resource types the site actually publishes.
+// -----------------------------------------------------------------------
+define('REQUEST_DIFFICULTIES', [
+    'beginner'     => 'Beginner',
+    'intermediate' => 'Intermediate',
+    'challenging'  => 'Challenging',
+    'any'          => 'Any',
+]);
+
+define('REQUEST_FORMATS', [
+    'pdf'     => 'Printable PDF',
+    'word'    => 'Editable Word document',
+    'ppt'     => 'PowerPoint',
+    'google'  => 'Google-friendly format',
+    'digital' => 'Digital/HTML',
+    'any'     => 'Any format',
+]);
+
+define('REQUEST_STATUSES', [
+    'new'         => 'New',
+    'reviewing'   => 'Reviewing',
+    'planned'     => 'Planned',
+    'in_progress' => 'In Progress',
+    'published'   => 'Published',
+    'declined'    => 'Declined',
+    'duplicate'   => 'Duplicate',
+]);
+
+// -----------------------------------------------------------------------
 // PAGINATION
 // -----------------------------------------------------------------------
 define('RESOURCES_PER_PAGE', 12);

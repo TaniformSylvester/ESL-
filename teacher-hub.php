@@ -31,5 +31,17 @@ require_once __DIR__ . '/includes/header.php';
             </div>
         </section>
     <?php endforeach; ?>
+
+    <div class="row justify-content-center mt-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm text-center">
+                <div class="card-body p-4">
+                    <h2 class="h5 fw-bold mb-2">Can't Find What You Need?</h2>
+                    <p class="text-secondary mb-3">Tell us what resource you need and help us create resources that teachers actually use.</p>
+                    <a href="<?= e(base_url('request-resource.php')) ?>" class="btn btn-outline-primary px-4">Request a Resource</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

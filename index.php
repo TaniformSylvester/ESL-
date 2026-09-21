@@ -286,6 +286,22 @@ require_once __DIR__ . '/includes/header.php';
 
 <section class="py-5 section-soft">
     <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body p-4 p-md-5">
+                        <h2 class="h4 fw-bold mb-2">Tell Us What You Need</h2>
+                        <p class="text-secondary mb-4">Can't find the resource you're looking for? Request a worksheet, lesson plan, PowerPoint, quiz, game, or other teaching resource, and help us decide what to create next.</p>
+                        <a href="<?= e(base_url('request-resource.php')) ?>" class="btn btn-outline-primary px-4">Request a Resource</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
         <h2 class="h3 fw-bold text-center mb-5">Frequently Asked Questions</h2>
         <div class="row justify-content-center">
             <div class="col-lg-8">

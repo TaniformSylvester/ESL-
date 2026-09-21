@@ -15,6 +15,7 @@
                     <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('teacher-hub.php')) ?>">Teacher Hub</a></li>
                     <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('teacher-tools.php')) ?>">Teacher Tools</a></li>
                     <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('bundles.php')) ?>">Bundles</a></li>
+                    <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('request-resource.php')) ?>">Request a Resource</a></li>
                     <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('pricing.php')) ?>">Pricing</a></li>
                     <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('about.php')) ?>">About</a></li>
                     <li><a class="text-secondary text-decoration-none" href="<?= e(base_url('contact.php')) ?>">Contact</a></li>

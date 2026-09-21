@@ -16,6 +16,7 @@ $navItems = [
     ['label' => 'Bundles',        'href' => 'admin/bundles.php',     'icon' => 'fa-box-open',     'match' => ['bundles.php']],
     ['label' => 'Videos',         'href' => 'admin/videos.php',      'icon' => 'fa-video',        'match' => ['videos.php']],
     ['label' => 'Reviews',        'href' => 'admin/reviews.php',     'icon' => 'fa-star',         'match' => ['reviews.php']],
+    ['label' => 'Requests',       'href' => 'admin/requests.php',    'icon' => 'fa-inbox',        'match' => ['requests.php', 'request-detail.php']],
     ['label' => 'Teacher Hub',    'href' => 'admin/guides.php',      'icon' => 'fa-book-open',    'match' => ['guides.php', 'guide-add.php', 'guide-edit.php']],
     ['label' => 'Payments',       'href' => 'admin/payments.php',    'icon' => 'fa-money-bill',   'match' => ['payments.php']],
     ['label' => 'Subscriptions',  'href' => 'admin/subscriptions.php', 'icon' => 'fa-id-card',    'match' => ['subscriptions.php']],
