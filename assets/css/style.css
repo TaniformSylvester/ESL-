@@ -146,6 +146,18 @@ footer a:hover {
     color: #fff !important;
 }
 
+/* Opens the main nav's "Teacher Hub" dropdown (Teacher Hub + Request a
+   Resource) on hover instead of requiring a click — but only at the
+   navbar-expand-lg breakpoint where the nav is actually horizontal;
+   below that it collapses into the offcanvas menu, where hover doesn't
+   apply and Bootstrap's normal tap-to-open dropdown behavior takes over
+   unchanged. */
+@media (min-width: 992px) {
+    .navbar-hover-dropdown:hover > .dropdown-menu {
+        display: block;
+    }
+}
+
 /* Lets the page-number group in render_pagination() (includes/functions.php)
    shrink and wrap its own numbers onto a second line when they don't fit,
    while Previous/Next — siblings in the same flex-nowrap row — stay put on

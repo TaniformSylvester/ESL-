@@ -105,7 +105,13 @@ $websiteSchema = [
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('resources.php')) ?>">Resources</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('games.php')) ?>">Games</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('teacher-tools.php')) ?>">Teacher Tools</a></li>
-                <li class="nav-item"><a class="nav-link" href="<?= e(base_url('teacher-hub.php')) ?>">Teacher Hub</a></li>
+                <li class="nav-item dropdown navbar-hover-dropdown">
+                    <a class="nav-link dropdown-toggle" href="<?= e(base_url('teacher-hub.php')) ?>" role="button" data-bs-toggle="dropdown" aria-expanded="false">Teacher Hub</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="<?= e(base_url('teacher-hub.php')) ?>">Teacher Hub</a></li>
+                        <li><a class="dropdown-item" href="<?= e(base_url('request-resource.php')) ?>">Request a Resource</a></li>
+                    </ul>
+                </li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('bundles.php')) ?>">Bundles</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('pricing.php')) ?>">Pricing</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('about.php')) ?>">About</a></li>
