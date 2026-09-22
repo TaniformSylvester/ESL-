@@ -321,6 +321,22 @@ footer a:hover {
     background-color: var(--brand-primary);
 }
 
+/* Per-subject gradient so the games hub reads as colorful at a glance
+   instead of every card sharing the same flat blue tile. */
+.game-card-thumb-esl { background: linear-gradient(135deg, var(--subject-esl), #1d4ed8); }
+.game-card-thumb-math { background: linear-gradient(135deg, var(--subject-math), #5b21b6); }
+.game-card-thumb-science { background: linear-gradient(135deg, var(--subject-science), #0f766e); }
+
+.badge-subject-esl { background-color: var(--subject-esl); color: #fff; }
+.badge-subject-math { background-color: var(--subject-math); color: #fff; }
+.badge-subject-science { background-color: var(--subject-science); color: #fff; }
+
+.badge-grade {
+    background-color: #eef2ff;
+    color: #4338ca;
+    border: 1px solid #c7d2fe;
+}
+
 .game-embed-frame {
     width: 100%;
     aspect-ratio: 4 / 3;

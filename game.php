@@ -38,11 +38,12 @@ require_once __DIR__ . '/includes/header.php';
         </ol>
     </nav>
 
+    <?php $subjectKey = game_subject_key($game['subject'] ?? ''); ?>
     <div class="row g-4 g-lg-5 mb-4">
         <div class="col-lg-8">
             <div class="d-flex flex-wrap gap-2 mb-2">
-                <span class="badge bg-light text-dark border"><?= e($game['subject']) ?></span>
-                <span class="badge bg-light text-dark border"><?= e($game['grade']) ?></span>
+                <span class="badge badge-subject-<?= e($subjectKey) ?>"><?= e($game['subject']) ?></span>
+                <span class="badge badge-grade"><?= e($game['grade']) ?></span>
                 <span class="badge bg-light text-dark border"><?= e($game['topic']) ?></span>
                 <span class="badge badge-free"><?= e($game['difficulty']) ?></span>
             </div>

@@ -119,9 +119,34 @@ function get_all_games(): array
             'thumbnail' => asset_url('images/games/daily-routines-adventure-thumb.svg'),
             'featured'  => true,
         ],
+        [
+            'slug'                   => 'place-value-digit-value',
+            'title'                  => 'Place Value & Digit Value',
+            'subject'                => 'Math',
+            'grade'                  => 'Grade 1',
+            'topic'                  => 'Place Value',
+            'difficulty'             => 'Easy',
+            'short_description'      => 'Identify the tens and ones place and figure out what a digit is really worth in a two-digit number.',
+            'what_students_practice' => [
+                'Naming the tens and ones place in a two-digit number',
+                'Finding the value of a digit (e.g. the 5 in 57 is worth 50)',
+                'Telling apart a digit from the value it represents',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Choose Place Value, Digit Value or Mixed mode on the start screen.',
+                'Look at the highlighted digit tile together and discuss the answer.',
+                'Select the answer as a class, then move to the next number.',
+            ],
+            'thumbnail' => asset_url('images/games/place-value-digit-value-thumb.svg'),
+            'featured'  => true,
+        ],
         // Future games (see get_related_games() and the Number Challenge
         // architecture for how a new mode/game slots in without rebuilding
         // the hub): Number Recognition, Missing Number, Number Bonds, etc.
+        // Grade 1-6 Math arc (place value is the first entry): more grade
+        // levels/topics to follow as their own self-contained bundles.
     ];
 }
 
@@ -157,6 +182,16 @@ function get_related_games(array $game, int $limit = 3): array
     });
 
     return array_slice($others, 0, max(1, $limit));
+}
+
+/** Maps a game's display subject label to the CSS accent key used by the site-wide --subject-* variables (game-card.php, game.php, style.css). */
+function game_subject_key(string $subject): string
+{
+    return match (true) {
+        stripos($subject, 'math') !== false    => 'math',
+        stripos($subject, 'science') !== false => 'science',
+        default                                => 'esl',
+    };
 }
 
 /** The embeddable game bundle's URL — every game lives at assets/games/<slug>/index.html. */

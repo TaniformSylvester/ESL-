@@ -8,11 +8,12 @@ $difficultyBadgeClass = match ($game['difficulty'] ?? '') {
     'Advanced' => 'badge-members',
     default    => 'bg-light text-dark border',
 };
+$subjectKey = game_subject_key($game['subject'] ?? '');
 ?>
 <div class="col">
     <div class="card game-card shadow-sm h-100">
         <a href="<?= e(base_url('game.php?slug=' . urlencode($game['slug']))) ?>" class="text-decoration-none text-reset">
-            <div class="game-card-thumb d-flex align-items-center justify-content-center">
+            <div class="game-card-thumb game-card-thumb-<?= e($subjectKey) ?> d-flex align-items-center justify-content-center">
                 <?php if (!empty($game['thumbnail'])): ?>
                     <img src="<?= e($game['thumbnail']) ?>" class="card-img-top" alt="<?= e($game['title']) ?>" loading="lazy">
                 <?php else: ?>
@@ -22,8 +23,8 @@ $difficultyBadgeClass = match ($game['difficulty'] ?? '') {
         </a>
         <div class="card-body d-flex flex-column">
             <div class="d-flex flex-wrap gap-1 mb-2">
-                <span class="badge bg-light text-dark border"><?= e($game['subject']) ?></span>
-                <span class="badge bg-light text-dark border"><?= e($game['grade']) ?></span>
+                <span class="badge badge-subject-<?= e($subjectKey) ?>"><?= e($game['subject']) ?></span>
+                <span class="badge badge-grade"><?= e($game['grade']) ?></span>
                 <span class="badge <?= e($difficultyBadgeClass) ?>"><?= e($game['difficulty']) ?></span>
             </div>
             <h3 class="h6 fw-bold mb-1">
