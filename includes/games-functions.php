@@ -142,11 +142,35 @@ function get_all_games(): array
             'thumbnail' => asset_url('images/games/place-value-digit-value-thumb.svg'),
             'featured'  => true,
         ],
+        [
+            'slug'                   => 'skip-counting',
+            'title'                  => 'Skip Counting Challenge',
+            'subject'                => 'Math',
+            'grade'                  => 'Grade 2',
+            'topic'                  => 'Skip Counting',
+            'difficulty'             => 'Easy',
+            'short_description'      => 'Count by 2s, 5s and 10s to find the missing number in a sequence.',
+            'what_students_practice' => [
+                'Counting forward by 2s, 5s and 10s',
+                'Spotting the pattern in a number sequence',
+                'Finding a missing number, not just the next one',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Choose a counting step (2s, 5s or 10s) and a difficulty level.',
+                'Look at the sequence together and figure out the missing number.',
+                'Select the answer as a class, then move to the next sequence.',
+            ],
+            'thumbnail' => asset_url('images/games/skip-counting-thumb.svg'),
+            'featured'  => true,
+        ],
         // Future games (see get_related_games() and the Number Challenge
         // architecture for how a new mode/game slots in without rebuilding
         // the hub): Number Recognition, Missing Number, Number Bonds, etc.
-        // Grade 1-6 Math arc (place value is the first entry): more grade
-        // levels/topics to follow as their own self-contained bundles.
+        // Grade 1-6 Math arc (Grade 1 place value, Grade 2 skip counting):
+        // more grade levels/topics to follow as their own self-contained
+        // bundles.
     ];
 }
 
