@@ -165,12 +165,35 @@ function get_all_games(): array
             'thumbnail' => asset_url('images/games/skip-counting-thumb.svg'),
             'featured'  => true,
         ],
+        [
+            'slug'                   => 'times-tables-challenge',
+            'title'                  => 'Times Tables Challenge',
+            'subject'                => 'Math',
+            'grade'                  => 'Grade 3',
+            'topic'                  => 'Multiplication & Division',
+            'difficulty'             => 'Easy',
+            'short_description'      => 'Build multiplication and division fact fluency with fast-paced times-table questions.',
+            'what_students_practice' => [
+                'Multiplication facts up to the 12 times table',
+                'Division as the inverse of multiplication',
+                'Quick recall of times-table facts',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Choose Multiplication, Division or Mixed mode on the start screen.',
+                'Show each question and let students discuss the answer.',
+                'Select the answer together, then move to the next question.',
+            ],
+            'thumbnail' => asset_url('images/games/times-tables-challenge-thumb.svg'),
+            'featured'  => true,
+        ],
         // Future games (see get_related_games() and the Number Challenge
         // architecture for how a new mode/game slots in without rebuilding
         // the hub): Number Recognition, Missing Number, Number Bonds, etc.
-        // Grade 1-6 Math arc (Grade 1 place value, Grade 2 skip counting):
-        // more grade levels/topics to follow as their own self-contained
-        // bundles.
+        // Grade 1-6 Math arc (Grade 1 place value, Grade 2 skip counting,
+        // Grade 3 times tables): more grade levels/topics to follow as
+        // their own self-contained bundles.
     ];
 }
 
