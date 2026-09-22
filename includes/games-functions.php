@@ -188,12 +188,35 @@ function get_all_games(): array
             'thumbnail' => asset_url('images/games/times-tables-challenge-thumb.svg'),
             'featured'  => true,
         ],
+        [
+            'slug'                   => 'fraction-frenzy',
+            'title'                  => 'Fraction Frenzy',
+            'subject'                => 'Math',
+            'grade'                  => 'Grade 4',
+            'topic'                  => 'Equivalent & Comparing Fractions',
+            'difficulty'             => 'Easy',
+            'short_description'      => 'Spot equivalent fractions and compare fraction sizes using colorful visual fraction bars.',
+            'what_students_practice' => [
+                'Recognizing equivalent fractions (e.g. 1/2 = 2/4)',
+                'Comparing two fractions to find which is greater',
+                'Reading a fraction bar model',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Choose Equivalent, Compare or Mixed mode on the start screen.',
+                'Look at the fraction bar(s) together and reason about the answer.',
+                'Select the answer as a class, then move to the next fraction.',
+            ],
+            'thumbnail' => asset_url('images/games/fraction-frenzy-thumb.svg'),
+            'featured'  => true,
+        ],
         // Future games (see get_related_games() and the Number Challenge
         // architecture for how a new mode/game slots in without rebuilding
         // the hub): Number Recognition, Missing Number, Number Bonds, etc.
         // Grade 1-6 Math arc (Grade 1 place value, Grade 2 skip counting,
-        // Grade 3 times tables): more grade levels/topics to follow as
-        // their own self-contained bundles.
+        // Grade 3 times tables, Grade 4 fractions): more grade levels/
+        // topics to follow as their own self-contained bundles.
     ];
 }
 
