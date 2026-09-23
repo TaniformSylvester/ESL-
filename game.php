@@ -39,7 +39,7 @@ require_once __DIR__ . '/includes/header.php';
     </nav>
 
     <?php $subjectKey = game_subject_key($game['subject'] ?? ''); ?>
-    <div class="row g-4 g-lg-5 mb-4">
+    <div class="row g-3 align-items-end mb-3">
         <div class="col-lg-8">
             <div class="d-flex flex-wrap gap-2 mb-2">
                 <span class="badge badge-subject-<?= e($subjectKey) ?>"><?= e($game['subject']) ?></span>
@@ -47,14 +47,28 @@ require_once __DIR__ . '/includes/header.php';
                 <span class="badge bg-light text-dark border"><?= e($game['topic']) ?></span>
                 <span class="badge badge-free"><?= e($game['difficulty']) ?></span>
             </div>
-            <h1 class="fw-bold mb-3"><?= e($game['title']) ?></h1>
+            <h1 class="fw-bold mb-2"><?= e($game['title']) ?></h1>
             <p class="text-secondary mb-0"><?= e($game['short_description']) ?></p>
         </div>
-        <div class="col-lg-4 d-flex align-items-center">
-            <a href="#play" class="btn btn-primary btn-lg w-100">
-                <i class="fa-solid fa-play me-2"></i>Play Game
+        <div class="col-lg-4 d-flex gap-2">
+            <a href="#play" class="btn btn-primary btn-lg flex-fill">
+                <i class="fa-solid fa-play me-2"></i>Play
+            </a>
+            <a href="<?= e(game_embed_url($game)) ?>" target="_blank" rel="noopener" class="btn btn-outline-primary btn-lg flex-fill">
+                <i class="fa-solid fa-up-right-from-square me-2"></i>Full Page
             </a>
         </div>
+    </div>
+
+    <div id="play" class="game-play-section mb-5">
+        <h2 class="visually-hidden">Play <?= e($game['title']) ?></h2>
+        <iframe src="<?= e(game_embed_url($game)) ?>" title="<?= e($game['title']) ?>" class="game-embed-frame" allow="fullscreen; autoplay" allowfullscreen></iframe>
+        <p class="small text-secondary mt-2 mb-0">
+            Tip: tap <strong>Full Page</strong> to open the game on its own, or use the <i class="fa-solid fa-expand"></i> button inside the game for classroom fullscreen.
+            <?php if ($game['team_play'] ?? true): ?>
+                Choose <strong>👥 2 Teams</strong> on the start screen to play team vs. team.
+            <?php endif; ?>
+        </p>
     </div>
 
     <div class="row g-4 mb-5">
@@ -86,12 +100,6 @@ require_once __DIR__ . '/includes/header.php';
             </div>
         </div>
         <?php endif; ?>
-    </div>
-
-    <div id="play" class="mb-5">
-        <h2 class="h4 fw-bold mb-3">Play <?= e($game['title']) ?></h2>
-        <iframe src="<?= e(game_embed_url($game)) ?>" title="<?= e($game['title']) ?>" class="game-embed-frame" loading="lazy" allowfullscreen></iframe>
-        <p class="small text-secondary mt-2 mb-0">Tip: use the <i class="fa-solid fa-expand"></i> fullscreen button inside the game for the best classroom display.</p>
     </div>
 
     <?php if (!empty($relatedGames)): ?>

@@ -9,10 +9,11 @@ $difficultyBadgeClass = match ($game['difficulty'] ?? '') {
     default    => 'bg-light text-dark border',
 };
 $subjectKey = game_subject_key($game['subject'] ?? '');
+$gamePlayUrl = base_url('game.php?slug=' . urlencode($game['slug'])) . '#play';
 ?>
-<div class="col">
+<div class="col" data-subject="<?= e($subjectKey) ?>">
     <div class="card game-card shadow-sm h-100">
-        <a href="<?= e(base_url('game.php?slug=' . urlencode($game['slug']))) ?>" class="text-decoration-none text-reset">
+        <a href="<?= e($gamePlayUrl) ?>" class="text-decoration-none text-reset">
             <div class="game-card-thumb game-card-thumb-<?= e($subjectKey) ?> d-flex align-items-center justify-content-center">
                 <?php if (!empty($game['thumbnail'])): ?>
                     <img src="<?= e($game['thumbnail']) ?>" class="card-img-top" alt="<?= e($game['title']) ?>" loading="lazy">
@@ -28,12 +29,12 @@ $subjectKey = game_subject_key($game['subject'] ?? '');
                 <span class="badge <?= e($difficultyBadgeClass) ?>"><?= e($game['difficulty']) ?></span>
             </div>
             <h3 class="h6 fw-bold mb-1">
-                <a class="text-decoration-none text-reset" href="<?= e(base_url('game.php?slug=' . urlencode($game['slug']))) ?>">
+                <a class="text-decoration-none text-reset" href="<?= e($gamePlayUrl) ?>">
                     <?= e($game['title']) ?>
                 </a>
             </h3>
             <p class="small text-secondary flex-grow-1"><?= e($game['short_description']) ?></p>
-            <a href="<?= e(base_url('game.php?slug=' . urlencode($game['slug']))) ?>" class="btn btn-primary btn-sm mt-2">
+            <a href="<?= e($gamePlayUrl) ?>" class="btn btn-primary btn-sm mt-2">
                 <i class="fa-solid fa-play me-1"></i>Play Game
             </a>
         </div>

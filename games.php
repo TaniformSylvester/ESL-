@@ -31,12 +31,46 @@ require_once __DIR__ . '/includes/header.php';
     <?php if (empty($games)): ?>
         <div class="alert alert-info">New games are on the way &mdash; check back soon.</div>
     <?php else: ?>
-        <h2 class="h4 fw-bold mb-4">All Games</h2>
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 mb-5">
+        <?php
+            $subjectCounts = [];
+            foreach ($games as $g) {
+                $subjectCounts[$g['subject']] = ($subjectCounts[$g['subject']] ?? 0) + 1;
+            }
+        ?>
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+            <h2 class="h4 fw-bold mb-0">All Games</h2>
+            <div class="game-filter d-flex flex-wrap gap-2" role="group" aria-label="Filter games by subject">
+                <button type="button" class="btn btn-sm btn-primary" data-filter="all" aria-pressed="true">All (<?= count($games) ?>)</button>
+                <?php foreach ($subjectCounts as $subject => $count): ?>
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-filter="<?= e(game_subject_key($subject)) ?>" aria-pressed="false"><?= e($subject) ?> (<?= (int)$count ?>)</button>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 mb-5" id="gamesGrid">
             <?php foreach ($games as $game): ?>
                 <?php include __DIR__ . '/includes/game-card.php'; ?>
             <?php endforeach; ?>
         </div>
+        <script>
+            (function () {
+                var buttons = document.querySelectorAll('.game-filter [data-filter]');
+                var cards = document.querySelectorAll('#gamesGrid > [data-subject]');
+                buttons.forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        var filter = btn.getAttribute('data-filter');
+                        buttons.forEach(function (b) {
+                            var on = b === btn;
+                            b.setAttribute('aria-pressed', on ? 'true' : 'false');
+                            b.classList.toggle('btn-primary', on);
+                            b.classList.toggle('btn-outline-primary', !on);
+                        });
+                        cards.forEach(function (card) {
+                            card.classList.toggle('d-none', filter !== 'all' && card.getAttribute('data-subject') !== filter);
+                        });
+                    });
+                });
+            })();
+        </script>
     <?php endif; ?>
 
     <div class="row justify-content-center">

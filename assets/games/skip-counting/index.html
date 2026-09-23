@@ -6,6 +6,7 @@
 <title>Skip Counting Challenge — TeachLuma Games</title>
 <style>
   :root {
+    --tlfx-accent: var(--subject-math);
     --brand-primary: #2563eb;
     --brand-secondary: #f59e0b;
     --brand-success: #16a34a;
@@ -610,7 +611,10 @@
         </div>
       </div>
 
-      <button type="button" class="start-btn" id="startBtn">Start Game</button>
+      <div class="start-actions">
+        <button type="button" class="start-btn" id="startBtn">▶ Start Game</button>
+        <button type="button" class="start-btn start-btn-teams" id="startTeamsBtn" aria-label="Play in two teams">👥 2 Teams</button>
+      </div>
     </div>
   </section>
 
@@ -619,6 +623,7 @@
     <div class="screen-inner">
       <div class="hud">
         <span class="hud-stat" id="hudCounter" aria-live="polite">Question <strong>1</strong> / 10</span>
+        <span class="hud-stat hidden" id="hudTeam" aria-live="polite"></span>
         <span class="hud-stat hud-streak hidden" id="hudStreak">🔥 <strong id="hudStreakCount">0</strong> streak</span>
         <span class="hud-stat">Score: <strong id="hudScore">0</strong></span>
       </div>
@@ -667,6 +672,7 @@
   </section>
 </div>
 
+<script src="../shared/game-fx.js"></script>
 <script>
 (function () {
   'use strict';
@@ -897,6 +903,11 @@
   // -------------------------------------------------------------------
   // Gameplay state
   // -------------------------------------------------------------------
+  // Optional fun layer (shared/game-fx.js); the game plays normally without it.
+  var FX = window.TLFX || null;
+  var teams = FX ? new FX.Teams() : null;
+  var teamMode = false;
+
   var state = {
     index: 0,
     score: 0,
@@ -914,6 +925,7 @@
   var hudStreakCount = document.getElementById('hudStreakCount');
 
   function updateStreakDisplay() {
+    if (teams && teams.enabled) { hudStreak.classList.add('hidden'); return; }
     hudStreakCount.textContent = String(state.streak);
     if (state.streak >= 2) {
       hudStreak.classList.remove('hidden');
@@ -975,6 +987,11 @@
     var q = state.questions[state.index];
     questionText.textContent = q.text;
     hudCounter.innerHTML = 'Question <strong>' + (state.index + 1) + '</strong> / ' + settings.totalQuestions;
+    if (teams) { teams.renderTurn(document.getElementById('hudTeam'), state.index); }
+    if (FX) {
+      FX.enter(document.querySelector('.pv-display, .sc-display, .frac-display') || questionText);
+      FX.enter(document.getElementById('answersGrid'));
+    }
     var progressPct = (state.index / settings.totalQuestions) * 100;
     progressFill.style.width = progressPct + '%';
     progressTrack.setAttribute('aria-valuenow', String(Math.round(progressPct)));
@@ -1017,7 +1034,8 @@
     state.streak = 0;
     state.bestStreak = 0;
     state.questions = buildQuestions();
-    hudScore.textContent = '0';
+    if (teams) { teams.reset(teamMode); }
+    hudScore.textContent = teams && teams.enabled ? teams.scoreText() : '0';
     updateStreakDisplay();
     showScreen(screenPlay);
     renderQuestion();
@@ -1086,11 +1104,20 @@
       state.score++;
       state.streak++;
       state.bestStreak = Math.max(state.bestStreak, state.streak);
-      hudScore.textContent = String(state.score);
+      if (teams && teams.enabled) {
+        teams.award(state.index);
+        hudScore.textContent = teams.scoreText();
+      } else {
+        hudScore.textContent = String(state.score);
+      }
       btn.classList.add('correct');
+      if (FX) { FX.popText(btn, '+1'); }
       updateStreakDisplay();
 
-      if (state.streak >= 3 && state.streak % 3 === 0) {
+      if (teams && teams.enabled) {
+        feedbackText.textContent = '✓ Point for ' + FX.TEAM_NAMES[teams.turn(state.index)] + '!';
+        soundCorrect();
+      } else if (state.streak >= 3 && state.streak % 3 === 0) {
         feedbackText.textContent = '🔥 ' + state.streak + ' in a row!';
         soundStreak();
       } else {
@@ -1100,6 +1127,7 @@
       feedbackText.className = 'feedback correct';
     } else {
       btn.classList.add('incorrect');
+      if (FX) { FX.shake(btn); }
       answerButtons.forEach(function (b) {
         if (b === btn) { return; }
         if (b.dataset.answer === String(q.correct)) {
@@ -1145,16 +1173,44 @@
 
     var streakNote = state.bestStreak >= 3 ? (' Best streak: ' + state.bestStreak + '.') : '';
 
-    document.getElementById('resultsEmoji').textContent = emoji;
-    document.getElementById('resultsScore').textContent = state.score + ' / ' + total;
-    document.getElementById('resultsDetail').textContent = message + ' That\'s ' + pct + '% correct.' + streakNote;
+    var resultsScoreEl = document.getElementById('resultsScore');
+    if (teams && teams.enabled) {
+      var summary = teams.summary();
+      document.getElementById('resultsEmoji').textContent = summary.emoji;
+      resultsScoreEl.textContent = summary.title;
+      document.getElementById('resultsDetail').textContent = summary.detail;
+    } else {
+      document.getElementById('resultsEmoji').textContent = emoji;
+      resultsScoreEl.textContent = state.score + ' / ' + total;
+      document.getElementById('resultsDetail').textContent = message + ' That\'s ' + pct + '% correct.' + streakNote;
+    }
 
     showScreen(screenResults);
+    if (FX) {
+      if (teams && teams.enabled) {
+        FX.celebrate({ after: resultsScoreEl, confetti: true });
+      } else {
+        FX.celebrate({
+          after: resultsScoreEl,
+          stars: FX.starCount(pct),
+          bestKey: 'skip-counting:' + (settings.mode || settings.step) + ':' + settings.difficulty + ':' + total,
+          bestValue: pct,
+          bestLabel: function (v) { return v + '%'; },
+          confetti: pct >= 60
+        });
+      }
+    }
     soundComplete();
     trackPlay('completed');
   }
 
-  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('startBtn').addEventListener('click', function () { teamMode = false; startGame(); });
+  var startTeamsBtn = document.getElementById('startTeamsBtn');
+  if (teams) {
+    startTeamsBtn.addEventListener('click', function () { teamMode = true; startGame(); });
+  } else {
+    startTeamsBtn.classList.add('hidden');
+  }
   document.getElementById('playAgainBtn').addEventListener('click', startGame);
   document.getElementById('changeSettingsBtn').addEventListener('click', function () {
     clearTimer();

@@ -20,6 +20,7 @@
  *   how_to_use        array<string>  short numbered classroom-use steps
  *   thumbnail         ?string  URL to a thumbnail image, or null to use the default icon tile
  *   featured          bool     whether this game is eligible for homepage/hub "Featured" placement
+ *   team_play         bool     optional, default true — whether the game offers "2 Teams" play
  */
 
 /** Every configured game, in display order. */
@@ -118,6 +119,7 @@ function get_all_games(): array
             ],
             'thumbnail' => asset_url('images/games/daily-routines-adventure-thumb.svg'),
             'featured'  => true,
+            'team_play' => false,
         ],
         [
             'slug'                   => 'place-value-digit-value',

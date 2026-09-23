@@ -6,6 +6,7 @@
 <title>Vocabulary Match — TeachLuma Games</title>
 <style>
   :root {
+    --tlfx-accent: var(--brand-primary);
     --brand-primary: #2563eb;
     --brand-primary-dark: #1d4ed8;
     --brand-secondary: #f59e0b;
@@ -453,7 +454,10 @@
         <p class="option-hint">Hard mixes your chosen category with another one, for extra challenge.</p>
       </div>
 
-      <button type="button" class="start-btn" id="startBtn">Start Game</button>
+      <div class="start-actions">
+        <button type="button" class="start-btn" id="startBtn">▶ Start Game</button>
+        <button type="button" class="start-btn start-btn-teams" id="startTeamsBtn" aria-label="Play in two teams">👥 2 Teams</button>
+      </div>
     </div>
   </section>
 
@@ -461,6 +465,7 @@
   <section class="screen hidden" id="screenPlay" aria-label="Vocabulary Match gameplay">
     <div class="screen-inner wide">
       <div class="hud">
+        <span class="hud-stat hidden" id="hudTeam" aria-live="polite"></span>
         <span class="hud-stat">Moves: <strong id="hudMoves">0</strong></span>
         <span class="hud-stat">Matched: <strong id="hudMatched">0</strong> / <strong id="hudTotal">6</strong></span>
         <span class="hud-stat">Time: <strong id="hudTime">0:00</strong></span>
@@ -487,6 +492,7 @@
   </section>
 </div>
 
+<script src="../shared/game-fx.js"></script>
 <script>
 (function () {
   'use strict';
@@ -683,6 +689,20 @@
   var hudTime = document.getElementById('hudTime');
   var feedbackBanner = document.getElementById('feedbackBanner');
 
+  // Optional fun layer (shared/game-fx.js); the game plays normally without it.
+  var FX = window.TLFX || null;
+  var teams = FX ? new FX.Teams() : null;
+  var teamMode = false;
+  // Classic memory rules: a match keeps the turn, a miss passes it on.
+  var teamTurn = 0;
+  var hudTeam = document.getElementById('hudTeam');
+
+  function renderTeamHud() {
+    if (!teams) { return; }
+    teams.renderTurn(hudTeam, teamTurn);
+    if (teams.enabled) { hudTeam.insertAdjacentHTML('beforeend', ' <span>' + teams.scoreText() + '</span>'); }
+  }
+
   var state = {
     cards: [],
     flipped: [],
@@ -849,7 +869,14 @@
         });
         state.matchedCount++;
         hudMatched.textContent = String(state.matchedCount);
-        feedbackBanner.textContent = '✓ Match!';
+        if (FX) { FX.popText(cardEl(i2), '+1'); }
+        if (teams && teams.enabled) {
+          teams.award(teamTurn);
+          renderTeamHud();
+          feedbackBanner.textContent = '✓ Match! ' + FX.TEAM_NAMES[teams.turn(teamTurn)] + ' go again!';
+        } else {
+          feedbackBanner.textContent = '✓ Match!';
+        }
         feedbackBanner.className = 'feedback-banner correct';
         soundMatch();
         state.flipped = [];
@@ -863,7 +890,10 @@
       feedbackBanner.textContent = '✗ Try Again!';
       feedbackBanner.className = 'feedback-banner incorrect';
       soundMismatch();
-      [i1, i2].forEach(function (i) { cardEl(i).classList.add('mismatch'); });
+      [i1, i2].forEach(function (i) {
+        cardEl(i).classList.add('mismatch');
+        if (FX) { FX.shake(cardEl(i)); }
+      });
 
       window.setTimeout(function () {
         [i1, i2].forEach(function (i) {
@@ -874,6 +904,7 @@
         });
         feedbackBanner.textContent = ' ';
         feedbackBanner.className = 'feedback-banner';
+        if (teams && teams.enabled) { teamTurn++; renderTeamHud(); }
         state.flipped = [];
         state.locked = false;
       }, state.mismatchDelayMs);
@@ -893,6 +924,9 @@
 
     hudMoves.textContent = '0';
     hudMatched.textContent = '0';
+    if (teams) { teams.reset(teamMode); }
+    teamTurn = 0;
+    renderTeamHud();
     hudTotal.textContent = String(config.pairCount);
 
     renderGrid();
@@ -935,16 +969,46 @@
     var emoji = perfect ? '🏆' : (efficient ? '🎉' : '👍');
     var tier = perfect ? 'Perfect game — every match on the first try!' : (efficient ? 'Great matching!' : 'Nicely done — keep practicing to find pairs faster!');
 
-    document.getElementById('resultsEmoji').textContent = emoji;
-    document.getElementById('resultsScore').textContent = 'Finished in ' + state.moves + ' move' + (state.moves === 1 ? '' : 's');
-    document.getElementById('resultsDetail').textContent = 'That took ' + formatTime(elapsed) + '. ' + tier;
+    var resultsScoreEl = document.getElementById('resultsScore');
+    if (teams && teams.enabled) {
+      var summary = teams.summary();
+      document.getElementById('resultsEmoji').textContent = summary.emoji;
+      resultsScoreEl.textContent = summary.title;
+      document.getElementById('resultsDetail').textContent = summary.detail + ' All ' + state.pairCount + ' pairs found in ' + formatTime(elapsed) + '.';
+    } else {
+      document.getElementById('resultsEmoji').textContent = emoji;
+      resultsScoreEl.textContent = 'Finished in ' + state.moves + ' move' + (state.moves === 1 ? '' : 's');
+      document.getElementById('resultsDetail').textContent = 'That took ' + formatTime(elapsed) + '. ' + tier;
+    }
 
     showScreen(screenResults);
+    if (FX) {
+      if (teams && teams.enabled) {
+        FX.celebrate({ after: resultsScoreEl, confetti: true });
+      } else {
+        var memoryStars = state.moves <= Math.ceil(state.pairCount * 1.3) ? 3 : (state.moves <= state.pairCount * 2 ? 2 : 1);
+        // Fewer moves is better, so the stored best is the negated move count.
+        FX.celebrate({
+          after: resultsScoreEl,
+          stars: memoryStars,
+          bestKey: 'vocabulary-match:' + settings.category + ':' + settings.difficulty,
+          bestValue: -state.moves,
+          bestLabel: function (v) { return (-v) + ' moves'; },
+          confetti: memoryStars >= 2
+        });
+      }
+    }
     soundComplete();
     trackPlay('completed');
   }
 
-  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('startBtn').addEventListener('click', function () { teamMode = false; startGame(); });
+  var startTeamsBtn = document.getElementById('startTeamsBtn');
+  if (teams) {
+    startTeamsBtn.addEventListener('click', function () { teamMode = true; startGame(); });
+  } else {
+    startTeamsBtn.classList.add('hidden');
+  }
   document.getElementById('playAgainBtn').addEventListener('click', startGame);
   document.getElementById('changeSettingsBtn').addEventListener('click', function () {
     stopClock();

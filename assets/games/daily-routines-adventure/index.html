@@ -673,6 +673,7 @@
   </div>
 </div>
 
+<script src="../shared/game-fx.js"></script>
 <script>
 (function () {
   'use strict';
@@ -876,6 +877,17 @@
   // -------------------------------------------------------------------
   // Game state
   // -------------------------------------------------------------------
+  // Optional fun layer (shared/game-fx.js); the game plays normally without it.
+  var FX = window.TLFX || null;
+
+  // Runs after render(): animates the feedback box that just appeared.
+  function fxFeedback(ok, points) {
+    if (!FX) { return; }
+    var el = document.querySelector('.feedback.success, .feedback.error');
+    if (!el) { return; }
+    if (ok) { FX.bounce(el); FX.popText(el, '+' + points); } else { FX.shake(el); }
+  }
+
   var state = null;
 
   function freshState() {
@@ -968,6 +980,7 @@
       soundIncorrect();
     }
     render();
+    fxFeedback(isCorrect, 10);
   }
 
   function tryAgainOrder() {
@@ -993,6 +1006,7 @@
       soundIncorrect();
     }
     render();
+    fxFeedback(isCorrect, 5);
   }
 
   function nextMatchQuestion() {
@@ -1036,6 +1050,7 @@
       soundIncorrect();
     }
     render();
+    fxFeedback(isCorrect, 5);
   }
 
   function nextBuilderQuestion() {
@@ -1076,6 +1091,7 @@
       soundIncorrect();
     }
     render();
+    fxFeedback(isCorrect, 5);
   }
 
   function nextTimeQuestion() {
@@ -1109,6 +1125,7 @@
       soundIncorrect();
     }
     render();
+    fxFeedback(isCorrect, 5);
   }
 
   function nextReadQuestion() {
@@ -1414,8 +1431,22 @@
     if (state.screen === 'home') {
       screenRoot.innerHTML = renderHome();
     } else if (allActivitiesCompleted()) {
+      var firstCompletion = !trackedCompletion;
       if (!trackedCompletion) { trackedCompletion = true; soundComplete(); trackPlay('completed'); }
       screenRoot.innerHTML = renderCompletion();
+      if (firstCompletion && FX) {
+        var maxScore = 0;
+        Object.keys(ACTIVITY_MAX_SCORES).forEach(function (k) { maxScore += ACTIVITY_MAX_SCORES[k]; });
+        var pct = Math.round((state.score / maxScore) * 100);
+        FX.celebrate({
+          after: screenRoot.querySelector('.completion-score'),
+          stars: FX.starCount(pct),
+          bestKey: 'daily-routines-adventure',
+          bestValue: state.score,
+          bestLabel: function (v) { return v + ' pts'; },
+          confetti: true
+        });
+      }
     } else {
       screenRoot.innerHTML = renderActivity();
     }

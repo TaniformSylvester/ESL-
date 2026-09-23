@@ -6,6 +6,7 @@
 <title>Phonics Sound Match — TeachLuma Games</title>
 <style>
   :root {
+    --tlfx-accent: var(--brand-primary);
     --brand-primary: #2563eb;
     --brand-primary-dark: #1d4ed8;
     --brand-secondary: #f59e0b;
@@ -351,6 +352,11 @@
   /* -----------------------------------------------------------------
      End screen
      ----------------------------------------------------------------- */
+  .players-toggle { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.25rem; }
+  .players-btn { font: inherit; font-weight: 700; padding: 0.6rem 1.1rem; min-height: 44px; border-radius: 999px; border: 2.5px solid var(--border, #e2e8f0); background: #fff; color: inherit; cursor: pointer; touch-action: manipulation; }
+  .players-btn[aria-pressed="true"] { background: var(--brand-primary); border-color: var(--brand-primary); color: #fff; }
+  .players-btn:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+  .team-turn { text-align: center; margin: 0.25rem 0 0.5rem; }
   .end-screen { text-align: center; }
 
   .stars { font-size: clamp(1.6rem, 5vw, 2.25rem); margin: 0.5rem 0; letter-spacing: 0.2rem; }
@@ -567,6 +573,10 @@
           <span>Hard</span><span class="level-sub">Middle sounds</span>
         </button>
       </div>
+      <div class="players-toggle" id="playersGroup" role="group" aria-label="Players">
+        <button type="button" class="players-btn" data-teams="0" aria-pressed="true">🙋 Solo</button>
+        <button type="button" class="players-btn" data-teams="1" aria-pressed="false">👥 2 Teams</button>
+      </div>
     </div>
   </section>
 
@@ -580,6 +590,7 @@
         <div class="progress-bar" id="progressBar" aria-live="polite"></div>
         <div class="score-display" id="scoreDisplay">Score: 0/0</div>
       </div>
+      <div class="team-turn hidden" id="hudTeam" aria-live="polite"></div>
 
       <div class="round-content">
         <div class="target-sound">
@@ -615,6 +626,7 @@
   </section>
 </div>
 
+<script src="../shared/game-fx.js"></script>
 <script>
 (function () {
   'use strict';
@@ -820,6 +832,25 @@
   // -------------------------------------------------------------------
   // Game state
   // -------------------------------------------------------------------
+  // Optional fun layer (shared/game-fx.js); the game plays normally without it.
+  var FX = window.TLFX || null;
+  var teams = FX ? new FX.Teams() : null;
+  var teamMode = false;
+  var hudTeam = document.getElementById('hudTeam');
+  var playersGroup = document.getElementById('playersGroup');
+  if (!teams) {
+    playersGroup.classList.add('hidden');
+  } else {
+    playersGroup.addEventListener('click', function (event) {
+      var b = event.target.closest('.players-btn');
+      if (!b) { return; }
+      teamMode = b.getAttribute('data-teams') === '1';
+      Array.prototype.forEach.call(playersGroup.querySelectorAll('.players-btn'), function (x) {
+        x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+      });
+    });
+  }
+
   var state = { levelKey: null, round: 0, score: 0, answered: false, selected: null };
 
   var levelGroup = document.getElementById('levelGroup');
@@ -860,6 +891,7 @@
     state.score = 0;
     state.answered = false;
     state.selected = null;
+    if (teams) { teams.reset(teamMode); }
     levelBadge.textContent = LEVELS[levelKey].name;
     showScreen(screenPlay);
     renderRound();
@@ -875,7 +907,9 @@
       dot.textContent = i < state.round ? '✓' : String(i + 1);
       progressBar.appendChild(dot);
     });
-    scoreDisplay.textContent = 'Score: ' + state.score + '/' + levelData.questions.length;
+    scoreDisplay.textContent = teams && teams.enabled
+      ? teams.scoreText()
+      : 'Score: ' + state.score + '/' + levelData.questions.length;
   }
 
   function renderRound() {
@@ -886,6 +920,8 @@
     state.selected = null;
 
     renderProgress();
+    if (teams) { teams.renderTurn(hudTeam, state.round); }
+    if (FX) { FX.enter(targetLetter.parentNode); FX.enter(answerCards); }
     targetLetter.textContent = q.letter;
     targetInstruction.textContent = levelData.prompt;
     feedbackMessage.textContent = '';
@@ -927,6 +963,7 @@
       card.disabled = true;
       if (cardWord === word) {
         card.classList.add(isCorrect ? 'correct' : 'incorrect');
+        if (FX) { if (isCorrect) { FX.popText(card, '+1'); } else { FX.shake(card); } }
       } else if (cardWord === q.correct) {
         card.classList.add('correct');
       }
@@ -934,7 +971,10 @@
 
     if (isCorrect) {
       state.score++;
-      feedbackMessage.textContent = '✓ Correct!';
+      if (teams && teams.enabled) { teams.award(state.round); }
+      feedbackMessage.textContent = teams && teams.enabled
+        ? '✓ Point for ' + FX.TEAM_NAMES[teams.turn(state.round)] + '!'
+        : '✓ Correct!';
       feedbackMessage.className = 'feedback-message feedback-correct';
       soundCorrect();
       speak('Correct! ' + word + '.');
@@ -983,9 +1023,27 @@
     }
     document.getElementById('endMessage').textContent = message;
 
+    var endScoreEl = document.getElementById('endScore');
+    if (teams && teams.enabled) {
+      var summary = teams.summary();
+      document.getElementById('endStars').textContent = summary.emoji;
+      endScoreEl.textContent = summary.title;
+      document.getElementById('endMessage').textContent = summary.detail;
+    }
+
     soundComplete();
     trackPlay('completed');
     showScreen(screenEnd);
+    if (FX) {
+      var pct = Math.round((state.score / total) * 100);
+      FX.celebrate({
+        after: endScoreEl,
+        bestKey: teams && teams.enabled ? null : 'phonics-sound-match:' + state.levelKey,
+        bestValue: state.score,
+        bestLabel: function (v) { return v + '/' + total; },
+        confetti: (teams && teams.enabled) || pct >= 60
+      });
+    }
   }
 
   showScreen(screenMenu);

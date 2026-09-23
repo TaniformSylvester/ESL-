@@ -349,18 +349,38 @@ footer a:hover {
     border: 1px solid #c7d2fe;
 }
 
+/* The embedded game fills the viewport height below the sticky navbar
+   (a fixed aspect ratio made it ~260px tall on phones — unplayable). */
+.game-play-section {
+    scroll-margin-top: 64px;
+}
+
 .game-embed-frame {
+    display: block;
     width: 100%;
-    aspect-ratio: 4 / 3;
+    height: calc(100vh - 80px);
+    height: calc(100svh - 80px);
+    min-height: 480px;
+    max-height: 860px;
     border: 0;
     border-radius: 0.75rem;
     box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+    background: #f8fafc;
 }
 
-@media (min-width: 768px) {
+@media (max-width: 575.98px) {
     .game-embed-frame {
-        aspect-ratio: 16 / 10;
+        width: calc(100% + 1.5rem);
+        margin-left: -0.75rem;
+        height: calc(100vh - 64px);
+        height: calc(100svh - 64px);
+        border-radius: 0;
+        box-shadow: none;
     }
+}
+
+.game-filter .btn {
+    border-radius: 999px;
 }
 
 /* ---------------------------------------------------------------------
