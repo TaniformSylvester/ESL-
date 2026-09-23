@@ -104,15 +104,15 @@ $websiteSchema = [
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url()) ?>">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('resources.php')) ?>">Resources</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('games.php')) ?>">Games</a></li>
-                <li class="nav-item"><a class="nav-link" href="<?= e(base_url('teacher-tools.php')) ?>">Teacher Tools</a></li>
                 <li class="nav-item dropdown navbar-hover-dropdown">
                     <a class="nav-link dropdown-toggle" href="<?= e(base_url('teacher-hub.php')) ?>" role="button" data-bs-toggle="dropdown" aria-expanded="false">Teacher Hub</a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="<?= e(base_url('teacher-hub.php')) ?>">Teacher Hub</a></li>
+                        <li><a class="dropdown-item" href="<?= e(base_url('teacher-tools.php')) ?>">Teacher Tools</a></li>
+                        <li><a class="dropdown-item" href="<?= e(base_url('bundles.php')) ?>">Bundles</a></li>
                         <li><a class="dropdown-item" href="<?= e(base_url('request-resource.php')) ?>">Request a Resource</a></li>
                     </ul>
                 </li>
-                <li class="nav-item"><a class="nav-link" href="<?= e(base_url('bundles.php')) ?>">Bundles</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('pricing.php')) ?>">Pricing</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('about.php')) ?>">About</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= e(base_url('contact.php')) ?>">Contact</a></li>
@@ -120,16 +120,24 @@ $websiteSchema = [
 
             <ul class="navbar-nav align-items-lg-center gap-lg-2">
                 <?php if ($isLoggedIn): ?>
-                    <li class="nav-item"><a class="nav-link" href="<?= e(base_url('dashboard.php')) ?>">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= e(base_url('member/favorites.php')) ?>">Favorites</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= e(base_url('member/downloads.php')) ?>">Downloads</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= e(base_url('member/reviews.php')) ?>">My Reviews</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= e(base_url('member/subscription.php')) ?>">Subscription</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= e(base_url('member/profile.php')) ?>">Profile</a></li>
-                    <?php if ($userRole === 'admin'): ?>
-                        <li class="nav-item"><a class="nav-link" href="<?= e(base_url('admin/index.php')) ?>">Admin Panel</a></li>
-                    <?php endif; ?>
-                    <li class="nav-item"><a class="nav-link" href="<?= e(base_url('member/logout.php')) ?>">Logout</a></li>
+                    <li class="nav-item dropdown navbar-hover-dropdown">
+                        <a class="nav-link dropdown-toggle" href="<?= e(base_url('dashboard.php')) ?>" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-circle-user me-1"></i>My Account
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="<?= e(base_url('dashboard.php')) ?>">Dashboard</a></li>
+                            <li><a class="dropdown-item" href="<?= e(base_url('member/favorites.php')) ?>">Favorites</a></li>
+                            <li><a class="dropdown-item" href="<?= e(base_url('member/downloads.php')) ?>">Downloads</a></li>
+                            <li><a class="dropdown-item" href="<?= e(base_url('member/reviews.php')) ?>">My Reviews</a></li>
+                            <li><a class="dropdown-item" href="<?= e(base_url('member/subscription.php')) ?>">Subscription</a></li>
+                            <li><a class="dropdown-item" href="<?= e(base_url('member/profile.php')) ?>">Profile</a></li>
+                            <?php if ($userRole === 'admin'): ?>
+                                <li><a class="dropdown-item" href="<?= e(base_url('admin/index.php')) ?>">Admin Panel</a></li>
+                            <?php endif; ?>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="<?= e(base_url('member/logout.php')) ?>">Logout</a></li>
+                        </ul>
+                    </li>
                 <?php else: ?>
                     <li class="nav-item"><a class="nav-link" href="<?= e(base_url('login.php')) ?>">Login</a></li>
                     <li class="nav-item">

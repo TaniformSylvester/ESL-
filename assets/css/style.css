@@ -156,6 +156,18 @@ footer a:hover {
     .navbar-hover-dropdown:hover > .dropdown-menu {
         display: block;
     }
+
+    /* Bootstrap only right-aligns .dropdown-menu-end when its JS opened
+       the menu (via [data-bs-popper]); a hover-opened menu needs this so
+       the rightmost dropdown doesn't hang off the viewport edge. */
+    .navbar-hover-dropdown > .dropdown-menu-end {
+        right: 0;
+        left: auto;
+    }
+
+    .navbar .nav-link {
+        white-space: nowrap;
+    }
 }
 
 /* Lets the page-number group in render_pagination() (includes/functions.php)
