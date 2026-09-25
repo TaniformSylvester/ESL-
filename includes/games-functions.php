@@ -213,12 +213,80 @@ function get_all_games(): array
             'thumbnail' => asset_url('images/games/fraction-frenzy-thumb.svg'),
             'featured'  => true,
         ],
+        [
+            'slug'                   => 'decimal-detective',
+            'title'                  => 'Decimal Detective',
+            'subject'                => 'Math',
+            'grade'                  => 'Grade 5',
+            'topic'                  => 'Decimals',
+            'difficulty'             => 'Medium',
+            'short_description'      => 'Compare, round and read decimals to the thousandths on a colorful place-value chart.',
+            'what_students_practice' => [
+                'Comparing decimals with different numbers of digits (0.5 vs 0.45)',
+                'Rounding decimals to the nearest whole, tenth or hundredth',
+                'Finding the value of a digit in a decimal',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Choose Compare, Rounding or Mixed, and tenths, hundredths or thousandths.',
+                'Use the place-value chart to talk through each answer together.',
+                'Play solo, or pick 2 Teams for a class competition.',
+            ],
+            'thumbnail' => asset_url('images/games/decimal-detective-thumb.svg'),
+            'featured'  => true,
+        ],
+        [
+            'slug'                   => 'ratio-percent-rally',
+            'title'                  => 'Ratio & Percent Rally',
+            'subject'                => 'Math',
+            'grade'                  => 'Grade 6',
+            'topic'                  => 'Ratios & Percents',
+            'difficulty'             => 'Medium',
+            'short_description'      => 'Find percents of numbers, convert fractions to percents, and simplify and complete ratios.',
+            'what_students_practice' => [
+                'Finding a percent of a number (e.g. 25% of 80)',
+                'Writing fractions as percents',
+                'Simplifying ratios and finding equivalent ratios',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Choose Percents, Ratios or Mixed, then a difficulty level.',
+                'Ask students to explain their strategy before selecting an answer.',
+                'Play solo, or pick 2 Teams for a class competition.',
+            ],
+            'thumbnail' => asset_url('images/games/ratio-percent-rally-thumb.svg'),
+            'featured'  => true,
+        ],
+        [
+            'slug'                   => 'science-sorter',
+            'title'                  => 'Science Sorter',
+            'subject'                => 'Science',
+            'grade'                  => 'Grade 1–3',
+            'topic'                  => 'Classifying Living Things & Matter',
+            'difficulty'             => 'Easy',
+            'short_description'      => 'Sort things into living or non-living, animal groups, and solids, liquids and gases — with a fun fact for tricky ones.',
+            'what_students_practice' => [
+                'Telling living things from non-living things',
+                'Classifying animals as mammals, birds, fish, reptiles or insects',
+                'Sorting materials into solids, liquids and gases',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Choose Living?, Animals or Matter; Hard adds tricky items like bats and sand.',
+                'Read the fun fact aloud after each answer and discuss why.',
+                'Play solo, or pick 2 Teams for a class competition.',
+            ],
+            'thumbnail' => asset_url('images/games/science-sorter-thumb.svg'),
+            'featured'  => true,
+        ],
         // Future games (see get_related_games() and the Number Challenge
         // architecture for how a new mode/game slots in without rebuilding
         // the hub): Number Recognition, Missing Number, Number Bonds, etc.
-        // Grade 1-6 Math arc (Grade 1 place value, Grade 2 skip counting,
-        // Grade 3 times tables, Grade 4 fractions): more grade levels/
-        // topics to follow as their own self-contained bundles.
+        // The Grade 1-6 Math arc is complete (place value, skip counting,
+        // times tables, fractions, decimals, ratios & percents).
     ];
 }
 

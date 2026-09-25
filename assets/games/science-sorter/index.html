@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Skip Counting Challenge — TeachLuma Games</title>
+<title>Science Sorter — TeachLuma Games</title>
 <style>
   :root {
     --tlfx-accent: var(--subject-math);
@@ -278,64 +278,54 @@
     text-align: right;
   }
 
-  /* -----------------------------------------------------------------
-     Skip-count sequence display — a row of colorful number tiles with
-     one shown as "?" (the blank the question is asking about).
-     ----------------------------------------------------------------- */
-  .sc-display {
+  .game-display {
     display: flex;
     justify-content: center;
-    gap: clamp(0.5rem, 2.5vw, 1rem);
-    margin: 0.5rem 0 1.25rem;
-    flex-wrap: nowrap;
+    margin: 0.25rem 0 1rem;
   }
 
-  .sc-tile {
+  .ss-card {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    width: clamp(3.5rem, 16vw, 5.5rem);
-    height: clamp(3.5rem, 16vw, 5.5rem);
-    border-radius: 0.85rem;
+    gap: 0.25rem;
+    min-width: clamp(160px, 40vw, 230px);
+    padding: 0.9rem 1.5rem 1rem;
+    border-radius: 1.4rem;
     background: #fff;
     border: 3px solid var(--border);
-    font-size: clamp(1.35rem, 6vw, 2.25rem);
+    box-shadow: 0 6px 0 #EDE3D0;
+  }
+
+  .ss-emoji {
+    font-size: clamp(3.6rem, 13vw, 5.6rem);
+    line-height: 1.1;
+  }
+
+  .ss-name {
+    font-size: clamp(1.3rem, 4vw, 1.9rem);
     font-weight: 800;
     color: var(--subject-math-dark);
-    transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
   }
 
-  @keyframes scBlankPulse {
-    0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
-    70% { box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+  .answers.answers-three {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
-  .sc-tile-blank {
-    border-color: var(--brand-secondary);
-    border-style: dashed;
-    background: #fffbeb;
-    color: #b45309;
-    transform: scale(1.08);
-    animation: scBlankPulse 1.6s ease-in-out infinite;
+  @media (max-width: 479.98px) {
+    .answers.answers-three { grid-template-columns: 1fr; max-width: 320px; }
   }
 
-  .sc-tile-blank.answered {
-    border-style: solid;
-    animation: none;
-    transform: none;
-  }
-
-  .sc-tile-blank.answered.correct-tile {
-    background: var(--brand-success);
-    border-color: var(--brand-success);
-    color: #fff;
-  }
-
-  .sc-tile-blank.answered.incorrect-tile {
-    background: var(--brand-danger);
-    border-color: var(--brand-danger);
-    color: #fff;
+  .fact {
+    text-align: center;
+    min-height: 1.4rem;
+    margin: -0.5rem auto 0;
+    max-width: 560px;
+    font-weight: 700;
+    color: var(--ink-soft);
   }
 
   .question {
@@ -359,8 +349,17 @@
     .answers { grid-template-columns: repeat(4, 1fr); }
   }
 
+  .answers.answers-compact {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .answer-btn {
-    font-size: clamp(1.35rem, 4.5vw, 2.1rem);
+    /* Category labels ("⚙️ Non-living") must stay on one line. */
+    font-size: clamp(1.1rem, 4.2vw, 1.5rem);
+    white-space: nowrap;
     font-weight: 800;
     padding: 1rem 0.5rem;
     min-height: clamp(4.5rem, 14vw, 6.5rem);
@@ -515,11 +514,13 @@
     .hud { margin-bottom: 0.4rem; }
     .progress-track { margin-bottom: 0.5rem; }
     .timer-wrap { margin-bottom: 0.5rem; }
-    .sc-display { margin: 0.15rem 0 0.5rem; gap: 0.35rem; }
-    .sc-tile { width: clamp(2.5rem, 12vw, 3.5rem); height: clamp(2.5rem, 12vw, 3.5rem); font-size: clamp(1rem, 4vw, 1.5rem); }
+    .ss-card { padding: 0.3rem 1rem; }
+    .ss-emoji { font-size: 2.4rem; }
+    .ss-name { font-size: 1.05rem; }
+    .fact { font-size: 0.8rem; margin-top: -0.3rem; }
     .question { margin: 0.15rem 0 0.5rem; font-size: clamp(1rem, 3.5vw, 1.4rem); }
     .answers { gap: 0.5rem; margin-bottom: 0.6rem; }
-    .answer-btn { min-height: clamp(2.5rem, 10vw, 3.5rem); font-size: clamp(1.1rem, 3.5vw, 1.6rem); }
+    .answer-btn { min-height: clamp(2.5rem, 10vw, 3.5rem); font-size: clamp(1rem, 3.5vw, 1.4rem); }
     .feedback { min-height: 1.6rem; font-size: 1.1rem; }
 
     .results-emoji { font-size: 2rem; margin-bottom: 0.25rem; }
@@ -553,7 +554,7 @@
 <body>
 <div id="app">
   <div class="topbar">
-    <span class="topbar-title"><a class="topbar-home" href="../../../games.php" target="_top" aria-label="All TeachLuma games"><img src="../../brand/teachluma-icon.svg" alt="" width="32" height="30"></a><span class="topbar-name">Skip Counting Challenge</span></span>
+    <span class="topbar-title"><a class="topbar-home" href="../../../games.php" target="_top" aria-label="All TeachLuma games"><img src="../../brand/teachluma-icon.svg" alt="" width="32" height="30"></a><span class="topbar-name">Science Sorter</span></span>
     <div class="topbar-actions">
       <button type="button" class="icon-btn" id="muteBtn" aria-pressed="false" aria-label="Mute sound">🔊<span class="sr-only"> Sound on</span></button>
       <button type="button" class="icon-btn" id="fullscreenBtn" aria-label="Enter fullscreen">⛶ Fullscreen</button>
@@ -561,20 +562,20 @@
   </div>
 
   <!-- START SCREEN -->
-  <section class="screen" id="screenStart" aria-label="Skip Counting Challenge setup">
+  <section class="screen" id="screenStart" aria-label="Science Sorter setup">
     <div class="screen-inner">
       <div class="start-hero">
-        <h1>Skip Counting Challenge</h1>
-        <p>Grade 2 Math &middot; Counting by 2s, 5s &amp; 10s</p>
+        <h1>Science Sorter</h1>
+        <p>Grade 1&ndash;3 Science &middot; Living Things, Animal Groups &amp; Matter</p>
       </div>
 
       <div class="option-groups-wrap">
         <div class="option-group" role="group" aria-labelledby="modeLabel">
           <span class="option-group-label" id="modeLabel">Choose your game</span>
           <div class="option-row" id="modeGroup">
-            <button type="button" class="option-btn" data-value="2" aria-pressed="true">By 2s</button>
-            <button type="button" class="option-btn" data-value="5" aria-pressed="false">By 5s</button>
-            <button type="button" class="option-btn" data-value="10" aria-pressed="false">By 10s</button>
+            <button type="button" class="option-btn" data-value="living" aria-pressed="true">Living?</button>
+            <button type="button" class="option-btn" data-value="animals" aria-pressed="false">Animals</button>
+            <button type="button" class="option-btn" data-value="matter" aria-pressed="false">Matter</button>
           </div>
         </div>
 
@@ -582,13 +583,13 @@
           <span class="option-group-label" id="difficultyLabel">Difficulty</span>
           <div class="option-row" id="difficultyGroup">
             <button type="button" class="option-btn option-btn-stacked" data-value="easy" aria-pressed="false">
-              <span>Easy</span><span class="opt-sub">up to 50</span>
+              <span>Easy</span><span class="opt-sub">everyday things</span>
             </button>
             <button type="button" class="option-btn option-btn-stacked" data-value="medium" aria-pressed="true">
-              <span>Medium</span><span class="opt-sub">up to 100</span>
+              <span>Medium</span><span class="opt-sub">more to sort</span>
             </button>
             <button type="button" class="option-btn option-btn-stacked" data-value="hard" aria-pressed="false">
-              <span>Hard</span><span class="opt-sub">tricky</span>
+              <span>Hard</span><span class="opt-sub">tricky ones</span>
             </button>
           </div>
         </div>
@@ -620,7 +621,7 @@
   </section>
 
   <!-- PLAY SCREEN -->
-  <section class="screen hidden" id="screenPlay" aria-label="Skip Counting Challenge gameplay">
+  <section class="screen hidden" id="screenPlay" aria-label="Science Sorter gameplay">
     <div class="screen-inner">
       <div class="hud">
         <span class="hud-stat" id="hudCounter" aria-live="polite">Question <strong>1</strong> / 10</span>
@@ -639,12 +640,7 @@
         <span class="timer-label" id="timerLabelText">10</span>
       </div>
 
-      <div class="sc-display" id="scDisplay" aria-live="polite">
-        <div class="sc-tile" data-tile="0"></div>
-        <div class="sc-tile" data-tile="1"></div>
-        <div class="sc-tile" data-tile="2"></div>
-        <div class="sc-tile" data-tile="3"></div>
-      </div>
+      <div class="game-display" id="gameDisplay" aria-live="polite"></div>
 
       <p class="question" id="questionText" aria-live="polite">&nbsp;</p>
 
@@ -656,11 +652,12 @@
       </div>
 
       <p class="feedback" id="feedbackText" aria-live="assertive">&nbsp;</p>
+      <p class="fact" id="factText" aria-live="polite"></p>
     </div>
   </section>
 
   <!-- RESULTS SCREEN -->
-  <section class="screen hidden" id="screenResults" aria-label="Skip Counting Challenge results">
+  <section class="screen hidden" id="screenResults" aria-label="Science Sorter results">
     <div class="screen-inner center-text">
       <p class="results-emoji" id="resultsEmoji">🎉</p>
       <p class="results-score" id="resultsScore">8 / 10</p>
@@ -678,12 +675,7 @@
 (function () {
   'use strict';
 
-  // -------------------------------------------------------------------
-  // Question generation — a 4-number skip-counted sequence with one
-  // position blanked out. Difficulty controls the max value in the
-  // sequence and whether the blank can land in the middle (harder) or
-  // is always the last number ("what comes next", easier).
-  // -------------------------------------------------------------------
+
   function randInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
@@ -699,58 +691,100 @@
     return copy;
   }
 
-  var DIFFICULTY_CONFIG = {
-    easy:   { max: 50, blankAnywhere: false },
-    medium: { max: 100, blankAnywhere: false },
-    hard:   { max: 100, blankAnywhere: true }
-  };
-
-  function buildDistractors(correct, step) {
-    var candidates = [correct + step, Math.max(0, correct - step), correct + 1, Math.max(0, correct - 1), correct + Math.max(1, Math.floor(step / 2))];
-    var unique = [];
+  function uniqueExcept(candidates, correct, n) {
+    var out = [];
     candidates.forEach(function (c) {
-      if (c !== correct && unique.indexOf(c) === -1) {
-        unique.push(c);
-      }
+      if (c !== correct && out.indexOf(c) === -1) { out.push(c); }
     });
-    var guard = 0;
-    while (unique.length < 3 && guard < 30) {
-      var extra = Math.max(0, correct + randInt(-step * 2, step * 2));
-      if (extra !== correct && unique.indexOf(extra) === -1) {
-        unique.push(extra);
-      }
-      guard++;
-    }
-    return unique.slice(0, 3);
+    return out.slice(0, n);
   }
 
-  function buildSkipQuestion(step, difficultyKey) {
-    var cfg = DIFFICULTY_CONFIG[difficultyKey] || DIFFICULTY_CONFIG.medium;
-    var maxMultiple = Math.max(0, Math.floor(cfg.max / step) - 3);
-    var startMultiple = randInt(0, maxMultiple);
-    var start = startMultiple * step;
-    var sequence = [start, start + step, start + 2 * step, start + 3 * step];
-    var blankIndex = cfg.blankAnywhere ? randInt(1, 3) : 3;
-    var correct = sequence[blankIndex];
-    var distractors = buildDistractors(correct, step);
+  // -------------------------------------------------------------------
+  // Sorting decks. Each item: [emoji, name, category, optional fact].
+  // "Hard" adds the classic trick items (bat, whale, penguin, fire,
+  // mushroom, sand, honey...) with a short explanation after answering.
+  // Emoji kept to widely supported ones (Unicode 11 and earlier).
+  // -------------------------------------------------------------------
+  var CATEGORIES = {
+    living: [['living', '🌱 Living'], ['nonliving', '⚙️ Non-living']],
+    animals: [['mammal', '🐾 Mammal'], ['bird', '🐦 Bird'], ['fish', '🐟 Fish'], ['reptile', '🦎 Reptile'], ['insect', '🐞 Insect']],
+    matter: [['solid', '🧱 Solid'], ['liquid', '💧 Liquid'], ['gas', '💨 Gas']]
+  };
 
+  var DECKS = {
+    living: {
+      easy: [['🐶', 'Dog', 'living'], ['🌳', 'Tree', 'living'], ['🐱', 'Cat', 'living'], ['🌻', 'Sunflower', 'living'], ['🐝', 'Bee', 'living'],
+             ['🚗', 'Car', 'nonliving'], ['⚽', 'Ball', 'nonliving'], ['📚', 'Book', 'nonliving'], ['✏️', 'Pencil', 'nonliving'], ['🧸', 'Teddy bear', 'nonliving']],
+      medium: [['🐟', 'Fish', 'living'], ['🐛', 'Caterpillar', 'living'], ['🌵', 'Cactus', 'living', 'A cactus grows, needs water and makes seeds — it is a living plant.'], ['🐢', 'Turtle', 'living'],
+               ['🎒', 'Backpack', 'nonliving'], ['✂️', 'Scissors', 'nonliving'], ['🔑', 'Key', 'nonliving'], ['📱', 'Phone', 'nonliving'], ['💧', 'Water', 'nonliving', 'Living things need water, but water itself is not alive.']],
+      hard: [['🍄', 'Mushroom', 'living', 'Mushrooms are fungi — they grow, feed and make spores, so they are alive.'], ['🌱', 'Seed', 'living', 'A seed is alive but resting. Give it water and warmth and it grows.'],
+             ['🦠', 'Germ', 'living', 'Germs are tiny living things. They feed, grow and make more of themselves.'], ['🔥', 'Fire', 'nonliving', 'Fire moves and "grows", but it cannot eat, breathe or have babies — it is not alive.'],
+             ['☀️', 'Sun', 'nonliving', 'The Sun gives energy to living things, but it is a star, not a living thing.'], ['🤖', 'Robot', 'nonliving', 'A robot can move, but it cannot grow or reproduce. It is a machine.'],
+             ['☁️', 'Cloud', 'nonliving', 'Clouds are made of tiny water drops. They move, but they are not alive.']]
+    },
+    animals: {
+      easy: [['🐶', 'Dog', 'mammal'], ['🐄', 'Cow', 'mammal'], ['🐘', 'Elephant', 'mammal'], ['🦆', 'Duck', 'bird'], ['🦉', 'Owl', 'bird'],
+             ['🐠', 'Clownfish', 'fish'], ['🐍', 'Snake', 'reptile'], ['🐊', 'Crocodile', 'reptile'], ['🐝', 'Bee', 'insect'], ['🦋', 'Butterfly', 'insect']],
+      medium: [['🦁', 'Lion', 'mammal'], ['🐒', 'Monkey', 'mammal'], ['🦜', 'Parrot', 'bird'], ['🐓', 'Rooster', 'bird'], ['🐡', 'Pufferfish', 'fish'],
+               ['🦎', 'Lizard', 'reptile'], ['🐢', 'Turtle', 'reptile', 'Turtles have scaly skin and lay eggs on land — they are reptiles.'], ['🐜', 'Ant', 'insect'], ['🐞', 'Ladybug', 'insect'], ['🦗', 'Cricket', 'insect']],
+      hard: [['🐋', 'Whale', 'mammal', 'Whales live in the sea, but they breathe air and feed their babies milk — mammals!'], ['🦇', 'Bat', 'mammal', 'Bats fly, but they have fur and feed their babies milk — mammals!'],
+             ['🐬', 'Dolphin', 'mammal', 'Dolphins breathe air through a blowhole and feed their babies milk.'], ['🐧', 'Penguin', 'bird', 'Penguins cannot fly, but they have feathers and lay eggs — birds!'],
+             ['🦈', 'Shark', 'fish', 'Sharks breathe through gills and live in water all their lives — fish!'], ['🦖', 'Dinosaur (T. rex)', 'reptile', 'Dinosaurs were reptiles that lived long ago.'],
+             ['🦉', 'Owl', 'bird'], ['🐜', 'Ant', 'insect', 'Ants have six legs and three body parts, like every insect.']]
+    },
+    matter: {
+      easy: [['🍎', 'Apple', 'solid'], ['🧱', 'Brick', 'solid'], ['🥄', 'Spoon', 'solid'], ['🔑', 'Key', 'solid'],
+             ['💧', 'Water', 'liquid'], ['🥛', 'Milk', 'liquid'], ['☕', 'Tea', 'liquid'], ['💨', 'Air', 'gas'], ['🌬️', 'Wind', 'gas']],
+      medium: [['📏', 'Ruler', 'solid'], ['❄️', 'Snow', 'solid', 'Snow is frozen water — a solid that melts into a liquid.'], ['🍹', 'Juice', 'liquid'], ['🛢️', 'Oil', 'liquid'],
+               ['♨️', 'Steam', 'gas', 'Steam is water heated until it turns into a gas.'], ['🎈', 'Air inside a balloon', 'gas'], ['🍫', 'Chocolate bar', 'solid']],
+      hard: [['⏳', 'Sand', 'solid', 'Sand pours like a liquid, but every grain is a tiny solid that keeps its shape.'], ['🍯', 'Honey', 'liquid', 'Honey is thick and slow, but it flows and takes the shape of its jar — a liquid.'],
+             ['🍦', 'Ice cream', 'solid', 'Frozen ice cream is a solid — until it melts into a liquid!'], ['🎈', 'Helium in a balloon', 'gas', 'Helium is a gas that is lighter than air, so the balloon floats.'],
+             ['🧼', 'Soap bar', 'solid'], ['🥤', 'Soda', 'liquid', 'Soda is a liquid with bubbles of gas inside it.'], ['🌫️', 'Fog', 'liquid', 'Fog is made of tiny drops of liquid water floating in the air.']]
+    }
+  };
+
+  // Hard includes the easier items too so the deck never runs dry.
+  function deckFor(mode, level) {
+    var d = DECKS[mode];
+    if (level === 'easy') { return d.easy; }
+    if (level === 'medium') { return d.easy.concat(d.medium); }
+    return d.medium.concat(d.hard);
+  }
+
+  var drawState = {};
+  function draw(mode, level) {
+    var key = mode + ':' + level;
+    if (!drawState[key] || drawState[key].length === 0) { drawState[key] = shuffle(deckFor(mode, level)); }
+    return drawState[key].pop();
+  }
+
+  function buildSortQuestion(mode, level) {
+    var item = draw(mode, level);
+    var cats = CATEGORIES[mode];
+    var correctCat = cats.filter(function (c) { return c[0] === item[2]; })[0];
+    var choices;
+    if (cats.length > 4) {
+      var others = shuffle(cats.filter(function (c) { return c[0] !== item[2]; })).slice(0, 3);
+      choices = shuffle([correctCat].concat(others));
+    } else {
+      choices = cats.slice();
+    }
+    var prompts = { living: 'Is it living or non-living?', animals: 'Which animal group does it belong to?', matter: 'Is it a solid, a liquid or a gas?' };
     return {
-      type: 'skip_count',
-      step: step,
-      sequence: sequence,
-      blankIndex: blankIndex,
-      text: blankIndex === 3
-        ? 'Counting by ' + step + 's — what number comes next?'
-        : 'Counting by ' + step + 's — which number is missing?',
-      correct: correct,
-      choices: shuffle([correct].concat(distractors))
+      type: mode,
+      emoji: item[0],
+      name: item[1],
+      fact: item[3] || '',
+      text: prompts[mode],
+      correct: correctCat[1],
+      choices: choices.map(function (c) { return c[1]; })
     };
   }
 
   var QUESTION_GENERATORS = {
-    2:  function (difficultyKey) { return buildSkipQuestion(2, difficultyKey); },
-    5:  function (difficultyKey) { return buildSkipQuestion(5, difficultyKey); },
-    10: function (difficultyKey) { return buildSkipQuestion(10, difficultyKey); }
+    living: function (level) { return buildSortQuestion('living', level); },
+    animals: function (level) { return buildSortQuestion('animals', level); },
+    matter: function (level) { return buildSortQuestion('matter', level); }
   };
 
   // -------------------------------------------------------------------
@@ -762,7 +796,7 @@
   var audioCtx = null;
   var soundOn = true;
   try {
-    soundOn = localStorage.getItem('sc_sound_on') !== '0';
+    soundOn = localStorage.getItem('ss_sound_on') !== '0';
   } catch (e) { /* localStorage unavailable — default to on, non-fatal */ }
 
   function getAudioCtx() {
@@ -806,7 +840,7 @@
       fetch('../../../api/game-track.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: 'skip-counting', event: eventType })
+        body: JSON.stringify({ slug: 'science-sorter', event: eventType })
       }).catch(function () {});
     } catch (e) { /* non-fatal */ }
   }
@@ -863,7 +897,7 @@
   muteBtn.addEventListener('click', function () {
     soundOn = !soundOn;
     renderMuteBtn();
-    try { localStorage.setItem('sc_sound_on', soundOn ? '1' : '0'); } catch (e) { /* non-fatal */ }
+    try { localStorage.setItem('ss_sound_on', soundOn ? '1' : '0'); } catch (e) { /* non-fatal */ }
   });
 
   // -------------------------------------------------------------------
@@ -880,9 +914,9 @@
   }
 
   // -------------------------------------------------------------------
-  // Start-screen option groups (step / difficulty / question count / timer)
+  // Start-screen option groups (mode / difficulty / question count / timer)
   // -------------------------------------------------------------------
-  var settings = { step: 2, difficulty: 'medium', totalQuestions: 10, timerSeconds: 0 };
+  var settings = { mode: 'living', difficulty: 'medium', totalQuestions: 10, timerSeconds: 0 };
 
   function wireOptionGroup(groupId, settingKey, parse) {
     var group = document.getElementById(groupId);
@@ -896,7 +930,7 @@
     });
   }
 
-  wireOptionGroup('modeGroup', 'step', function (v) { return parseInt(v, 10); });
+  wireOptionGroup('modeGroup', 'mode', function (v) { return v; });
   wireOptionGroup('difficultyGroup', 'difficulty', function (v) { return v; });
   wireOptionGroup('countGroup', 'totalQuestions', function (v) { return parseInt(v, 10); });
   wireOptionGroup('timerGroup', 'timerSeconds', function (v) { return parseInt(v, 10); });
@@ -943,10 +977,17 @@
   var timerFill = document.getElementById('timerFill');
   var timerTrack = document.getElementById('timerTrack');
   var timerLabelText = document.getElementById('timerLabelText');
-  var scTiles = Array.prototype.slice.call(document.querySelectorAll('.sc-tile'));
+  var gameDisplay = document.getElementById('gameDisplay');
   var questionText = document.getElementById('questionText');
   var feedbackText = document.getElementById('feedbackText');
+  var factText = document.getElementById('factText');
+  function showFact(q) { factText.textContent = q.fact ? '💡 ' + q.fact : ''; }
+  var answersGrid = document.getElementById('answersGrid');
   var answerButtons = Array.prototype.slice.call(document.querySelectorAll('.answer-btn'));
+
+  function renderDisplay(q) {
+    gameDisplay.innerHTML = '<div class="ss-card"><span class="ss-emoji" aria-hidden="true">' + q.emoji + '</span><span class="ss-name">' + q.name + '</span></div>';
+  }
 
   function clearTimer() {
     if (state.timerHandle) {
@@ -990,7 +1031,7 @@
     hudCounter.innerHTML = 'Question <strong>' + (state.index + 1) + '</strong> / ' + settings.totalQuestions;
     if (teams) { teams.renderTurn(document.getElementById('hudTeam'), state.index); }
     if (FX) {
-      FX.enter(document.querySelector('.pv-display, .sc-display, .frac-display') || questionText);
+      FX.enter(document.querySelector('.game-display') || questionText);
       FX.enter(document.getElementById('answersGrid'));
     }
     var progressPct = (state.index / settings.totalQuestions) * 100;
@@ -998,30 +1039,31 @@
     progressTrack.setAttribute('aria-valuenow', String(Math.round(progressPct)));
     feedbackText.textContent = ' ';
     feedbackText.className = 'feedback';
+    factText.textContent = '';
     state.locked = false;
 
-    scTiles.forEach(function (tile, i) {
-      tile.className = 'sc-tile';
-      if (i === q.blankIndex) {
-        tile.textContent = '?';
-        tile.classList.add('sc-tile-blank');
+    renderDisplay(q);
+
+    var count = q.choices.length;
+    answerButtons.forEach(function (btn, i) {
+      if (i < count) {
+        btn.className = 'answer-btn';
+        btn.textContent = String(q.choices[i]);
+        btn.dataset.answer = String(q.choices[i]);
+        btn.disabled = false;
       } else {
-        tile.textContent = String(q.sequence[i]);
+        btn.className = 'answer-btn hidden';
+        btn.disabled = true;
       }
     });
-
-    answerButtons.forEach(function (btn, i) {
-      btn.className = 'answer-btn';
-      btn.textContent = String(q.choices[i]);
-      btn.dataset.answer = String(q.choices[i]);
-      btn.disabled = false;
-    });
+    answersGrid.classList.toggle('answers-compact', count === 2);
+    answersGrid.classList.toggle('answers-three', count === 3);
 
     startQuestionTimer();
   }
 
   function buildQuestions() {
-    var generator = QUESTION_GENERATORS[settings.step] || QUESTION_GENERATORS[2];
+    var generator = QUESTION_GENERATORS[settings.mode] || QUESTION_GENERATORS['living'];
     var list = [];
     for (var i = 0; i < settings.totalQuestions; i++) {
       list.push(generator(settings.difficulty));
@@ -1049,20 +1091,13 @@
 
   function revealCorrect(correct) {
     answerButtons.forEach(function (b) {
+      if (b.classList.contains('hidden')) { return; }
       if (b.dataset.answer === String(correct)) {
         b.classList.add('correct');
       } else {
         b.classList.add('dimmed');
       }
     });
-  }
-
-  function markBlankTile(isCorrect) {
-    var q = state.questions[state.index];
-    var blankTile = scTiles[q.blankIndex];
-    blankTile.textContent = String(q.correct);
-    blankTile.classList.add('answered');
-    blankTile.classList.add(isCorrect ? 'correct-tile' : 'incorrect-tile');
   }
 
   function advance() {
@@ -1073,7 +1108,7 @@
       } else {
         finishGame();
       }
-    }, 1300);
+    }, state.questions[state.index] && state.questions[state.index].fact ? 3200 : 1300);
   }
 
   function handleTimeout() {
@@ -1082,7 +1117,7 @@
     lockButtons();
     var q = state.questions[state.index];
     revealCorrect(q.correct);
-    markBlankTile(false);
+    showFact(q);
     feedbackText.textContent = "⏰ Time's Up!";
     feedbackText.className = 'feedback incorrect';
     soundIncorrect();
@@ -1099,7 +1134,7 @@
 
     var q = state.questions[state.index];
     var isCorrect = btn.dataset.answer === String(q.correct);
-    markBlankTile(isCorrect);
+    showFact(q);
 
     if (isCorrect) {
       state.score++;
@@ -1130,7 +1165,7 @@
       btn.classList.add('incorrect');
       if (FX) { FX.shake(btn); }
       answerButtons.forEach(function (b) {
-        if (b === btn) { return; }
+        if (b.classList.contains('hidden') || b === btn) { return; }
         if (b.dataset.answer === String(q.correct)) {
           b.classList.add('correct');
         } else {
@@ -1151,13 +1186,14 @@
     btn.addEventListener('click', function () { handleAnswer(btn); });
   });
 
-  // Keyboard support during gameplay: number keys 1-4 pick an answer.
+  // Keyboard support during gameplay: number keys 1-4 pick an answer
+  // (only the currently visible ones respond).
   document.addEventListener('keydown', function (event) {
     if (screenPlay.classList.contains('hidden')) { return; }
     var num = parseInt(event.key, 10);
     if (num >= 1 && num <= 4) {
       var target = answerButtons[num - 1];
-      if (target && !target.disabled) {
+      if (target && !target.disabled && !target.classList.contains('hidden')) {
         target.click();
       }
     }
@@ -1194,7 +1230,7 @@
         FX.celebrate({
           after: resultsScoreEl,
           stars: FX.starCount(pct),
-          bestKey: 'skip-counting:' + (settings.mode || settings.step) + ':' + settings.difficulty + ':' + total,
+          bestKey: 'fraction-frenzy:' + (settings.mode || settings.step) + ':' + settings.difficulty + ':' + total,
           bestValue: pct,
           bestLabel: function (v) { return v + '%'; },
           confetti: pct >= 60

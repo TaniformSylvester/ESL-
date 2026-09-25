@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Skip Counting Challenge — TeachLuma Games</title>
+<title>Decimal Detective — TeachLuma Games</title>
 <style>
   :root {
     --tlfx-accent: var(--subject-math);
@@ -278,65 +278,47 @@
     text-align: right;
   }
 
-  /* -----------------------------------------------------------------
-     Skip-count sequence display — a row of colorful number tiles with
-     one shown as "?" (the blank the question is asking about).
-     ----------------------------------------------------------------- */
-  .sc-display {
+  /* Place-value chart: digits line up under Ones . Tenths Hundredths ... */
+  .game-display {
     display: flex;
     justify-content: center;
-    gap: clamp(0.5rem, 2.5vw, 1rem);
-    margin: 0.5rem 0 1.25rem;
-    flex-wrap: nowrap;
+    margin: 0.25rem 0 1.25rem;
   }
 
-  .sc-tile {
+  .dd-chart {
+    display: grid;
+    gap: 0.35rem;
+    justify-content: center;
+  }
+
+  .dd-head {
+    font-size: clamp(0.62rem, 1.6vw, 0.78rem);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    text-align: center;
+    padding-bottom: 0.15rem;
+  }
+
+  .dd-cell {
+    width: clamp(2.6rem, 9vw, 4rem);
+    height: clamp(3rem, 10vw, 4.4rem);
     display: flex;
     align-items: center;
     justify-content: center;
-    width: clamp(3.5rem, 16vw, 5.5rem);
-    height: clamp(3.5rem, 16vw, 5.5rem);
-    border-radius: 0.85rem;
+    border-radius: 0.8rem;
     background: #fff;
     border: 3px solid var(--border);
-    font-size: clamp(1.35rem, 6vw, 2.25rem);
+    font-size: clamp(1.6rem, 5vw, 2.6rem);
     font-weight: 800;
     color: var(--subject-math-dark);
-    transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
   }
 
-  @keyframes scBlankPulse {
-    0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
-    70% { box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-  }
-
-  .sc-tile-blank {
-    border-color: var(--brand-secondary);
-    border-style: dashed;
-    background: #fffbeb;
-    color: #b45309;
-    transform: scale(1.08);
-    animation: scBlankPulse 1.6s ease-in-out infinite;
-  }
-
-  .sc-tile-blank.answered {
-    border-style: solid;
-    animation: none;
-    transform: none;
-  }
-
-  .sc-tile-blank.answered.correct-tile {
-    background: var(--brand-success);
-    border-color: var(--brand-success);
-    color: #fff;
-  }
-
-  .sc-tile-blank.answered.incorrect-tile {
-    background: var(--brand-danger);
-    border-color: var(--brand-danger);
-    color: #fff;
-  }
+  .dd-cell.empty { background: transparent; border-style: dashed; opacity: 0.45; }
+  .dd-point { width: 1rem; border: 0; background: transparent; font-size: clamp(2rem, 6vw, 3rem); }
+  .dd-cell.hl { border-color: var(--brand-secondary); background: #fffbeb; color: #b45309; transform: scale(1.06); }
+  .dd-head.hl { color: #b45309; }
 
   .question {
     text-align: center;
@@ -359,8 +341,15 @@
     .answers { grid-template-columns: repeat(4, 1fr); }
   }
 
+  .answers.answers-compact {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .answer-btn {
-    font-size: clamp(1.35rem, 4.5vw, 2.1rem);
+    font-size: clamp(1.2rem, 4.5vw, 1.9rem);
     font-weight: 800;
     padding: 1rem 0.5rem;
     min-height: clamp(4.5rem, 14vw, 6.5rem);
@@ -515,11 +504,11 @@
     .hud { margin-bottom: 0.4rem; }
     .progress-track { margin-bottom: 0.5rem; }
     .timer-wrap { margin-bottom: 0.5rem; }
-    .sc-display { margin: 0.15rem 0 0.5rem; gap: 0.35rem; }
-    .sc-tile { width: clamp(2.5rem, 12vw, 3.5rem); height: clamp(2.5rem, 12vw, 3.5rem); font-size: clamp(1rem, 4vw, 1.5rem); }
+    .dd-cell { width: 2.2rem; height: 2.4rem; font-size: 1.3rem; }
+    .dd-head { font-size: 0.55rem; }
     .question { margin: 0.15rem 0 0.5rem; font-size: clamp(1rem, 3.5vw, 1.4rem); }
     .answers { gap: 0.5rem; margin-bottom: 0.6rem; }
-    .answer-btn { min-height: clamp(2.5rem, 10vw, 3.5rem); font-size: clamp(1.1rem, 3.5vw, 1.6rem); }
+    .answer-btn { min-height: clamp(2.5rem, 10vw, 3.5rem); font-size: clamp(1rem, 3.5vw, 1.4rem); }
     .feedback { min-height: 1.6rem; font-size: 1.1rem; }
 
     .results-emoji { font-size: 2rem; margin-bottom: 0.25rem; }
@@ -553,7 +542,7 @@
 <body>
 <div id="app">
   <div class="topbar">
-    <span class="topbar-title"><a class="topbar-home" href="../../../games.php" target="_top" aria-label="All TeachLuma games"><img src="../../brand/teachluma-icon.svg" alt="" width="32" height="30"></a><span class="topbar-name">Skip Counting Challenge</span></span>
+    <span class="topbar-title"><a class="topbar-home" href="../../../games.php" target="_top" aria-label="All TeachLuma games"><img src="../../brand/teachluma-icon.svg" alt="" width="32" height="30"></a><span class="topbar-name">Decimal Detective</span></span>
     <div class="topbar-actions">
       <button type="button" class="icon-btn" id="muteBtn" aria-pressed="false" aria-label="Mute sound">🔊<span class="sr-only"> Sound on</span></button>
       <button type="button" class="icon-btn" id="fullscreenBtn" aria-label="Enter fullscreen">⛶ Fullscreen</button>
@@ -561,20 +550,20 @@
   </div>
 
   <!-- START SCREEN -->
-  <section class="screen" id="screenStart" aria-label="Skip Counting Challenge setup">
+  <section class="screen" id="screenStart" aria-label="Decimal Detective setup">
     <div class="screen-inner">
       <div class="start-hero">
-        <h1>Skip Counting Challenge</h1>
-        <p>Grade 2 Math &middot; Counting by 2s, 5s &amp; 10s</p>
+        <h1>Decimal Detective</h1>
+        <p>Grade 5 Math &middot; Compare, Round &amp; Place Value</p>
       </div>
 
       <div class="option-groups-wrap">
         <div class="option-group" role="group" aria-labelledby="modeLabel">
           <span class="option-group-label" id="modeLabel">Choose your game</span>
           <div class="option-row" id="modeGroup">
-            <button type="button" class="option-btn" data-value="2" aria-pressed="true">By 2s</button>
-            <button type="button" class="option-btn" data-value="5" aria-pressed="false">By 5s</button>
-            <button type="button" class="option-btn" data-value="10" aria-pressed="false">By 10s</button>
+            <button type="button" class="option-btn" data-value="compare" aria-pressed="true">Compare</button>
+            <button type="button" class="option-btn" data-value="round" aria-pressed="false">Rounding</button>
+            <button type="button" class="option-btn" data-value="mixed" aria-pressed="false">Mixed</button>
           </div>
         </div>
 
@@ -582,13 +571,13 @@
           <span class="option-group-label" id="difficultyLabel">Difficulty</span>
           <div class="option-row" id="difficultyGroup">
             <button type="button" class="option-btn option-btn-stacked" data-value="easy" aria-pressed="false">
-              <span>Easy</span><span class="opt-sub">up to 50</span>
+              <span>Easy</span><span class="opt-sub">tenths</span>
             </button>
             <button type="button" class="option-btn option-btn-stacked" data-value="medium" aria-pressed="true">
-              <span>Medium</span><span class="opt-sub">up to 100</span>
+              <span>Medium</span><span class="opt-sub">hundredths</span>
             </button>
             <button type="button" class="option-btn option-btn-stacked" data-value="hard" aria-pressed="false">
-              <span>Hard</span><span class="opt-sub">tricky</span>
+              <span>Hard</span><span class="opt-sub">thousandths</span>
             </button>
           </div>
         </div>
@@ -620,7 +609,7 @@
   </section>
 
   <!-- PLAY SCREEN -->
-  <section class="screen hidden" id="screenPlay" aria-label="Skip Counting Challenge gameplay">
+  <section class="screen hidden" id="screenPlay" aria-label="Decimal Detective gameplay">
     <div class="screen-inner">
       <div class="hud">
         <span class="hud-stat" id="hudCounter" aria-live="polite">Question <strong>1</strong> / 10</span>
@@ -639,12 +628,7 @@
         <span class="timer-label" id="timerLabelText">10</span>
       </div>
 
-      <div class="sc-display" id="scDisplay" aria-live="polite">
-        <div class="sc-tile" data-tile="0"></div>
-        <div class="sc-tile" data-tile="1"></div>
-        <div class="sc-tile" data-tile="2"></div>
-        <div class="sc-tile" data-tile="3"></div>
-      </div>
+      <div class="game-display" id="gameDisplay" aria-live="polite"></div>
 
       <p class="question" id="questionText" aria-live="polite">&nbsp;</p>
 
@@ -660,7 +644,7 @@
   </section>
 
   <!-- RESULTS SCREEN -->
-  <section class="screen hidden" id="screenResults" aria-label="Skip Counting Challenge results">
+  <section class="screen hidden" id="screenResults" aria-label="Decimal Detective results">
     <div class="screen-inner center-text">
       <p class="results-emoji" id="resultsEmoji">🎉</p>
       <p class="results-score" id="resultsScore">8 / 10</p>
@@ -678,12 +662,7 @@
 (function () {
   'use strict';
 
-  // -------------------------------------------------------------------
-  // Question generation — a 4-number skip-counted sequence with one
-  // position blanked out. Difficulty controls the max value in the
-  // sequence and whether the blank can land in the middle (harder) or
-  // is always the last number ("what comes next", easier).
-  // -------------------------------------------------------------------
+
   function randInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
@@ -699,58 +678,116 @@
     return copy;
   }
 
-  var DIFFICULTY_CONFIG = {
-    easy:   { max: 50, blankAnywhere: false },
-    medium: { max: 100, blankAnywhere: false },
-    hard:   { max: 100, blankAnywhere: true }
-  };
-
-  function buildDistractors(correct, step) {
-    var candidates = [correct + step, Math.max(0, correct - step), correct + 1, Math.max(0, correct - 1), correct + Math.max(1, Math.floor(step / 2))];
-    var unique = [];
+  function uniqueExcept(candidates, correct, n) {
+    var out = [];
     candidates.forEach(function (c) {
-      if (c !== correct && unique.indexOf(c) === -1) {
-        unique.push(c);
-      }
+      if (c !== correct && out.indexOf(c) === -1) { out.push(c); }
     });
-    var guard = 0;
-    while (unique.length < 3 && guard < 30) {
-      var extra = Math.max(0, correct + randInt(-step * 2, step * 2));
-      if (extra !== correct && unique.indexOf(extra) === -1) {
-        unique.push(extra);
-      }
-      guard++;
-    }
-    return unique.slice(0, 3);
+    return out.slice(0, n);
   }
 
-  function buildSkipQuestion(step, difficultyKey) {
-    var cfg = DIFFICULTY_CONFIG[difficultyKey] || DIFFICULTY_CONFIG.medium;
-    var maxMultiple = Math.max(0, Math.floor(cfg.max / step) - 3);
-    var startMultiple = randInt(0, maxMultiple);
-    var start = startMultiple * step;
-    var sequence = [start, start + step, start + 2 * step, start + 3 * step];
-    var blankIndex = cfg.blankAnywhere ? randInt(1, 3) : 3;
-    var correct = sequence[blankIndex];
-    var distractors = buildDistractors(correct, step);
+  // -------------------------------------------------------------------
+  // Decimal questions. Numbers are handled as integers in units of
+  // 10^-dp so rounding and comparing are exact (no floating-point drift).
+  // Difficulty sets how many decimal places are in play.
+  // -------------------------------------------------------------------
+  var DIFFICULTY_DP = { easy: 1, medium: 2, hard: 3 };
+  var PLACE_NAMES = ['ones', 'tenths', 'hundredths', 'thousandths'];
 
+  // "k" units of 10^-dp  ->  "4.26"
+  function fmt(k, dp) {
+    if (dp === 0) { return String(k); }
+    var neg = k < 0; k = Math.abs(k);
+    var p = Math.pow(10, dp);
+    var whole = Math.floor(k / p);
+    var frac = String(k % p);
+    while (frac.length < dp) { frac = '0' + frac; }
+    return (neg ? '-' : '') + whole + '.' + frac;
+  }
+
+  // Drop trailing zeros for "natural" decimals (0.50 -> 0.5)
+  function trim(s) {
+    return s.indexOf('.') === -1 ? s : s.replace(/0+$/, '').replace(/\.$/, '');
+  }
+
+  function digitsOf(s) {
+    var parts = s.split('.');
+    return { whole: parts[0], frac: parts[1] || '' };
+  }
+
+  function buildCompare(level) {
+    var dp = DIFFICULTY_DP[level] || 2;
+    var whole = randInt(0, 9);
+    var a, b, dpA, dpB, guard = 0;
+    do {
+      dpA = randInt(1, dp);
+      dpB = dp === 1 ? 1 : randInt(1, dp);
+      a = whole * Math.pow(10, dpA) + randInt(1, Math.pow(10, dpA) - 1);
+      b = whole * Math.pow(10, dpB) + randInt(1, Math.pow(10, dpB) - 1);
+      guard++;
+    } while (guard < 50 && (a * Math.pow(10, 3 - dpA) === b * Math.pow(10, 3 - dpB)));
+    var aText = trim(fmt(a, dpA));
+    var bText = trim(fmt(b, dpB));
+    var greater = a * Math.pow(10, 3 - dpA) > b * Math.pow(10, 3 - dpB) ? aText : bText;
     return {
-      type: 'skip_count',
-      step: step,
-      sequence: sequence,
-      blankIndex: blankIndex,
-      text: blankIndex === 3
-        ? 'Counting by ' + step + 's — what number comes next?'
-        : 'Counting by ' + step + 's — which number is missing?',
+      type: 'compare',
+      numbers: [aText, bText],
+      text: 'Which decimal is greater?',
+      correct: greater,
+      choices: shuffle([aText, bText])
+    };
+  }
+
+  function buildRound(level) {
+    var dp = DIFFICULTY_DP[level] || 2;
+    var k;
+    do { k = randInt(Math.pow(10, dp), 20 * Math.pow(10, dp) - 1); } while (k % 10 === 0);
+    var to = dp - 1;
+    var lower = Math.floor(k / 10);
+    var rounded = lower + (k % 10 >= 5 ? 1 : 0);
+    var correct = fmt(rounded, to);
+    var others = uniqueExcept([fmt(lower, to), fmt(lower + 1, to), fmt(rounded + 1, to), fmt(Math.max(0, rounded - 1), to), fmt(rounded + 2, to)], correct, 3);
+    var target = to === 0 ? 'the nearest whole number' : 'the nearest ' + PLACE_NAMES[to].replace(/s$/, '');
+    return {
+      type: 'round',
+      numbers: [fmt(k, dp)],
+      highlight: to,
+      text: 'Round ' + fmt(k, dp) + ' to ' + target + '.',
       correct: correct,
-      choices: shuffle([correct].concat(distractors))
+      choices: shuffle([correct].concat(others))
+    };
+  }
+
+  function buildPlace(level) {
+    var dp = DIFFICULTY_DP[level] || 2;
+    var k;
+    do { k = randInt(Math.pow(10, dp), 100 * Math.pow(10, dp) - 1); } while (k % 10 === 0);
+    var s = fmt(k, dp);
+    var frac = digitsOf(s).frac;
+    var pos, guard = 0;
+    do { pos = randInt(1, dp); guard++; } while (guard < 20 && frac.charAt(pos - 1) === '0');
+    if (frac.charAt(pos - 1) === '0') { pos = dp; }
+    var d = parseInt(frac.charAt(pos - 1), 10);
+    var value = function (p) { return p <= 0 ? String(d * Math.pow(10, -p)) : trim(fmt(d, p)); };
+    var correct = value(pos);
+    var others = uniqueExcept([value(0), value(pos + 1), value(pos - 1), value(pos + 2), value(-1)], correct, 3);
+    return {
+      type: 'place',
+      numbers: [s],
+      highlight: pos,
+      text: 'What is the value of the highlighted digit ' + d + '?',
+      correct: correct,
+      choices: shuffle([correct].concat(others))
     };
   }
 
   var QUESTION_GENERATORS = {
-    2:  function (difficultyKey) { return buildSkipQuestion(2, difficultyKey); },
-    5:  function (difficultyKey) { return buildSkipQuestion(5, difficultyKey); },
-    10: function (difficultyKey) { return buildSkipQuestion(10, difficultyKey); }
+    compare: buildCompare,
+    round: buildRound,
+    mixed: function (level) {
+      var r = Math.random();
+      return r < 0.34 ? buildCompare(level) : (r < 0.67 ? buildRound(level) : buildPlace(level));
+    }
   };
 
   // -------------------------------------------------------------------
@@ -762,7 +799,7 @@
   var audioCtx = null;
   var soundOn = true;
   try {
-    soundOn = localStorage.getItem('sc_sound_on') !== '0';
+    soundOn = localStorage.getItem('dd_sound_on') !== '0';
   } catch (e) { /* localStorage unavailable — default to on, non-fatal */ }
 
   function getAudioCtx() {
@@ -806,7 +843,7 @@
       fetch('../../../api/game-track.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: 'skip-counting', event: eventType })
+        body: JSON.stringify({ slug: 'decimal-detective', event: eventType })
       }).catch(function () {});
     } catch (e) { /* non-fatal */ }
   }
@@ -863,7 +900,7 @@
   muteBtn.addEventListener('click', function () {
     soundOn = !soundOn;
     renderMuteBtn();
-    try { localStorage.setItem('sc_sound_on', soundOn ? '1' : '0'); } catch (e) { /* non-fatal */ }
+    try { localStorage.setItem('dd_sound_on', soundOn ? '1' : '0'); } catch (e) { /* non-fatal */ }
   });
 
   // -------------------------------------------------------------------
@@ -880,9 +917,9 @@
   }
 
   // -------------------------------------------------------------------
-  // Start-screen option groups (step / difficulty / question count / timer)
+  // Start-screen option groups (mode / difficulty / question count / timer)
   // -------------------------------------------------------------------
-  var settings = { step: 2, difficulty: 'medium', totalQuestions: 10, timerSeconds: 0 };
+  var settings = { mode: 'compare', difficulty: 'medium', totalQuestions: 10, timerSeconds: 0 };
 
   function wireOptionGroup(groupId, settingKey, parse) {
     var group = document.getElementById(groupId);
@@ -896,7 +933,7 @@
     });
   }
 
-  wireOptionGroup('modeGroup', 'step', function (v) { return parseInt(v, 10); });
+  wireOptionGroup('modeGroup', 'mode', function (v) { return v; });
   wireOptionGroup('difficultyGroup', 'difficulty', function (v) { return v; });
   wireOptionGroup('countGroup', 'totalQuestions', function (v) { return parseInt(v, 10); });
   wireOptionGroup('timerGroup', 'timerSeconds', function (v) { return parseInt(v, 10); });
@@ -943,10 +980,44 @@
   var timerFill = document.getElementById('timerFill');
   var timerTrack = document.getElementById('timerTrack');
   var timerLabelText = document.getElementById('timerLabelText');
-  var scTiles = Array.prototype.slice.call(document.querySelectorAll('.sc-tile'));
+  var gameDisplay = document.getElementById('gameDisplay');
   var questionText = document.getElementById('questionText');
   var feedbackText = document.getElementById('feedbackText');
+  var answersGrid = document.getElementById('answersGrid');
   var answerButtons = Array.prototype.slice.call(document.querySelectorAll('.answer-btn'));
+
+  // Place-value chart: every number lines up on its decimal point.
+  function renderDisplay(q) {
+    var maxWhole = 1, maxFrac = 0;
+    q.numbers.forEach(function (n) {
+      var p = digitsOf(n);
+      maxWhole = Math.max(maxWhole, p.whole.length);
+      maxFrac = Math.max(maxFrac, p.frac.length);
+    });
+    var wholeNames = ['ones', 'tens'];
+    var cols = maxWhole + 1 + maxFrac;
+    var html = '<div class="dd-chart" style="grid-template-columns:repeat(' + cols + ', auto)">';
+    for (var w = maxWhole - 1; w >= 0; w--) {
+      html += '<div class="dd-head' + (q.highlight === 0 && w === 0 ? ' hl' : '') + '">' + wholeNames[w] + '</div>';
+    }
+    html += '<div class="dd-head"></div>';
+    for (var f = 1; f <= maxFrac; f++) {
+      html += '<div class="dd-head' + (q.highlight === f ? ' hl' : '') + '">' + PLACE_NAMES[f] + '</div>';
+    }
+    q.numbers.forEach(function (n) {
+      var p = digitsOf(n);
+      for (var w2 = maxWhole - 1; w2 >= 0; w2--) {
+        var ch = p.whole.charAt(p.whole.length - 1 - w2);
+        html += '<div class="dd-cell' + (ch === '' ? ' empty' : '') + (q.highlight === 0 && w2 === 0 ? ' hl' : '') + '">' + ch + '</div>';
+      }
+      html += '<div class="dd-cell dd-point">' + (p.frac.length ? '.' : '') + '</div>';
+      for (var f2 = 1; f2 <= maxFrac; f2++) {
+        var c = p.frac.charAt(f2 - 1);
+        html += '<div class="dd-cell' + (c === '' ? ' empty' : '') + (q.highlight === f2 ? ' hl' : '') + '">' + c + '</div>';
+      }
+    });
+    gameDisplay.innerHTML = html + '</div>';
+  }
 
   function clearTimer() {
     if (state.timerHandle) {
@@ -990,7 +1061,7 @@
     hudCounter.innerHTML = 'Question <strong>' + (state.index + 1) + '</strong> / ' + settings.totalQuestions;
     if (teams) { teams.renderTurn(document.getElementById('hudTeam'), state.index); }
     if (FX) {
-      FX.enter(document.querySelector('.pv-display, .sc-display, .frac-display') || questionText);
+      FX.enter(document.querySelector('.game-display') || questionText);
       FX.enter(document.getElementById('answersGrid'));
     }
     var progressPct = (state.index / settings.totalQuestions) * 100;
@@ -1000,28 +1071,28 @@
     feedbackText.className = 'feedback';
     state.locked = false;
 
-    scTiles.forEach(function (tile, i) {
-      tile.className = 'sc-tile';
-      if (i === q.blankIndex) {
-        tile.textContent = '?';
-        tile.classList.add('sc-tile-blank');
+    renderDisplay(q);
+
+    var count = q.choices.length;
+    answerButtons.forEach(function (btn, i) {
+      if (i < count) {
+        btn.className = 'answer-btn';
+        btn.textContent = String(q.choices[i]);
+        btn.dataset.answer = String(q.choices[i]);
+        btn.disabled = false;
       } else {
-        tile.textContent = String(q.sequence[i]);
+        btn.className = 'answer-btn hidden';
+        btn.disabled = true;
       }
     });
-
-    answerButtons.forEach(function (btn, i) {
-      btn.className = 'answer-btn';
-      btn.textContent = String(q.choices[i]);
-      btn.dataset.answer = String(q.choices[i]);
-      btn.disabled = false;
-    });
+    answersGrid.classList.toggle('answers-compact', count === 2);
+    answersGrid.classList.toggle('answers-three', count === 3);
 
     startQuestionTimer();
   }
 
   function buildQuestions() {
-    var generator = QUESTION_GENERATORS[settings.step] || QUESTION_GENERATORS[2];
+    var generator = QUESTION_GENERATORS[settings.mode] || QUESTION_GENERATORS['compare'];
     var list = [];
     for (var i = 0; i < settings.totalQuestions; i++) {
       list.push(generator(settings.difficulty));
@@ -1049,20 +1120,13 @@
 
   function revealCorrect(correct) {
     answerButtons.forEach(function (b) {
+      if (b.classList.contains('hidden')) { return; }
       if (b.dataset.answer === String(correct)) {
         b.classList.add('correct');
       } else {
         b.classList.add('dimmed');
       }
     });
-  }
-
-  function markBlankTile(isCorrect) {
-    var q = state.questions[state.index];
-    var blankTile = scTiles[q.blankIndex];
-    blankTile.textContent = String(q.correct);
-    blankTile.classList.add('answered');
-    blankTile.classList.add(isCorrect ? 'correct-tile' : 'incorrect-tile');
   }
 
   function advance() {
@@ -1082,7 +1146,6 @@
     lockButtons();
     var q = state.questions[state.index];
     revealCorrect(q.correct);
-    markBlankTile(false);
     feedbackText.textContent = "⏰ Time's Up!";
     feedbackText.className = 'feedback incorrect';
     soundIncorrect();
@@ -1099,7 +1162,6 @@
 
     var q = state.questions[state.index];
     var isCorrect = btn.dataset.answer === String(q.correct);
-    markBlankTile(isCorrect);
 
     if (isCorrect) {
       state.score++;
@@ -1130,7 +1192,7 @@
       btn.classList.add('incorrect');
       if (FX) { FX.shake(btn); }
       answerButtons.forEach(function (b) {
-        if (b === btn) { return; }
+        if (b.classList.contains('hidden') || b === btn) { return; }
         if (b.dataset.answer === String(q.correct)) {
           b.classList.add('correct');
         } else {
@@ -1151,13 +1213,14 @@
     btn.addEventListener('click', function () { handleAnswer(btn); });
   });
 
-  // Keyboard support during gameplay: number keys 1-4 pick an answer.
+  // Keyboard support during gameplay: number keys 1-4 pick an answer
+  // (only the currently visible ones respond).
   document.addEventListener('keydown', function (event) {
     if (screenPlay.classList.contains('hidden')) { return; }
     var num = parseInt(event.key, 10);
     if (num >= 1 && num <= 4) {
       var target = answerButtons[num - 1];
-      if (target && !target.disabled) {
+      if (target && !target.disabled && !target.classList.contains('hidden')) {
         target.click();
       }
     }
@@ -1194,7 +1257,7 @@
         FX.celebrate({
           after: resultsScoreEl,
           stars: FX.starCount(pct),
-          bestKey: 'skip-counting:' + (settings.mode || settings.step) + ':' + settings.difficulty + ':' + total,
+          bestKey: 'fraction-frenzy:' + (settings.mode || settings.step) + ':' + settings.difficulty + ':' + total,
           bestValue: pct,
           bestLabel: function (v) { return v + '%'; },
           confetti: pct >= 60

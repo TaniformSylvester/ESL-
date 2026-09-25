@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Daily Routines Adventure — TeachLuma Games</title>
 <style>
   :root {
@@ -249,7 +249,9 @@
   }
 
   .routine-card:hover { border-color: var(--brand-primary); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
-  .routine-card:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 2px; }
+  .routine-card:focus-within { border-color: var(--brand-primary); }
+  .routine-select { flex: 1; display: flex; align-items: center; gap: 0.75rem; min-width: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; border-radius: 8px; touch-action: manipulation; }
+  .routine-select:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 3px; }
   .routine-card.selected { background: #eff6ff; border-color: var(--brand-primary); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
   .routine-card.correct { background: #ecfdf5; border-color: var(--brand-success); }
   .routine-card.incorrect { background: #fef2f2; border-color: var(--brand-danger); }
@@ -658,11 +660,12 @@
     .header { margin-bottom: 0; }
   }
 </style>
+<link rel="stylesheet" href="../shared/game-theme.css?v=1">
 </head>
 <body>
 <div id="app">
   <div class="topbar">
-    <span class="topbar-title">🌞 Daily Routines Adventure</span>
+    <span class="topbar-title"><a class="topbar-home" href="../../../games.php" target="_top" aria-label="All TeachLuma games"><img src="../../brand/teachluma-icon.svg" alt="" width="32" height="30"></a><span class="topbar-name">Daily Routines Adventure</span></span>
     <div class="topbar-actions">
       <button type="button" class="icon-btn" id="muteBtn" aria-pressed="false" aria-label="Mute sound">🔊<span class="sr-only"> Sound on</span></button>
       <button type="button" class="icon-btn" id="fullscreenBtn" aria-label="Enter fullscreen">⛶ Fullscreen</button>
@@ -1214,9 +1217,11 @@
       var upDisabled = state.order.selected !== index || index === 0;
       var downDisabled = state.order.selected !== index || index === state.order.cards.length - 1;
       html +=
-        '<div class="' + cls + '" data-action="select-order-card" data-index="' + index + '" role="button" tabindex="0" aria-pressed="' + (state.order.selected === index) + '">' +
-          '<span class="routine-emoji">' + card.emoji + '</span>' +
-          '<span class="routine-text">' + escapeHtml(card.phrase) + '</span>' +
+        '<div class="' + cls + '" data-index="' + index + '">' +
+          '<button type="button" class="routine-select" data-action="select-order-card" data-index="' + index + '" aria-pressed="' + (state.order.selected === index) + '">' +
+            '<span class="routine-emoji" aria-hidden="true">' + card.emoji + '</span>' +
+            '<span class="routine-text">' + escapeHtml(card.phrase) + '</span>' +
+          '</button>' +
           '<div class="routine-controls">' +
             '<button type="button" class="hear-button" data-action="hear-phrase" data-phrase="' + escapeHtml(card.phrase) + '" aria-label="Hear ' + escapeHtml(card.phrase) + '">🔊 Hear</button>' +
             '<button type="button" class="control-button" data-action="move-order-up" data-index="' + index + '"' + (upDisabled ? ' disabled' : '') + ' aria-label="Move up">↑</button>' +
@@ -1492,20 +1497,6 @@
       case 'select-read-choice': selectReadChoice(target.getAttribute('data-choice')); break;
       case 'next-read': nextReadQuestion(); break;
     }
-  });
-
-  // Only the routine-card div itself needs manual Enter/Space handling —
-  // it's a div with role="button", not a real button. The Hear/Move
-  // up/down controls nested inside it are real <button> elements and
-  // already get native Enter/Space activation from the browser, so this
-  // must match the event's own target exactly (not the nearest matching
-  // ancestor) or pressing Enter on a nested button would also re-toggle
-  // the card's own selection underneath it.
-  appEl.addEventListener('keydown', function (event) {
-    if (event.key !== 'Enter' && event.key !== ' ') { return; }
-    if (!event.target.matches('[data-action="select-order-card"]')) { return; }
-    event.preventDefault();
-    selectOrderCard(parseInt(event.target.getAttribute('data-index'), 10));
   });
 
   render();

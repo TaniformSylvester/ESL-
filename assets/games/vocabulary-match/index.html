@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vocabulary Match — TeachLuma Games</title>
 <style>
   :root {
@@ -126,11 +126,11 @@
 
   .option-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.6rem;
   }
 
-  .option-row.cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .option-row.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
   .option-hint {
     font-size: 0.8rem;
@@ -157,6 +157,11 @@
   }
 
   .option-btn .opt-emoji { font-size: 1.4em; }
+
+  /* Very narrow phones: stack the emoji over the label so "🎨 Colors" fits a third of 320px. */
+  @media (max-width: 360px) {
+    .option-btn { flex-direction: column; gap: 0.1rem; padding: 0.6rem 0.25rem; }
+  }
 
   .option-btn-stacked { flex-direction: column; gap: 0.15rem; line-height: 1.15; }
   .option-btn-stacked .opt-sub { font-size: 0.7em; font-weight: 600; opacity: 0.8; }
@@ -410,11 +415,12 @@
     clip: rect(0,0,0,0); white-space: nowrap; border: 0;
   }
 </style>
+<link rel="stylesheet" href="../shared/game-theme.css?v=1">
 </head>
 <body>
 <div id="app">
   <div class="topbar">
-    <span class="topbar-title">🃏 Vocabulary Match</span>
+    <span class="topbar-title"><a class="topbar-home" href="../../../games.php" target="_top" aria-label="All TeachLuma games"><img src="../../brand/teachluma-icon.svg" alt="" width="32" height="30"></a><span class="topbar-name">Vocabulary Match</span></span>
     <div class="topbar-actions">
       <button type="button" class="icon-btn" id="muteBtn" aria-pressed="false" aria-label="Mute sound">🔊<span class="sr-only"> Sound on</span></button>
       <button type="button" class="icon-btn" id="fullscreenBtn" aria-label="Enter fullscreen">⛶ Fullscreen</button>
