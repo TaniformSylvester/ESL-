@@ -208,6 +208,15 @@ function resource_type_icon(string $resourceType): string
         'Assessment'          => 'fa-clipboard-check',
         'Poster'              => 'fa-image',
         'Teacher Resource'    => 'fa-book',
+        'Complete Lesson Pack' => 'fa-box-archive',
+        'Speaking Activity'   => 'fa-comments',
+        'Reading Activity'    => 'fa-book-open-reader',
+        'Writing Activity'    => 'fa-pen-nib',
+        'Quiz'                => 'fa-circle-question',
+        'Grading Rubric'      => 'fa-list-check',
+        'Homework'            => 'fa-house-laptop',
+        'Classroom Poster'    => 'fa-image',
+        'Activity Pack'       => 'fa-shapes',
         default               => 'fa-file',
     };
 }
@@ -376,6 +385,25 @@ function get_resource_counts_by_subject(): array
     $counts = [];
     foreach ($stmt->fetchAll() as $row) {
         $counts[$row['name']] = (int)$row['total'];
+    }
+
+    return $counts;
+}
+
+/** Live published-resource counts per resource type, most common first — only types that actually have resources. */
+function get_resource_counts_by_type(): array
+{
+    $stmt = getDB()->query(
+        "SELECT resource_type, COUNT(*) AS total
+         FROM resources
+         WHERE is_published = 1 AND status = 'active'
+         GROUP BY resource_type
+         ORDER BY total DESC, resource_type ASC"
+    );
+
+    $counts = [];
+    foreach ($stmt->fetchAll() as $row) {
+        $counts[$row['resource_type']] = (int)$row['total'];
     }
 
     return $counts;

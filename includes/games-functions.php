@@ -259,11 +259,7 @@ function get_related_games(array $game, int $limit = 3): array
 /** Maps a game's display subject label to the CSS accent key used by the site-wide --subject-* variables (game-card.php, game.php, style.css). */
 function game_subject_key(string $subject): string
 {
-    return match (true) {
-        stripos($subject, 'math') !== false    => 'math',
-        stripos($subject, 'science') !== false => 'science',
-        default                                => 'esl',
-    };
+    return subject_key($subject);
 }
 
 /** The embeddable game bundle's URL — every game lives at assets/games/<slug>/index.html. */

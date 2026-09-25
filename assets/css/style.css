@@ -1,160 +1,623 @@
-/* ESL Teacher Hub — base styles. Colors are CSS variables so the brand
-   palette can be changed in one place. */
+/* =====================================================================
+   TeachLuma — design system + site styles
+   Every color, radius, shadow and font comes from the tokens below;
+   components reference tokens, never raw hex values, so the brand can be
+   retuned in one place. Legacy variable names (--brand-*, --subject-*)
+   are kept as aliases so older markup picks up the new palette.
+   ===================================================================== */
 
+/* ---------------------------------------------------------------- Fonts
+   Self-hosted (assets/fonts, SIL OFL) — no third-party font request.
+   Fredoka = display/headings/logo, Nunito = body/UI. */
+@font-face { font-family: 'Fredoka'; font-style: normal; font-weight: 600; font-display: swap; src: url('../fonts/fredoka-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Fredoka'; font-style: normal; font-weight: 700; font-display: swap; src: url('../fonts/fredoka-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 400; font-display: swap; src: url('../fonts/nunito-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 600; font-display: swap; src: url('../fonts/nunito-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 700; font-display: swap; src: url('../fonts/nunito-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 800; font-display: swap; src: url('../fonts/nunito-latin-800-normal.woff2') format('woff2'); }
+
+/* ---------------------------------------------------------------- Tokens */
 :root {
-    --brand-primary: #2563eb;
-    --brand-primary-dark: #1d4ed8;
-    --brand-secondary: #f59e0b;
-    --brand-success: #16a34a;
-    --brand-bg-soft: #f8fafc;
+    /* Brand palette */
+    --tl-navy: #172A6E;
+    --tl-navy-dark: #0F1D52;
+    --tl-navy-soft: #E8ECF8;
+    --tl-yellow: #FBB829;
+    --tl-yellow-dark: #EDA412;
+    --tl-yellow-soft: #FFF1CC;
+    --tl-orange: #F57C2B;
+    --tl-orange-ink: #B4530F;      /* orange text on light backgrounds (AA) */
+    --tl-orange-bright: #D9660B;   /* large display highlights only (AA large) */
+    --tl-orange-soft: #FFE8D6;
+    --tl-teal: #1FB5A8;
+    --tl-teal-ink: #0E7C73;
+    --tl-teal-soft: #DDF5F2;
+    --tl-green: #2EA45B;
+    --tl-green-ink: #1B7A40;
+    --tl-blue: #2F6FE4;
+    --tl-purple: #7C5CD6;
+    --tl-pink: #E8527A;
 
-    /* Subtle per-subject accents (icons + a thin top border on subject
-       cards only) — intentionally muted so the site stays professional
-       rather than turning into a rainbow of category colors. */
-    --subject-esl: #2563eb;
-    --subject-math: #7c3aed;
-    --subject-science: #0d9488;
+    /* Neutrals */
+    --tl-cream: #FFF8EC;
+    --tl-cream-2: #FDF0DA;
+    --tl-white: #FFFFFF;
+    --tl-text: #1C2541;
+    --tl-muted: #5B6478;
+    --tl-border: #EEE6D6;
+    --tl-border-cool: #E3E7F0;
+    --tl-link: #2155B8;
+    --tl-input-bg: #F4F2EE;
 
-    /* Retints Bootstrap's own primary color to the brand blue everywhere
-       Bootstrap reads --bs-primary/--bs-primary-rgb (.text-primary,
-       .bg-primary, .border-primary, .link-primary, subtle variants, focus
-       rings, etc.) — without this, those utilities silently render in
-       Bootstrap's stock #0d6efd instead of the brand's #2563eb, which is
-       exactly the "assembled from Bootstrap components" look this pass is
-       fixing. Button variants (.btn-primary/.btn-outline-primary) hardcode
-       their own --bs-btn-* variables per Bootstrap's source, so they still
-       need their own overrides below — this alone doesn't cover them. */
-    --bs-primary: #2563eb;
-    --bs-primary-rgb: 37, 99, 235;
+    /* Subject system — base (icons/accents), ink (AA text on soft), soft (tints) */
+    --subject-esl: var(--tl-blue);        --subject-esl-ink: #1D4FB8;      --subject-esl-soft: #E6EEFF;
+    --subject-math: var(--tl-orange);     --subject-math-ink: #AE4E0B;     --subject-math-soft: #FFEBDA;
+    --subject-science: var(--tl-green);   --subject-science-ink: #1B7A40;  --subject-science-soft: #E1F5E8;
+    --subject-games: var(--tl-purple);    --subject-games-ink: #5B3FB3;    --subject-games-soft: #EFEAFE;
+    --subject-videos: var(--tl-pink);     --subject-videos-ink: #B3234C;   --subject-videos-soft: #FDE7EE;
+
+    /* Shape + depth */
+    --tl-radius-sm: 0.5rem;
+    --tl-radius: 1rem;
+    --tl-radius-lg: 1.5rem;
+    --tl-radius-pill: 999px;
+    --tl-shadow-sm: 0 1px 2px rgba(23, 42, 110, 0.05), 0 4px 12px -6px rgba(23, 42, 110, 0.12);
+    --tl-shadow: 0 2px 4px rgba(23, 42, 110, 0.05), 0 14px 30px -14px rgba(23, 42, 110, 0.26);
+    --tl-shadow-lg: 0 22px 48px -20px rgba(23, 42, 110, 0.35);
+    --tl-ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+
+    /* Type */
+    --tl-font-display: 'Fredoka', 'Nunito', system-ui, sans-serif;
+    --tl-font-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+
+    /* Legacy aliases (older rules/markup) */
+    --brand-primary: var(--tl-navy);
+    --brand-primary-dark: var(--tl-navy-dark);
+    --brand-secondary: var(--tl-yellow);
+    --brand-success: var(--tl-green-ink);
+    --brand-bg-soft: var(--tl-cream);
+
+    /* Retint Bootstrap's own variables so every utility (.text-primary,
+       .bg-primary, focus rings, links, .shadow-sm, secondary text) follows
+       the brand instead of Bootstrap's stock blue/grey. */
+    --bs-primary: #172A6E;
+    --bs-primary-rgb: 23, 42, 110;
+    --bs-secondary-rgb: 91, 100, 120;
+    --bs-secondary-color: #5B6478;
+    --bs-body-font-family: var(--tl-font-body);
+    --bs-body-color: #1C2541;
+    --bs-body-color-rgb: 28, 37, 65;
+    --bs-link-color: #2155B8;
+    --bs-link-color-rgb: 33, 85, 184;
+    --bs-link-hover-color: #172A6E;
+    --bs-link-hover-color-rgb: 23, 42, 110;
+    --bs-border-color: #E3E7F0;
+    --bs-box-shadow-sm: var(--tl-shadow-sm);
+    --bs-box-shadow: var(--tl-shadow);
+    --bs-border-radius: 0.75rem;
+    --bs-border-radius-lg: 1rem;
+    --bs-focus-ring-color: rgba(33, 85, 184, 0.35);
 }
 
+/* ---------------------------------------------------------------- Base */
 body {
-    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-    color: #1f2937;
-    background-color: #ffffff;
+    font-family: var(--tl-font-body);
+    color: var(--tl-text);
+    background-color: var(--tl-white);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6,
+.display-1, .display-2, .display-3, .display-4, .display-5, .display-6 {
+    font-family: var(--tl-font-display);
+    font-weight: 600;
+    color: var(--tl-navy);
+    letter-spacing: -0.005em;
+}
+
+/* Small card titles stay in the body face: Fredoka is for display sizes. */
+.h6, h6 {
+    font-family: var(--tl-font-body);
+    font-weight: 800;
+    letter-spacing: 0;
 }
 
 a {
-    color: var(--brand-primary);
+    color: var(--tl-link);
 }
 
-/* Full state coverage (default/hover/focus/active/disabled) via Bootstrap's
-   own --bs-btn-* variables, matching how Bootstrap itself defines every
-   button variant — safer than overriding background-color/border-color
-   alone, which left the focus ring and active/disabled states in
-   Bootstrap's stock blue. */
+a:hover {
+    color: var(--tl-navy);
+}
+
+:focus-visible {
+    outline: 3px solid var(--tl-link);
+    outline-offset: 2px;
+}
+
+.text-secondary {
+    color: var(--tl-muted) !important;
+}
+
+.lead {
+    color: var(--tl-muted);
+}
+
+::selection {
+    background: var(--tl-yellow-soft);
+    color: var(--tl-navy);
+}
+
+/* ---------------------------------------------------------------- Buttons
+   All state colors via Bootstrap's own --bs-btn-* variables (covers
+   hover/focus/active/disabled). Pill-shaped, gentle lift on hover. */
+.btn,
+.btn-sm,
+.btn-lg {
+    --bs-btn-border-radius: var(--tl-radius-pill);
+    --bs-btn-font-weight: 700;
+    --bs-btn-focus-box-shadow: 0 0 0 0.25rem rgba(33, 85, 184, 0.35);
+}
+
+.btn {
+    transition: transform 0.18s var(--tl-ease), box-shadow 0.18s ease, background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn:not(:disabled):not(.disabled):not(.btn-link):not(.dropdown-toggle):hover {
+    transform: translateY(-2px);
+}
+
+.btn:not(:disabled):not(.btn-link):active {
+    transform: translateY(0);
+}
+
+.btn-lg {
+    --bs-btn-padding-y: 0.8rem;
+    --bs-btn-padding-x: 1.6rem;
+    --bs-btn-font-size: 1.05rem;
+}
+
 .btn-primary {
-    --bs-btn-bg: var(--brand-primary);
-    --bs-btn-border-color: var(--brand-primary);
-    --bs-btn-hover-bg: var(--brand-primary-dark);
-    --bs-btn-hover-border-color: var(--brand-primary-dark);
-    --bs-btn-active-bg: var(--brand-primary-dark);
-    --bs-btn-active-border-color: var(--brand-primary-dark);
-    --bs-btn-disabled-bg: var(--brand-primary);
-    --bs-btn-disabled-border-color: var(--brand-primary);
-    --bs-btn-focus-shadow-rgb: var(--bs-primary-rgb);
+    --bs-btn-bg: var(--tl-navy);
+    --bs-btn-border-color: var(--tl-navy);
+    --bs-btn-hover-bg: var(--tl-navy-dark);
+    --bs-btn-hover-border-color: var(--tl-navy-dark);
+    --bs-btn-active-bg: var(--tl-navy-dark);
+    --bs-btn-active-border-color: var(--tl-navy-dark);
+    --bs-btn-disabled-bg: var(--tl-navy);
+    --bs-btn-disabled-border-color: var(--tl-navy);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 10px 20px -10px rgba(23, 42, 110, 0.55);
+}
+
+/* The brand CTA: gold with navy text (7.5:1). */
+.btn-accent {
+    --bs-btn-color: var(--tl-navy);
+    --bs-btn-bg: var(--tl-yellow);
+    --bs-btn-border-color: var(--tl-yellow);
+    --bs-btn-hover-color: var(--tl-navy);
+    --bs-btn-hover-bg: #FFC444;
+    --bs-btn-hover-border-color: #FFC444;
+    --bs-btn-active-color: var(--tl-navy);
+    --bs-btn-active-bg: var(--tl-yellow-dark);
+    --bs-btn-active-border-color: var(--tl-yellow-dark);
+    --bs-btn-disabled-color: var(--tl-navy);
+    --bs-btn-disabled-bg: var(--tl-yellow);
+    --bs-btn-disabled-border-color: var(--tl-yellow);
+    box-shadow: 0 8px 18px -10px rgba(237, 164, 18, 0.9);
+}
+
+.btn-accent:hover {
+    box-shadow: 0 12px 22px -10px rgba(237, 164, 18, 0.95);
 }
 
 .btn-outline-primary {
-    --bs-btn-color: var(--brand-primary);
-    --bs-btn-border-color: var(--brand-primary);
-    --bs-btn-hover-bg: var(--brand-primary);
-    --bs-btn-hover-border-color: var(--brand-primary);
-    --bs-btn-active-bg: var(--brand-primary-dark);
-    --bs-btn-active-border-color: var(--brand-primary-dark);
-    --bs-btn-disabled-color: var(--brand-primary);
-    --bs-btn-disabled-border-color: var(--brand-primary);
-    --bs-btn-focus-shadow-rgb: var(--bs-primary-rgb);
+    --bs-btn-color: var(--tl-navy);
+    --bs-btn-border-color: var(--tl-navy);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--tl-navy);
+    --bs-btn-hover-border-color: var(--tl-navy);
+    --bs-btn-active-bg: var(--tl-navy-dark);
+    --bs-btn-active-border-color: var(--tl-navy-dark);
+    --bs-btn-disabled-color: var(--tl-navy);
+    --bs-btn-disabled-border-color: var(--tl-navy);
+    border-width: 2px;
 }
 
-.navbar-brand {
-    color: var(--brand-primary) !important;
+.btn-soft {
+    --bs-btn-color: var(--tl-navy);
+    --bs-btn-bg: var(--tl-navy-soft);
+    --bs-btn-border-color: transparent;
+    --bs-btn-hover-color: var(--tl-navy);
+    --bs-btn-hover-bg: #DCE2F5;
+    --bs-btn-hover-border-color: transparent;
+    --bs-btn-active-bg: #D2DAF2;
 }
 
-/* Every .card sitewide (resource/video/game/bundle/guide/subject cards,
-   testimonial cards, CTA cards, the FAQ accordion's card-like sections,
-   admin dashboard cards, etc.) gets the same, slightly-more-rounded corner
-   radius instead of Bootstrap's default 0.375rem — one rule instead of
-   repeating border-radius on every card variant below. */
-.card {
-    --bs-card-border-radius: 0.75rem;
+/* Text-style CTA with an arrow that nudges on hover. */
+.link-arrow {
+    font-weight: 800;
+    color: var(--tl-navy);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
 }
 
-.badge-free {
-    background-color: var(--brand-success);
+.link-arrow i {
+    transition: transform 0.18s var(--tl-ease);
 }
 
-.badge-members {
-    background-color: var(--brand-secondary);
-    color: #1f2937;
+.link-arrow:hover {
+    color: var(--tl-link);
 }
 
-.resource-card {
-    border: 1px solid #e5e7eb;
+.link-arrow:hover i {
+    transform: translateX(3px);
+}
+
+/* ---------------------------------------------------------------- Forms */
+.form-control,
+.form-select {
     border-radius: 0.75rem;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-    height: 100%;
+    border-color: var(--tl-border-cool);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--tl-link);
+    box-shadow: 0 0 0 0.2rem rgba(33, 85, 184, 0.18);
+}
+
+/* ---------------------------------------------------------------- Cards
+   One shared look for every content card: soft border, soft shadow,
+   16px radius, lift on hover. */
+.card {
+    --bs-card-border-radius: var(--tl-radius);
+    --bs-card-inner-border-radius: calc(var(--tl-radius) - 1px);
+    --bs-card-border-color: var(--tl-border);
+}
+
+.resource-card,
+.video-card,
+.game-card,
+.bundle-card,
+.guide-card,
+.subject-card,
+.tl-card {
+    background: var(--tl-white);
+    border: 1px solid var(--tl-border);
+    border-radius: var(--tl-radius);
+    box-shadow: var(--tl-shadow-sm);
+    transition: transform 0.22s var(--tl-ease), box-shadow 0.22s ease, border-color 0.22s ease;
     overflow: hidden;
 }
 
-.resource-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+.resource-card:hover,
+.video-card:hover,
+.game-card:hover,
+.bundle-card:hover,
+.guide-card:hover,
+.subject-card:hover,
+a.tl-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--tl-shadow);
+    border-color: #E6DCC7;
 }
 
-.resource-card .card-img-top {
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
+.card-title-link {
+    color: var(--tl-navy);
+    text-decoration: none;
+}
+
+.card-title-link:hover {
+    color: var(--tl-link);
+}
+
+/* Media area shared by content cards */
+.card-media {
+    position: relative;
     display: block;
+    overflow: hidden;
+    background: var(--tl-cream);
 }
 
-.resource-card .card-body {
-    min-width: 0;
+.card-media img {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+    transition: transform 0.4s var(--tl-ease);
 }
 
-.resource-card .card-body h3,
-.resource-card .card-body p {
-    overflow-wrap: break-word;
-    word-break: break-word;
+.resource-card:hover .card-media img,
+.video-card:hover .card-media img,
+.bundle-card:hover .card-media img,
+.game-card:hover .card-media img {
+    transform: scale(1.04);
 }
 
-.section-soft {
-    background-color: var(--brand-bg-soft);
+.card-media-badges {
+    position: absolute;
+    left: 0.75rem;
+    top: 0.75rem;
+    right: 3.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    pointer-events: none;
 }
 
-/* Reserves stable space for an AdSense unit before the ad script loads,
-   so it never causes a layout shift (CLS) as content jumps around it.
-   Mobile auto-format ads tend to render as a taller rectangle; wider
-   viewports tend to get a shorter, full-width banner instead. */
-.ad-slot {
-    min-height: 16rem;
+.card-meta {
+    font-size: 0.85rem;
+    color: var(--tl-muted);
 }
 
-@media (min-width: 768px) {
-    .ad-slot {
-        min-height: 7rem;
+/* ---------------------------------------------------------------- Badges */
+.badge {
+    --bs-badge-font-weight: 800;
+    --bs-badge-border-radius: var(--tl-radius-pill);
+    --bs-badge-padding-y: 0.42em;
+    --bs-badge-padding-x: 0.75em;
+    letter-spacing: 0.01em;
+}
+
+.badge-free { background-color: var(--tl-green-ink); color: #fff; }
+.badge-members { background-color: var(--tl-yellow); color: var(--tl-navy); }
+.badge-grade { background-color: var(--tl-navy-soft); color: var(--tl-navy); }
+.badge-neutral { background-color: #F2EFE9; color: var(--tl-text); }
+
+.badge-subject-esl { background-color: var(--subject-esl-soft); color: var(--subject-esl-ink); }
+.badge-subject-math { background-color: var(--subject-math-soft); color: var(--subject-math-ink); }
+.badge-subject-science { background-color: var(--subject-science-soft); color: var(--subject-science-ink); }
+.badge-subject-games { background-color: var(--subject-games-soft); color: var(--subject-games-ink); }
+.badge-subject-videos { background-color: var(--subject-videos-soft); color: var(--subject-videos-ink); }
+
+/* Badges sitting on top of a thumbnail need a solid backing. */
+.card-media-badges .badge {
+    box-shadow: 0 2px 6px rgba(23, 42, 110, 0.15);
+}
+
+.card-media-badges .badge[class*="badge-subject-"] {
+    background-color: #fff;
+}
+
+/* ---------------------------------------------------------------- Section scaffolding */
+.section {
+    padding: 4.5rem 0;
+}
+
+.section-sm {
+    padding: 3rem 0;
+}
+
+@media (max-width: 767.98px) {
+    .section { padding: 3.25rem 0; }
+    .section-sm { padding: 2.25rem 0; }
+}
+
+.section-soft,
+.section-cream {
+    background-color: var(--tl-cream);
+}
+
+.section-head {
+    margin-bottom: 2.25rem;
+}
+
+.section-head.text-center .section-lead {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.section-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+    font: 800 0.78rem/1 var(--tl-font-body);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--eyebrow-color, var(--tl-orange-ink));
+}
+
+.section-eyebrow::before {
+    content: '';
+    width: 1.4rem;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--eyebrow-bar, var(--tl-yellow));
+}
+
+.section-title {
+    font-size: clamp(1.7rem, 2.6vw + 0.6rem, 2.4rem);
+    font-weight: 700;
+    line-height: 1.12;
+    margin-bottom: 0.6rem;
+}
+
+.section-lead {
+    color: var(--tl-muted);
+    font-size: 1.075rem;
+    max-width: 640px;
+    margin-bottom: 0;
+}
+
+/* Highlighted word(s) inside a heading: bright orange + gold swoosh. */
+.text-highlight {
+    color: var(--tl-orange-bright);
+    position: relative;
+    white-space: nowrap;
+}
+
+.text-highlight-swoosh {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11C50 4 120 3 197 8' fill='none' stroke='%23FBB829' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: 100% 0.36em;
+    background-position: 0 100%;
+    padding-bottom: 0.12em;
+}
+
+/* Scroll-reveal (progressive: only when JS set html.js and motion is OK) */
+@media (prefers-reduced-motion: no-preference) {
+    .js [data-reveal] {
+        opacity: 0;
+        transform: translateY(18px);
+        transition: opacity 0.6s ease, transform 0.6s var(--tl-ease);
+    }
+
+    .js [data-reveal].is-visible {
+        opacity: 1;
+        transform: none;
     }
 }
 
-.hero {
-    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%);
-    color: #fff;
+/* ---------------------------------------------------------------- Header / navigation */
+/* No backdrop-filter/transform here: either would make the header the
+   containing block for the position:fixed off-canvas menu, clipping it to
+   the header's height and turning its hidden off-screen state into real
+   horizontal page scroll on phones. */
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    background: var(--tl-white);
+    border-bottom: 1px solid var(--tl-border);
+    box-shadow: 0 1px 0 rgba(23, 42, 110, 0.02), 0 6px 18px -14px rgba(23, 42, 110, 0.25);
 }
 
-footer a:hover {
-    color: #fff !important;
+.site-header .navbar {
+    --bs-navbar-padding-y: 0.55rem;
 }
 
-/* Opens the main nav's "Teacher Hub" dropdown (Teacher Hub + Request a
-   Resource) on hover instead of requiring a click — but only at the
-   navbar-expand-lg breakpoint where the nav is actually horizontal;
-   below that it collapses into the offcanvas menu, where hover doesn't
-   apply and Bootstrap's normal tap-to-open dropdown behavior takes over
-   unchanged. */
+.site-header .navbar-brand {
+    padding: 0;
+    margin-right: 1.25rem;
+    display: flex;
+    align-items: center;
+}
+
+.brand-logo {
+    display: block;
+    height: 40px;
+    width: auto;
+}
+
+@media (max-width: 380px) {
+    .brand-logo { height: 34px; }
+}
+
+.site-nav .nav-link {
+    position: relative;
+    font-weight: 700;
+    font-size: 0.98rem;
+    color: var(--tl-navy);
+    padding: 0.55rem 0.8rem;
+    border-radius: var(--tl-radius-sm);
+}
+
+.site-nav .nav-link:hover,
+.site-nav .nav-link:focus-visible {
+    color: var(--tl-link);
+}
+
+.site-nav .nav-link.active {
+    color: var(--tl-navy);
+}
+
+.site-nav .nav-icon {
+    width: 1.25rem;
+    text-align: center;
+    color: var(--tl-orange);
+}
+
+.nav-search {
+    position: relative;
+}
+
+.nav-search .nav-search-icon {
+    position: absolute;
+    left: 0.95rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--tl-muted);
+    pointer-events: none;
+    font-size: 0.9rem;
+}
+
+.nav-search .form-control {
+    height: 42px;
+    border-radius: var(--tl-radius-pill);
+    background: var(--tl-input-bg);
+    border: 1px solid transparent;
+    padding-left: 2.4rem;
+    font-size: 0.92rem;
+}
+
+.nav-search .form-control:focus {
+    background: #fff;
+    border-color: var(--tl-link);
+}
+
+.nav-search .form-control::placeholder {
+    color: #767E90;
+}
+
+.header-actions .btn {
+    --bs-btn-padding-y: 0.5rem;
+    --bs-btn-padding-x: 1.15rem;
+    white-space: nowrap;
+}
+
+.site-header .dropdown-menu {
+    --bs-dropdown-border-radius: var(--tl-radius);
+    --bs-dropdown-border-color: var(--tl-border);
+    --bs-dropdown-link-active-bg: var(--tl-navy-soft);
+    --bs-dropdown-link-active-color: var(--tl-navy);
+    --bs-dropdown-link-hover-bg: var(--tl-cream);
+    --bs-dropdown-item-padding-y: 0.55rem;
+    padding: 0.5rem;
+    box-shadow: var(--tl-shadow);
+}
+
+.site-header .dropdown-item {
+    border-radius: 0.6rem;
+    font-weight: 600;
+    color: var(--tl-text);
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.site-header .dropdown-item i {
+    width: 1.1rem;
+    text-align: center;
+    color: var(--tl-orange);
+}
+
+.site-header .navbar-toggler {
+    border: 0;
+    padding: 0.5rem;
+    border-radius: 0.75rem;
+    color: var(--tl-navy);
+    font-size: 1.35rem;
+    line-height: 1;
+}
+
+.site-header .navbar-toggler:focus {
+    box-shadow: 0 0 0 0.2rem rgba(33, 85, 184, 0.35);
+}
+
+/* Desktop (>= lg): hover dropdowns + animated underline indicator */
 @media (min-width: 992px) {
     .navbar-hover-dropdown:hover > .dropdown-menu {
         display: block;
+        margin-top: 0;
     }
 
     /* Bootstrap only right-aligns .dropdown-menu-end when its JS opened
@@ -165,49 +628,956 @@ footer a:hover {
         left: auto;
     }
 
-    .navbar .nav-link {
+    .site-nav .nav-link {
         white-space: nowrap;
+    }
+
+    .site-nav .nav-link::after {
+        content: '';
+        position: absolute;
+        left: 0.8rem;
+        right: 0.8rem;
+        bottom: 0.1rem;
+        height: 3px;
+        border-radius: 3px;
+        background: var(--tl-yellow);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.22s var(--tl-ease);
+    }
+
+    .site-nav .nav-link:hover::after,
+    .site-nav .nav-link.active::after {
+        transform: scaleX(1);
+    }
+
+    .site-nav .dropdown-toggle.nav-link::after {
+        border: 0;
+        margin: 0;
+        vertical-align: 0;
+    }
+
+    .site-nav .nav-icon {
+        display: none;
+    }
+
+    .offcanvas-extras {
+        display: none !important;
     }
 }
 
-/* Lets the page-number group in render_pagination() (includes/functions.php)
+/* Between lg and xl there isn't room for the full search pill — it
+   becomes an icon that opens a search dropdown. */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+    .site-nav .nav-link { padding-left: 0.6rem; padding-right: 0.6rem; }
+    .site-nav .nav-link::after { left: 0.6rem; right: 0.6rem; }
+    .nav-search-inline { display: none !important; }
+}
+
+@media (min-width: 1200px) {
+    .nav-search-toggle { display: none !important; }
+    .nav-search-inline .form-control { width: 200px; }
+}
+
+@media (min-width: 1400px) {
+    .nav-search-inline .form-control { width: 250px; }
+}
+
+/* Mobile (< lg): off-canvas panel */
+@media (max-width: 991.98px) {
+    .site-header .offcanvas {
+        --bs-offcanvas-width: min(88vw, 360px);
+        border-left: 0;
+        border-radius: var(--tl-radius-lg) 0 0 var(--tl-radius-lg);
+    }
+
+    .site-header .offcanvas-header {
+        border-bottom: 1px solid var(--tl-border);
+    }
+
+    .site-nav .nav-link {
+        font-size: 1.05rem;
+        padding: 0.8rem 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .site-nav .nav-link.active {
+        background: var(--tl-cream);
+        box-shadow: inset 4px 0 0 var(--tl-yellow);
+    }
+
+    .site-nav .dropdown-menu {
+        border: 0;
+        box-shadow: none;
+        padding: 0 0 0.5rem 2rem;
+        background: transparent;
+    }
+
+    .site-nav .dropdown-toggle::after {
+        margin-left: auto;
+    }
+
+    .nav-search-toggle { display: none !important; }
+
+    .header-actions {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.6rem !important;
+        padding-top: 1rem;
+        margin-top: 0.75rem;
+        border-top: 1px solid var(--tl-border);
+    }
+
+    .header-actions .btn {
+        width: 100%;
+        --bs-btn-padding-y: 0.75rem;
+    }
+
+    .header-actions .dropdown-menu {
+        position: static;
+        box-shadow: none;
+        border: 0;
+        padding: 0;
+    }
+}
+
+/* ---------------------------------------------------------------- Hero (homepage) */
+.home-hero {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    background: var(--tl-cream);
+    padding: 3rem 0 5.5rem;
+}
+
+.home-hero::before,
+.home-hero::after,
+.hero::before,
+.hero::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Gold organic corner shape (top-left) */
+.home-hero::before,
+.hero::before {
+    width: 320px;
+    height: 260px;
+    left: -190px;
+    top: -150px;
+    background: var(--tl-yellow);
+    border-radius: 42% 58% 62% 38% / 45% 42% 58% 55%;
+    transform: rotate(-12deg);
+}
+
+/* Teal curve (bottom-left) */
+.home-hero::after,
+.hero::after {
+    width: 640px;
+    height: 300px;
+    left: -300px;
+    bottom: -220px;
+    background: var(--tl-teal);
+    border-radius: 50%;
+}
+
+.home-hero .container {
+    position: relative;
+}
+
+.hero-eyebrow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.75rem;
+    margin-bottom: 1.1rem;
+    font: 800 0.8rem/1.2 var(--tl-font-body);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--tl-navy);
+}
+
+.hero-eyebrow span + span::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: 0.75rem;
+    border-radius: 50%;
+    background: var(--tl-yellow);
+    vertical-align: middle;
+    transform: translateY(-1px);
+}
+
+.home-hero h1 {
+    font-size: clamp(2.3rem, 3.6vw + 1rem, 3.75rem);
+    font-weight: 700;
+    line-height: 1.06;
+    letter-spacing: -0.012em;
+    margin-bottom: 1.1rem;
+}
+
+.home-hero .hero-lead {
+    font-size: clamp(1.02rem, 0.4vw + 0.95rem, 1.18rem);
+    color: #414A63;
+    max-width: 540px;
+    margin-bottom: 1.6rem;
+}
+
+.hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.hero-subjects {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.subject-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: var(--tl-radius-pill);
+    font-weight: 800;
+    font-size: 0.86rem;
+    text-decoration: none;
+    background: var(--pill-soft, var(--tl-navy-soft));
+    color: var(--pill-ink, var(--tl-navy));
+    transition: transform 0.18s var(--tl-ease), box-shadow 0.18s ease;
+}
+
+.subject-pill small {
+    font-weight: 700;
+    opacity: 0.85;
+}
+
+a.subject-pill:hover {
+    color: var(--pill-ink, var(--tl-navy));
+    transform: translateY(-2px);
+    box-shadow: var(--tl-shadow-sm);
+}
+
+.subject-pill.is-esl { --pill-soft: var(--subject-esl-soft); --pill-ink: var(--subject-esl-ink); }
+.subject-pill.is-math { --pill-soft: var(--subject-math-soft); --pill-ink: var(--subject-math-ink); }
+.subject-pill.is-science { --pill-soft: var(--subject-science-soft); --pill-ink: var(--subject-science-ink); }
+
+.hero-art {
+    position: relative;
+}
+
+.hero-art img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 640px;
+    margin-left: auto;
+}
+
+.hero-art-badge {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.9rem 0.6rem 0.6rem;
+    border-radius: var(--tl-radius);
+    background: #fff;
+    box-shadow: var(--tl-shadow);
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: var(--tl-navy);
+    line-height: 1.2;
+}
+
+.hero-art-badge small {
+    display: block;
+    font-weight: 600;
+    color: var(--tl-muted);
+}
+
+.hero-art-badge .icon-bubble {
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 0.95rem;
+}
+
+.hero-art-badge.badge-a { left: 4%; bottom: -3%; }
+.hero-art-badge.badge-b { right: -1%; top: 1%; }
+
+@media (prefers-reduced-motion: no-preference) {
+    .hero-art-badge { animation: tl-bob 5s ease-in-out infinite; }
+    .hero-art-badge.badge-b { animation-delay: -2.5s; }
+}
+
+@keyframes tl-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+@media (min-width: 992px) {
+    .home-hero { padding: 4rem 0 6.5rem; }
+}
+
+@media (max-width: 991.98px) {
+    .home-hero .hero-copy { text-align: center; }
+    .home-hero .hero-lead { margin-left: auto; margin-right: auto; }
+    .hero-eyebrow, .hero-ctas, .hero-subjects { justify-content: center; }
+    .hero-art img { margin: 0 auto; max-width: 560px; }
+}
+
+@media (max-width: 575.98px) {
+    .hero-eyebrow { font-size: 0.68rem; letter-spacing: 0.08em; gap: 0.3rem 0.5rem; }
+    .hero-eyebrow span + span::before { margin-right: 0.5rem; }
+    .stat-item { gap: 0.6rem; padding: 0.35rem; }
+    .stat-item .icon-bubble { width: 2.5rem; height: 2.5rem; font-size: 1rem; }
+    .stat-value { font-size: 1.35rem; }
+    .hero-ctas .btn { flex: 1 1 100%; }
+    .hero-art-badge { display: none; }
+    .home-hero::before { width: 240px; height: 200px; left: -130px; top: -110px; }
+}
+
+/* Generic page hero (about.php, games.php, ...) — same visual language, lighter. */
+.hero {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    background: var(--tl-cream);
+    color: var(--tl-text);
+}
+
+.hero::before {
+    width: 260px;
+    height: 220px;
+    left: -140px;
+    top: -120px;
+}
+
+.hero::after {
+    width: 520px;
+    height: 240px;
+    left: auto;
+    right: -260px;
+    bottom: -190px;
+    opacity: 0.9;
+}
+
+.hero .lead {
+    color: #414A63;
+}
+
+/* ---------------------------------------------------------------- Icon bubbles (stats, features, steps) */
+.icon-bubble {
+    width: 3rem;
+    height: 3rem;
+    flex-shrink: 0;
+    border-radius: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    background: var(--bubble-soft, var(--tl-navy-soft));
+    color: var(--bubble-ink, var(--tl-navy));
+}
+
+.tone-esl { --bubble-soft: var(--subject-esl-soft); --bubble-ink: var(--subject-esl-ink); --tone: var(--subject-esl); --tone-soft: var(--subject-esl-soft); --tone-ink: var(--subject-esl-ink); }
+.tone-math { --bubble-soft: var(--subject-math-soft); --bubble-ink: var(--subject-math-ink); --tone: var(--subject-math); --tone-soft: var(--subject-math-soft); --tone-ink: var(--subject-math-ink); }
+.tone-science { --bubble-soft: var(--subject-science-soft); --bubble-ink: var(--subject-science-ink); --tone: var(--subject-science); --tone-soft: var(--subject-science-soft); --tone-ink: var(--subject-science-ink); }
+.tone-games { --bubble-soft: var(--subject-games-soft); --bubble-ink: var(--subject-games-ink); --tone: var(--subject-games); --tone-soft: var(--subject-games-soft); --tone-ink: var(--subject-games-ink); }
+.tone-videos { --bubble-soft: var(--subject-videos-soft); --bubble-ink: var(--subject-videos-ink); --tone: var(--subject-videos); --tone-soft: var(--subject-videos-soft); --tone-ink: var(--subject-videos-ink); }
+.tone-gold { --bubble-soft: var(--tl-yellow-soft); --bubble-ink: #8A5A00; --tone: var(--tl-yellow); --tone-soft: var(--tl-yellow-soft); --tone-ink: #8A5A00; }
+.tone-teal { --bubble-soft: var(--tl-teal-soft); --bubble-ink: var(--tl-teal-ink); --tone: var(--tl-teal); --tone-soft: var(--tl-teal-soft); --tone-ink: var(--tl-teal-ink); }
+
+/* ---------------------------------------------------------------- Homepage: stats strip */
+.stat-strip {
+    position: relative;
+    z-index: 2;
+    margin-top: -3.25rem;
+    background: #fff;
+    border: 1px solid var(--tl-border);
+    border-radius: var(--tl-radius-lg);
+    box-shadow: var(--tl-shadow);
+    padding: 1.25rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.5rem;
+}
+
+.stat-value {
+    font: 700 1.6rem/1 var(--tl-font-display);
+    color: var(--tl-navy);
+}
+
+.stat-label {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--tl-muted);
+    margin: 0.2rem 0 0;
+}
+
+/* ---------------------------------------------------------------- Homepage: ecosystem tiles */
+.eco-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: var(--tl-text);
+    border-top: 4px solid var(--tone, var(--tl-yellow));
+}
+
+.eco-card h3 {
+    margin: 1rem 0 0.4rem;
+    font-size: 1.3rem;
+}
+
+.eco-card p {
+    color: var(--tl-muted);
+    flex-grow: 1;
+    margin-bottom: 1rem;
+}
+
+.eco-card .link-arrow {
+    color: var(--tone-ink, var(--tl-navy));
+}
+
+a.eco-card:hover {
+    color: var(--tl-text);
+}
+
+/* ---------------------------------------------------------------- Homepage: subject cards */
+.subject-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-decoration: none;
+    color: var(--tl-text);
+}
+
+.subject-card-top {
+    position: relative;
+    padding: 1.6rem 1.5rem 1.25rem;
+    background: var(--tone-soft, var(--tl-cream));
+    overflow: hidden;
+}
+
+.subject-card-top::after {
+    content: '';
+    position: absolute;
+    right: -30px;
+    top: -30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: var(--tone, var(--tl-yellow));
+    opacity: 0.16;
+}
+
+.subject-card-top .icon-bubble {
+    background: #fff;
+    color: var(--tone-ink);
+    box-shadow: var(--tl-shadow-sm);
+    width: 3.4rem;
+    height: 3.4rem;
+    font-size: 1.4rem;
+}
+
+.subject-card-body {
+    padding: 1.25rem 1.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.subject-card-body h3 {
+    font-size: 1.35rem;
+    margin-bottom: 0.3rem;
+}
+
+.subject-card-body p {
+    color: var(--tl-muted);
+    flex-grow: 1;
+}
+
+.subject-card .link-arrow {
+    color: var(--tone-ink);
+}
+
+a.subject-card:hover {
+    color: var(--tl-text);
+}
+
+/* Legacy subject-card hooks still used elsewhere */
+.subject-esl .subject-icon { color: var(--subject-esl-ink); }
+.subject-math .subject-icon { color: var(--subject-math-ink); }
+.subject-science .subject-icon { color: var(--subject-science-ink); }
+
+/* ---------------------------------------------------------------- Homepage: resource-type chips */
+.type-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    height: 100%;
+    padding: 0.85rem 1rem;
+    border-radius: var(--tl-radius);
+    background: #fff;
+    border: 1px solid var(--tl-border);
+    color: var(--tl-navy);
+    font-weight: 800;
+    text-decoration: none;
+    transition: transform 0.18s var(--tl-ease), box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.type-chip .icon-bubble {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1rem;
+    border-radius: 0.75rem;
+}
+
+.type-chip small {
+    display: block;
+    font-weight: 700;
+    color: var(--tl-muted);
+    font-size: 0.8rem;
+}
+
+.type-chip:hover {
+    color: var(--tl-navy);
+    transform: translateY(-3px);
+    box-shadow: var(--tl-shadow-sm);
+    border-color: #E6DCC7;
+}
+
+/* ---------------------------------------------------------------- Homepage: how it works */
+.step-card {
+    position: relative;
+    height: 100%;
+    padding: 1.75rem 1.5rem 1.5rem;
+    background: #fff;
+    border: 1px solid var(--tl-border);
+    border-radius: var(--tl-radius);
+}
+
+.step-number {
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font: 700 1.2rem/1 var(--tl-font-display);
+    background: var(--tone, var(--tl-yellow));
+    color: #fff;
+    margin-bottom: 1rem;
+}
+
+.step-card.tone-gold .step-number { color: var(--tl-navy); }
+
+.step-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.4rem;
+}
+
+.step-card p {
+    color: var(--tl-muted);
+    margin: 0;
+}
+
+.creator-card {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    border-radius: var(--tl-radius-lg);
+    background: var(--tl-navy);
+    color: #fff;
+    height: 100%;
+}
+
+.creator-card img {
+    width: 96px;
+    height: 96px;
+    flex-shrink: 0;
+}
+
+.creator-card h3 {
+    color: #fff;
+    font-size: 1.25rem;
+    margin-bottom: 0.35rem;
+}
+
+.creator-card p {
+    color: #D8DDEE;
+    margin: 0;
+}
+
+@media (max-width: 575.98px) {
+    .creator-card { flex-direction: column; text-align: center; }
+}
+
+/* ---------------------------------------------------------------- Homepage: games band (navy) */
+.section-navy {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    background: var(--tl-navy);
+    color: #fff;
+}
+
+.section-navy::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    width: 420px;
+    height: 420px;
+    right: -160px;
+    top: -200px;
+    border-radius: 50%;
+    background: var(--tl-teal);
+    opacity: 0.22;
+}
+
+.section-navy::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    width: 190px;
+    height: 170px;
+    left: -90px;
+    bottom: -90px;
+    border-radius: 42% 58% 62% 38% / 45% 42% 58% 55%;
+    background: var(--tl-yellow);
+}
+
+.section-navy .section-title,
+.section-navy h2 {
+    color: #fff;
+}
+
+.section-navy .section-lead {
+    color: #D8DDEE;
+}
+
+.section-navy .section-eyebrow {
+    --eyebrow-color: var(--tl-yellow);
+}
+
+.section-navy .text-highlight {
+    color: var(--tl-yellow);
+}
+
+/* ---------------------------------------------------------------- Homepage: reviews */
+.review-card {
+    height: 100%;
+    padding: 1.5rem;
+    background: #fff;
+    border: 1px solid var(--tl-border);
+    border-radius: var(--tl-radius);
+    position: relative;
+}
+
+.review-card::before {
+    content: '\201C';
+    position: absolute;
+    right: 1.1rem;
+    top: 0.1rem;
+    font: 700 4rem/1 var(--tl-font-display);
+    color: var(--tl-yellow);
+    opacity: 0.5;
+}
+
+.review-stars {
+    color: #F5A300;
+}
+
+/* ---------------------------------------------------------------- Homepage: CTA cards + final CTA */
+.cta-card {
+    height: 100%;
+    padding: 2rem;
+    border-radius: var(--tl-radius-lg);
+    background: var(--tone-soft, var(--tl-cream));
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-card::after {
+    content: '';
+    position: absolute;
+    right: -50px;
+    bottom: -60px;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: var(--tone, var(--tl-yellow));
+    opacity: 0.18;
+}
+
+.cta-card h2 {
+    font-size: 1.55rem;
+}
+
+.cta-card .icon-bubble {
+    background: #fff;
+    box-shadow: var(--tl-shadow-sm);
+}
+
+.cta-card p {
+    color: #414A63;
+}
+
+.final-cta {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    border-radius: 2rem;
+    background: var(--tl-navy);
+    color: #fff;
+    padding: 3rem 2rem;
+}
+
+.final-cta::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    left: -80px;
+    top: -110px;
+    width: 280px;
+    height: 240px;
+    border-radius: 42% 58% 62% 38% / 45% 42% 58% 55%;
+    background: var(--tl-yellow);
+    opacity: 0.95;
+}
+
+.final-cta::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    right: -150px;
+    bottom: -210px;
+    width: 340px;
+    height: 280px;
+    border-radius: 50%;
+    background: var(--tl-teal);
+    opacity: 0.5;
+}
+
+.final-cta .text-highlight {
+    color: var(--tl-yellow);
+}
+
+.final-cta h2 {
+    color: #fff;
+    font-size: clamp(1.8rem, 2.4vw + 0.8rem, 2.6rem);
+    font-weight: 700;
+}
+
+.final-cta p {
+    color: #D8DDEE;
+}
+
+.final-cta img {
+    width: 150px;
+    height: 150px;
+}
+
+@media (min-width: 992px) {
+    .final-cta { padding: 3.5rem 4rem; }
+}
+
+/* ---------------------------------------------------------------- FAQ accordion */
+.accordion-tl {
+    --bs-accordion-border-color: var(--tl-border);
+    --bs-accordion-border-radius: var(--tl-radius);
+    --bs-accordion-inner-border-radius: var(--tl-radius);
+    --bs-accordion-btn-focus-box-shadow: 0 0 0 0.2rem rgba(33, 85, 184, 0.3);
+    --bs-accordion-active-bg: var(--tl-cream);
+    --bs-accordion-active-color: var(--tl-navy);
+    --bs-accordion-btn-color: var(--tl-navy);
+}
+
+.accordion-tl .accordion-item {
+    border: 1px solid var(--tl-border);
+    border-radius: var(--tl-radius) !important;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+}
+
+.accordion-tl .accordion-button {
+    font-family: var(--tl-font-body);
+    font-weight: 800;
+    font-size: 1.02rem;
+    padding: 1.1rem 1.25rem;
+}
+
+.accordion-tl .accordion-body {
+    color: #414A63;
+}
+
+/* ---------------------------------------------------------------- Footer */
+.site-footer {
+    position: relative;
+    margin-top: 5rem;
+    background: var(--tl-navy-dark);
+    color: #D8DDEE;
+    padding: 4rem 0 2rem;
+}
+
+.site-footer::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -38px;
+    height: 40px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 40' preserveAspectRatio='none'%3E%3Cpath d='M0 40V22C240 2 480 0 720 14S1200 38 1440 12V40Z' fill='%230F1D52'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
+}
+
+.site-footer h2 {
+    color: #fff;
+    font-size: 1rem;
+    font-family: var(--tl-font-body);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.site-footer a {
+    color: #D8DDEE;
+    text-decoration: none;
+}
+
+.site-footer a:hover,
+.site-footer a:focus-visible {
+    color: var(--tl-yellow);
+}
+
+.site-footer :focus-visible {
+    outline-color: var(--tl-yellow);
+}
+
+.site-footer .footer-links li {
+    margin-bottom: 0.55rem;
+}
+
+.footer-logo {
+    height: 44px;
+    width: auto;
+    margin-bottom: 1rem;
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    font-size: 0.88rem;
+    color: #B7BFD6;
+}
+
+.footer-tagline {
+    color: var(--tl-yellow);
+    font-weight: 800;
+}
+
+/* ---------------------------------------------------------------- Ad slot
+   Reserves stable space for an AdSense unit before the ad script loads,
+   so it never causes a layout shift (CLS). */
+.ad-slot {
+    min-height: 16rem;
+}
+
+@media (min-width: 768px) {
+    .ad-slot {
+        min-height: 7rem;
+    }
+}
+
+/* ---------------------------------------------------------------- Pagination
+   Lets the page-number group in render_pagination() (includes/functions.php)
    shrink and wrap its own numbers onto a second line when they don't fit,
-   while Previous/Next — siblings in the same flex-nowrap row — stay put on
-   the first line pinned to their edges. Flex items default to
-   min-width:auto, which would otherwise stop this group from shrinking
-   below its content size and force the whole row (Previous and Next
-   included) to overflow instead of this group alone wrapping. */
+   while Previous/Next — siblings in the same flex-nowrap row — stay put.
+   Flex items default to min-width:auto, which would otherwise stop this
+   group from shrinking below its content size. */
+.pagination {
+    --bs-pagination-color: var(--tl-navy);
+    --bs-pagination-hover-color: var(--tl-navy);
+    --bs-pagination-hover-bg: var(--tl-cream);
+    --bs-pagination-active-bg: var(--tl-navy);
+    --bs-pagination-active-border-color: var(--tl-navy);
+    --bs-pagination-focus-box-shadow: 0 0 0 0.2rem rgba(33, 85, 184, 0.3);
+    --bs-pagination-border-color: var(--tl-border-cool);
+    font-weight: 700;
+}
+
 .pagination-numbers {
     flex: 1 1 auto;
     min-width: 0;
 }
 
-.subject-card {
-    border-top: 3px solid transparent;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+/* ---------------------------------------------------------------- Resource cards */
+.resource-card {
+    height: 100%;
 }
 
-.subject-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+.resource-card .card-img-top,
+.resource-card .card-media-placeholder {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
+    border-radius: 0;
 }
 
-.subject-card.subject-esl { border-top-color: var(--subject-esl); }
-.subject-card.subject-math { border-top-color: var(--subject-math); }
-.subject-card.subject-science { border-top-color: var(--subject-science); }
-
-.subject-esl .subject-icon { color: var(--subject-esl); }
-.subject-math .subject-icon { color: var(--subject-math); }
-.subject-science .subject-icon { color: var(--subject-science); }
-
-.guide-card {
-    border-radius: 0.75rem;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+.card-media-placeholder {
+    position: relative;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 85% 18%, rgba(255, 255, 255, 0.7) 0 42px, transparent 43px),
+        radial-gradient(circle at 12% 88%, rgba(255, 255, 255, 0.55) 0 70px, transparent 71px),
+        var(--tone-soft, var(--tl-cream));
+    color: var(--tone-ink, var(--tl-navy));
 }
 
-.guide-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+.card-media-placeholder i {
+    width: 5.5rem;
+    height: 5.5rem;
+    border-radius: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.3rem;
+    background: #fff;
+    box-shadow: var(--tl-shadow);
+    transform: rotate(-4deg);
+}
+
+.resource-card .card-body {
+    min-width: 0;
+    padding: 1.1rem 1.15rem 1.2rem;
+}
+
+.resource-card .card-body h3,
+.resource-card .card-body p {
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .favorite-btn {
@@ -218,38 +1588,57 @@ footer a:hover {
     align-items: center;
     justify-content: center;
     padding: 0;
-    box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.15);
+    background: #fff;
+    border: 0;
+    box-shadow: 0 0.125rem 0.375rem rgba(23, 42, 110, 0.2);
 }
 
 .favorite-btn.active {
     background-color: #fff;
 }
 
-/* ---------------------------------------------------------------------
-   Video cards & embedded video player (video.php, resource.php, homepage)
-   ------------------------------------------------------------------- */
-
-.video-card {
-    border: 1px solid #e5e7eb;
-    border-radius: 0.75rem;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+/* ---------------------------------------------------------------- Guide cards */
+.guide-card {
+    border-left: 4px solid var(--tl-teal);
 }
 
-.video-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+.guide-card .card-body {
+    padding: 1.35rem 1.35rem 1.25rem;
 }
 
+/* ---------------------------------------------------------------- Video cards & embedded player */
 .video-card .card-img-top {
     aspect-ratio: 16 / 9;
     object-fit: cover;
+    border-radius: 0;
+}
+
+.video-play-chip {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 3.25rem;
+    height: 3.25rem;
+    margin: -1.625rem 0 0 -1.625rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--subject-videos-ink);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s var(--tl-ease);
+}
+
+.video-card:hover .video-play-chip {
+    transform: scale(1.1);
 }
 
 .video-embed-play-btn {
     width: 4.5rem;
     height: 4.5rem;
-    background-color: rgba(255, 255, 255, 0.92);
-    color: var(--brand-primary);
+    background-color: rgba(255, 255, 255, 0.94);
+    color: var(--tl-navy);
     font-size: 1.5rem;
     box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.25);
     border: none;
@@ -259,19 +1648,15 @@ footer a:hover {
 .video-embed-play-btn:hover,
 .video-embed-play-btn:focus {
     background-color: #fff;
-    color: var(--brand-primary-dark);
+    color: var(--tl-navy-dark);
     transform: translate(-50%, -50%) scale(1.08);
 }
 
-/* ---------------------------------------------------------------------
-   Teacher review & rating system
-   ------------------------------------------------------------------- */
-
-/* Interactive star selector on the review form — pure CSS, radio-based.
+/* ---------------------------------------------------------------- Teacher reviews & ratings
+   Interactive star selector on the review form — pure CSS, radio-based.
    Markup order must be 5,4,3,2,1 (see resource.php) so that, combined
    with row-reverse below, hovering/checking a star highlights it and
-   every star to its left via the general sibling selector. Works
-   identically on touch (tap sets :checked) as on desktop hover. */
+   every star to its left via the general sibling selector. */
 .star-rating-input {
     display: flex;
     flex-direction: row-reverse;
@@ -301,71 +1686,50 @@ footer a:hover {
     color: #f5b301;
 }
 
-/* Review cards on the resource detail page */
 .review-item .review-text {
     overflow-wrap: break-word;
     word-break: break-word;
 }
 
 .review-helpful-btn.active {
-    background-color: var(--brand-bg-soft);
-    border-color: var(--brand-primary);
-    color: var(--brand-primary);
+    background-color: var(--tl-cream);
+    border-color: var(--tl-navy);
+    color: var(--tl-navy);
 }
 
-/* ---------------------------------------------------------------------
-   TeachLuma Games — hub cards (games.php, homepage, game.php "More Games")
-   ------------------------------------------------------------------- */
-
-.game-card {
-    border: 1px solid #e5e7eb;
-    border-radius: 0.75rem;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.game-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
-}
-
+/* ---------------------------------------------------------------- Games (hub cards, landing page, embed) */
 .game-card-thumb {
     aspect-ratio: 16 / 9;
-    background-color: var(--brand-primary);
+    background-color: var(--subject-games);
 }
 
-/* Per-subject gradient so the games hub reads as colorful at a glance
-   instead of every card sharing the same flat blue tile. */
-.game-card-thumb-esl { background: linear-gradient(135deg, var(--subject-esl), #1d4ed8); }
-.game-card-thumb-math { background: linear-gradient(135deg, var(--subject-math), #5b21b6); }
-.game-card-thumb-science { background: linear-gradient(135deg, var(--subject-science), #0f766e); }
-
-.badge-subject-esl { background-color: var(--subject-esl); color: #fff; }
-.badge-subject-math { background-color: var(--subject-math); color: #fff; }
-.badge-subject-science { background-color: var(--subject-science); color: #fff; }
-
-.badge-grade {
-    background-color: #eef2ff;
-    color: #4338ca;
-    border: 1px solid #c7d2fe;
+.game-card-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-/* The embedded game fills the viewport height below the sticky navbar
-   (a fixed aspect ratio made it ~260px tall on phones — unplayable). */
+/* Per-subject fallback gradients when a game has no thumbnail image. */
+.game-card-thumb-esl { background: linear-gradient(135deg, var(--subject-esl), #1D4FB8); }
+.game-card-thumb-math { background: linear-gradient(135deg, var(--subject-games), #5B3FB3); }
+.game-card-thumb-science { background: linear-gradient(135deg, var(--subject-science), #1B7A40); }
+
+/* The embedded game fills the viewport height below the sticky navbar. */
 .game-play-section {
-    scroll-margin-top: 64px;
+    scroll-margin-top: 72px;
 }
 
 .game-embed-frame {
     display: block;
     width: 100%;
-    height: calc(100vh - 80px);
-    height: calc(100svh - 80px);
+    height: calc(100vh - 88px);
+    height: calc(100svh - 88px);
     min-height: 480px;
     max-height: 860px;
     border: 0;
-    border-radius: 0.75rem;
-    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
-    background: #f8fafc;
+    border-radius: var(--tl-radius);
+    box-shadow: var(--tl-shadow);
+    background: var(--tl-cream);
 }
 
 @media (max-width: 575.98px) {
@@ -380,24 +1744,22 @@ footer a:hover {
 }
 
 .game-filter .btn {
-    border-radius: 999px;
+    border-radius: var(--tl-radius-pill);
 }
 
-/* ---------------------------------------------------------------------
-   Teacher Tools — Random Name Picker & Classroom Timer
-   ------------------------------------------------------------------- */
-
+/* ---------------------------------------------------------------- Teacher Tools — Random Name Picker & Classroom Timer */
 .teacher-tool-card {
-    border-radius: 0.75rem;
+    border-radius: var(--tl-radius);
 }
 
 .teacher-tool-display {
+    font-family: var(--tl-font-display);
     font-size: 2.5rem;
     font-weight: 700;
     padding: 1.5rem 1rem;
-    border-radius: 0.5rem;
-    background-color: var(--brand-bg-soft);
-    color: var(--brand-primary);
+    border-radius: var(--tl-radius);
+    background-color: var(--tl-cream);
+    color: var(--tl-navy);
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
@@ -406,35 +1768,24 @@ footer a:hover {
     color: #b91c1c;
 }
 
-/* ---------------------------------------------------------------------
-   Bundles — listing cards (bundles.php), homepage Featured Bundle
-   section, and the bundle detail page's preview gallery + lightbox
-   (bundle.php).
-   ------------------------------------------------------------------- */
-
-.bundle-card {
-    border: 1px solid #e5e7eb;
-    border-radius: 0.75rem;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.bundle-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
-}
-
+/* ---------------------------------------------------------------- Bundles — cards, detail-page gallery + lightbox */
 .bundle-card-thumb {
     aspect-ratio: 4 / 3;
-    background-color: var(--brand-primary);
+    background: linear-gradient(135deg, var(--tl-teal), var(--tl-teal-ink));
 }
 
 .bundle-card-thumb .card-img-top {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 0;
 }
 
-/* Bundle detail page: thumbnail rail + large main preview image */
+.bundle-price {
+    font: 700 1.35rem/1 var(--tl-font-display);
+    color: var(--tl-navy);
+}
+
 .bundle-gallery {
     display: flex;
     flex-direction: row;
@@ -461,9 +1812,9 @@ footer a:hover {
     position: relative;
     width: 100%;
     aspect-ratio: 1 / 1;
-    background-color: var(--brand-bg-soft);
-    border: 1px solid #e5e7eb;
-    border-radius: 0.75rem;
+    background-color: var(--tl-cream);
+    border: 1px solid var(--tl-border);
+    border-radius: var(--tl-radius);
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -479,8 +1830,8 @@ footer a:hover {
 .bundle-gallery-thumb {
     width: 100%;
     aspect-ratio: 1 / 1;
-    border: 2px solid #e5e7eb;
-    border-radius: 0.5rem;
+    border: 2px solid var(--tl-border);
+    border-radius: 0.6rem;
     overflow: hidden;
     background-color: #fff;
     padding: 0;
@@ -497,16 +1848,16 @@ footer a:hover {
 }
 
 .bundle-gallery-thumb:hover {
-    border-color: var(--brand-primary);
+    border-color: var(--tl-navy);
 }
 
 .bundle-gallery-thumb.active {
-    border-color: var(--brand-primary);
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+    border-color: var(--tl-navy);
+    box-shadow: 0 0 0 2px rgba(23, 42, 110, 0.25);
 }
 
 .bundle-gallery-thumb:focus-visible {
-    outline: 3px solid var(--brand-primary);
+    outline: 3px solid var(--tl-link);
     outline-offset: 2px;
 }
 
@@ -534,11 +1885,10 @@ footer a:hover {
     }
 }
 
-/* Preview lightbox */
 .bundle-lightbox {
     position: fixed;
     inset: 0;
-    background-color: rgba(15, 23, 42, 0.92);
+    background-color: rgba(15, 29, 82, 0.92);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -572,7 +1922,7 @@ footer a:hover {
     position: absolute;
     border: none;
     background-color: rgba(255, 255, 255, 0.95);
-    color: #1f2937;
+    color: var(--tl-text);
     border-radius: 50%;
     width: 2.75rem;
     height: 2.75rem;
@@ -629,4 +1979,29 @@ footer a:hover {
 
 body.bundle-lightbox-open {
     overflow: hidden;
+}
+
+/* ---------------------------------------------------------------- Motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .btn:hover,
+    .resource-card:hover,
+    .video-card:hover,
+    .game-card:hover,
+    .bundle-card:hover,
+    .guide-card:hover,
+    .subject-card:hover,
+    .type-chip:hover,
+    a.tl-card:hover,
+    a.subject-pill:hover {
+        transform: none !important;
+    }
 }

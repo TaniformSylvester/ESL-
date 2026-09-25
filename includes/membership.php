@@ -5,6 +5,11 @@
  * than re-deriving membership state from raw DB columns.
  */
 
+// isMemberActive() calls is_logged_in(); pages that never load auth.php
+// themselves (about.php, terms.php, ...) reach this via the header's ad
+// check, which fatally errored for signed-in visitors without it.
+require_once __DIR__ . '/auth.php';
+
 function get_membership(int $userId): ?array
 {
     $stmt = getDB()->prepare('SELECT * FROM memberships WHERE user_id = ? LIMIT 1');

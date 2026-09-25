@@ -46,6 +46,19 @@ ErrorDocument 500 /500.php
     ExpiresByType image/jpeg "access plus 1 month"
     ExpiresByType image/webp "access plus 1 month"
     ExpiresByType image/svg+xml "access plus 1 month"
+    ExpiresByType image/x-icon "access plus 1 month"
+    ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+# Self-hosted brand fonts (assets/fonts) — correct type so browsers cache them.
+<IfModule mod_mime.c>
+    AddType font/woff2 .woff2
+</IfModule>
+
+# Compress text assets (HTML/CSS/JS/SVG) — the hero illustration and logos
+# are SVG, which shrinks ~70% gzipped.
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/plain application/javascript application/json image/svg+xml
 </IfModule>
 
 # Force HTTPS — uncomment AFTER SSL is active (cPanel: SSL/TLS Status, or

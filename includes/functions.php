@@ -15,6 +15,28 @@ function asset_url(string $path): string
 }
 
 /**
+ * asset_url() plus a ?v=<file mtime> cache-buster. .htaccess tells browsers
+ * to cache CSS/JS/images for a month, so anything that changes between
+ * deploys must use this or returning visitors keep the stale copy.
+ */
+function versioned_asset_url(string $path): string
+{
+    $file = ROOT_PATH . '/assets/' . ltrim($path, '/');
+
+    return asset_url($path) . (is_file($file) ? '?v=' . filemtime($file) : '');
+}
+
+/** Maps a subject name to the CSS accent key behind the site-wide --subject-* tokens (esl | math | science). */
+function subject_key(string $subject): string
+{
+    return match (true) {
+        stripos($subject, 'math') !== false    => 'math',
+        stripos($subject, 'science') !== false => 'science',
+        default                                => 'esl',
+    };
+}
+
+/**
  * Strips known tracking/marketing query parameters from a path+query
  * string before it's used to build a canonical URL — a link like
  * resource.php?slug=x&utm_source=facebook must still canonicalize to
