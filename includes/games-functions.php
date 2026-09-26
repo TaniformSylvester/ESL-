@@ -1,0 +1,408 @@
+<?php
+/**
+ * TeachLuma Games — metadata for the interactive HTML5 classroom games
+ * library. A plain config array, not a database table: each game is a
+ * genuinely bespoke, hand-built HTML5 bundle (assets/games/<slug>/index.html
+ * — the same convention already used by config.php's PRACTICE_ACTIVITIES),
+ * not admin-generated content, so there is nothing here an admin form would
+ * meaningfully CRUD. Adding a new game means adding one entry below plus
+ * its own self-contained bundle — nothing else needs to change.
+ *
+ * Fields per game:
+ *   slug              string   URL slug, also the assets/games/<slug>/ folder name
+ *   title             string
+ *   subject           string   display label, e.g. "Math"
+ *   grade             string   display label, e.g. "Grade 1–2"
+ *   topic             string
+ *   difficulty        string   "Easy" | "Medium" | "Advanced"
+ *   short_description string   one-sentence summary for cards
+ *   what_students_practice array<string>  bullet list for the game landing page
+ *   how_to_use        array<string>  short numbered classroom-use steps
+ *   thumbnail         ?string  URL to a thumbnail image, or null to use the default icon tile
+ *   featured          bool     whether this game is eligible for homepage/hub "Featured" placement
+ *   team_play         bool     optional, default true — whether the game offers "2 Teams" play
+ */
+
+/** Every configured game, in display order. */
+function get_all_games(): array
+{
+    return [
+        [
+            'slug'                   => 'number-challenge',
+            'title'                  => 'Number Challenge',
+            'subject'                => 'Math',
+            'grade'                  => 'Grade 1–2',
+            'topic'                  => 'Addition & Subtraction',
+            'difficulty'             => 'Easy',
+            'short_description'      => 'Practice addition, subtraction and mental math in a fast-paced whole-class game.',
+            'what_students_practice' => [
+                'Addition within 20',
+                'Subtraction within 20',
+                'Quick mental math recall',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Choose a mode, question count and timer on the start screen.',
+                'Show each question and let students discuss the answer.',
+                'Select the answer together, then move to the next question.',
+            ],
+            'thumbnail' => asset_url('images/games/number-challenge-thumb.svg'),
+            'featured'  => true,
+        ],
+        [
+            'slug'                   => 'vocabulary-match',
+            'title'                  => 'Vocabulary Match',
+            'subject'                => 'ESL',
+            'grade'                  => 'Kindergarten–Grade 2',
+            'topic'                  => 'Vocabulary',
+            'difficulty'             => 'Easy',
+            'short_description'      => 'A picture-and-word memory matching game covering animals, food and colors vocabulary.',
+            'what_students_practice' => [
+                'Matching pictures to their English word',
+                'Core vocabulary: animals, food and colors',
+                'Visual memory and turn-taking',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Choose a category and number of pairs on the start screen.',
+                'Call on students to pick two cards and say the word aloud.',
+                'Keep going until every picture is matched with its word.',
+            ],
+            'thumbnail' => asset_url('images/games/vocabulary-match-thumb.svg'),
+            'featured'  => true,
+        ],
+        [
+            'slug'                   => 'phonics-sound-match',
+            'title'                  => 'Phonics Sound Match',
+            'subject'                => 'ESL',
+            'grade'                  => 'Kindergarten–Grade 1',
+            'topic'                  => 'Phonics',
+            'difficulty'             => 'Easy',
+            'short_description'      => 'Practice beginning, ending and middle sounds by matching a sound to a picture and word.',
+            'what_students_practice' => [
+                'Identifying beginning, middle and ending sounds',
+                'Matching a sound to a picture and its word',
+                'Phonemic awareness for early reading',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Choose a level: Easy, Medium or Hard.',
+                'Say the target sound aloud and let students think of the answer.',
+                'Click the picture-word that matches, then move to the next round.',
+            ],
+            'thumbnail' => asset_url('images/games/phonics-sound-match-thumb.svg'),
+            'featured'  => true,
+        ],
+        [
+            'slug'                   => 'daily-routines-adventure',
+            'title'                  => 'Daily Routines Adventure',
+            'subject'                => 'ESL',
+            'grade'                  => 'Grade 1–3',
+            'topic'                  => 'Daily Routines & Sentences',
+            'difficulty'             => 'Easy',
+            'short_description'      => 'Five mini-activities covering daily routines vocabulary — ordering, matching, sentence building, telling time and reading comprehension.',
+            'what_students_practice' => [
+                'Daily routine vocabulary and sequencing',
+                'Building simple sentences from words',
+                'Telling time and matching it to routines',
+                'Reading short stories and answering questions',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Work through the five activities in any order using the tabs.',
+                'Discuss each answer as a class before moving to the next question.',
+                'Complete all five activities to finish the game.',
+            ],
+            'thumbnail' => asset_url('images/games/daily-routines-adventure-thumb.svg'),
+            'featured'  => true,
+            'team_play' => false,
+        ],
+        [
+            'slug'                   => 'place-value-digit-value',
+            'title'                  => 'Place Value & Digit Value',
+            'subject'                => 'Math',
+            'grade'                  => 'Grade 1',
+            'topic'                  => 'Place Value',
+            'difficulty'             => 'Easy',
+            'short_description'      => 'Identify the tens and ones place and figure out what a digit is really worth in a two-digit number.',
+            'what_students_practice' => [
+                'Naming the tens and ones place in a two-digit number',
+                'Finding the value of a digit (e.g. the 5 in 57 is worth 50)',
+                'Telling apart a digit from the value it represents',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Choose Place Value, Digit Value or Mixed mode on the start screen.',
+                'Look at the highlighted digit tile together and discuss the answer.',
+                'Select the answer as a class, then move to the next number.',
+            ],
+            'thumbnail' => asset_url('images/games/place-value-digit-value-thumb.svg'),
+            'featured'  => true,
+        ],
+        [
+            'slug'                   => 'skip-counting',
+            'title'                  => 'Skip Counting Challenge',
+            'subject'                => 'Math',
+            'grade'                  => 'Grade 2',
+            'topic'                  => 'Skip Counting',
+            'difficulty'             => 'Easy',
+            'short_description'      => 'Count by 2s, 5s and 10s to find the missing number in a sequence.',
+            'what_students_practice' => [
+                'Counting forward by 2s, 5s and 10s',
+                'Spotting the pattern in a number sequence',
+                'Finding a missing number, not just the next one',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Choose a counting step (2s, 5s or 10s) and a difficulty level.',
+                'Look at the sequence together and figure out the missing number.',
+                'Select the answer as a class, then move to the next sequence.',
+            ],
+            'thumbnail' => asset_url('images/games/skip-counting-thumb.svg'),
+            'featured'  => true,
+        ],
+        [
+            'slug'                   => 'times-tables-challenge',
+            'title'                  => 'Times Tables Challenge',
+            'subject'                => 'Math',
+            'grade'                  => 'Grade 3',
+            'topic'                  => 'Multiplication & Division',
+            'difficulty'             => 'Easy',
+            'short_description'      => 'Build multiplication and division fact fluency with fast-paced times-table questions.',
+            'what_students_practice' => [
+                'Multiplication facts up to the 12 times table',
+                'Division as the inverse of multiplication',
+                'Quick recall of times-table facts',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Choose Multiplication, Division or Mixed mode on the start screen.',
+                'Show each question and let students discuss the answer.',
+                'Select the answer together, then move to the next question.',
+            ],
+            'thumbnail' => asset_url('images/games/times-tables-challenge-thumb.svg'),
+            'featured'  => true,
+        ],
+        [
+            'slug'                   => 'fraction-frenzy',
+            'title'                  => 'Fraction Frenzy',
+            'subject'                => 'Math',
+            'grade'                  => 'Grade 4',
+            'topic'                  => 'Equivalent & Comparing Fractions',
+            'difficulty'             => 'Easy',
+            'short_description'      => 'Spot equivalent fractions and compare fraction sizes using colorful visual fraction bars.',
+            'what_students_practice' => [
+                'Recognizing equivalent fractions (e.g. 1/2 = 2/4)',
+                'Comparing two fractions to find which is greater',
+                'Reading a fraction bar model',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Choose Equivalent, Compare or Mixed mode on the start screen.',
+                'Look at the fraction bar(s) together and reason about the answer.',
+                'Select the answer as a class, then move to the next fraction.',
+            ],
+            'thumbnail' => asset_url('images/games/fraction-frenzy-thumb.svg'),
+            'featured'  => true,
+        ],
+        [
+            'slug'                   => 'decimal-detective',
+            'title'                  => 'Decimal Detective',
+            'subject'                => 'Math',
+            'grade'                  => 'Grade 5',
+            'topic'                  => 'Decimals',
+            'difficulty'             => 'Medium',
+            'short_description'      => 'Compare, round and read decimals to the thousandths on a colorful place-value chart.',
+            'what_students_practice' => [
+                'Comparing decimals with different numbers of digits (0.5 vs 0.45)',
+                'Rounding decimals to the nearest whole, tenth or hundredth',
+                'Finding the value of a digit in a decimal',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Choose Compare, Rounding or Mixed, and tenths, hundredths or thousandths.',
+                'Use the place-value chart to talk through each answer together.',
+                'Play solo, or pick 2 Teams for a class competition.',
+            ],
+            'thumbnail' => asset_url('images/games/decimal-detective-thumb.svg'),
+            'featured'  => true,
+        ],
+        [
+            'slug'                   => 'ratio-percent-rally',
+            'title'                  => 'Ratio & Percent Rally',
+            'subject'                => 'Math',
+            'grade'                  => 'Grade 6',
+            'topic'                  => 'Ratios & Percents',
+            'difficulty'             => 'Medium',
+            'short_description'      => 'Find percents of numbers, convert fractions to percents, and simplify and complete ratios.',
+            'what_students_practice' => [
+                'Finding a percent of a number (e.g. 25% of 80)',
+                'Writing fractions as percents',
+                'Simplifying ratios and finding equivalent ratios',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Choose Percents, Ratios or Mixed, then a difficulty level.',
+                'Ask students to explain their strategy before selecting an answer.',
+                'Play solo, or pick 2 Teams for a class competition.',
+            ],
+            'thumbnail' => asset_url('images/games/ratio-percent-rally-thumb.svg'),
+            'featured'  => true,
+        ],
+        [
+            'slug'                   => 'science-sorter',
+            'title'                  => 'Science Sorter',
+            'subject'                => 'Science',
+            'grade'                  => 'Grade 1–3',
+            'topic'                  => 'Classifying Living Things & Matter',
+            'difficulty'             => 'Easy',
+            'short_description'      => 'Sort things into living or non-living, animal groups, and solids, liquids and gases — with a fun fact for tricky ones.',
+            'what_students_practice' => [
+                'Telling living things from non-living things',
+                'Classifying animals as mammals, birds, fish, reptiles or insects',
+                'Sorting materials into solids, liquids and gases',
+            ],
+            'how_to_use' => [
+                'Open the game on your laptop or tablet.',
+                'Connect to a projector or classroom display, if you have one.',
+                'Choose Living?, Animals or Matter; Hard adds tricky items like bats and sand.',
+                'Read the fun fact aloud after each answer and discuss why.',
+                'Play solo, or pick 2 Teams for a class competition.',
+            ],
+            'thumbnail' => asset_url('images/games/science-sorter-thumb.svg'),
+            'featured'  => true,
+        ],
+        // Future games (see get_related_games() and the Number Challenge
+        // architecture for how a new mode/game slots in without rebuilding
+        // the hub): Number Recognition, Missing Number, Number Bonds, etc.
+        // The Grade 1-6 Math arc is complete (place value, skip counting,
+        // times tables, fractions, decimals, ratios & percents).
+    ];
+}
+
+/** Up to $limit featured games, for the homepage and hub "Featured" rail. */
+function get_featured_games(int $limit = 3): array
+{
+    $featured = array_values(array_filter(get_all_games(), static fn(array $g): bool => !empty($g['featured'])));
+
+    return array_slice($featured, 0, max(1, $limit));
+}
+
+function get_game_by_slug(string $slug): ?array
+{
+    foreach (get_all_games() as $game) {
+        if ($game['slug'] === $slug) {
+            return $game;
+        }
+    }
+
+    return null;
+}
+
+/** Other games for a "More Games" section — same subject first, then anything else, excluding the current game. */
+function get_related_games(array $game, int $limit = 3): array
+{
+    $others = array_values(array_filter(get_all_games(), static fn(array $g): bool => $g['slug'] !== $game['slug']));
+
+    usort($others, static function (array $a, array $b) use ($game): int {
+        $aMatch = $a['subject'] === $game['subject'] ? 0 : 1;
+        $bMatch = $b['subject'] === $game['subject'] ? 0 : 1;
+
+        return $aMatch <=> $bMatch;
+    });
+
+    return array_slice($others, 0, max(1, $limit));
+}
+
+/** Maps a game's display subject label to the CSS accent key used by the site-wide --subject-* variables (game-card.php, game.php, style.css). */
+function game_subject_key(string $subject): string
+{
+    return subject_key($subject);
+}
+
+/** The embeddable game bundle's URL — every game lives at assets/games/<slug>/index.html. */
+function game_embed_url(array $game): string
+{
+    return asset_url('games/' . rawurlencode($game['slug']) . '/index.html');
+}
+
+// -----------------------------------------------------------------------
+// PLAY TRACKING — real usage counts for the admin dashboard, recorded by
+// api/game-track.php whenever a game's own JS fires a "started"/"completed"
+// event. game_slug is validated against get_all_games() before anything is
+// written, so a bad or made-up slug can never pollute the table.
+// -----------------------------------------------------------------------
+
+/** Records one real play event. Silently a no-op for an unknown slug/event — the caller (api/game-track.php) already validates, this is just a second line of defense. */
+function record_game_play(string $slug, string $eventType): void
+{
+    if (!in_array($eventType, ['started', 'completed'], true) || !get_game_by_slug($slug)) {
+        return;
+    }
+
+    $userId = is_logged_in() ? (int)$_SESSION['user_id'] : null;
+
+    getDB()->prepare('INSERT INTO game_plays (game_slug, event_type, user_id) VALUES (?, ?, ?)')
+        ->execute([$slug, $eventType, $userId]);
+}
+
+/** Total "started" plays across every game, all time — the admin dashboard's headline number. */
+function get_total_game_plays(): int
+{
+    return (int)getDB()->query("SELECT COUNT(*) FROM game_plays WHERE event_type = 'started'")->fetchColumn();
+}
+
+/** "started" plays so far this calendar month. */
+function get_game_plays_this_month(): int
+{
+    $stmt = getDB()->prepare(
+        "SELECT COUNT(*) FROM game_plays WHERE event_type = 'started' AND DATE_FORMAT(played_at, '%Y-%m') = ?"
+    );
+    $stmt->execute([date('Y-m')]);
+
+    return (int)$stmt->fetchColumn();
+}
+
+/**
+ * Per-game play stats for the admin dashboard breakdown table — every
+ * configured game is listed even with zero real plays (never omitted,
+ * never fabricated), ordered by most-played first.
+ */
+function get_game_play_stats(): array
+{
+    $stmt = getDB()->prepare(
+        "SELECT
+            SUM(CASE WHEN event_type = 'started' THEN 1 ELSE 0 END) AS started,
+            SUM(CASE WHEN event_type = 'completed' THEN 1 ELSE 0 END) AS completed
+         FROM game_plays
+         WHERE game_slug = ?"
+    );
+
+    $rows = [];
+    foreach (get_all_games() as $game) {
+        $stmt->execute([$game['slug']]);
+        $counts = $stmt->fetch();
+
+        $rows[] = [
+            'slug'      => $game['slug'],
+            'title'     => $game['title'],
+            'subject'   => $game['subject'],
+            'started'   => (int)($counts['started'] ?? 0),
+            'completed' => (int)($counts['completed'] ?? 0),
+        ];
+    }
+
+    usort($rows, static fn(array $a, array $b): int => $b['started'] <=> $a['started']);
+
+    return $rows;
+}

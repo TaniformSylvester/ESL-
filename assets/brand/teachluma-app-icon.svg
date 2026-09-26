@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="t"><title id="t">TeachLuma</title><rect width="64" height="64" rx="14" fill="#FFF8EC"/><g transform="translate(6.4 5.6) scale(0.8)"><g stroke-linecap="round" stroke="#FBB829" stroke-width="3.6" fill="none">
+    <path d="M32 18.5V12.5"/><path d="M20.3 23.4 16.2 19.3"/><path d="M43.7 23.4 47.8 19.3"/><path d="M15.6 32.5H10.2"/><path d="M48.4 32.5H53.8"/>
+  </g>
+  <circle cx="32" cy="36.5" r="11.5" fill="#FBB829"/>
+  <path d="M32 43.2C25 38.8 15.5 37.6 5.5 39.6V53.4C15.5 51.4 25 52.4 32 57C39 52.4 48.5 51.4 58.5 53.4V39.6C48.5 37.6 39 38.8 32 43.2Z" fill="#172A6E" stroke="#172A6E" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M30.8 42.4C25.2 38.9 17.2 37.9 9.2 39.2V50.6C17.2 49.4 25.2 50.3 30.8 53.6Z" fill="#FFF8EC"/>
+  <path d="M33.2 42.4C38.8 38.9 46.8 37.9 54.8 39.2V50.6C46.8 49.4 38.8 50.3 33.2 53.6Z" fill="#FFF8EC"/>
+  <path d="M28 45.2C23.6 43 18 42.4 12.6 43M28 49.2C23.6 47.2 18 46.7 12.6 47.2" fill="none" stroke="#F57C2B" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M36 45.2C40.4 43 46 42.4 51.4 43M36 49.2C40.4 47.2 46 46.7 51.4 47.2" fill="none" stroke="#1FB5A8" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M55 8 56.4 11.7 60.1 13.1 56.4 14.5 55 18.2 53.6 14.5 49.9 13.1 53.6 11.7Z" fill="#1FB5A8"/></g></svg>

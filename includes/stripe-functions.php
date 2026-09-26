@@ -1,0 +1,183 @@
+<?php
+/**
+ * Minimal Stripe REST API client — no SDK/Composer dependency, consistent
+ * with the rest of this codebase. Only implements what this app actually
+ * uses: creating a one-time Checkout Session and verifying webhook
+ * signatures. See config/stripe.php for where the keys live.
+ */
+
+/**
+ * POSTs form-encoded params to the Stripe API with the secret key as the
+ * HTTP Basic Auth username (Stripe's documented auth scheme — no password).
+ * Returns the decoded JSON body on any response (2xx or error), or null if
+ * the request itself couldn't be made (network failure, etc).
+ */
+function stripe_api_request(string $method, string $endpoint, array $params = []): ?array
+{
+    $ch = curl_init('https://api.stripe.com/v1/' . ltrim($endpoint, '/'));
+
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_USERPWD        => STRIPE_SECRET_KEY . ':',
+        CURLOPT_TIMEOUT        => 15,
+    ]);
+
+    if ($method === 'POST') {
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+    }
+
+    $response = curl_exec($ch);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+
+    if ($response === false) {
+        error_log('Stripe API request failed: ' . $curlError);
+        return null;
+    }
+
+    $decoded = json_decode($response, true);
+    return is_array($decoded) ? $decoded : null;
+}
+
+/**
+ * Creates a one-time (mode=payment) Checkout Session for the given plan
+ * (monthly or annual), priced in THB using config.php's PRICE_MONTHLY /
+ * PRICE_ANNUAL — the same prices already shown on pricing.php, so a
+ * teacher never sees a different amount at checkout than what was
+ * advertised. Offers both 'card' and 'promptpay' as payment methods, so a
+ * Thai customer can scan and pay via PromptPay directly inside Stripe's
+ * hosted checkout, with no separate manual-transfer step. PromptPay is a
+ * delayed-confirmation method — see stripe/webhook.php's payment_status
+ * check, which already only credits membership once Stripe confirms the
+ * PromptPay payment actually cleared, not just that checkout was opened.
+ * Returns ['success' => bool, 'url' => ?string, 'error' => ?string]. The
+ * caller redirects the browser to the returned url — Stripe hosts the
+ * actual payment page, so card/bank details never touch this server.
+ */
+function create_stripe_checkout_session(array $user, string $plan = 'monthly'): array
+{
+    if (!array_key_exists($plan, PLAN_DAYS)) {
+        $plan = 'monthly';
+    }
+
+    $price = $plan === 'annual' ? PRICE_ANNUAL : PRICE_MONTHLY;
+    $planLabel = PLAN_LABELS[$plan] ?? (ucfirst($plan) . ' Plan');
+
+    $params = [
+        'mode'                 => 'payment',
+        'payment_method_types' => ['card', 'promptpay'],
+        'customer_email'       => $user['email'],
+        'success_url'          => base_url('member/subscription.php?stripe=success&session_id={CHECKOUT_SESSION_ID}'),
+        'cancel_url'           => base_url('member/subscription.php?stripe=cancelled'),
+        'line_items' => [
+            [
+                'quantity'   => 1,
+                'price_data' => [
+                    'currency'     => 'thb',
+                    'unit_amount'  => (int)round($price * 100),
+                    'product_data' => [
+                        'name' => SITE_NAME . ' ' . $planLabel,
+                    ],
+                ],
+            ],
+        ],
+        'metadata' => [
+            'type'    => 'membership',
+            'user_id' => (string)$user['id'],
+            'plan'    => $plan,
+        ],
+    ];
+
+    $result = stripe_api_request('POST', 'checkout/sessions', $params);
+
+    if (!$result || isset($result['error'])) {
+        error_log('Stripe checkout session creation failed: ' . ($result['error']['message'] ?? 'unknown error'));
+        return ['success' => false, 'url' => null, 'error' => 'Could not start the Stripe checkout. Please try again or use another payment method.'];
+    }
+
+    return ['success' => true, 'url' => $result['url'] ?? null, 'error' => null];
+}
+
+/**
+ * Creates a one-time Checkout Session for a resource bundle — same card +
+ * PromptPay setup as the membership checkout, priced at the bundle's own
+ * price (THB). metadata.type = 'bundle' is how stripe/webhook.php tells
+ * this apart from a membership payment on the same shared endpoint.
+ * Returns ['success' => bool, 'url' => ?string, 'error' => ?string].
+ */
+function create_bundle_checkout_session(array $user, array $bundle): array
+{
+    $params = [
+        'mode'                 => 'payment',
+        'payment_method_types' => ['card', 'promptpay'],
+        'customer_email'       => $user['email'],
+        'success_url'          => base_url('bundle.php?slug=' . rawurlencode($bundle['slug']) . '&stripe=success'),
+        'cancel_url'           => base_url('bundle.php?slug=' . rawurlencode($bundle['slug']) . '&stripe=cancelled'),
+        'line_items' => [
+            [
+                'quantity'   => 1,
+                'price_data' => [
+                    'currency'     => 'thb',
+                    'unit_amount'  => (int)round((float)$bundle['price'] * 100),
+                    'product_data' => [
+                        'name' => SITE_NAME . ' Bundle — ' . $bundle['title'],
+                    ],
+                ],
+            ],
+        ],
+        'metadata' => [
+            'type'      => 'bundle',
+            'user_id'   => (string)$user['id'],
+            'bundle_id' => (string)$bundle['id'],
+        ],
+    ];
+
+    $result = stripe_api_request('POST', 'checkout/sessions', $params);
+
+    if (!$result || isset($result['error'])) {
+        error_log('Stripe bundle checkout session creation failed: ' . ($result['error']['message'] ?? 'unknown error'));
+        return ['success' => false, 'url' => null, 'error' => 'Could not start the Stripe checkout. Please try again.'];
+    }
+
+    return ['success' => true, 'url' => $result['url'] ?? null, 'error' => null];
+}
+
+/**
+ * Verifies a Stripe webhook request came from Stripe, per Stripe's
+ * documented signature scheme: the Stripe-Signature header carries a
+ * timestamp and one or more v1 signatures, each an HMAC-SHA256 of
+ * "{timestamp}.{raw request body}" keyed with the webhook signing secret.
+ * A tolerance window guards against replayed old requests.
+ */
+function verify_stripe_webhook_signature(string $payload, string $sigHeader, string $secret, int $toleranceSeconds = 300): bool
+{
+    $parts = [];
+    foreach (explode(',', $sigHeader) as $pair) {
+        $pair = explode('=', $pair, 2);
+        if (count($pair) === 2) {
+            $parts[trim($pair[0])][] = trim($pair[1]);
+        }
+    }
+
+    $timestamp = isset($parts['t'][0]) ? (int)$parts['t'][0] : 0;
+    $signatures = $parts['v1'] ?? [];
+
+    if ($timestamp === 0 || empty($signatures)) {
+        return false;
+    }
+
+    if (abs(time() - $timestamp) > $toleranceSeconds) {
+        return false;
+    }
+
+    $expected = hash_hmac('sha256', $timestamp . '.' . $payload, $secret);
+
+    foreach ($signatures as $signature) {
+        if (hash_equals($expected, $signature)) {
+            return true;
+        }
+    }
+
+    return false;
+}
