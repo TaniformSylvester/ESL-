@@ -16,6 +16,7 @@ require_once __DIR__ . '/includes/header.php';
             <ul>
                 <li>Account details you provide: name, email, school, country, and optional phone number.</li>
                 <li>Payment confirmation details from Stripe when you upgrade to Teacher Pro (amount, plan, and a payment reference). We do not process or store your card details — Stripe handles payment directly and securely.</li>
+                <li>If you pay by scanning our PromptPay QR code instead: the payment slip you upload (which usually shows your name, your bank and a partly hidden account number), the date you paid and any transaction reference you enter.</li>
                 <li>Basic usage information such as which resources you download, used to maintain your download history and improve the resource library.</li>
                 <li>Messages you send us through the contact form.</li>
             </ul>
@@ -27,7 +28,8 @@ require_once __DIR__ . '/includes/header.php';
             <p>Passwords are stored using industry-standard hashing and are never stored or visible in plain text, including to our own team.</p>
 
             <h2 class="h5 fw-bold mt-4">Payment Processing</h2>
-            <p>Teacher Pro payments are processed by <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Stripe</a>, a third-party payment processor. When you pay by card or PromptPay, your payment details are sent directly to Stripe &mdash; we never see or store your card number or bank details. Stripe shares back with us only what we need to activate your membership: your email, the plan and amount paid, and a payment reference.</p>
+            <p>Teacher Pro payments are processed by <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Stripe</a>, a third-party payment processor. When you pay through Stripe, your payment details are sent directly to Stripe &mdash; we never see or store your card number or bank details. Stripe shares back with us only what we need to activate your membership: your email, the plan and amount paid, and a payment reference.</p>
+            <p>You can also pay by scanning our PromptPay QR code, which sends the money from your bank straight to ours without going through Stripe. To confirm that payment you upload your payment slip. Slips are stored privately, can only be viewed by our admin team, and are used only to check and record your payment.</p>
 
             <h2 class="h5 fw-bold mt-4">Advertising &amp; Cookies</h2>
             <p><?= e(SITE_NAME) ?> shows ads served by Google AdSense to visitors and free-tier members (never to paying members with an active subscription). Google and its partners may use cookies or similar technologies to serve ads based on your prior visits to this or other websites. You can opt out of personalized advertising by visiting <a href="https://adssettings.google.com" target="_blank" rel="noopener">Google Ads Settings</a>, and you can learn more about how Google uses data at <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">policies.google.com/technologies/partner-sites</a>. Where required, a consent banner lets you choose whether to allow personalized advertising.</p>

@@ -735,7 +735,7 @@ INSERT INTO settings (setting_key, setting_value) VALUES
     ('bank_account_number', ''),
     ('promptpay_number', ''),
     ('qr_code_image', ''),
-    ('payment_instructions', 'Please transfer the membership fee to the bank account or PromptPay number shown above, then submit your payment details below for approval.'),
+    ('payment_instructions', ''),
     ('logo_path', ''),
     ('favicon_path', ''),
     ('social_facebook', ''),

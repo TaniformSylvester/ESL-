@@ -2,12 +2,14 @@
 require_once __DIR__ . '/includes/init.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/resource-functions.php';
+require_once __DIR__ . '/includes/promptpay-functions.php';
 
 $isLoggedIn = is_logged_in();
 $totalResources = get_published_resource_count();
 $typeCounts = get_resource_type_counts();
 $subjectCounts = get_resource_counts_by_subject();
 
+$scanToPayOn = scan_to_pay_config() !== null;
 $annualMonthlyEquivalent = PRICE_ANNUAL / 12;
 $annualSavings = (PRICE_MONTHLY * 12) - PRICE_ANNUAL;
 
@@ -135,11 +137,16 @@ require_once __DIR__ . '/includes/header.php';
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <h2 class="h4 fw-bold mb-3">How Membership Works</h2>
-            <p>Membership activates automatically as soon as your payment is confirmed. Here's how it works:</p>
+            <p>Here's how it works:</p>
             <ol>
                 <li class="mb-2">Free resources are unlimited for everyone &mdash; download them right away, no account required.</li>
                 <li class="mb-2">When you're ready to unlock members-only resources, go to your <strong>Subscription</strong> page and choose Monthly or Annual.</li>
-                <li class="mb-2">Pay securely by card or scan to pay with PromptPay &mdash; handled by Stripe. Your membership activates immediately once payment is confirmed, no waiting.</li>
+                <?php if (STRIPE_ENABLED): ?>
+                    <li class="mb-2">Pay securely by card &mdash; handled by Stripe. Your membership activates immediately once payment is confirmed, no waiting.</li>
+                <?php endif; ?>
+                <?php if ($scanToPayOn): ?>
+                    <li class="mb-2"><?= STRIPE_ENABLED ? 'Or scan to pay' : 'Scan to pay' ?> with PromptPay from any Thai banking app, then upload your slip. We'll check it and activate your membership, usually within a few hours.</li>
+                <?php endif; ?>
                 <li class="mb-2">Renew before your membership expires to keep access to members-only resources &mdash; if it lapses, your account simply reverts to the Free plan (still unlimited free downloads) rather than being locked out.</li>
             </ol>
         </div>

@@ -14,6 +14,12 @@ const PAYMENT_METHODS = [
     'manual_other'  => 'Other',
 ];
 
+/** The Teacher Pro price for a plan, in config.php's CURRENCY. */
+function plan_price(string $plan): float
+{
+    return (float)($plan === 'annual' ? PRICE_ANNUAL : PRICE_MONTHLY);
+}
+
 /** For displaying any payment row's method, including the gateway-only 'stripe' value PAYMENT_METHODS excludes. */
 function payment_method_label(string $method): string
 {
@@ -25,10 +31,16 @@ function payment_method_label(string $method): string
 }
 
 /**
- * Validates and stores a manual payment submission, and marks the
- * membership 'pending' (unless it's already active — an early renewal
- * payment must not interrupt current access while it awaits approval).
- * Returns ['success' => bool, 'errors' => array<string,string>]
+ * Validates and stores a manual payment submission (the "Scan to pay"
+ * PromptPay form on member/subscription.php), and marks the membership
+ * 'pending' (unless it's already active — an early renewal payment must
+ * not interrupt current access while it awaits approval).
+ *
+ * The amount is always the chosen plan's price, never a typed-in figure,
+ * so what the admin sees matches what the QR asked for. The payment slip
+ * is required (it's what the admin checks); the transaction reference is
+ * optional because most teachers will just upload the slip it's printed on.
+ * Returns ['success' => bool, 'errors' => array<string,string>, 'payment' => array|null]
  */
 function submit_payment(int $userId, array $input, array $file): array
 {
@@ -39,17 +51,13 @@ function submit_payment(int $userId, array $input, array $file): array
         $plan = 'monthly';
     }
 
-    $amount = (float)($input['amount'] ?? 0);
-    $method = (string)($input['method'] ?? 'bank_transfer');
+    $amount = plan_price($plan);
+    $method = (string)($input['method'] ?? 'promptpay');
     $paymentDate = trim((string)($input['payment_date'] ?? ''));
     $reference = clean_input($input['reference_number'] ?? '');
 
-    if ($amount <= 0 || $amount > 999999) {
-        $errors['amount'] = 'Please enter a valid amount.';
-    }
-
     if (!array_key_exists($method, PAYMENT_METHODS)) {
-        $method = 'bank_transfer';
+        $method = 'promptpay';
     }
 
     $paymentDateObj = DateTime::createFromFormat('Y-m-d', $paymentDate);
@@ -63,12 +71,14 @@ function submit_payment(int $userId, array $input, array $file): array
         $errors['payment_date'] = 'Payment date cannot be in the future.';
     }
 
-    if ($reference === '' || mb_strlen($reference) > 150) {
-        $errors['reference_number'] = 'Please enter the transaction/reference number.';
+    if (mb_strlen($reference) > 150) {
+        $errors['reference_number'] = 'That reference is too long — please check it.';
     }
 
     $screenshotFilename = null;
-    if (!empty($file['name'])) {
+    if (empty($file['name'])) {
+        $errors['screenshot'] = 'Please upload your payment slip (a screenshot or photo of it is fine).';
+    } else {
         $upload = handle_upload($file, UPLOAD_BASE_PATH . '/payment-proofs', ALLOWED_IMAGE_MIME_TYPES, MAX_IMAGE_SIZE_BYTES);
 
         if (!$upload['success']) {
@@ -79,20 +89,41 @@ function submit_payment(int $userId, array $input, array $file): array
     }
 
     if (!empty($errors)) {
-        return ['success' => false, 'errors' => $errors];
+        if ($screenshotFilename !== null) {
+            @unlink(UPLOAD_BASE_PATH . '/payment-proofs/' . $screenshotFilename);
+        }
+        return ['success' => false, 'errors' => $errors, 'payment' => null];
     }
 
     $db = getDB();
     $db->prepare(
         'INSERT INTO payments (user_id, amount, currency, method, plan, reference_number, payment_date, screenshot_path, status)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
-    )->execute([$userId, $amount, CURRENCY, $method, $plan, $reference, $paymentDate, $screenshotFilename, 'pending']);
+    )->execute([$userId, $amount, CURRENCY, $method, $plan, $reference !== '' ? $reference : null, $paymentDate, $screenshotFilename, 'pending']);
+    $paymentId = (int)$db->lastInsertId();
 
     // Don't downgrade a currently-active member who is paying ahead of expiry.
+    // (Registration always creates the membership row; the INSERT is only a
+    // safety net so a slip from an account without one still shows as pending.)
     $db->prepare("UPDATE memberships SET status = 'pending' WHERE user_id = ? AND status != 'active'")
         ->execute([$userId]);
+    $db->prepare("INSERT INTO memberships (user_id, status) SELECT ?, 'pending' FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM memberships WHERE user_id = ?)")
+        ->execute([$userId, $userId]);
 
-    return ['success' => true, 'errors' => []];
+    return [
+        'success' => true,
+        'errors'  => [],
+        'payment' => ['id' => $paymentId, 'amount' => $amount, 'plan' => $plan, 'method' => $method],
+    ];
+}
+
+/** The member's newest payment still awaiting review, if any — so the Scan to pay panel can say "we've got your slip" instead of inviting a duplicate. */
+function get_pending_payment(int $userId): ?array
+{
+    $stmt = getDB()->prepare("SELECT * FROM payments WHERE user_id = ? AND status = 'pending' ORDER BY created_at DESC LIMIT 1");
+    $stmt->execute([$userId]);
+
+    return $stmt->fetch() ?: null;
 }
 
 /**

@@ -1584,6 +1584,79 @@ a.subject-card:hover {
     color: var(--tl-muted);
 }
 
+/* ---------------------------------------------------------------- Scan to pay (member/subscription.php) */
+.scan-to-pay {
+    scroll-margin-top: 6rem;
+    border-top: 4px solid var(--tl-yellow) !important;
+}
+
+.scan-plan-toggle .btn[aria-pressed="true"] {
+    background-color: var(--tl-navy);
+    border-color: var(--tl-navy);
+    color: #fff;
+}
+
+.scan-qr-card {
+    max-width: 300px;
+    margin: 0 auto;
+    padding: 1rem 1rem 1.1rem;
+    background: #fff;
+    border: 2px solid var(--tl-border-cool);
+    border-radius: 1.1rem;
+    box-shadow: 0 14px 30px -22px rgba(23, 42, 110, 0.55);
+}
+
+.scan-qr-brand {
+    margin: -1rem -1rem 0.85rem;
+    padding: 0.45rem;
+    border-radius: 0.95rem 0.95rem 0 0;
+    background: #003D6A; /* PromptPay / Thai QR navy, so teachers recognise it */
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+
+.scan-qr {
+    display: block;
+    width: 100%;
+    max-width: 240px;
+    aspect-ratio: 1;
+    margin: 0 auto;
+}
+
+.scan-qr svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.scan-qr-image {
+    height: auto;
+    object-fit: contain;
+}
+
+.scan-qr-amount {
+    margin-top: 0.5rem;
+    font-family: var(--tl-font-display);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--tl-navy);
+}
+
+.scan-steps {
+    padding-left: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.scan-steps li {
+    margin-bottom: 0.5rem;
+}
+
+.scan-steps li::marker {
+    font-weight: 800;
+    color: var(--tl-orange-ink);
+}
+
 /* ---------------------------------------------------------------- Resource cards */
 .resource-card {
     height: 100%;
