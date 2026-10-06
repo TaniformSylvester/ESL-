@@ -7,6 +7,8 @@
  * confirmed Stripe charge behind it.
  */
 
+require_once __DIR__ . '/upload-functions.php'; // handle_upload(), used by this file's save functions
+
 function bundle_slug_exists(string $slug, ?int $excludeId = null): bool
 {
     if ($excludeId !== null) {

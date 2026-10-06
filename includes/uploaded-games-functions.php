@@ -23,6 +23,8 @@
  * separate image/sound files beside it won't find them.
  */
 
+require_once __DIR__ . '/upload-functions.php'; // handle_upload(), used by this file's save functions
+
 const UPLOADED_GAMES_DIR = UPLOAD_BASE_PATH . '/games';
 const UPLOADED_GAME_MAX_BYTES = 15 * 1024 * 1024;
 const UPLOADED_GAME_MAX_FILES = 50;

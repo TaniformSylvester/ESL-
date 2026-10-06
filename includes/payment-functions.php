@@ -6,6 +6,8 @@
  * approve/reject functions here don't care how a payment was created.
  */
 
+require_once __DIR__ . '/upload-functions.php'; // handle_upload(), used by this file's save functions
+
 // The manual-submission form's selectable options — deliberately excludes
 // 'stripe', which is only ever set by the webhook, never chosen by a user.
 const PAYMENT_METHODS = [

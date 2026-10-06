@@ -5,6 +5,8 @@
  * /admin/resources.php, resource-add.php, resource-edit.php).
  */
 
+require_once __DIR__ . '/upload-functions.php'; // handle_upload(), used by this file's save functions
+
 /** $subjectId filters to one subject's categories; omit/0 for all subjects (e.g. the admin category list). */
 function get_categories(int $subjectId = 0): array
 {

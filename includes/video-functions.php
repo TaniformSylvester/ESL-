@@ -6,6 +6,8 @@
  * includes/video-card.php / video.php / resource.php, never in the database.
  */
 
+require_once __DIR__ . '/upload-functions.php'; // handle_upload(), used by this file's save functions
+
 function video_slug_exists(string $slug, ?int $excludeId = null): bool
 {
     if ($excludeId !== null) {
