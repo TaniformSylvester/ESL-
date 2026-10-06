@@ -13,8 +13,8 @@ $scanToPayOn = scan_to_pay_config() !== null;
 $annualMonthlyEquivalent = PRICE_ANNUAL / 12;
 $annualSavings = (PRICE_MONTHLY * 12) - PRICE_ANNUAL;
 
-$pageTitle = 'Pricing';
-$pageDescription = 'TeachLuma pricing for teachers across Southeast Asia: free resources are unlimited for everyone, no account required, or go Teacher Pro for members-only resources at ' . format_currency(PRICE_MONTHLY) . '/month or ' . format_currency(PRICE_ANNUAL) . '/year.';
+$pageTitle = 'Pricing — Free & Teacher Pro Plans';
+$pageDescription = 'Free resources are unlimited for every teacher, no account needed. Teacher Pro unlocks members-only resources for ' . format_currency(PRICE_MONTHLY) . '/month or ' . format_currency(PRICE_ANNUAL) . '/year.';
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container py-5">

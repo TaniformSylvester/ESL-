@@ -23,6 +23,7 @@ $recentDownloads = get_recent_active_downloads($user['id'], 5);
 $hasContinueSection = !empty($recentFavorites) || !empty($recentDownloads);
 
 $pageTitle = 'Dashboard';
+$pageRobots = 'noindex, follow';
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container py-5">

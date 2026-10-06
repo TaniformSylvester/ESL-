@@ -4,8 +4,8 @@ require_once __DIR__ . '/includes/guide-functions.php';
 
 $guidesGrouped = get_all_guides_grouped();
 
-$pageTitle = 'Teacher Hub';
-$pageDescription = 'Practical teaching guidance for ESL, Math, Science and classroom practice — how to teach specific topics, classroom activities, and tips from ' . SITE_NAME . '.';
+$pageTitle = 'Teacher Hub — Teaching Tips & Classroom Guides';
+$pageDescription = 'Practical guides for teaching ESL, Math and Science: how to teach specific topics, classroom activities and classroom-management tips from ' . SITE_NAME . '.';
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container py-5">

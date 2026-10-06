@@ -71,7 +71,7 @@ header('Content-Type: ' . $contentType);
 header("Content-Security-Policy: sandbox allow-scripts allow-forms allow-modals allow-popups allow-pointer-lock allow-downloads; frame-ancestors 'self'");
 header('X-Content-Type-Options: nosniff');
 header('Referrer-Policy: no-referrer');
-header('X-Robots-Tag: noindex'); // the game.php landing page is the one to index
+header('X-Robots-Tag: noindex, indexifembedded'); // the game.php landing page is the one to index
 header('Cache-Control: ' . ($row['is_published'] ? 'public, max-age=300' : 'private, no-store'));
 header('Content-Length: ' . strlen($html));
 

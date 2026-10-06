@@ -2,6 +2,7 @@
 require_once __DIR__ . '/includes/init.php';
 
 $pageTitle = 'Something Went Wrong';
+$pageRobots = 'noindex, follow';
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container text-center py-5 my-5">

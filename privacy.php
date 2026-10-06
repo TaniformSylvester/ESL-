@@ -2,6 +2,7 @@
 require_once __DIR__ . '/includes/init.php';
 
 $pageTitle = 'Privacy Policy';
+$pageDescription = 'How ' . SITE_NAME . ' collects, uses and protects your information, including cookies, Google Analytics, advertising and payment details.';
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container py-5">

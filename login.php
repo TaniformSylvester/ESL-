@@ -33,7 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = 'Login';
-$pageDescription = 'Log in to your ' . SITE_NAME . ' account.';
+$pageDescription = 'Log in to your ' . SITE_NAME . ' account to download resources, save favorites and manage your membership.';
+$pageRobots = 'noindex, follow';
 
 // Analytics only — identifies two funnel moments without changing any
 // login/redirect behavior: arriving here because a download required

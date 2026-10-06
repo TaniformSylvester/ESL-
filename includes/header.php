@@ -12,7 +12,9 @@ $pageRobots = $pageRobots ?? 'index, follow';
 $gaCustomEvents = $gaCustomEvents ?? [];
 $isLoggedIn = isset($_SESSION['user_id']);
 $userRole = $_SESSION['user_role'] ?? null;
-$showAds = should_show_ads();
+// A page sets $hideAds = true when it's shown to a class on the projector
+// (games, classroom tools): children see that screen, so no ads there.
+$showAds = should_show_ads() && empty($hideAds);
 $canonicalUrl = rtrim(SITE_URL, '/') . strip_tracking_params($_SERVER['REQUEST_URI'] ?? '/');
 $organizationSchema = [
     '@context' => 'https://schema.org',

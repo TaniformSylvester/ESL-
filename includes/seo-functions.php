@@ -22,7 +22,8 @@
 function pluralize_resource_type(string $type): string
 {
     static $irregular = [
-        'Quiz' => 'Quizzes',
+        'Quiz'     => 'Quizzes',
+        'Homework' => 'Homework',
     ];
     if (isset($irregular[$type])) {
         return $irregular[$type];
@@ -253,11 +254,13 @@ function generate_resources_listing_seo(array $filters, ?array $subject, ?array 
     if ($category) {
         $labelParts[] = $category['name'];
     }
-    if (!empty($filters['resource_type'])) {
-        $labelParts[] = pluralize_resource_type($filters['resource_type']);
+    $typeLabel = !empty($filters['resource_type']) ? pluralize_resource_type($filters['resource_type']) : '';
+    if ($typeLabel !== '') {
+        $labelParts[] = $typeLabel;
     }
 
     $isSearch = trim((string)($filters['search'] ?? '')) !== '';
+    $isFree = ($filters['access'] ?? '') === 'free';
     $label = implode(' ', $labelParts);
 
     if ($isSearch) {
@@ -271,20 +274,37 @@ function generate_resources_listing_seo(array $filters, ?array $subject, ?array 
         ];
     }
 
+    if ($label === '' && $isFree) {
+        return [
+            'title'       => 'Free Teaching Resources — Worksheets & Lesson Plans',
+            'description' => 'Free ESL, Math and Science worksheets, lesson plans, PowerPoints and classroom activities. Unlimited downloads for every teacher, no account needed.',
+            'h1'          => 'Free Teaching Resources',
+            'intro'       => 'Every resource on this page is free to download, as many times as you like.',
+            'noindex'     => $resultCount === 0,
+        ];
+    }
+
     if ($label === '') {
         return [
-            'title'       => 'Resources',
+            'title'       => 'Teaching Resources: Worksheets & Lesson Plans',
             'description' => 'Browse the complete ' . SITE_NAME . ' resource library — English/ESL, Math and Science lesson plans, worksheets, PowerPoints, games and more.',
-            'h1'          => 'Resources',
+            'h1'          => 'Teaching Resources',
             'intro'       => null,
             'noindex'     => $resultCount === 0,
         ];
     }
 
-    $title = $label . ' Resources';
-    $intro = 'Browse ready-to-use ' . $label . ' resources for your classroom, including worksheets, lesson plans, PowerPoints and more.';
+    // "Grade 2 ESL Worksheets" reads naturally; only add "Resources" when
+    // no resource type is chosen ("Grade 2 ESL Resources"), never
+    // "Worksheets Resources".
+    $title = ($isFree ? 'Free ' : '') . ($typeLabel !== '' ? $label : $label . ' Resources');
+    if ($label === $typeLabel) {
+        // Type on its own ("Worksheets") is too vague to rank; say what it covers.
+        $title .= ' for ESL, Math & Science';
+    }
+    $intro = 'Browse ready-to-use ' . ($isFree ? 'free ' : '') . $label . ($typeLabel !== '' ? '' : ' resources') . ' for your classroom.';
     $description = seo_truncate_at_word(
-        'Download ' . $label . ' resources on ' . SITE_NAME . ' — ready-to-use lesson plans, worksheets, PowerPoints and classroom activities.',
+        'Download ' . ($isFree ? 'free ' : '') . $label . ($typeLabel !== '' ? '' : ' resources') . ' on ' . SITE_NAME . ' — ready-to-use, printable and made for real classrooms.',
         160
     );
 

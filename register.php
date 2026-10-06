@@ -42,7 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = 'Register';
-$pageDescription = 'Create your free ' . SITE_NAME . ' account.';
+$pageDescription = 'Create your free ' . SITE_NAME . ' account to download teaching resources, save favorites and track your downloads.';
+$pageRobots = 'noindex, follow';
 
 // Fires only on the initial GET landing, not on a form re-submission
 // after a validation error, so retrying doesn't re-count the same start.

@@ -64,8 +64,8 @@ $gradeRangeLabel = static function (array $subject): string {
 $typeCounts = array_slice(get_resource_counts_by_type(), 0, 8, true);
 $typeTones = ['gold', 'teal', 'esl', 'math', 'science', 'games', 'videos', 'gold'];
 
-$pageTitle = 'Ready-to-Use Teaching Resources for Schools Across Southeast Asia';
-$pageDescription = 'Find practical ESL, Mathematics and Science resources, classroom activities and interactive learning games designed for classrooms across Southeast Asia.';
+$pageTitle = 'Free ESL, Math & Science Teaching Resources';
+$pageDescription = 'Free ESL, Math and Science worksheets, lesson plans, PowerPoints and interactive classroom games for teachers across Southeast Asia. Download and teach today.';
 
 // Single source of truth for the FAQ accordion below — also drives the
 // FAQPage schema, so the structured data can never drift from what a

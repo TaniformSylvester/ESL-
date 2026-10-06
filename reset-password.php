@@ -34,6 +34,7 @@ if ($tokenUser && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = 'Reset Password';
+$pageRobots = 'noindex, follow';
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container py-5">

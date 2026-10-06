@@ -13,7 +13,6 @@ $staticPages = [
     ['loc' => base_url('teacher-tools.php'), 'priority' => '0.6'],
     ['loc' => base_url('bundles.php'), 'priority' => '0.6'],
     ['loc' => base_url('request-resource.php'), 'priority' => '0.5'],
-    ['loc' => base_url('videos.php'), 'priority' => '0.6'],
     ['loc' => base_url('games.php'), 'priority' => '0.8'],
     ['loc' => base_url('pricing.php'), 'priority' => '0.8'],
     ['loc' => base_url('about.php'), 'priority' => '0.5'],
@@ -55,6 +54,23 @@ $stmt = getDB()->query(
 );
 $categoryPages = $stmt->fetchAll();
 
+// Resource-type pages ("Worksheets", "Lesson Plans"...) and the free-resources
+// page are landing pages teachers search for, so list the ones with content.
+$typePages = getDB()->query(
+    "SELECT resource_type, MAX(updated_at) AS last_updated
+     FROM resources WHERE is_published = 1 AND status = 'active'
+     GROUP BY resource_type"
+)->fetchAll();
+$freeLastUpdated = getDB()->query(
+    "SELECT MAX(updated_at) FROM resources WHERE is_published = 1 AND status = 'active' AND is_free = 1"
+)->fetchColumn();
+
+// videos.php is noindexed while it has no videos (generate_videos_listing_seo()),
+// so only list it once it does — never point Google at a noindex page.
+if (!empty($videoPages)) {
+    $staticPages[] = ['loc' => base_url('videos.php'), 'priority' => '0.6'];
+}
+
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -62,6 +78,20 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     <url>
         <loc><?= e($page['loc']) ?></loc>
         <priority><?= e($page['priority']) ?></priority>
+    </url>
+<?php endforeach; ?>
+<?php if ($freeLastUpdated): ?>
+    <url>
+        <loc><?= e(base_url('resources.php?access=free')) ?></loc>
+        <lastmod><?= e(date('Y-m-d', strtotime($freeLastUpdated))) ?></lastmod>
+        <priority>0.8</priority>
+    </url>
+<?php endif; ?>
+<?php foreach ($typePages as $typePage): ?>
+    <url>
+        <loc><?= e(base_url('resources.php?resource_type=' . urlencode($typePage['resource_type']))) ?></loc>
+        <lastmod><?= e(date('Y-m-d', strtotime($typePage['last_updated']))) ?></lastmod>
+        <priority>0.7</priority>
     </url>
 <?php endforeach; ?>
 <?php foreach ($subjectPages as $subjectPage): ?>

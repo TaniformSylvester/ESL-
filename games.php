@@ -5,8 +5,8 @@ require_once __DIR__ . '/includes/games-functions.php';
 
 $games = get_all_games();
 
-$pageTitle = 'Interactive Classroom Math Games for Teachers';
-$pageDescription = 'Free interactive classroom games for teachers — play on a projector, interactive whiteboard, tablet or phone. No login, no setup, just open and play.';
+$pageTitle = 'Free Classroom Games for ESL, Math & Science';
+$pageDescription = 'Free interactive ESL, Math and Science games for the classroom. Play on a projector, interactive whiteboard, tablet or phone. No login, no setup.';
 
 $breadcrumbSchema = [
     '@context'        => 'https://schema.org',
@@ -16,9 +16,23 @@ $breadcrumbSchema = [
     ],
 ];
 
+// Lets Google understand the hub as a list of individual game pages.
+$gamesListSchema = [
+    '@context'        => 'https://schema.org',
+    '@type'           => 'ItemList',
+    'name'            => 'Interactive Classroom Games',
+    'itemListElement' => array_map(static fn(array $g, int $i): array => [
+        '@type'    => 'ListItem',
+        'position' => $i + 1,
+        'url'      => base_url('game.php?slug=' . rawurlencode($g['slug'])),
+        'name'     => $g['title'],
+    ], $games, array_keys($games)),
+];
+
 require_once __DIR__ . '/includes/header.php';
 ?>
 <script type="application/ld+json"><?= json_encode($breadcrumbSchema, JSON_UNESCAPED_SLASHES) ?></script>
+<script type="application/ld+json"><?= json_encode($gamesListSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?></script>
 
 <section class="hero py-5">
     <div class="container py-4 text-center">

@@ -36,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = 'Forgot Password';
+$pageRobots = 'noindex, follow';
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container py-5">

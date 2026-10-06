@@ -2,6 +2,7 @@
 require_once __DIR__ . '/includes/init.php';
 
 $pageTitle = 'Terms & Conditions';
+$pageDescription = 'The terms for using ' . SITE_NAME . ' teaching resources, classroom games and Teacher Pro membership, including downloads, payments and acceptable use.';
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container py-5">

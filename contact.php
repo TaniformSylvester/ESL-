@@ -51,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = 'Contact Us';
+$pageDescription = 'Get in touch with the ' . SITE_NAME . ' team about teaching resources, Teacher Pro membership, payments, resource requests or partnerships.';
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container py-5">

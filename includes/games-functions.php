@@ -355,6 +355,22 @@ function game_embed_url(array $game): string
     return asset_url('games/' . rawurlencode($game['slug']) . '/index.html');
 }
 
+/**
+ * The image used when a game page is shared (Facebook, LINE, X) and in its
+ * structured data. Social sites can't show SVG, so built-in games use the
+ * PNG rendering of their thumbnail (assets/images/games/<slug>-og.png).
+ */
+function game_share_image(array $game): string
+{
+    if (is_uploaded_game($game)) {
+        return !empty($game['thumbnail']) ? $game['thumbnail'] : asset_url('images/og-image.jpg');
+    }
+
+    $png = 'images/games/' . $game['slug'] . '-og.png';
+
+    return is_file(ROOT_PATH . '/assets/' . $png) ? asset_url($png) : asset_url('images/og-image.jpg');
+}
+
 /** Whether a game is an admin-uploaded HTML game (sandboxed, no built-in teams/tracking). */
 function is_uploaded_game(array $game): bool
 {

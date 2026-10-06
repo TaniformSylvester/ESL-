@@ -2,6 +2,7 @@
 require_once __DIR__ . '/includes/init.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/games-functions.php';
+require_once __DIR__ . '/includes/seo-functions.php';
 
 $slug = trim((string)($_GET['slug'] ?? ''));
 $game = $slug !== '' ? get_game_by_slug($slug) : null;
@@ -15,20 +16,48 @@ if (!$game) {
 $relatedGames = get_related_games($game, 3);
 
 $pageTitle = $game['title'] . ' | ' . $game['grade'] . ' ' . $game['subject'] . ' Game';
-$pageDescription = $game['title'] . ' — ' . $game['short_description'] . ' Free to play on any device, no login required.';
+$pageDescription = seo_truncate_at_word($game['title'] . ' — ' . $game['short_description'] . ' Free to play on any device, no login required.', 160);
+$pageImage = game_share_image($game);
+$gameUrl = base_url('game.php?slug=' . rawurlencode($game['slug']));
+
+// Games are played on the classroom screen in front of children, so no
+// ads here (AdSense's script isn't even loaded); the hub and resource pages
+// teachers browse still carry them.
+$hideAds = true;
+
+$gameSchema = [
+    '@context'               => 'https://schema.org',
+    '@type'                  => 'LearningResource',
+    'name'                   => $game['title'],
+    'description'            => $game['short_description'],
+    'url'                    => $gameUrl,
+    'image'                  => $pageImage,
+    'learningResourceType'   => 'Educational game',
+    'interactivityType'      => 'active',
+    'educationalLevel'       => $game['grade'],
+    'about'                  => array_values(array_unique(array_filter([$game['subject'], $game['topic']]))),
+    'isAccessibleForFree'    => true,
+    'inLanguage'             => 'en',
+    'audience'               => ['@type' => 'EducationalAudience', 'educationalRole' => 'teacher'],
+    'provider'               => ['@type' => 'Organization', 'name' => SITE_NAME, 'url' => base_url()],
+];
+if (!empty($game['what_students_practice'])) {
+    $gameSchema['teaches'] = $game['what_students_practice'];
+}
 
 $breadcrumbSchema = [
     '@context'        => 'https://schema.org',
     '@type'           => 'BreadcrumbList',
     'itemListElement' => [
         ['@type' => 'ListItem', 'position' => 1, 'name' => 'Games', 'item' => base_url('games.php')],
-        ['@type' => 'ListItem', 'position' => 2, 'name' => $game['title'], 'item' => base_url('game.php?slug=' . rawurlencode($game['slug']))],
+        ['@type' => 'ListItem', 'position' => 2, 'name' => $game['title'], 'item' => $gameUrl],
     ],
 ];
 
 require_once __DIR__ . '/includes/header.php';
 ?>
 <script type="application/ld+json"><?= json_encode($breadcrumbSchema, JSON_UNESCAPED_SLASHES) ?></script>
+<script type="application/ld+json"><?= json_encode($gameSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?></script>
 
 <div class="container py-5">
     <nav aria-label="breadcrumb" class="mb-4">
