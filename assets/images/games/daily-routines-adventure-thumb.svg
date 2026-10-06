@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" role="img" aria-label="Daily Routines Adventure">
+  <defs>
+    <linearGradient id="draBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="50%" stop-color="#fce7f3"/>
+      <stop offset="100%" stop-color="#dbeafe"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="225" fill="url(#draBg)"/>
+
+  <!-- soft background texture -->
+  <circle cx="365" cy="35" r="55" fill="#ffffff" opacity="0.35"/>
+  <circle cx="25" cy="195" r="60" fill="#ffffff" opacity="0.3"/>
+
+  <!-- three routine cards, fanned out -->
+  <g transform="translate(112,118) rotate(-10)">
+    <rect x="-46" y="-56" width="92" height="112" rx="14" fill="#ffffff"/>
+    <text x="0" y="-6" font-size="34" text-anchor="middle">🌅</text>
+    <rect x="-32" y="14" width="64" height="9" rx="4.5" fill="#e2e8f0"/>
+  </g>
+  <g transform="translate(200,128) rotate(-1)">
+    <rect x="-48" y="-58" width="96" height="116" rx="14" fill="#ffffff"/>
+    <text x="0" y="-8" font-size="36" text-anchor="middle">🪥</text>
+    <rect x="-34" y="14" width="68" height="9" rx="4.5" fill="#e2e8f0"/>
+  </g>
+  <g transform="translate(288,118) rotate(9)">
+    <rect x="-46" y="-56" width="92" height="112" rx="14" fill="#ffffff"/>
+    <text x="0" y="-6" font-size="34" text-anchor="middle">🏫</text>
+    <rect x="-32" y="14" width="64" height="9" rx="4.5" fill="#e2e8f0"/>
+  </g>
+
+  <!-- ordering arrows between cards -->
+  <g fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round">
+    <path d="M 148 108 L 168 108" marker-end="url(#arrow)"/>
+    <path d="M 236 112 L 256 112" marker-end="url(#arrow)"/>
+  </g>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <!-- check badge -->
+  <g transform="translate(268,72)">
+    <circle r="19" fill="#16a34a"/>
+    <path d="M -8 0 L -2 7 L 9 -7" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- sparkle accent -->
+  <polygon points="55,60 58,68 66,71 58,74 55,82 52,74 44,71 52,68" fill="#f59e0b"/>
+</svg>

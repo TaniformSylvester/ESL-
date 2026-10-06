@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" role="img" aria-label="Place Value and Digit Value">
+  <defs>
+    <linearGradient id="pvBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#5b21b6"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="225" fill="url(#pvBg)"/>
+
+  <!-- soft background texture -->
+  <circle cx="360" cy="35" r="65" fill="#ffffff" opacity="0.06"/>
+  <circle cx="25" cy="195" r="50" fill="#ffffff" opacity="0.06"/>
+
+  <!-- Tens tile -->
+  <g transform="translate(140,112)">
+    <rect x="-58" y="-52" width="116" height="104" rx="16" fill="#ffffff"/>
+    <text x="0" y="14" font-family="Arial, sans-serif" font-size="52" font-weight="800" fill="#5b21b6" text-anchor="middle">5</text>
+    <text x="0" y="40" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="1" fill="#7c3aed" text-anchor="middle">TENS</text>
+  </g>
+
+  <!-- Ones tile (highlighted) -->
+  <g transform="translate(262,112)">
+    <rect x="-58" y="-52" width="116" height="104" rx="16" fill="#fffbeb" stroke="#f59e0b" stroke-width="5"/>
+    <text x="0" y="14" font-family="Arial, sans-serif" font-size="52" font-weight="800" fill="#b45309" text-anchor="middle">7</text>
+    <text x="0" y="40" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="1" fill="#b45309" text-anchor="middle">ONES</text>
+  </g>
+
+  <!-- value callout -->
+  <g transform="translate(200,34)">
+    <rect x="-48" y="-16" width="96" height="32" rx="16" fill="#f59e0b"/>
+    <text x="0" y="6" font-family="Arial, sans-serif" font-size="16" font-weight="800" fill="#1f2937" text-anchor="middle">7 = 7</text>
+  </g>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" role="img" aria-label="Decimal Detective">
+  <defs><linearGradient id="ddBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#5b21b6"/></linearGradient></defs>
+  <rect width="400" height="225" fill="url(#ddBg)"/>
+  <circle cx="360" cy="30" r="62" fill="#fff" opacity=".06"/><circle cx="30" cy="200" r="55" fill="#fff" opacity=".06"/>
+  <g font-family="Arial, sans-serif" font-weight="800" text-anchor="middle">
+    <text x="92" y="58" font-size="13" fill="#fff" opacity=".8" letter-spacing="1">ONES</text>
+    <text x="178" y="58" font-size="13" fill="#fff" opacity=".8" letter-spacing="1">TENTHS</text>
+    <text x="262" y="58" font-size="13" fill="#FBB829" letter-spacing="1">HUNDREDTHS</text>
+    <rect x="58" y="70" width="68" height="84" rx="14" fill="#fff"/><text x="92" y="130" font-size="50" fill="#5b21b6">3</text>
+    <circle cx="136" cy="140" r="7" fill="#fff"/>
+    <rect x="144" y="70" width="68" height="84" rx="14" fill="#fff"/><text x="178" y="130" font-size="50" fill="#5b21b6">4</text>
+    <rect x="228" y="66" width="68" height="92" rx="14" fill="#fffbeb" stroke="#FBB829" stroke-width="5"/><text x="262" y="132" font-size="52" fill="#b45309">7</text>
+  </g>
+  <g transform="translate(334 150)"><circle r="26" fill="none" stroke="#fff" stroke-width="7"/><path d="M18 18l20 20" stroke="#fff" stroke-width="9" stroke-linecap="round"/><circle r="17" fill="#fff" opacity=".2"/></g>
+  <path d="M60 188l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#FBB829"/>
+</svg>

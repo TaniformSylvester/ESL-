@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="av-t">
+<title id="av-t">TeachLuma teacher</title>
+<defs><clipPath id="av-c"><circle cx="100" cy="100" r="96"/></clipPath></defs>
+<circle cx="100" cy="100" r="96" fill="#FFE7B0"/>
+<g clip-path="url(#av-c)">
+  <g transform="translate(100 96) scale(.95)">
+    <path d="M-17 40H17V84H-17Z" fill="#5A331F"/>
+    <path d="M-44 86L-16 78H16L44 86C74 94 96 106 108 126L124 170L92 184L88 172V330H-88V172L-92 184L-124 170L-108 126C-96 106-74 94-44 86Z" fill="#1F2329"/>
+    <path d="M-108 126C-96 106-74 94-50 88C-66 104-76 124-80 150L-88 172L-92 184L-124 170Z" fill="#15181D" opacity=".75"/>
+    <path d="M92 184L124 170M-92 184L-124 170" stroke="#2B3038" stroke-width="5" stroke-linecap="round"/>
+    <path d="M-20 76L-36 100L-5 104L0 90Z" fill="#2B3038"/>
+    <path d="M20 76L36 100L5 104L0 90Z" fill="#2B3038"/>
+    <path d="M-20 77Q0 92 20 77" fill="none" stroke="#A6E22E" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M0 92V172" stroke="#A6E22E" stroke-width="4" stroke-linecap="round"/>
+    <path d="M0 96V168" stroke="#15181D" stroke-width="1.2" stroke-dasharray="2 2.5"/>
+    <rect x="-3.5" y="98" width="7" height="13" rx="2" fill="#A6E22E"/>
+</g>
+  <g transform="translate(100 104) scale(.95) rotate(-4)">
+    <ellipse cx="-46" cy="2" rx="9" ry="13" fill="#5A331F"/>
+    <ellipse cx="46" cy="2" rx="9" ry="13" fill="#5A331F"/>
+    <ellipse cx="-47" cy="2" rx="4" ry="7" fill="#4A2917"/>
+    <ellipse cx="47" cy="2" rx="4" ry="7" fill="#4A2917"/>
+    <path d="M-46-10C-46-52-26-66 0-66C26-66 46-52 46-10C46 22 34 50 0 56C-34 50-46 22-46-10Z" fill="#6E4128"/>
+    <path d="M-47-6C-49-44-33-70 0-70C33-70 49-44 47-6C45-16 44-24 42-29L40-36C30-43 16-45 0-45C-16-45-30-43-40-36L-42-29C-44-24-45-16-47-6Z" fill="#1E1611"/>
+    <path d="M-46-8C-44 16-36 44-12 54C-6 56.5 6 56.5 12 54C36 44 44 16 46-8C42 4 36 12 26 14C18 15.5 10 12 0 12C-10 12-18 15.5-26 14C-36 12-42 4-46-8Z" fill="#1E1611"/>
+    <path d="M-17 15C-11 10-4 11 0 13.5C4 11 11 10 17 15C12 19 4 18 0 17C-4 18-12 19-17 15Z" fill="#1E1611"/>
+    <path d="M-13.5 21.5Q0 35 13.5 21.5Q0 25-13.5 21.5Z" fill="#fff" stroke="#3B1D12" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M-6.5 5C-8-1-4-7 0-7C4-7 8-1 6.5 5C4.5 8.5-4.5 8.5-6.5 5Z" fill="#5A331F"/>
+    <path d="M-29-23C-23-29-14-29-8-25.5M29-23C23-29 14-29 8-25.5" fill="none" stroke="#1E1611" stroke-width="5.5" stroke-linecap="round"/>
+    <ellipse cx="-17.5" cy="-10" rx="4.6" ry="5.4" fill="#1E1611"/>
+    <ellipse cx="17.5" cy="-10" rx="4.6" ry="5.4" fill="#1E1611"/>
+    <circle cx="-16" cy="-12" r="1.5" fill="#fff"/>
+    <circle cx="19" cy="-12" r="1.5" fill="#fff"/>
+    <path d="M-24-60C-12-65 4-65 16-61" fill="none" stroke="#3E2E24" stroke-width="2.5" stroke-linecap="round" opacity=".7"/>
+</g>
+</g>
+<circle cx="100" cy="100" r="96" fill="none" stroke="#FBB829" stroke-width="6"/>
+</svg>
