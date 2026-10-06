@@ -249,6 +249,7 @@ foreach ($subjects as $subjectRow) {
                         <label class="form-label" for="resource_file">Resource File <?= $isEdit ? '<span class="text-secondary">(leave blank to keep the current file)</span>' : '' ?></label>
                         <input type="file" class="form-control <?= isset($errors['resource_file']) ? 'is-invalid' : '' ?>"
                                id="resource_file" name="resource_file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip" <?= $isEdit ? '' : 'required' ?>>
+                        <div class="form-text">PDF, Word, PowerPoint, Excel or ZIP. Playable <strong>HTML games</strong> go in <a href="<?= e(base_url('admin/games.php')) ?>">Admin &rarr; Games</a> instead, where they run safely in the browser.</div>
                         <?php if ($isEdit && !empty($resource['file_name'])): ?>
                             <div class="form-text">Current file: <?= e($resource['file_name']) ?> (<?= e(format_file_size((int)$resource['file_size'])) ?>)</div>
                         <?php endif; ?>

@@ -62,6 +62,43 @@ require_once __DIR__ . '/includes/header.php';
 
     <div id="play" class="game-play-section mb-5">
         <h2 class="visually-hidden">Play <?= e($game['title']) ?></h2>
+        <?php if (is_uploaded_game($game)): ?>
+            <?php // Uploaded games run sandboxed (no access to the site, cookies or this page) — see play-game.php. ?>
+            <iframe src="<?= e(game_embed_url($game)) ?>" title="<?= e($game['title']) ?>" class="game-embed-frame" id="game-frame"
+                    sandbox="allow-scripts allow-forms allow-modals allow-popups allow-pointer-lock allow-downloads"
+                    allow="fullscreen; autoplay" allowfullscreen></iframe>
+            <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
+                <button type="button" class="btn btn-sm btn-outline-primary" id="game-fullscreen" hidden>
+                    <i class="fa-solid fa-expand me-1" aria-hidden="true"></i>Fullscreen
+                </button>
+                <p class="small text-secondary mb-0">Tip: press <strong>Fullscreen</strong> to fill the screen for the whole class, or open the game on its own with <strong>Full Page</strong>.</p>
+            </div>
+            <script>
+                (function () {
+                    var frame = document.getElementById('game-frame');
+                    var button = document.getElementById('game-fullscreen');
+                    if (frame && button && (frame.requestFullscreen || frame.webkitRequestFullscreen)) {
+                        button.hidden = false;
+                        button.addEventListener('click', function () {
+                            (frame.requestFullscreen || frame.webkitRequestFullscreen).call(frame);
+                        });
+                    }
+                    // Count a play the first time someone clicks into the game
+                    // (focus moving into the iframe blurs this window).
+                    var counted = false;
+                    window.addEventListener('blur', function () {
+                        if (counted || document.activeElement !== frame) { return; }
+                        counted = true;
+                        fetch(<?= json_encode(base_url('api/game-track.php')) ?>, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ slug: <?= json_encode($game['slug']) ?>, event: 'started' }),
+                            keepalive: true
+                        }).catch(function () {});
+                    });
+                })();
+            </script>
+        <?php else: ?>
         <iframe src="<?= e(game_embed_url($game)) ?>" title="<?= e($game['title']) ?>" class="game-embed-frame" allow="fullscreen; autoplay" allowfullscreen></iframe>
         <p class="small text-secondary mt-2 mb-0">
             Tip: tap <strong>Full Page</strong> to open the game on its own, or use the <i class="fa-solid fa-expand"></i> button inside the game for classroom fullscreen.
@@ -69,6 +106,7 @@ require_once __DIR__ . '/includes/header.php';
                 Choose <strong>👥 2 Teams</strong> on the start screen to play team vs. team.
             <?php endif; ?>
         </p>
+        <?php endif; ?>
     </div>
 
     <div class="row g-4 mb-5">

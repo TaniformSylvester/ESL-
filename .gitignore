@@ -8,6 +8,7 @@
 /uploads/previews/*
 /uploads/payment-proofs/*
 /uploads/bundles/*
+/uploads/games/*
 !/uploads/protected/.gitkeep
 !/uploads/protected/.htaccess
 !/uploads/thumbnails/.gitkeep
@@ -18,6 +19,8 @@
 !/uploads/payment-proofs/.htaccess
 !/uploads/bundles/.gitkeep
 !/uploads/bundles/.htaccess
+!/uploads/games/.gitkeep
+!/uploads/games/.htaccess
 
 # OS / editor cruft
 .DS_Store

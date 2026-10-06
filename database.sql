@@ -643,6 +643,38 @@ CREATE TABLE IF NOT EXISTS game_plays (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------------------------
+-- uploaded_games — HTML games uploaded from Admin > Games, listed on the
+-- Games hub alongside the hand-built games in includes/games-functions.php
+-- (which still own any slug they use; an upload can't take one). The HTML
+-- lives in uploads/games/<file_name> (no direct web access) and is served
+-- only through play-game.php inside a browser sandbox. what_students_practice
+-- and how_to_use hold one item per line.
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS uploaded_games (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    slug VARCHAR(100) NOT NULL,
+    title VARCHAR(150) NOT NULL,
+    subject VARCHAR(50) NOT NULL DEFAULT 'ESL',
+    grade VARCHAR(50) NOT NULL DEFAULT '',
+    topic VARCHAR(150) NOT NULL DEFAULT '',
+    difficulty ENUM('Easy', 'Medium', 'Advanced') NOT NULL DEFAULT 'Easy',
+    short_description VARCHAR(255) NOT NULL DEFAULT '',
+    what_students_practice TEXT NULL,
+    how_to_use TEXT NULL,
+    file_name VARCHAR(100) NOT NULL,
+    original_filename VARCHAR(255) NOT NULL DEFAULT '',
+    file_size INT UNSIGNED NOT NULL DEFAULT 0,
+    thumbnail VARCHAR(100) NULL,
+    is_published TINYINT(1) NOT NULL DEFAULT 0,
+    is_featured TINYINT(1) NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_uploaded_games_slug (slug),
+    KEY idx_uploaded_games_published (is_published)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
 -- admin_logs
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS admin_logs (

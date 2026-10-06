@@ -21,10 +21,21 @@
  *   thumbnail         ?string  URL to a thumbnail image, or null to use the default icon tile
  *   featured          bool     whether this game is eligible for homepage/hub "Featured" placement
  *   team_play         bool     optional, default true — whether the game offers "2 Teams" play
+ *
+ * HTML games uploaded from Admin > Games (includes/uploaded-games-functions.php)
+ * are merged in by get_all_games() in the same shape, with 'source' => 'upload'.
  */
 
-/** Every configured game, in display order. */
+require_once __DIR__ . '/uploaded-games-functions.php';
+
+/** Every game on the hub: the built-in games, then published uploads (newest first). */
 function get_all_games(): array
+{
+    return array_merge(get_builtin_games(), get_published_uploaded_games());
+}
+
+/** The hand-built games bundled with the site, in display order. */
+function get_builtin_games(): array
 {
     return [
         [
@@ -330,10 +341,24 @@ function game_subject_key(string $subject): string
     return subject_key($subject);
 }
 
-/** The embeddable game bundle's URL — every game lives at assets/games/<slug>/index.html. */
+/**
+ * The embeddable game's URL. Built-in games live at
+ * assets/games/<slug>/index.html; uploaded games are served sandboxed by
+ * play-game.php (see includes/uploaded-games-functions.php).
+ */
 function game_embed_url(array $game): string
 {
+    if (($game['source'] ?? '') === 'upload') {
+        return base_url('play-game.php?slug=' . rawurlencode($game['slug']));
+    }
+
     return asset_url('games/' . rawurlencode($game['slug']) . '/index.html');
+}
+
+/** Whether a game is an admin-uploaded HTML game (sandboxed, no built-in teams/tracking). */
+function is_uploaded_game(array $game): bool
+{
+    return ($game['source'] ?? '') === 'upload';
 }
 
 // -----------------------------------------------------------------------
