@@ -143,6 +143,19 @@ def cmd_new_spec(a):
     out = SPEC_DIR / f"{a.key}.json"
     if out.exists() and not a.force:
         raise SystemExit(f"{out} exists (use --force to overwrite).")
+    if e.get("regenerates_item_id"):
+        # Start a regeneration from the rejected version, with the admin's note
+        # attached, so only what the note asks for needs to change.
+        prev = next((r for r in _client().work_queue()["regenerate"] if r["id"] == e["regenerates_item_id"]), None)
+        if prev and prev.get("spec"):
+            spec = {k: v for k, v in prev["spec"].items() if not k.startswith("_")}
+            spec["key"] = e["key"]
+            spec["meta"]["regenerates_item_id"] = e["regenerates_item_id"]
+            spec["_admin_feedback"] = e.get("review_note") or ""
+            _write(out, spec)
+            print(f"Wrote {out} from the rejected version.\nAdmin feedback: {spec['_admin_feedback'] or '(none)'}\n"
+                  f"Fix what the feedback asks for (it may concern the generator itself), then: python -m tlgen build {out}")
+            return
     pro = e["tier"] == "pro"
     todo = "TODO"
     skeleton = {

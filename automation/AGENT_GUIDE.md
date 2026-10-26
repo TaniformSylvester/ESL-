@@ -34,7 +34,12 @@ Run all commands from `automation/` with `.venv/bin/python -m tlgen …`
 3. `run-start --trigger scheduled|manual` (for a run the admin marked for
    retry: `run-start --trigger retry --retry-of <id>`).
 4. For each planned key:
-   1. `new-spec <key>` creates `specs/work/<key>.json`.
+   1. `new-spec <key>` creates `specs/work/<key>.json`. For an admin
+      regeneration request, it starts from the rejected version and adds the
+      admin's note as `_admin_feedback`: change what the note asks for. To get
+      new math questions, delete that section's `items` (keep its `generator`)
+      and change its `seed` or ranges. If the note is about the generator
+      itself (layout, thumbnails), say so in the `run-finish` message.
    2. Fill every `TODO` (see *Writing the spec* below). Use the examples in
       `specs/examples/` as the quality bar.
    3. `build specs/work/<key>.json` renders, runs QC and applies automatic

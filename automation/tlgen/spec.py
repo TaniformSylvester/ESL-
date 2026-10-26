@@ -251,5 +251,5 @@ def all_text(spec):
             for x in v:
                 walk(x, key)
 
-    walk({k: v for k, v in spec.items()})
+    walk({k: v for k, v in spec.items() if not k.startswith("_")})   # skip _path, _admin_feedback
     return out
