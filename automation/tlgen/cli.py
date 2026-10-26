@@ -73,7 +73,16 @@ def cmd_check(a):
         ok &= bool(shutil.which(tool))
     print(("✓ " if config.EMOJI_FONT else "✗ ") + f"Noto Color Emoji: {config.EMOJI_FONT or 'missing (apt-get install fonts-noto-color-emoji)'}")
     ok &= bool(config.EMOJI_FONT)
-    print(("✓ " if config.API_TOKEN else "✗ ") + f"TEACHLUMA_API_TOKEN {'set' if config.API_TOKEN else 'not set'} · API {config.API_BASE}")
+    print(f"• token: {'TEACHLUMA_API_TOKEN environment variable' if config.API_TOKEN else 'network secret (added by the proxy, not visible here)'}")
+    try:
+        st = _client().status()
+        print(f"✓ API {config.API_BASE}: connected · emergency_stop={st['settings']['emergency_stop']}")
+    except api.ApiError as exc:
+        ok = False
+        hint = {0: "site not reachable: allow the domain under Network access",
+                401: "token missing or wrong: check the secret's headers and allowed website",
+                503: "migration not run on the site yet"}.get(exc.status, "")
+        print(f"✗ API {config.API_BASE}: {exc}" + (f" ({hint})" if hint else ""))
     sys.exit(0 if ok else 1)
 
 

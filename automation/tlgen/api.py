@@ -22,12 +22,14 @@ class Client:
     def __init__(self, base=None, token=None):
         self.base = (base or config.API_BASE).rstrip("/")
         self.token = token or config.API_TOKEN
-        if not self.token:
-            raise RuntimeError("TEACHLUMA_API_TOKEN is not set (add it as an environment secret).")
         self.session = requests.Session()
-        # Both headers: some hosts strip Authorization before PHP sees it.
-        self.session.headers.update({"Authorization": f"Bearer {self.token}", "X-TeachLuma-Token": self.token,
-                                     "User-Agent": "TeachLuma-Generator/1.0"})
+        self.session.headers["User-Agent"] = "TeachLuma-Generator/1.0"
+        if self.token:
+            # Both headers: some hosts strip Authorization before PHP sees it.
+            self.session.headers.update({"Authorization": f"Bearer {self.token}", "X-TeachLuma-Token": self.token})
+        # Without TEACHLUMA_API_TOKEN, the token is expected to be a network
+        # secret: the session's egress proxy adds the headers, so the token
+        # never exists inside the session. The site answers 401 if it doesn't.
 
     def _call(self, method, action, *, json_body=None, data=None, files=None, retries=3):
         url = f"{self.base}/api/automation.php?action={action}"

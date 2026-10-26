@@ -42,8 +42,15 @@ the real pages.
    session title bar, then Edit.
    - **Network access:** add `teachluma.com` under *Allowed domains*, and
      keep *Allow package managers* ticked.
-   - **Secret:** add the token under *Network secrets* (or as an environment
-     variable) named `TEACHLUMA_API_TOKEN`.
+   - **Secret:** under *Network secrets*, add the token:
+     - Allowed websites: `teachluma.com`;
+     - Path prefix: `/api/automation.php`;
+     - header `Authorization` with prefix `Bearer`;
+     - a second header `X-TeachLuma-Token` with no prefix and the same token
+       (some hosts strip `Authorization`).
+
+     The token then never exists inside the session. Alternatively, set an
+     environment variable `TEACHLUMA_API_TOKEN`.
    - Never paste the token into a chat, a file or GitHub.
 5. In a new session: `bash automation/bootstrap.sh`. It installs the tools
    and checks everything.
