@@ -105,8 +105,12 @@ class Deck:
         qs = []
         for part in ("quiz", "worksheet"):
             for sec in (self.spec.get(part) or {}).get("sections", []):
-                if sec["type"] in ("multiple_choice", "true_false", "math", "fill_blank"):
-                    qs += [(sec["type"], it) for it in sec["items"][:3]]
+                # Listening items need the teacher's voice, and picture options
+                # don't work as slide text, so those stay on paper.
+                if sec["type"] in ("multiple_choice", "true_false", "math", "fill_blank") and not sec.get("teacher_script"):
+                    qs += [(sec["type"], it) for it in sec["items"][:3]
+                           if not (sec["type"] == "multiple_choice" and any(illustrations.is_emoji(str(o)) for o in it["options"]))
+                           and not (it.get("render") or {}).get("objects")]
             if len(qs) >= 4:
                 break
         for n, (t, it) in enumerate(qs[:5], 1):

@@ -49,10 +49,10 @@ def qc_context(online=True):
     if online:
         try:
             c = _client()
-            st, tax = c.status(), c.taxonomy()
-            _write(CACHE_DIR / "taxonomy.json", tax)
-            _write(CACHE_DIR / "status.json", st)
-            return {"taxonomy": tax, "settings": st["settings"], "client": c, "catalog": None}
+            st, tax, cat = c.status(), c.taxonomy(), c.catalog()
+            for name, data in (("taxonomy", tax), ("status", st), ("catalog", cat)):
+                _write(CACHE_DIR / f"{name}.json", data)
+            return {"taxonomy": tax, "settings": st["settings"], "client": c, "catalog": cat}
         except Exception as exc:
             print(f"! site not reachable ({exc}); using cached catalog from the last `plan`.")
     return {"taxonomy": _read(CACHE_DIR / "taxonomy.json"), "settings": (_read(CACHE_DIR / "status.json") or {}).get("settings"),

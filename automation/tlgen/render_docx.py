@@ -152,7 +152,14 @@ class Doc:
                     self.picture(p.add_run(), illustrations.emoji_png(it["q"], 160), 1.2)
                 else:
                     p.add_run(str(it["q"]))
-                self.d.add_paragraph("      " + "        ".join(f"○ {S.LETTERS[k]}) {o}" for k, o in enumerate(it["options"])))
+                p = self.d.add_paragraph("      ")
+                for k, o in enumerate(it["options"]):
+                    p.add_run(f"○ {S.LETTERS[k]}) ")
+                    if illustrations.is_emoji(str(o)):
+                        self.picture(p.add_run(), illustrations.emoji_png(str(o), 160), 1.0 * max(1, len(str(o)) if not str(o).startswith("pic:") else 1))
+                    else:
+                        p.add_run(str(o))
+                    p.add_run("        ")
         elif t == "true_false":
             for i, it in enumerate(items):
                 self.d.add_paragraph(f"{i + 1}. {it['statement']}      ○ True   ○ False")
@@ -198,6 +205,10 @@ class Doc:
                         self.picture(cells[j].add_paragraph().add_run(), illustrations.clock_png(r["clock"][0], r["clock"][1], 300, r.get("hands", True)), 3.4)
                     elif "fraction" in r:
                         self.picture(cells[j].add_paragraph().add_run(), illustrations.fraction_png(*r["fraction"], size=300), 3.2)
+                    elif "objects" in r:
+                        run = cells[j].add_paragraph().add_run()
+                        for _ in range(r["objects"][1]):
+                            self.picture(run, illustrations.emoji_png(r["objects"][0], 120), 0.75)
                     elif "base10" in r:
                         png = illustrations.base10_png(*r["base10"])
                         from PIL import Image
@@ -225,7 +236,7 @@ class Doc:
         if self.spec.get("vocabulary"):
             self.d.add_heading("Key vocabulary", level=2)
             self.table([[v.get("emoji", ""), v["word"], v["definition"], v.get("example", "")] for v in self.spec["vocabulary"]],
-                       header=["", "Word", "Meaning", "Example"], widths=[1.6, 3.2, 6, 6.2])
+                       header=["", "Word", "Meaning", "Example"], widths=[1.6, 3.9, 5.8, 5.7])
         self.d.add_heading("Lesson procedure", level=2)
         self.table([[st["name"], f"{st['minutes']} min", "\n".join("• " + x for x in S.as_lines(st["steps"]))] for st in lp["stages"]],
                    header=["Stage", "Time", "What to do"], widths=[3.2, 2, 11.8])
@@ -249,6 +260,11 @@ class Doc:
             self.d.add_heading(S.PART_TITLES[part], level=2)
             for i, sec in enumerate(self.spec[part]["sections"]):
                 self.para(f"{i + 1}. {sec.get('title') or sec['type'].replace('_', ' ').capitalize()}", bold=True, color=self.color["ink"])
+                script = S.as_lines(sec.get("teacher_script"))
+                if script:
+                    self.para("Teacher reads aloud:", bold=True)
+                    for line in script:
+                        self.d.add_paragraph(line, style="List Bullet")
                 for a, b in S.section_answers(sec, S.seed_for(self.spec, part, i)):
                     self.d.add_paragraph(f"{a}   {b}")
 

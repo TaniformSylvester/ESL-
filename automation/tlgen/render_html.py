@@ -7,6 +7,7 @@ over its page budget.
 """
 import re
 from html import escape
+from pathlib import Path
 
 from . import config, illustrations, spec as S
 
@@ -37,6 +38,13 @@ html,body{{margin:0;padding:0}}
 body{{font-family:Nunito,Arial,sans-serif;font-size:{base}pt;color:var(--text);line-height:1.38;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 h1,h2,h3{{font-family:Fredoka,Nunito,sans-serif;color:var(--navy);margin:0}}
 .emoji{{font-family:'Noto Color Emoji';line-height:1}}
+.emoji img.pic{{height:1.15em;width:auto;vertical-align:-0.2em}}
+.emoji img.pic{{max-width:2.4em;object-fit:contain}}
+.card .emoji img.pic,.fc .emoji img.pic{{height:1.5em}}
+.cover .art img.pic{{height:1em;margin:0 2mm}}
+.opt .emoji{{font-size:22pt;vertical-align:middle}}
+.key .script{{background:#FFF6DD;border-left:4px solid var(--gold);padding:2mm 3mm;margin:0 0 2mm;border-radius:2mm}}
+.key .script b{{display:block;color:var(--ink);margin-bottom:.5mm}}
 .emoji.big{{font-size:1.9em;vertical-align:-0.25em;margin-right:1.5mm}}
 .page{{break-before:page}}
 .page:first-child{{break-before:auto}}
@@ -106,6 +114,8 @@ ol.items>li{{margin:0 0 calc(3.2mm*var(--gap));break-inside:avoid}}
 .mathgrid.cols3{{grid-template-columns:1fr 1fr 1fr}}
 .mq{{display:flex;gap:2.5mm;align-items:flex-start;break-inside:avoid;font-size:1.06em;font-weight:700}}
 .mq .n{{color:var(--main);font-weight:800;min-width:6mm}}
+.objs{{display:grid;grid-template-columns:repeat(5,9mm);gap:1.5mm 1mm;margin-top:2mm}}
+.objs .emoji{{font-size:17pt;text-align:center}}
 .cmp{{display:inline-block;width:9mm;height:9mm;border:2px solid var(--navy);border-radius:50%;vertical-align:middle;margin:0 2.5mm}}
 u.dig{{text-decoration:underline 2px var(--main);text-underline-offset:3px;color:var(--ink)}}
 .mq svg{{display:block;margin-top:1.5mm}}
@@ -132,6 +142,9 @@ def e(s):
 
 def _emoji(s, size=None):
     style = f' style="font-size:{size}"' if size else ""
+    if illustrations.is_picture(s):     # built-in drawing, sized like an emoji glyph
+        src = Path(illustrations.picture_png(s[4:], 400, square=False)).as_uri()
+        return f'<span class="emoji"{style}><img class="pic" src="{src}" alt="{e(s[4:])}"></span>'
     return f'<span class="emoji"{style}>{e(s)}</span>'
 
 
@@ -145,7 +158,7 @@ def _text(s):
 
 def _cell(s):
     """Text, or a big emoji when the value is an emoji."""
-    return _emoji(s) if illustrations.is_emoji(str(s)) else e(s)
+    return _emoji(s) if illustrations.is_emoji(str(s)) else _text(s)
 
 
 def _head(kicker, title, logo=True):
@@ -183,17 +196,17 @@ def render_section(sec, n, seed):
             + "</div></li>" for it in items) + "</ol>")
     elif t == "true_false":
         out.append('<ol class="items">' + "".join(
-            f"<li>{e(it['statement'])}<div class='opts'><span class='opt'>True</span><span class='opt'>False</span></div></li>" for it in items) + "</ol>")
+            f"<li>{_text(it['statement'])}<div class='opts'><span class='opt'>True</span><span class='opt'>False</span></div></li>" for it in items) + "</ol>")
     elif t == "short_answer":
         lines = sec.get("lines", 2)
         out.append('<ol class="items">' + "".join(
-            f"<li>{e(it['q'])}" + '<div class="wline"></div>' * lines + "</li>" for it in items) + "</ol>")
+            f"<li>{_text(it['q'])}" + '<div class="wline"></div>' * lines + "</li>" for it in items) + "</ol>")
     elif t == "label":
         out.append('<div class="cards">' + "".join(
             f'<div class="card"><b>{i + 1}</b>{_emoji(it["emoji"])}<span class="line" style="min-width:90%"></span></div>' for i, it in enumerate(items)) + "</div>")
     elif t == "sequence":
         order = S.shuffled(items, seed)
-        out.append('<table class="seq">' + "".join(f'<tr class="item"><td class="box">&nbsp;</td><td><b>{S.LETTERS[i]}.</b> {e(s)}</td></tr>'
+        out.append('<table class="seq">' + "".join(f'<tr class="item"><td class="box">&nbsp;</td><td><b>{S.LETTERS[i]}.</b> {_text(s)}</td></tr>'
                                                   for i, s in enumerate(order)) + "</table>")
     elif t == "sort":
         out.append('<div class="bank"><b>Words:</b>' + "".join(f"<span>{e(w)}</span>" for w in bank) + "</div>")
@@ -206,7 +219,8 @@ def render_section(sec, n, seed):
             f"<li>{e(it['prompt'])}<div class='draw'></div>" + '<div class="wline"></div>' * it.get("lines", 1) + "</li>" for it in items) + "</ol>")
     elif t == "math":
         has_pic = any(it.get("render") for it in items)
-        cols = "" if has_pic or any(len(it["prompt"]) > 24 for it in items) else " cols3"
+        # Three columns only for short prompts with a single blank (e.g. "29 + 12 = ____").
+        cols = "" if has_pic or any(len(it["prompt"]) > 18 or it["prompt"].count("____") > 1 for it in items) else " cols3"
         cells = []
         for i, it in enumerate(items):
             pic = ""
@@ -217,6 +231,9 @@ def render_section(sec, n, seed):
                 pic = illustrations.fraction_svg(*r["fraction"], size=100)
             elif "base10" in r:
                 pic = illustrations.base10_svg(*r["base10"])
+            elif "objects" in r:
+                thing, n = r["objects"]
+                pic = '<div class="objs">' + f'<span class="emoji">{e(thing)}</span>' * n + "</div>"
             elif "rect" in r and max(r["rect"]) <= 12:
                 pic = illustrations.rect_svg(*r["rect"], unit=12)
             prompt = e(it["prompt"])
@@ -337,11 +354,14 @@ def rubric(spec):
 def answer_key(spec, standalone=False):
     out = [f'<section class="page key">{_head("Answer key", spec["meta"]["title"])}']
     for part in S.parts(spec):
-        out.append(f'<h2 style="font-size:14pt;margin-top:3mm">{S.PART_TITLES[part]}</h2>')
+        heading = f'<h2 style="font-size:14pt;margin-top:3mm">{S.PART_TITLES[part]}</h2>'
         for i, sec in enumerate(spec[part]["sections"]):
             title = sec.get("title") or sec["type"].replace("_", " ").title()
             ans = S.section_answers(sec, S.seed_for(spec, part, i))
-            out.append(f"<div class='blk'><h3>{i + 1}. {e(title)}</h3><div class='ans'>" + "".join(f"<div><b>{e(a)}</b> {e(b)}</div>" for a, b in ans) + "</div></div>")
+            script = "".join(f"<div>{e(x)}</div>" for x in S.as_lines(sec.get("teacher_script")))
+            script = f"<div class='script'><b>Teacher reads aloud:</b>{script}</div>" if script else ""
+            # The part heading travels with its first section so it is never stranded.
+            out.append(f"<div class='blk'>{heading if i == 0 else ''}<h3>{i + 1}. {e(title)}</h3>{script}<div class='ans'>" + "".join(f"<div><b>{e(a)}</b> {_text(b)}</div>" for a, b in ans) + "</div></div>")
     out.append("</section>")
     return "".join(out)
 
@@ -375,7 +395,7 @@ def thumb_card(spec, width=1200, height=675):
     c = config.SUBJECT_COLORS[m["subject"]]
     b = config.BRAND
     tier = ("PRO", b["gold"], b["navy"]) if m["tier"] == "pro" else ("FREE", "#1FB5A8", "#fff")
-    art = "".join(_emoji(x) for x in (spec.get("cover_emoji") or [])[:3])
+    art = "".join(_emoji(x) for x in (spec.get("cover_emoji") or [])[:4])
     title = m["title"]
     size = 64 if len(title) <= 34 else (54 if len(title) <= 50 else 46)
     return f"""<!doctype html><html><head><meta charset="utf-8"><style>{_font_css()}
@@ -383,7 +403,8 @@ html,body{{margin:0;width:{width}px;height:{height}px;overflow:hidden}}
 body{{background:linear-gradient(135deg,{b['navy']} 0%,{b['navy_dark']} 100%);font-family:Nunito;color:#fff;position:relative}}
 .blob{{position:absolute;right:-120px;top:-120px;width:620px;height:620px;border-radius:50%;background:{c['main']};opacity:.95}}
 .blob2{{position:absolute;right:250px;bottom:-200px;width:340px;height:340px;border-radius:50%;background:{b['gold']};opacity:.9}}
-.art{{position:absolute;right:70px;top:120px;width:420px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px 26px;font-family:'Noto Color Emoji';font-size:120px;line-height:1.1}}
+.art{{position:absolute;right:60px;top:95px;width:440px;display:grid;grid-template-columns:1fr 1fr;justify-items:center;align-items:center;gap:18px 20px;font-family:'Noto Color Emoji';font-size:115px;line-height:1.1}}
+.art img.pic{{height:1.25em;max-width:1.85em;object-fit:contain;vertical-align:middle}}
 .txt{{position:absolute;left:64px;top:56px;width:620px}}
 img{{height:46px}}
 h1{{font-family:Fredoka;font-weight:700;font-size:{size}px;line-height:1.05;margin:44px 0 18px;text-shadow:0 3px 0 rgba(0,0,0,.18)}}

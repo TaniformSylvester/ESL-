@@ -78,6 +78,10 @@ def solve(gen, p):
         return 2 * (p["l"] + p["w"])
     if gen == "area_rect":
         return p["l"] * p["w"]
+    if gen == "odd_even_objects":
+        return "even" if p["n"] % 2 == 0 else "odd"
+    if gen == "doubles":
+        return f"{p['n'] // 2} + {p['n'] // 2}"
     if gen in ("from_place_values", "base_ten_read"):
         return p["h"] * 100 + p["t"] * 10 + p["o"]
     if gen == "word_add":
@@ -162,7 +166,7 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         return _item("skip_count", {"start": start, "step": stp, "blank_index": blank}, ",  ".join(shown))
     if gen == "odd_even":
         n = rng.randint(lo, hi)
-        return _item("odd_even", {"n": n}, f"Is {n} odd or even?")
+        return _item("odd_even", {"n": n}, f"Is {n} odd or even? ____")
     if gen == "round":
         n = rng.randint(lo, hi)
         return _item("round", {"n": n, "to": to}, f"Round {n} to the nearest {to}: ____")
@@ -188,6 +192,13 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         n = rng.randint(1, d - 1)
         k = rng.randint(2, 4)
         return _item("equivalent_fraction", {"n": n, "d": d, "d2": d * k}, f"{n}/{d} = ____/{d * k}")
+    if gen == "odd_even_objects":
+        n = rng.randint(max(lo, 3), min(hi, 20))
+        thing = rng.choice(["🍎", "⭐", "🐟", "🌸", "🧦", "🍪", "🎈", "🐞"])
+        return _item(gen, {"n": n, "thing": thing}, "Circle pairs. Odd or even? ____", {"objects": [thing, n]})
+    if gen == "doubles":
+        n = 2 * rng.randint(max(2, lo // 2), max(3, min(hi, 20) // 2))
+        return _item(gen, {"n": n}, f"{n} = ____ + ____")
     if gen == "from_place_values":
         h, t, o = rng.randint(1, 9), rng.randint(0, 9), rng.randint(0, 9)
         unit = lambda n, word: f"{n} {word}" + ("" if n == 1 else "s")

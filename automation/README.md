@@ -89,8 +89,9 @@ Commands (from `automation/`, with `.venv/bin/python -m tlgen`): `check`,
   - image sizes;
   - every mandatory QC check marked passed;
   - the score matching its breakdown;
-  - duplicates (same file, same title, or a ≥60% similar topic at the same
-    grade).
+  - duplicates: the same file, the same title, a ≥60% similar topic at the
+    same grade, or a topic whose key words all appear in an existing resource
+    at that grade.
 - **Idempotency keys:** a retried upload never creates a second draft.
 - **Audit log:** every API call and admin action is recorded (dashboard →
   Audit log).
@@ -144,6 +145,9 @@ is uploaded. You can request regeneration from the dashboard.
 - `tlgen/`: the generator (planner, renderers, QC, CLI).
 - `tlgen/data/topics.json`: curriculum topic bank (ESL K–10, Math 1–6,
   Science 1–6).
-- `specs/examples/`: the three reviewed acceptance-test specs, as a quality
-  reference.
+- `specs/examples/`: reviewed example specs, as a quality reference: the
+  three live test drafts (frog life cycle, odd and even numbers, two-step
+  instructions) and the first three local tests (short vowels, place value,
+  plant life cycle). Those first three overlap resources already on the live
+  site, so they were not uploaded there.
 - `specs/work/`, `out/`, `.venv/`, `.cache/`: local working files (gitignored).

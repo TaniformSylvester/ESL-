@@ -46,6 +46,31 @@ def similarity(a, b):
     return len(x & y) / len(x | y)
 
 
+def coverage(topic, text):
+    """Share of the topic's key words found in `text` (1.0 = fully contained)."""
+    x, y = set(tokens(topic)), set(tokens(text))
+    return len(x & y) / len(x) if x else 0.0
+
+
+# The planner skips a topic when an existing resource at the same grade covers
+# at least this share of its key words. Uploads are blocked (server and QC)
+# only at full coverage, so near-misses such as "Life Cycle of a Frog" next to
+# a broad plants unit that mentions "life cycle" are still allowed.
+PLAN_COVERAGE = 0.75
+
+
+def covered_by(catalog, subject, grade, topic, threshold):
+    """Existing resources at this subject+grade that already cover `topic`."""
+    out = []
+    for r in catalog.get("resources", []):
+        if not r.get("is_published") and r.get("automation_status") in ("rejected", "regenerate_requested", "regenerated"):
+            continue
+        if r["subject"] == subject and r.get("grade") == grade and r.get("status") == "active" \
+                and coverage(topic, f"{r['title']} {r.get('topic') or ''}") >= threshold:
+            out.append(r["title"])
+    return out
+
+
 def local_duplicates(catalog, subject, grade, title, topic):
     """Same rule as the server; used for planning and offline QC."""
     hits = []
@@ -61,6 +86,8 @@ def local_duplicates(catalog, subject, grade, title, topic):
             hits.append({"reason": "same title in this subject", "title": r["title"], "score": 1.0, "blocking": True})
         elif r.get("grade") == grade and sim >= 0.6:
             hits.append({"reason": "substantially similar topic at the same grade", "title": r["title"], "score": round(sim, 2), "blocking": True})
+        elif r.get("grade") == grade and len(tokens(topic)) >= 2 and coverage(topic, f"{r['title']} {r.get('topic') or ''}") >= 1.0:
+            hits.append({"reason": "topic already covered at the same grade", "title": r["title"], "score": 1.0, "blocking": True})
     for it in catalog.get("automation_items", []):
         # Topics already generated (or attempted) at this grade are skipped too,
         # unless an admin asked for them to be regenerated.
@@ -123,7 +150,7 @@ def plan(status, catalog, taxonomy, count=None, queue=None, only=None):
                 category, topic = line.split("|", 1)
                 if category not in valid_cats.get(subject, set()):
                     continue
-                if local_duplicates(catalog, subject, grade, topic, topic):
+                if local_duplicates(catalog, subject, grade, topic, topic) or covered_by(catalog, subject, grade, topic, PLAN_COVERAGE):
                     continue
                 # Lower is better: empty categories first, then thin grades, then bank order.
                 candidates.append(((cell[(subject, grade, category)], grade_total, order), subject, grade, category, topic))

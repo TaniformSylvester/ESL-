@@ -251,6 +251,12 @@ def run(spec, pkg, *, taxonomy=None, settings=None, client=None, catalog=None):
             res = client.duplicate_check(m["subject"], m["grade"], m["title"], m["topic"])
             hits = [x for x in res["matches"] if x["blocking"]]
             source = "live catalog"
+            if catalog is not None and len(planner.tokens(m["topic"])) >= 2:
+                # Same "topic already covered" rule as the server, also applied
+                # here so it holds even where the site runs an older version.
+                hits += [{"reason": "topic already covered at the same grade", "title": t}
+                         for t in planner.covered_by(catalog, m["subject"], m["grade"], m["topic"], 1.0)
+                         if t not in [h["title"] for h in hits]]
         elif catalog is not None:
             hits = planner.local_duplicates(catalog, m["subject"], m["grade"], m["title"], m["topic"])
             # The planner also skips topics generated before; a resource built

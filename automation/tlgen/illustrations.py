@@ -29,15 +29,18 @@ def _cache(name):
 
 
 def emoji_png(char: str, size: int = 160) -> str:
-    """Render one emoji to a transparent PNG (cached)."""
+    """Render an emoji (or a few in a row, or a "pic:" drawing) to a transparent PNG (cached)."""
+    if is_picture(char):
+        return picture_png(char[4:], size)
     key = hashlib.md5(f"{char}:{size}".encode()).hexdigest()[:12]
     out = _cache(f"emoji-{key}.png")
     if out.exists():
         return str(out)
     font = ImageFont.truetype(config.EMOJI_FONT, 109)   # Noto Color Emoji is a fixed 109px bitmap font
-    img = Image.new("RGBA", (136, 128), (0, 0, 0, 0))
+    width = 136 * max(1, len(char))
+    img = Image.new("RGBA", (width, 128), (0, 0, 0, 0))
     ImageDraw.Draw(img).text((0, 0), char, font=font, embedded_color=True)
-    bbox = img.getbbox() or (0, 0, 136, 128)
+    bbox = img.getbbox() or (0, 0, width, 128)
     img = img.crop(bbox)
     img.thumbnail((size, size), Image.LANCZOS)
     canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
@@ -47,7 +50,120 @@ def emoji_png(char: str, size: int = 160) -> str:
 
 
 def is_emoji(s: str) -> bool:
-    return bool(s) and any(ord(c) > 0x2100 for c in s) and len(s) <= 8
+    """True for a short emoji string or a built-in "pic:" drawing (both are pictures)."""
+    return is_picture(s) or (bool(s) and any(ord(c) > 0x2100 for c in s) and len(s) <= 8)
+
+
+def is_picture(s: str) -> bool:
+    return isinstance(s, str) and s.startswith("pic:") and s[4:] in PICTURES
+
+
+# ---------------------------------------------------------------- drawn pictures ("pic:<name>")
+# For things with no suitable emoji. Drawn on a 100x100 grid at 8x, then
+# scaled down (anti-aliased). Original work, same licence as the diagrams.
+_EGG, _DOT = (214, 228, 232, 255), (30, 34, 40, 255)
+_TAD, _TAD_LIGHT = (74, 78, 52, 255), (104, 110, 74, 255)
+_FROG, _FROG_DARK, _BELLY = (96, 170, 64, 255), (52, 112, 38, 255), (196, 222, 120, 255)
+
+
+def _canvas():
+    k = 8
+    img = Image.new("RGBA", (100 * k, 100 * k), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+
+    def pts(*xy):
+        return [(x * k, y * k) for x, y in zip(xy[::2], xy[1::2])]
+
+    def ell(cx, cy, rx, ry, fill, outline=None, w=1.2):
+        d.ellipse([(cx - rx) * k, (cy - ry) * k, (cx + rx) * k, (cy + ry) * k], fill=fill,
+                  outline=outline, width=int(w * k) if outline else 0)
+    return img, d, pts, ell, k
+
+
+def _eye(ell, x, y, r):
+    ell(x, y, r, r, (255, 255, 255, 255), _DOT, 0.8)
+    ell(x + r * 0.15, y + r * 0.1, r * 0.5, r * 0.5, _DOT)
+
+
+def _draw_frogspawn():
+    img, d, pts, ell, k = _canvas()
+    spots = [(30, 40), (44, 34), (58, 36), (72, 42), (24, 54), (38, 50), (52, 49), (66, 52), (80, 56),
+             (32, 64), (46, 63), (60, 64), (74, 68), (40, 76), (55, 77), (67, 80), (50, 22), (64, 24)]
+    for x, y in spots:
+        ell(x, y, 8.5, 8.5, _EGG, (150, 176, 186, 255), 0.8)
+    for x, y in spots:
+        ell(x, y, 2.6, 2.6, _DOT)
+    return img
+
+
+def _tadpole(d, pts, ell, legs=False, front=False):
+    tail = pts(48, 44, 60, 40, 72, 46, 84, 43, 96, 49, 84, 54, 72, 53, 60, 60, 48, 57)
+    d.polygon(tail, fill=_TAD_LIGHT)
+    if legs:
+        for dx in (0, 7):
+            d.line(pts(46 + dx, 58, 50 + dx, 70, 57 + dx, 72), fill=_TAD, width=3 * 8, joint="curve")
+    if front:
+        d.line(pts(30, 60, 28, 70, 33, 72), fill=_TAD, width=3 * 8, joint="curve")
+    ell(34, 50, 19, 14, _TAD)
+    _eye(ell, 24, 45, 4.2)
+
+
+def _draw_tadpole():
+    img, d, pts, ell, k = _canvas()
+    _tadpole(d, pts, ell)
+    return img
+
+
+def _draw_tadpole_legs():
+    img, d, pts, ell, k = _canvas()
+    _tadpole(d, pts, ell, legs=True, front=True)
+    return img
+
+
+def _frog(d, pts, ell, tail=False):
+    if tail:
+        d.polygon(pts(62, 46, 97, 40, 92, 47, 70, 58), fill=_FROG_DARK)     # shrinking tail
+    d.polygon(pts(58, 74, 88, 76, 90, 81, 56, 80), fill=_FROG_DARK)        # back foot
+    ell(66, 64, 15, 10, _FROG_DARK)                                         # back thigh
+    ell(48, 58, 26, 17, _FROG)                                              # body
+    ell(44, 66, 18, 7, _BELLY)
+    ell(26, 52, 15, 12, _FROG)                                              # head
+    d.line(pts(34, 64, 30, 79, 36, 81), fill=_FROG_DARK, width=4 * 8, joint="curve")   # front leg
+    d.line(pts(14, 56, 26, 58), fill=_FROG_DARK, width=int(1.4 * 8))        # mouth
+    _eye(ell, 28, 41, 6.5)
+
+
+def _draw_froglet():
+    img, d, pts, ell, k = _canvas()
+    _frog(d, pts, ell, tail=True)
+    return img
+
+
+def _draw_frog():
+    img, d, pts, ell, k = _canvas()
+    _frog(d, pts, ell)
+    return img
+
+
+PICTURES = {"frogspawn": _draw_frogspawn, "tadpole": _draw_tadpole, "tadpole_legs": _draw_tadpole_legs,
+            "froglet": _draw_froglet, "frog": _draw_frog}
+
+
+def picture_png(name, size=160, square=True):
+    """PNG of a drawing; square=False keeps the drawing's own shape (for HTML)."""
+    out = _cache(f"pic-{name}-{size}{'' if square else '-tight'}.png")
+    if out.exists():
+        return str(out)
+    img = PICTURES[name]()
+    img = img.crop(img.getbbox())
+    img.thumbnail((size, size), Image.LANCZOS)
+    if not square:
+        img.save(out)
+        return str(out)
+    canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    canvas.paste(img, ((size - img.width) // 2, (size - img.height) // 2), img)
+    canvas.save(out)
+    return str(out)
 
 
 # ---------------------------------------------------------------- clocks

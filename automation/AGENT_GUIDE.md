@@ -26,7 +26,7 @@ in order.
 Run all commands from `automation/` with `.venv/bin/python -m tlgen …`
 (`bash bootstrap.sh` first in a fresh session).
 
-1. `status`: check the site. If emergency stop is on, stop. For a scheduled
+1. `check`, then `status`: check the tools and the site. If emergency stop is on, stop. For a scheduled
    run, continue only if `due` is true.
 2. `plan`: picks topics from curriculum gaps, avoids duplicates and assigns
    Free/Pro to match the dashboard setting. Admin regeneration requests come
@@ -64,8 +64,11 @@ Fill the spec yourself. Never leave filler text.
   `multiple_choice` or `short_answer`) must be checked twice by you.
 - Multiple-choice distractors must be clearly wrong, but not silly. There
   must be exactly one correct answer.
-- Pictures (emoji) must clearly show the word. If no emoji clearly fits a
-  word, choose another word.
+- Pictures (emoji) must clearly show the word. If no emoji clearly fits, use
+  a built-in drawing (`"pic:frogspawn"`, `"pic:tadpole"`, `"pic:tadpole_legs"`,
+  `"pic:froglet"`, `"pic:frog"`; see `PICTURES` in `tlgen/illustrations.py`)
+  or choose another word. Never use a picture that could teach something
+  wrong (for example, a fish emoji for "tadpole").
 
 **Language and level**
 - Student instructions: one short sentence, simple words.
@@ -90,6 +93,14 @@ Fill the spec yourself. Never leave filler text.
   `"word_bank": true`), `multiple_choice`, `true_false`, `short_answer`,
   `label` (emoji + word), `sequence` (steps in the correct order; they are
   shuffled when printed), `sort` (groups of words), `draw_write`, `math`.
+- Listening activities: add `"teacher_script": ["Number 1. Stand up, then
+  clap your hands.", …]` to the section. The script prints in the answer key
+  for the teacher to read aloud. Two-step picture options use an arrow:
+  `"🧍➡️👏"`.
+- Math generators include `add`, `sub`, `mult`, `div`, `compare`,
+  `expanded_form`, `digit_value`, `from_place_values`, `base_ten_read`,
+  `skip_count`, `odd_even`, `odd_even_objects`, `doubles`, `round`, clocks,
+  fractions, perimeter/area and word problems (`tlgen/mathgen.py`).
 - `spelling_allow` is only for real words the spell checker doesn't know,
   such as "CVC". It shows in the QC report.
 

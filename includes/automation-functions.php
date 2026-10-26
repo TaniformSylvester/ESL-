@@ -456,8 +456,9 @@ function automation_similarity(string $a, string $b): float
 
 /**
  * Existing resources that duplicate or closely resemble a proposed one.
- * Blocking matches: same file, same title in the same subject, or a topic
- * at least 60% similar in the same subject and grade.
+ * Blocking matches: same file, same title in the same subject, a topic at
+ * least 60% similar in the same subject and grade, or a topic whose key words
+ * all appear in an existing resource at the same grade.
  */
 function automation_find_duplicates(string $subjectSlug, string $grade, string $title, string $topic, ?string $fileHash = null): array
 {
@@ -480,6 +481,7 @@ function automation_find_duplicates(string $subjectSlug, string $grade, string $
                                                     AND ai.status IN ('rejected', 'regenerate_requested', 'regenerated')))"
     );
     $stmt->execute([$subjectSlug]);
+    $topicWords = automation_tokens($topic);
     foreach ($stmt->fetchAll() as $r) {
         $sameTitle = automation_tokens($r['title']) === automation_tokens($title) && automation_tokens($title);
         $topicSim = max(automation_similarity($topic, (string)$r['topic']), automation_similarity($topic, $r['title']), automation_similarity($title, $r['title']));
@@ -488,6 +490,11 @@ function automation_find_duplicates(string $subjectSlug, string $grade, string $
             $matches[] = ['reason' => 'same title in this subject', 'title' => $r['title'], 'resource_id' => (int)$r['id'], 'score' => 1.0, 'blocking' => true];
         } elseif ($sameGrade && $topicSim >= 0.6) {
             $matches[] = ['reason' => 'substantially similar topic at the same grade', 'title' => $r['title'], 'resource_id' => (int)$r['id'], 'score' => round($topicSim, 2), 'blocking' => true];
+        } elseif ($sameGrade && count($topicWords) >= 2
+                  && !array_diff($topicWords, automation_tokens($r['title'] . ' ' . (string)$r['topic']))) {
+            // Every key word of the topic already appears in an existing
+            // resource at this grade (long titles dilute the similarity score).
+            $matches[] = ['reason' => 'topic already covered at the same grade', 'title' => $r['title'], 'resource_id' => (int)$r['id'], 'score' => 1.0, 'blocking' => true];
         } elseif ($topicSim >= 0.6) {
             $matches[] = ['reason' => 'similar topic at another grade (allowed)', 'title' => $r['title'], 'resource_id' => (int)$r['id'], 'score' => round($topicSim, 2), 'blocking' => false];
         }
