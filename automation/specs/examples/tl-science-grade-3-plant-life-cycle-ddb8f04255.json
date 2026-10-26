@@ -1,0 +1,336 @@
+{
+  "version": 1,
+  "key": "tl-science-grade-3-plant-life-cycle-ddb8f04255",
+  "meta": {
+    "subject": "science",
+    "grade": "Grade 3",
+    "category": "plants",
+    "topic": "Plant Life Cycle",
+    "tier": "free",
+    "resource_type": "Lesson Plan",
+    "title": "The Life Cycle of a Flowering Plant",
+    "description": "A ready-to-teach Grade 3 science lesson on the plant life cycle: seed, germination, seedling, adult plant, flower, pollination and fruit. Includes a timed lesson plan, a six-activity worksheet, an editable Word version and a full answer key.",
+    "overview": "Students learn that a flowering plant goes through a cycle of stages: a seed germinates, grows into a seedling and then an adult plant, makes flowers, and after pollination produces fruit with new seeds. The lesson builds the key vocabulary first, then moves from guided ordering of the stages to independent practice and a labelled drawing.",
+    "learning_objectives": [
+      "Name and order the main stages of a flowering plant's life cycle (seed, seedling, adult plant, flower, fruit).",
+      "Explain what a seed needs to germinate and what roots and leaves do for a growing plant.",
+      "Describe how pollination and seed dispersal help plants make new plants."
+    ],
+    "how_to_use": [
+      "Print the worksheet pages (one per student) and keep the answer key for yourself.",
+      "Teach the vocabulary and the life-cycle diagram using the lesson plan (about 15 minutes).",
+      "Do activities 1 and 2 together or in pairs, then let students finish activities 3–5 on their own.",
+      "Use activity 6 (draw and label) as an exit task or homework, and check answers with the answer key."
+    ],
+    "suggested_duration": "45 minutes",
+    "recommended_level": "Grade 3 (ages 8–9)",
+    "skills_practiced": "Sequencing, scientific vocabulary, reading for information, labelling diagrams",
+    "activity_ideas": [
+      "Plant bean seeds in clear cups so students can watch germination over two weeks.",
+      "Sort real seeds (beans, sunflower seeds, apple seeds) and talk about which fruit each came from.",
+      "Act out the life cycle: students crouch as seeds, slowly stand as seedlings and stretch out as flowers."
+    ],
+    "teacher_tips": "Bring one real seed and one real fruit (such as an apple you can cut open) to the warm-up. Seeing seeds inside a fruit makes the idea of a cycle much clearer.",
+    "differentiation_notes": "Support: let students use the vocabulary list during the worksheet and do activity 2 with a partner. Challenge: ask students to add pollination and seed dispersal to their activity 6 drawing.",
+    "assessment_notes": "Activities 1–5 check vocabulary and sequencing (answer key included). Activity 6 shows whether each student can recall and label the stages without help."
+  },
+  "cover_emoji": [
+    "🌱",
+    "🌻",
+    "🐝",
+    "🍎"
+  ],
+  "vocabulary": [
+    {
+      "word": "seed",
+      "emoji": "🌰",
+      "definition": "the part of a plant that can grow into a new plant",
+      "example": "A bean seed grows into a bean plant."
+    },
+    {
+      "word": "germinate",
+      "emoji": "🌱",
+      "definition": "to start to grow from a seed",
+      "example": "The seed will germinate when it gets water."
+    },
+    {
+      "word": "seedling",
+      "emoji": "🪴",
+      "definition": "a very young plant",
+      "example": "The seedling has two small leaves."
+    },
+    {
+      "word": "roots",
+      "emoji": "💧",
+      "definition": "plant parts that grow into the soil and take in water",
+      "example": "The roots hold the plant in the ground."
+    },
+    {
+      "word": "flower",
+      "emoji": "🌼",
+      "definition": "the part of a plant that makes seeds",
+      "example": "The sunflower has a big yellow flower."
+    },
+    {
+      "word": "pollination",
+      "emoji": "🐝",
+      "definition": "moving pollen from one flower to another so seeds can form",
+      "example": "Bees help with pollination."
+    },
+    {
+      "word": "fruit",
+      "emoji": "🍎",
+      "definition": "the part of a plant that holds and protects the seeds",
+      "example": "An apple is a fruit with seeds inside."
+    },
+    {
+      "word": "life cycle",
+      "emoji": "🔄",
+      "definition": "the stages a living thing goes through during its life",
+      "example": "A plant's life cycle starts with a seed."
+    }
+  ],
+  "lesson_plan": {
+    "materials": [
+      "Worksheet (one copy per student)",
+      "A few real seeds (beans or sunflower seeds) and one apple",
+      "Board and markers",
+      "Colored pencils for activity 6"
+    ],
+    "stages": [
+      {
+        "name": "Warm-up",
+        "minutes": 5,
+        "steps": [
+          "Show a real seed and ask: \"What will this seed become?\"",
+          "Cut the apple open and ask students what they see inside. Write their ideas on the board."
+        ]
+      },
+      {
+        "name": "Presentation",
+        "minutes": 10,
+        "steps": [
+          "Teach the key words with the vocabulary list. Say each word and have students repeat it.",
+          "Draw the life cycle as a circle on the board: seed → seedling → adult plant → flower → fruit with seeds → back to seed.",
+          "Explain that bees, other insects and the wind move pollen between flowers. This is pollination, and it lets the plant make seeds."
+        ]
+      },
+      {
+        "name": "Guided practice",
+        "minutes": 12,
+        "steps": [
+          "Do activity 1 (matching) together. Model the first answer, then let students finish.",
+          "In pairs, students put the six life-cycle steps in order (activity 2).",
+          "Check by asking one pair to read the steps aloud in the right order."
+        ]
+      },
+      {
+        "name": "Independent practice",
+        "minutes": 13,
+        "steps": [
+          "Students complete activities 3, 4 and 5 on their own.",
+          "Walk around and ask questions such as \"What does a seed need to germinate?\" and \"What do roots do?\""
+        ]
+      },
+      {
+        "name": "Wrap-up",
+        "minutes": 5,
+        "steps": [
+          "Students start activity 6: draw and label the life cycle of a sunflower (finish for homework if needed).",
+          "Exit question: \"Why are seeds important in a plant's life cycle?\""
+        ]
+      }
+    ],
+    "differentiation": {
+      "support": [
+        "Keep the vocabulary list on the desk during the worksheet.",
+        "Read the activity instructions aloud and complete activity 2 with a partner."
+      ],
+      "challenge": [
+        "Add pollination and seed dispersal to the activity 6 drawing.",
+        "Write two sentences comparing the life cycle of a bean plant and a sunflower."
+      ]
+    },
+    "assessment": "Use activities 1–5 to check vocabulary and sequencing. In activity 6, look for four stages in the correct order, arrows that show a cycle, and correct labels."
+  },
+  "worksheet": {
+    "title": "The Life Cycle of a Flowering Plant",
+    "sections": [
+      {
+        "type": "match",
+        "title": "Word match",
+        "instructions": "Draw a line from each word to its meaning.",
+        "items": [
+          {
+            "left": "seed",
+            "right": "the part of a plant that can grow into a new plant"
+          },
+          {
+            "left": "germinate",
+            "right": "to start to grow from a seed"
+          },
+          {
+            "left": "seedling",
+            "right": "a very young plant"
+          },
+          {
+            "left": "pollination",
+            "right": "moving pollen from one flower to another"
+          },
+          {
+            "left": "fruit",
+            "right": "the part of a plant that holds the seeds"
+          },
+          {
+            "left": "life cycle",
+            "right": "the stages a living thing goes through"
+          }
+        ]
+      },
+      {
+        "type": "sequence",
+        "title": "Put the stages in order",
+        "instructions": "The steps of a bean plant's life cycle are mixed up. Write 1 to 6 in the boxes to show the right order.",
+        "items": [
+          "A seed is planted in the soil.",
+          "The seed gets water and germinates.",
+          "A small seedling pushes up out of the soil.",
+          "The seedling grows into an adult plant with many leaves.",
+          "The adult plant grows flowers.",
+          "The flowers turn into pods with new seeds inside."
+        ]
+      },
+      {
+        "type": "fill_blank",
+        "title": "Complete the sentences",
+        "instructions": "Use the words in the word bank to complete each sentence.",
+        "word_bank": true,
+        "extra_words": [
+          "rocks"
+        ],
+        "items": [
+          {
+            "text": "A seed needs ____ and warmth to germinate.",
+            "answer": "water"
+          },
+          {
+            "text": "The ____ grow down into the soil and take in water.",
+            "answer": "roots"
+          },
+          {
+            "text": "Leaves use ____ to make food for the plant.",
+            "answer": "sunlight"
+          },
+          {
+            "text": "Bees carry ____ from flower to flower.",
+            "answer": "pollen"
+          },
+          {
+            "text": "A fruit protects the ____ inside it.",
+            "answer": "seeds"
+          }
+        ]
+      },
+      {
+        "type": "true_false",
+        "title": "True or false?",
+        "instructions": "Read each sentence. Circle True or False.",
+        "items": [
+          {
+            "statement": "A seedling is a very old plant.",
+            "answer": false
+          },
+          {
+            "statement": "Plants need sunlight to make their own food.",
+            "answer": true
+          },
+          {
+            "statement": "Pollination helps a plant make seeds.",
+            "answer": true
+          },
+          {
+            "statement": "Roots grow up toward the sky.",
+            "answer": false
+          },
+          {
+            "statement": "Wind and animals can carry seeds to new places.",
+            "answer": true
+          }
+        ]
+      },
+      {
+        "type": "multiple_choice",
+        "title": "Choose the best answer",
+        "instructions": "Circle the best answer for each question.",
+        "items": [
+          {
+            "q": "Which stage comes right after a seed germinates?",
+            "options": [
+              "adult plant",
+              "seedling",
+              "fruit"
+            ],
+            "answer": "seedling"
+          },
+          {
+            "q": "Which part of a plant makes seeds?",
+            "options": [
+              "the flower",
+              "the root",
+              "the stem"
+            ],
+            "answer": "the flower"
+          },
+          {
+            "q": "What is one way seeds move to new places?",
+            "options": [
+              "the roots push them",
+              "the wind blows them",
+              "the leaves throw them"
+            ],
+            "answer": "the wind blows them"
+          },
+          {
+            "q": "Why does a plant need roots?",
+            "options": [
+              "to catch sunlight",
+              "to make flowers",
+              "to take in water from the soil"
+            ],
+            "answer": "to take in water from the soil"
+          }
+        ]
+      },
+      {
+        "type": "draw_write",
+        "title": "Draw and label",
+        "instructions": "Show what you learned in a picture.",
+        "items": [
+          {
+            "prompt": "Draw the life cycle of a sunflower. Use arrows and label each stage: seed, seedling, adult plant, flower.",
+            "lines": 2,
+            "guidance": "Look for four stages in a circle joined by arrows (seed → seedling → adult plant → flower, then back to seed), with each stage labelled."
+          }
+        ]
+      }
+    ]
+  },
+  "social": {
+    "facebook_post": "🌱 FREE Grade 3 science lesson: The Life Cycle of a Flowering Plant!\n\nTake your class from seed to seedling to flower to fruit with a ready-to-teach 45-minute lesson plan, a six-activity worksheet (matching, sequencing, fill in the blanks, true or false and a draw-and-label task), an editable Word version and a full answer key.\n\nDownload it free on TeachLuma 👉 teachluma.com",
+    "pinterest_title": "Plant Life Cycle Lesson and Worksheet for Grade 3 (Free)",
+    "pinterest_description": "Free Grade 3 science lesson on the life cycle of a flowering plant. Includes a timed lesson plan, vocabulary list, six worksheet activities, an editable Word worksheet and an answer key. Great for spring science and plant units.",
+    "hashtags": [
+      "#TeachLuma",
+      "#ScienceForKids",
+      "#PlantLifeCycle",
+      "#Grade3Science",
+      "#TeacherResources",
+      "#FreeWorksheet"
+    ],
+    "visual_suggestions": [
+      "Square post: a real bean seedling in a clear cup next to the worksheet's sequencing activity.",
+      "Pinterest pin: the cover page on top, the worksheet page below, with the words FREE Grade 3 Plant Life Cycle."
+    ]
+  },
+  "spelling_allow": []
+}

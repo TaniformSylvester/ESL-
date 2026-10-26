@@ -19,6 +19,7 @@ $navItems = [
     ['label' => 'Reviews',        'href' => 'admin/reviews.php',     'icon' => 'fa-star',         'match' => ['reviews.php']],
     ['label' => 'Requests',       'href' => 'admin/requests.php',    'icon' => 'fa-inbox',        'match' => ['requests.php', 'request-detail.php']],
     ['label' => 'Teacher Hub',    'href' => 'admin/guides.php',      'icon' => 'fa-book-open',    'match' => ['guides.php', 'guide-add.php', 'guide-edit.php']],
+    ['label' => 'Resource Automation', 'href' => 'admin/automation.php', 'icon' => 'fa-robot',     'match' => ['automation.php', 'automation-item.php']],
     ['label' => 'Payments',       'href' => 'admin/payments.php',    'icon' => 'fa-money-bill',   'match' => ['payments.php']],
     ['label' => 'Subscriptions',  'href' => 'admin/subscriptions.php', 'icon' => 'fa-id-card',    'match' => ['subscriptions.php']],
     ['label' => 'Settings',       'href' => 'admin/settings.php',    'icon' => 'fa-gear',         'match' => ['settings.php']],

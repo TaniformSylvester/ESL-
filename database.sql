@@ -675,6 +675,136 @@ CREATE TABLE IF NOT EXISTS uploaded_games (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------------------------
+-- Resource Automation — generator settings, tokens, runs, generated items,
+-- social copy and the audit log (Admin > Resource Automation, /api/automation.php).
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS automation_settings (
+    id TINYINT UNSIGNED NOT NULL,
+    enabled TINYINT(1) NOT NULL DEFAULT 0,
+    emergency_stop TINYINT(1) NOT NULL DEFAULT 0,
+    frequency ENUM('manual', 'daily', 'weekly') NOT NULL DEFAULT 'manual',
+    run_hour TINYINT UNSIGNED NOT NULL DEFAULT 2,
+    subjects VARCHAR(100) NOT NULL DEFAULT 'esl,math,science',
+    grades TEXT NULL,
+    per_run TINYINT UNSIGNED NOT NULL DEFAULT 2,
+    free_percent TINYINT UNSIGNED NOT NULL DEFAULT 33,
+    max_uploads_per_day TINYINT UNSIGNED NOT NULL DEFAULT 10,
+    auto_publish TINYINT(1) NOT NULL DEFAULT 0,
+    auto_publish_min_score TINYINT UNSIGNED NOT NULL DEFAULT 90,
+    updated_by INT UNSIGNED NULL,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT IGNORE INTO automation_settings (id) VALUES (1);
+
+-- Generator access tokens. Only a SHA-256 hash is stored; the token itself is
+-- shown once when created. Scopes limit what a token may do.
+CREATE TABLE IF NOT EXISTS api_tokens (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    token_hash CHAR(64) NOT NULL,
+    token_prefix VARCHAR(16) NOT NULL,
+    scopes VARCHAR(255) NOT NULL DEFAULT 'catalog:read,drafts:write',
+    created_by INT UNSIGNED NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_used_at DATETIME NULL,
+    last_used_ip VARCHAR(45) NULL,
+    revoked_at DATETIME NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_api_tokens_hash (token_hash),
+    CONSTRAINT fk_api_tokens_creator FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- One row per generation run (scheduled, manual or a retry of an interrupted run).
+CREATE TABLE IF NOT EXISTS automation_runs (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    trigger_type ENUM('scheduled', 'manual', 'retry') NOT NULL DEFAULT 'manual',
+    status ENUM('running', 'completed', 'partial', 'failed', 'interrupted', 'stopped') NOT NULL DEFAULT 'running',
+    planned INT UNSIGNED NOT NULL DEFAULT 0,
+    generated INT UNSIGNED NOT NULL DEFAULT 0,
+    failed INT UNSIGNED NOT NULL DEFAULT 0,
+    plan MEDIUMTEXT NULL,
+    message TEXT NULL,
+    retry_of INT UNSIGNED NULL,
+    retry_requested TINYINT(1) NOT NULL DEFAULT 0,
+    token_id INT UNSIGNED NULL,
+    started_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    heartbeat_at DATETIME NULL,
+    finished_at DATETIME NULL,
+    PRIMARY KEY (id),
+    KEY idx_automation_runs_status (status),
+    KEY idx_automation_runs_started (started_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- One row per generated resource (uploaded draft, or failed after all
+-- correction attempts). resource_id is NULL for failures (nothing uploaded).
+CREATE TABLE IF NOT EXISTS automation_items (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    run_id INT UNSIGNED NULL,
+    resource_id INT UNSIGNED NULL,
+    idempotency_key VARCHAR(100) NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    subject_slug VARCHAR(50) NOT NULL,
+    grade_level VARCHAR(30) NOT NULL,
+    category_slug VARCHAR(120) NULL,
+    topic VARCHAR(150) NOT NULL,
+    resource_type VARCHAR(50) NOT NULL,
+    tier ENUM('free', 'pro') NOT NULL DEFAULT 'pro',
+    status ENUM('pending_review', 'approved', 'rejected', 'failed', 'regenerate_requested', 'regenerated') NOT NULL DEFAULT 'pending_review',
+    quality_score TINYINT UNSIGNED NULL,
+    score_breakdown TEXT NULL,
+    mandatory_passed TINYINT(1) NOT NULL DEFAULT 0,
+    qc_report MEDIUMTEXT NULL,
+    correction_attempts TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    error_report MEDIUMTEXT NULL,
+    main_file_hash CHAR(64) NULL,
+    spec MEDIUMTEXT NULL,
+    review_note VARCHAR(500) NULL,
+    reviewed_by INT UNSIGNED NULL,
+    reviewed_at DATETIME NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_automation_items_key (idempotency_key),
+    KEY idx_automation_items_status (status),
+    KEY idx_automation_items_hash (main_file_hash),
+    KEY idx_automation_items_run (run_id),
+    CONSTRAINT fk_automation_items_resource FOREIGN KEY (resource_id) REFERENCES resources (id) ON DELETE SET NULL,
+    CONSTRAINT fk_automation_items_run FOREIGN KEY (run_id) REFERENCES automation_runs (id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Social media copy prepared for a resource (never posted automatically).
+CREATE TABLE IF NOT EXISTS resource_social (
+    resource_id INT UNSIGNED NOT NULL,
+    facebook_post TEXT NULL,
+    pinterest_title VARCHAR(150) NULL,
+    pinterest_description VARCHAR(600) NULL,
+    hashtags VARCHAR(500) NULL,
+    visual_suggestions TEXT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (resource_id),
+    CONSTRAINT fk_resource_social_resource FOREIGN KEY (resource_id) REFERENCES resources (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Audit log for every automation API call and every admin automation action.
+-- Also backs the API rate limiter (recent rows per token).
+CREATE TABLE IF NOT EXISTS automation_audit (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    token_id INT UNSIGNED NULL,
+    admin_id INT UNSIGNED NULL,
+    action VARCHAR(50) NOT NULL,
+    http_status SMALLINT UNSIGNED NOT NULL DEFAULT 200,
+    ip VARCHAR(45) NULL,
+    detail VARCHAR(500) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_automation_audit_token_time (token_id, created_at),
+    KEY idx_automation_audit_time (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
 -- admin_logs
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS admin_logs (

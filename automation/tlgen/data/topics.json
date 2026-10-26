@@ -1,0 +1,132 @@
+{
+  "_about": "Curriculum topic bank used by the planner to find gaps in the TeachLuma catalog. Each entry is 'category-slug|Topic'. Category slugs must match the site's categories for that subject. Add topics freely; the planner skips anything the catalog already covers.",
+  "esl": {
+    "Kindergarten": [
+      "phonics|Letter Sounds A to M", "phonics|Letter Sounds N to Z", "vocabulary|Colors", "vocabulary|Shapes Around Us",
+      "vocabulary|Numbers 1 to 10", "vocabulary|Fruits", "speaking|Greetings and Saying Goodbye", "listening|Simple Classroom Instructions",
+      "vocabulary|Farm Animals", "classroom-english|Classroom Objects", "vocabulary|My Toys", "pronunciation|Rhyming Words"
+    ],
+    "Grade 1": [
+      "vocabulary|Feelings and Emotions", "vocabulary|Weather Words", "vocabulary|Food and Drinks", "vocabulary|Clothes",
+      "phonics|Short Vowel Sounds", "phonics|CVC Words", "grammar|This Is and These Are", "grammar|Is It a ...? Yes, It Is",
+      "speaking|What Is Your Name?", "reading|Simple Sight Words", "writing|Writing Simple Sentences", "vocabulary|Days of the Week",
+      "vocabulary|Parts of the House", "listening|Following Two-Step Instructions"
+    ],
+    "Grade 2": [
+      "grammar|Present Simple: I Like / I Don't Like", "grammar|Prepositions of Place", "vocabulary|Jobs and Occupations",
+      "vocabulary|Places in Town", "vocabulary|Months and Seasons", "phonics|Long Vowel Sounds with Silent E", "phonics|Consonant Digraphs sh ch th",
+      "reading|Short Stories and Questions", "speaking|Asking for Help in Class", "writing|Describing a Picture", "grammar|Can and Can't for Ability",
+      "vocabulary|Hobbies and Free Time"
+    ],
+    "Grade 3": [
+      "grammar|Present Continuous", "grammar|Plural Nouns", "grammar|Adjectives to Describe People", "vocabulary|Daily Routines",
+      "vocabulary|Transport", "reading|Reading for Main Idea", "writing|Writing a Postcard", "speaking|Telling Time in English",
+      "phonics|Vowel Teams ai ay ee ea", "listening|Listening for Details", "grammar|There Is and There Are", "vocabulary|Wild Animals and Habitats"
+    ],
+    "Grade 4": [
+      "grammar|Past Simple: Regular Verbs", "grammar|Past Simple: Irregular Verbs", "grammar|Comparative Adjectives", "grammar|Countable and Uncountable Nouns",
+      "vocabulary|Health and Illness", "vocabulary|Shopping and Money", "reading|Fact and Opinion", "writing|Writing a Friendly Letter",
+      "speaking|Giving Directions", "listening|Listening to Announcements", "grammar|Question Words", "pronunciation|Word Stress"
+    ],
+    "Grade 5": [
+      "grammar|Superlative Adjectives", "grammar|Future with Will and Going To", "grammar|Adverbs of Frequency", "vocabulary|Environment and Recycling",
+      "vocabulary|Festivals and Celebrations", "reading|Making Inferences", "writing|Writing a Narrative Paragraph", "speaking|Expressing Opinions",
+      "listening|Note-Taking from a Short Talk", "grammar|Modal Verbs: Must and Should", "vocabulary|Technology in Daily Life", "pronunciation|Past Tense -ed Endings"
+    ],
+    "Grade 6": [
+      "grammar|Present Perfect", "grammar|First Conditional", "grammar|Relative Clauses: Who, Which, That", "vocabulary|Feelings and Personality Adjectives",
+      "vocabulary|Travel and Holidays", "reading|Comparing Two Texts", "writing|Writing an Opinion Paragraph", "speaking|Presentations for Beginners",
+      "listening|Understanding Instructions and Procedures", "grammar|Past Continuous", "vocabulary|Phrasal Verbs for Daily Life", "pronunciation|Intonation in Questions"
+    ],
+    "Grade 7": [
+      "grammar|Present Perfect vs Past Simple", "grammar|Second Conditional", "grammar|Passive Voice: Present and Past", "vocabulary|Collocations with Make and Do",
+      "reading|Skimming and Scanning", "writing|Writing an Informal Email", "speaking|Agreeing and Disagreeing Politely", "listening|Listening to Interviews",
+      "vocabulary|Media and News", "grammar|Gerunds and Infinitives"
+    ],
+    "Grade 8": [
+      "grammar|Reported Speech", "grammar|Third Conditional", "grammar|Modal Verbs of Deduction", "vocabulary|Word Formation: Prefixes and Suffixes",
+      "reading|Author's Purpose", "writing|Writing a Formal Letter", "speaking|Debating a Topic", "listening|Understanding Accents and Context",
+      "vocabulary|Idioms for Everyday English", "grammar|Future Continuous and Future Perfect"
+    ],
+    "Grade 9": [
+      "grammar|Mixed Conditionals", "grammar|Advanced Passive Forms", "writing|Writing a For and Against Essay", "reading|Evaluating Arguments",
+      "vocabulary|Academic Vocabulary", "speaking|Formal Presentations", "listening|Lectures and Note-Taking", "grammar|Linking Words and Discourse Markers",
+      "writing|Writing a Report", "vocabulary|Synonyms and Register"
+    ],
+    "Grade 10": [
+      "grammar|Inversion for Emphasis", "grammar|Cleft Sentences", "writing|Writing an Argumentative Essay", "reading|Critical Reading of Opinion Articles",
+      "speaking|Interview Skills", "listening|Listening for Attitude and Tone", "vocabulary|Business English Basics", "writing|Writing a Summary",
+      "vocabulary|Figurative Language", "grammar|Advanced Modal Verbs"
+    ]
+  },
+  "math": {
+    "Grade 1": [
+      "numbers-and-counting|Counting Objects to 20", "numbers-and-counting|Number Words One to Twenty", "addition-and-subtraction|Addition Within 10",
+      "addition-and-subtraction|Subtraction Within 10", "number-sense|Comparing Numbers: More, Less, Equal", "geometry-and-shapes|3D Shapes Around Us",
+      "measurement|Longer and Shorter", "time-and-money|Telling Time to the Hour", "patterns-and-algebra-basics|Repeating Patterns",
+      "data-and-graphs|Picture Graphs", "numbers-and-counting|Ordinal Numbers First to Tenth", "number-sense|Tens and Ones"
+    ],
+    "Grade 2": [
+      "number-sense|Place Value: Hundreds, Tens and Ones", "addition-and-subtraction|Two-Digit Subtraction with Regrouping", "time-and-money|Telling Time to Five Minutes",
+      "numbers-and-counting|Skip Counting by 2s, 5s and 10s", "number-sense|Odd and Even Numbers", "measurement|Measuring Length in Centimeters",
+      "geometry-and-shapes|Halves and Quarters of Shapes", "data-and-graphs|Bar Graphs", "word-problems|Addition and Subtraction Word Problems",
+      "multiplication-and-division|Equal Groups and Arrays", "patterns-and-algebra-basics|Number Patterns", "time-and-money|Counting Money"
+    ],
+    "Grade 3": [
+      "multiplication-and-division|Multiplication Facts 2, 5 and 10", "multiplication-and-division|Division as Sharing", "fractions-and-decimals|Unit Fractions",
+      "fractions-and-decimals|Fractions on a Number Line", "measurement|Perimeter", "measurement|Area by Counting Squares",
+      "time-and-money|Telling Time to the Minute", "time-and-money|Elapsed Time", "addition-and-subtraction|Three-Digit Addition and Subtraction",
+      "number-sense|Rounding to the Nearest 10 and 100", "geometry-and-shapes|Quadrilaterals", "data-and-graphs|Scaled Picture and Bar Graphs"
+    ],
+    "Grade 4": [
+      "multiplication-and-division|Multi-Digit Multiplication", "multiplication-and-division|Long Division with Remainders", "fractions-and-decimals|Equivalent Fractions",
+      "fractions-and-decimals|Comparing Fractions", "fractions-and-decimals|Decimals: Tenths and Hundredths", "geometry-and-shapes|Angles and Measuring Angles",
+      "geometry-and-shapes|Lines of Symmetry", "measurement|Converting Units of Length", "number-sense|Factors and Multiples",
+      "number-sense|Place Value to One Million", "word-problems|Multi-Step Word Problems", "patterns-and-algebra-basics|Input-Output Rules"
+    ],
+    "Grade 5": [
+      "fractions-and-decimals|Adding and Subtracting Fractions with Unlike Denominators", "fractions-and-decimals|Multiplying Fractions", "fractions-and-decimals|Decimal Operations",
+      "measurement|Volume of Rectangular Prisms", "geometry-and-shapes|Coordinate Grids", "number-sense|Order of Operations",
+      "multiplication-and-division|Dividing by Two-Digit Numbers", "data-and-graphs|Line Plots with Fractions", "number-sense|Powers of Ten",
+      "geometry-and-shapes|Classifying Triangles", "measurement|Converting Measurement Units", "patterns-and-algebra-basics|Numerical Patterns and Rules"
+    ],
+    "Grade 6": [
+      "fractions-and-decimals|Dividing Fractions", "number-sense|Ratios and Rates", "number-sense|Percentages", "patterns-and-algebra-basics|Writing and Evaluating Expressions",
+      "patterns-and-algebra-basics|Solving One-Step Equations", "geometry-and-shapes|Area of Triangles and Quadrilaterals", "number-sense|Negative Numbers",
+      "data-and-graphs|Mean, Median, Mode and Range", "measurement|Surface Area with Nets", "number-sense|Greatest Common Factor and Least Common Multiple",
+      "geometry-and-shapes|Coordinate Plane in Four Quadrants", "word-problems|Ratio Word Problems"
+    ]
+  },
+  "science": {
+    "Grade 1": [
+      "living-things|Living and Non-Living Things", "human-body|My Five Senses", "plants|Parts of a Plant", "animals-and-habitats|Animal Coverings",
+      "weather-and-seasons|Daily Weather", "earth-and-space|Day and Night", "materials-and-properties|Sorting Materials", "forces-and-energy|Push and Pull",
+      "animals-and-habitats|Baby Animals and Their Parents", "environment-and-conservation|Taking Care of Our Earth"
+    ],
+    "Grade 2": [
+      "plants|What Plants Need to Grow", "animals-and-habitats|Animal Habitats", "materials-and-properties|Solids and Liquids", "human-body|Healthy Eating",
+      "earth-and-space|Rocks and Soil", "weather-and-seasons|The Four Seasons", "living-things|Life Cycle of a Butterfly", "forces-and-energy|Magnets",
+      "simple-experiments|Sink or Float", "environment-and-conservation|Reduce, Reuse, Recycle"
+    ],
+    "Grade 3": [
+      "plants|Plant Life Cycle", "living-things|Life Cycle of a Frog", "animals-and-habitats|Food Chains", "forces-and-energy|Forces and Motion",
+      "materials-and-properties|States of Matter", "earth-and-space|The Water Cycle", "human-body|The Skeleton and Muscles", "weather-and-seasons|Measuring Weather",
+      "simple-experiments|Fair Tests", "environment-and-conservation|Pollution and Its Effects"
+    ],
+    "Grade 4": [
+      "forces-and-energy|Simple Circuits", "forces-and-energy|Sound and Vibrations", "forces-and-energy|Light and Shadows", "human-body|The Digestive System",
+      "animals-and-habitats|Adaptations", "earth-and-space|Earth's Layers", "earth-and-space|Erosion and Weathering", "living-things|Classifying Vertebrates and Invertebrates",
+      "materials-and-properties|Conductors and Insulators", "simple-experiments|Making Predictions and Observations"
+    ],
+    "Grade 5": [
+      "earth-and-space|The Solar System", "earth-and-space|Phases of the Moon", "materials-and-properties|Mixtures and Solutions", "materials-and-properties|Reversible and Irreversible Changes",
+      "human-body|The Heart and Circulation", "human-body|The Respiratory System", "plants|Photosynthesis", "animals-and-habitats|Ecosystems",
+      "forces-and-energy|Gravity and Friction", "environment-and-conservation|Renewable and Non-Renewable Energy"
+    ],
+    "Grade 6": [
+      "living-things|Cells: Plant and Animal", "living-things|Microorganisms", "forces-and-energy|Forms of Energy", "forces-and-energy|Electricity and Magnetism",
+      "earth-and-space|Plate Tectonics, Earthquakes and Volcanoes", "materials-and-properties|Elements, Compounds and Mixtures", "human-body|The Nervous System",
+      "environment-and-conservation|Climate Change Basics", "animals-and-habitats|Biodiversity", "simple-experiments|Variables in an Experiment"
+    ]
+  }
+}

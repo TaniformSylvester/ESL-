@@ -26,3 +26,10 @@
 .DS_Store
 Thumbs.db
 *.swp
+
+# Resource generator (automation/) — local virtualenv, build output, caches
+/automation/.venv/
+/automation/out/
+/automation/.cache/
+/automation/specs/work/
+__pycache__/
