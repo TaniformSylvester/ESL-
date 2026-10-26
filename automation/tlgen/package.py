@@ -41,9 +41,10 @@ def render(spec, out_dir: Path, compact=0):
     from pypdf import PdfReader
     pages = len(PdfReader(str(main)).pages)
     thumb = images.thumbnail(spec, out_dir / "thumbnail.jpg")
+    thumb_fit = images.thumbnail_fits(spec, out_dir / "thumb-check")
     prev = images.preview(spec, main, pages, out_dir / "preview.jpg")
 
     included = render_html.whats_included(spec)
     included[0] = f"{pages}-page printable PDF lesson pack: " + included[0][0].lower() + included[0][1:]
-    return {"main": str(main), "extras": [(lbl, str(p)) for lbl, p in extras], "thumbnail": str(thumb), "preview": str(prev),
+    return {"main": str(main), "extras": [(lbl, str(p)) for lbl, p in extras], "thumbnail": str(thumb), "thumbnail_fit": thumb_fit, "preview": str(prev),
             "components": components, "whats_included": included, "pages": pages, "compact": compact}

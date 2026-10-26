@@ -390,28 +390,43 @@ def flashcards_only(spec, compact=0):
 
 
 # ---------------------------------------------------------------- cover cards (thumbnail)
-def thumb_card(spec, width=1200, height=675):
+def thumb_card(spec, width=1200, height=900):
+    """Resource-card thumbnail. The site shows these in a 4:3 frame, so the
+    card is designed at 4:3 and the title shrinks until it fits inside a safe
+    margin. The script records the result in body[data-fit] ("ok" or
+    "overflow"), which QC reads back (images.thumbnail_fits)."""
     m = spec["meta"]
     c = config.SUBJECT_COLORS[m["subject"]]
     b = config.BRAND
     tier = ("PRO", b["gold"], b["navy"]) if m["tier"] == "pro" else ("FREE", "#1FB5A8", "#fff")
     art = "".join(_emoji(x) for x in (spec.get("cover_emoji") or [])[:4])
     title = m["title"]
-    size = 64 if len(title) <= 34 else (54 if len(title) <= 50 else 46)
+    size = 88 if len(title) <= 30 else (78 if len(title) <= 45 else 68)
+    pad = 64
+    text_bottom = height - 150          # badges sit below this line
     return f"""<!doctype html><html><head><meta charset="utf-8"><style>{_font_css()}
 html,body{{margin:0;width:{width}px;height:{height}px;overflow:hidden}}
 body{{background:linear-gradient(135deg,{b['navy']} 0%,{b['navy_dark']} 100%);font-family:Nunito;color:#fff;position:relative}}
-.blob{{position:absolute;right:-120px;top:-120px;width:620px;height:620px;border-radius:50%;background:{c['main']};opacity:.95}}
-.blob2{{position:absolute;right:250px;bottom:-200px;width:340px;height:340px;border-radius:50%;background:{b['gold']};opacity:.9}}
-.art{{position:absolute;right:60px;top:95px;width:440px;display:grid;grid-template-columns:1fr 1fr;justify-items:center;align-items:center;gap:18px 20px;font-family:'Noto Color Emoji';font-size:115px;line-height:1.1}}
-.art img.pic{{height:1.25em;max-width:1.85em;object-fit:contain;vertical-align:middle}}
-.txt{{position:absolute;left:64px;top:56px;width:620px}}
-img{{height:46px}}
-h1{{font-family:Fredoka;font-weight:700;font-size:{size}px;line-height:1.05;margin:44px 0 18px;text-shadow:0 3px 0 rgba(0,0,0,.18)}}
-.sub{{font-size:26px;font-weight:800;color:{b['gold']}}}
-.badges{{position:absolute;left:64px;bottom:56px;display:flex;gap:14px}}
-.badges span{{border-radius:40px;padding:10px 24px;font-weight:800;font-size:24px;background:#fff;color:{b['navy']}}}
-</style></head><body><div class="blob"></div><div class="blob2"></div><div class="art">{art}</div>
-<div class="txt"><img src="{config.LOGO_WHITE_SVG.as_uri()}"><h1>{e(title)}</h1><div class="sub">{e(m['grade'])} · {e(c['name'])}</div></div>
+.blob{{position:absolute;right:-170px;top:-290px;width:740px;height:740px;border-radius:50%;background:{c['main']};opacity:.95}}
+.blob2{{position:absolute;right:-90px;bottom:-230px;width:420px;height:420px;border-radius:50%;background:{b['gold']};opacity:.9}}
+.art{{position:absolute;right:60px;top:36px;width:450px;height:330px;display:grid;grid-template-columns:1fr 1fr;justify-items:center;align-items:center;gap:10px 20px;font-family:'Noto Color Emoji';font-size:110px;line-height:1.1}}
+.art img.pic{{height:1.2em;max-width:1.85em;object-fit:contain;vertical-align:middle}}
+.logo{{position:absolute;left:{pad}px;top:60px;height:56px}}
+.txt{{position:absolute;left:{pad}px;right:{pad}px;top:470px}}
+h1{{font-family:Fredoka;font-weight:700;font-size:{size}px;line-height:1.06;margin:0 0 20px;overflow-wrap:break-word;text-shadow:0 3px 0 rgba(0,0,0,.18)}}
+.sub{{font-size:34px;font-weight:800;color:{b['gold']}}}
+.badges{{position:absolute;left:{pad}px;bottom:{pad}px;display:flex;gap:16px}}
+.badges span{{border-radius:40px;padding:12px 28px;font-weight:800;font-size:30px;background:#fff;color:{b['navy']}}}
+</style></head><body data-fit="pending"><div class="blob"></div><div class="blob2"></div><div class="art">{art}</div>
+<img class="logo" src="{config.LOGO_WHITE_SVG.as_uri()}" alt="">
+<div class="txt"><h1>{e(title)}</h1><div class="sub">{e(m['grade'])} · {e(c['name'])}</div></div>
 <div class="badges"><span style="background:{c['main']};color:#fff">{e(m['resource_type'])}</span><span style="background:{tier[1]};color:{tier[2]}">{tier[0]}</span></div>
+<script>
+document.fonts.ready.then(function () {{
+  var h = document.querySelector('h1'), box = document.querySelector('.txt'), size = parseFloat(getComputedStyle(h).fontSize);
+  function fits() {{ return box.getBoundingClientRect().bottom <= {text_bottom} && h.scrollWidth <= h.clientWidth; }}
+  while (!fits() && size > 44) {{ size -= 2; h.style.fontSize = size + 'px'; }}
+  document.body.setAttribute('data-fit', fits() ? 'ok' : 'overflow');
+}});
+</script>
 </body></html>"""

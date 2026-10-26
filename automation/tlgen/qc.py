@@ -218,7 +218,9 @@ def run(spec, pkg, *, taxonomy=None, settings=None, client=None, catalog=None):
 
     # 10. Images
     img_errs = []
-    for key, (mw, mh) in (("thumbnail", (1200, 675)), ("preview", (800, 600))):
+    if not pkg.get("thumbnail_fit"):
+        img_errs.append("thumbnail title does not fit its frame (shorten the title)")
+    for key, (mw, mh) in (("thumbnail", (1200, 900)), ("preview", (800, 600))):
         p = Path(pkg[key])
         w, h, white = images.visual_stats(p)
         if w < mw or h < mh:

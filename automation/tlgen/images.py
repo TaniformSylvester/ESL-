@@ -1,4 +1,4 @@
-"""Thumbnail (1200x675) and preview (1200x900) JPEGs for the resource page."""
+"""Thumbnail (1200x900, 4:3 like the site's card frame) and preview (1200x900) JPEGs."""
 import subprocess
 import tempfile
 from pathlib import Path
@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 from . import config, render_html, render_pdf
 
-THUMB = (1200, 675)
+THUMB = (1200, 900)     # 4:3, the shape of the resource-card frame on the site
 PREVIEW = (1200, 900)
 
 
@@ -22,6 +22,12 @@ def page_images(pdf: Path, pages, dpi=70):
             with Image.open(f"{stem}.png") as im:
                 out.append(im.convert("RGB"))
     return out
+
+
+def thumbnail_fits(spec, work: Path) -> bool:
+    """True when the thumbnail title fits its safe area (read back from Chromium)."""
+    dom = render_pdf.dump_dom(render_html.thumb_card(spec, *THUMB), Path(work))
+    return 'data-fit="ok"' in dom
 
 
 def thumbnail(spec, out: Path) -> Path:

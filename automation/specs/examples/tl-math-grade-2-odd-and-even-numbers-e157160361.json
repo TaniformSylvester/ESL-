@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "key": "tl-math-grade-2-odd-and-even-numbers-ac17c10fb2",
+  "key": "tl-math-grade-2-odd-and-even-numbers-e157160361",
   "meta": {
     "subject": "math",
     "grade": "Grade 2",
@@ -31,7 +31,8 @@
     ],
     "teacher_tips": "Let students touch and move counters before they use the ones digit rule. Ask \"Is anyone left without a partner?\" so the idea of odd and even stays concrete.",
     "differentiation_notes": "Support: give students counters for activities 1 and 3 and a hundred chart for activity 4. Challenge: ask students to explain what happens when you add two odd numbers.",
-    "assessment_notes": "Activities 1–6 check pairing, counting by 2s, doubles and the ones digit (answer key included). Activity 7 shows whether students can explain their reasoning."
+    "assessment_notes": "Activities 1–6 check pairing, counting by 2s, doubles and the ones digit (answer key included). Activity 7 shows whether students can explain their reasoning.",
+    "regenerates_item_id": 2
   },
   "cover_emoji": [
     "🧦",

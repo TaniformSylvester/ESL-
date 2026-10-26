@@ -42,3 +42,15 @@ def screenshot(html: str, out: Path, width: int, height: int) -> Path:
     with Image.open(out) as im:
         im.convert("RGB").crop((0, 0, width, height)).save(out)
     return out
+
+
+def dump_dom(html: str, work: Path) -> str:
+    """The page's DOM after scripts ran (used to read layout checks back)."""
+    work = Path(work)
+    src = work.with_suffix(".src.html")
+    src.write_text(html, encoding="utf-8")
+    with tempfile.TemporaryDirectory() as profile:
+        proc = subprocess.run([config.chromium(), *FLAGS, f"--user-data-dir={profile}", "--window-size=1200,1100",
+                               "--dump-dom", src.as_uri()], capture_output=True, text=True, timeout=180)
+    src.unlink()
+    return proc.stdout

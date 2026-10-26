@@ -28,8 +28,10 @@ cron jobs, Python or extra software.
 | Quiz, homework, rubric, picture flashcards | | ✓ |
 | Editable PowerPoint lesson slides | | ✓ |
 
-The thumbnail (1200×675) and preview (1200×900) images are generated from
-the real pages.
+The thumbnail (1200×900, the 4:3 shape of the site's resource cards) and
+the preview (1200×900) are generated from the real pages. The thumbnail title
+shrinks to fit inside a safe margin, and QC fails the package if it still
+doesn't fit.
 
 ## One-time setup
 
