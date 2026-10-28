@@ -4,6 +4,7 @@ Every generated item stores its parameters; qc.py re-solves each item from
 those parameters with solve() and fails the resource if any stored answer
 differs. Answers are therefore computed, never typed by a person or model.
 """
+import ast
 import random
 from fractions import Fraction
 from math import gcd
@@ -27,6 +28,48 @@ def _borrows(a, b):
             return True
         a, b = a // 10, b // 10
     return False
+
+
+def evaluate(expr: str) -> Fraction:
+    """Exact value of an integer expression with + - * / and brackets (no other syntax allowed)."""
+    ops = {ast.Add: lambda a, b: a + b, ast.Sub: lambda a, b: a - b, ast.Mult: lambda a, b: a * b, ast.Div: lambda a, b: a / b}
+
+    def ev(node):
+        if isinstance(node, ast.Expression):
+            return ev(node.body)
+        if isinstance(node, ast.BinOp) and type(node.op) in ops:
+            return ops[type(node.op)](ev(node.left), ev(node.right))
+        if isinstance(node, ast.Constant) and isinstance(node.value, int):
+            return Fraction(node.value)
+        raise ValueError(f"unsupported expression: {expr}")
+    return ev(ast.parse(expr, mode="eval"))
+
+
+def pretty(expr: str) -> str:
+    return expr.replace("*", "×").replace("/", "÷").replace("-", "−")
+
+
+PICTO_ASK = {   # (how many…, how many more…) wording per theme
+    "fruit": ("How many children chose {a}?", "How many more children chose {a} than {b}?"),
+    "pets": ("How many {a} are there?", "How many more {a} than {b}?"),
+    "weather": ("How many {a} were there?", "How many more {a} than {b}?"),
+    "toys": ("How many children chose {a}?", "How many more children chose {a} than {b}?"),
+}
+PICTO_THEMES = {
+    "fruit": ("Favorite fruit", [("🍎", "apples"), ("🍌", "bananas"), ("🍇", "grapes")]),
+    "pets": ("Our pets", [("🐶", "dogs"), ("🐱", "cats"), ("🐟", "fish")]),
+    "weather": ("Weather this month", [("☀️", "sunny days"), ("🌧️", "rainy days"), ("☁️", "cloudy days")]),
+    "toys": ("Favorite toys", [("⚽", "balls"), ("🧸", "teddy bears"), ("🪁", "kites")]),
+}
+
+
+def picto_data(theme, seed):
+    """Counts for a picture graph: fixed by theme + seed so every question in a section uses the same graph."""
+    rng = random.Random(f"picto:{theme}:{seed}")
+    while True:
+        counts = [rng.randint(2, 9) for _ in range(3)]
+        if len(set(counts)) == 3:          # distinct counts: "most" and "fewest" have one answer
+            return counts
 
 
 def fmt_time(h, m):
@@ -80,6 +123,29 @@ def solve(gen, p):
         return p["l"] * p["w"]
     if gen == "odd_even_objects":
         return "even" if p["n"] % 2 == 0 else "odd"
+    if gen == "thermometer_read":
+        return p["t"]
+    if gen == "order_ops":
+        v = evaluate(p["expr"])
+        assert v.denominator == 1 and v >= 0
+        return int(v)
+    if gen == "div_remainder":
+        return f"{p['a'] // p['b']} R {p['a'] % p['b']}"
+    if gen == "word_div":
+        return p["total"] // p["each"]
+    if gen == "pictograph":
+        counts = picto_data(p["theme"], p["data_seed"])
+        names = [n for _, n in PICTO_THEMES[p["theme"]][1]]
+        if p["q"] == "count":
+            return counts[p["i"]]
+        if p["q"] == "more":
+            return counts[p["i"]] - counts[p["j"]]
+        if p["q"] == "total":
+            return sum(counts)
+        if p["q"] == "most":
+            return names[counts.index(max(counts))]
+        if p["q"] == "fewest":
+            return names[counts.index(min(counts))]
     if gen == "doubles":
         return f"{p['n'] // 2} + {p['n'] // 2}"
     if gen in ("from_place_values", "base_ten_read"):
@@ -107,7 +173,7 @@ def generate(gen, count=6, seed=1, **kw):
     items, seen, guard = [], set(), 0
     while len(items) < count and guard < 2000:
         guard += 1
-        it = _one(gen, rng, **kw)
+        it = _one(gen, rng, _seed=seed, **kw)
         sig = repr(sorted(it["params"].items()))
         if sig in seen:
             continue
@@ -119,7 +185,7 @@ def generate(gen, count=6, seed=1, **kw):
 
 
 def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, step=5, to=10, digits=3,
-         parts=(2, 3, 4), denominators=(2, 3, 4, 6, 8), max_side=10, **_):
+         parts=(2, 3, 4), denominators=(2, 3, 4, 6, 8), max_side=10, theme="fruit", brackets=True, _seed=1, **_):
     if gen == "add":
         while True:
             a, b = rng.randint(lo, hi), rng.randint(lo, hi)
@@ -192,6 +258,64 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         n = rng.randint(1, d - 1)
         k = rng.randint(2, 4)
         return _item("equivalent_fraction", {"n": n, "d": d, "d2": d * k}, f"{n}/{d} = ____/{d * k}")
+    if gen == "thermometer_read":
+        t = rng.randrange(max(0, lo), min(40, hi) + 1, 2)
+        return _item(gen, {"t": t}, "What temperature does it show? ____ °C", {"thermo": t})
+    if gen == "order_ops":
+        templates = ["{a} + {b} * {c}", "{a} * {b} - {c}", "{a} - {b} * {c}", "{a} + {b} / {c}", "{a} * {b} + {c} * {d}",
+                     "{a} + {b} * {c} - {d}"]
+        if brackets:
+            templates += ["({a} + {b}) * {c}", "{a} * ({b} - {c})", "({a} + {b}) / {c}", "{a} - ({b} + {c})", "({a} - {b}) * ({c} + {d})"]
+        while True:
+            t = rng.choice(templates)
+            v = {k: rng.randint(2, 12) for k in "abcd"}
+            if "/" in t:                       # make every division exact
+                if "({a} + {b}) / {c}" == t:
+                    v["a"] = v["c"] * rng.randint(2, 9) - v["b"]
+                else:
+                    v["b"] = v["c"] * rng.randint(2, 9)
+            expr = t.format(**v)
+            try:
+                val = evaluate(expr)
+            except ZeroDivisionError:
+                continue
+            if val.denominator == 1 and 0 <= val <= 200 and all(x > 0 for x in v.values()):
+                return _item(gen, {"expr": expr}, f"{pretty(expr)} = ____")
+    if gen == "div_remainder":
+        while True:
+            b = rng.choice(list(factors))
+            a = rng.randint(max(lo, b * 2), hi)
+            if a % b:
+                return _item(gen, {"a": a, "b": b}, f"{a} ÷ {b} = ____")
+    if gen == "word_div":
+        each = rng.choice(list(factors))
+        total = each * rng.randint(max(2, lo), max_other)
+        name = rng.choice(NAMES)
+        things, one, many = rng.choice([("books", "shelf", "shelves"), ("eggs", "box", "boxes"), ("chairs", "row", "rows"),
+                                        ("stickers", "page", "pages"), ("pencils", "pack", "packs")])
+        return _item(gen, {"total": total, "each": each, "kind": things},
+                     f"{name} has {total} {things}. Each {one} holds {each} {things}. How many {many} does {name} need? ____")
+    if gen == "pictograph":
+        title, cats = PICTO_THEMES[theme]
+        q = rng.choice(["count", "count", "more", "total", "most", "fewest"])
+        counts = picto_data(theme, _seed)
+        i, j = rng.sample(range(3), 2)
+        if q == "more" and counts[i] < counts[j]:
+            i, j = j, i
+        params = {"theme": theme, "data_seed": _seed, "q": q}
+        if q == "count":
+            params["i"] = i
+            prompt = PICTO_ASK[theme][0].format(a=cats[i][1]) + " ____"
+        elif q == "more":
+            params.update(i=i, j=j)
+            prompt = PICTO_ASK[theme][1].format(a=cats[i][1], b=cats[j][1]) + " ____"
+        elif q == "total":
+            prompt = "How many are there in all? ____"
+        elif q == "most":
+            prompt = "Which has the most? ________"
+        else:
+            prompt = "Which has the fewest? ________"
+        return _item(gen, params, prompt, {"pictograph": [theme, _seed]})
     if gen == "odd_even_objects":
         n = rng.randint(max(lo, 3), min(hi, 20))
         thing = rng.choice(["🍎", "⭐", "🐟", "🌸", "🧦", "🍪", "🎈", "🐞"])
@@ -215,14 +339,14 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         name, (one, many) = rng.choice(NAMES), rng.choice(THINGS)
         if gen == "word_add":
             a, b = rng.randint(lo, hi), rng.randint(lo, hi)
-            return _item(gen, {"a": a, "b": b}, f"{name} has {a} {many if a != 1 else one}. A friend gives {name} {b} more. How many {many} does {name} have now?")
+            return _item(gen, {"a": a, "b": b}, f"{name} has {a} {many if a != 1 else one}. A friend gives {name} {b} more. How many {many} does {name} have now? ____")
         if gen == "word_sub":
             a, b = sorted((rng.randint(lo, hi), rng.randint(lo, hi)), reverse=True)
             if a == b:
                 a += 1
-            return _item(gen, {"a": a, "b": b}, f"{name} has {a} {many}. {name} gives away {b}. How many {many} are left?")
+            return _item(gen, {"a": a, "b": b}, f"{name} has {a} {many}. {name} gives away {b}. How many {many} are left? ____")
         groups, each = rng.randint(2, 6), rng.choice(list(factors))
-        return _item(gen, {"groups": groups, "each": each}, f"There are {groups} bags. Each bag has {each} {many}. How many {many} are there in all?")
+        return _item(gen, {"groups": groups, "each": each}, f"There are {groups} bags. Each bag has {each} {many}. How many {many} are there in all? ____")
     raise ValueError(f"unknown generator {gen}")
 
 

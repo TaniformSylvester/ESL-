@@ -12,7 +12,7 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
 
-from . import config, illustrations, spec as S
+from . import config, illustrations, mathgen, spec as S
 
 
 def _rgb(hexcode):
@@ -189,11 +189,27 @@ class Doc:
         elif t == "draw_write":
             for i, it in enumerate(items):
                 self.d.add_paragraph(f"{i + 1}. {it['prompt']}").paragraph_format.keep_with_next = True
-                box = self.d.add_table(rows=1, cols=1)
-                box.style = "Table Grid"
-                box.rows[0].height = Cm(5.5)
-                self.d.add_paragraph("_" * 70)
+                if it.get("box", True):
+                    box = self.d.add_table(rows=1, cols=1)
+                    box.style = "Table Grid"
+                    box.rows[0].height = Cm(5.5)
+                for _ in range(max(1, it.get("lines", 1))):
+                    self.d.add_paragraph("_" * 70)
         elif t == "math":
+            graph = next(((it.get("render") or {}).get("pictograph") for it in items if (it.get("render") or {}).get("pictograph")), None)
+            if graph:
+                title, cats = mathgen.PICTO_THEMES[graph[0]]
+                self.para(title, bold=True, color=config.BRAND["navy"])
+                g = self.d.add_table(rows=0, cols=2)
+                g.style = "Table Grid"
+                for (icon, name), n in zip(cats, mathgen.picto_data(*graph)):
+                    cells = g.add_row().cells
+                    cells[0].text = name.capitalize()
+                    run = cells[1].paragraphs[0].add_run()
+                    for _ in range(n):
+                        self.picture(run, illustrations.emoji_png(icon, 120), 0.7)
+                self._widths(g, [3.5, 13.5])
+                self.para("Each picture shows 1.", italic=True, color=config.BRAND["muted"], size=9)
             cols = 2
             t_ = self.d.add_table(rows=0, cols=cols)
             for i in range(0, len(items), cols):
@@ -205,6 +221,8 @@ class Doc:
                         self.picture(cells[j].add_paragraph().add_run(), illustrations.clock_png(r["clock"][0], r["clock"][1], 300, r.get("hands", True)), 3.4)
                     elif "fraction" in r:
                         self.picture(cells[j].add_paragraph().add_run(), illustrations.fraction_png(*r["fraction"], size=300), 3.2)
+                    elif "thermo" in r:
+                        self.picture(cells[j].add_paragraph().add_run(), illustrations.thermometer_png(r["thermo"]), 1.8)
                     elif "objects" in r:
                         run = cells[j].add_paragraph().add_run()
                         for _ in range(r["objects"][1]):

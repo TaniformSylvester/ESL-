@@ -9,7 +9,7 @@ import re
 from html import escape
 from pathlib import Path
 
-from . import config, illustrations, spec as S
+from . import config, illustrations, mathgen, spec as S
 
 
 def _font_css():
@@ -114,6 +114,13 @@ ol.items>li{{margin:0 0 calc(3.2mm*var(--gap));break-inside:avoid}}
 .mathgrid.cols3{{grid-template-columns:1fr 1fr 1fr}}
 .mq{{display:flex;gap:2.5mm;align-items:flex-start;break-inside:avoid;font-size:1.06em;font-weight:700}}
 .mq .n{{color:var(--main);font-weight:800;min-width:6mm}}
+.picto{{border:2px solid var(--soft);border-radius:3mm;padding:3mm 4mm;margin:0 0 calc(4mm*var(--gap));break-inside:avoid}}
+.picto .pt{{font:700 13pt Fredoka;color:var(--navy);text-align:center;margin-bottom:2mm}}
+.picto table td{{border-bottom:1px solid #E1E5EF;padding:1.5mm 2mm}}
+.picto td.pl{{width:44mm;font-weight:800;white-space:nowrap}}
+.picto td.pl .emoji{{font-size:15pt}}
+.picto td.pi .emoji{{font-size:19pt;margin-right:2.5mm}}
+.picto .pk{{font-size:9pt;color:var(--muted);text-align:right;margin-top:1.5mm}}
 .objs{{display:grid;grid-template-columns:repeat(5,9mm);gap:1.5mm 1mm;margin-top:2mm}}
 .objs .emoji{{font-size:17pt;text-align:center}}
 .cmp{{display:inline-block;width:9mm;height:9mm;border:2px solid var(--navy);border-radius:50%;vertical-align:middle;margin:0 2.5mm}}
@@ -211,9 +218,13 @@ def render_section(sec, n, seed):
                    + "".join("<tr>" + "<td></td>" * len(groups) + "</tr>" for _ in range(rows)) + "</table>")
     elif t == "draw_write":
         out.append('<ol class="items">' + "".join(
-            f"<li>{e(it['prompt'])}<div class='draw'></div>" + '<div class="wline"></div>' * it.get("lines", 1) + "</li>" for it in items) + "</ol>")
+            f"<li>{_text(it['prompt'])}" + ("<div class='draw'></div>" if it.get("box", True) else "")
+            + '<div class="wline"></div>' * it.get("lines", 1) + "</li>" for it in items) + "</ol>")
     elif t == "math":
-        has_pic = any(it.get("render") for it in items)
+        graph = next(((it.get("render") or {}).get("pictograph") for it in items if (it.get("render") or {}).get("pictograph")), None)
+        if graph:
+            out.append(pictograph_html(*graph))
+        has_pic = any(it.get("render") and "pictograph" not in it["render"] for it in items)
         # Three columns only for short prompts with a single blank (e.g. "29 + 12 = ____").
         cols = "" if has_pic or any(len(it["prompt"]) > 18 or it["prompt"].count("____") > 1 for it in items) else " cols3"
         cells = []
@@ -226,6 +237,10 @@ def render_section(sec, n, seed):
                 pic = illustrations.fraction_svg(*r["fraction"], size=100)
             elif "base10" in r:
                 pic = illustrations.base10_svg(*r["base10"])
+            elif "thermo" in r:
+                pic = illustrations.thermometer_svg(r["thermo"])
+            elif "pictograph" in r:
+                pic = ""                      # drawn once above the questions
             elif "objects" in r:
                 thing, n = r["objects"]
                 pic = '<div class="objs">' + f'<span class="emoji">{e(thing)}</span>' * n + "</div>"
@@ -244,6 +259,14 @@ def render_section(sec, n, seed):
         out.append(f'<div class="mathgrid{cols}">{"".join(cells)}</div>')
     out.append("</div>")
     return "".join(out)
+
+
+def pictograph_html(theme, seed):
+    title, cats = mathgen.PICTO_THEMES[theme]
+    counts = mathgen.picto_data(theme, seed)
+    rows = "".join(f'<tr><td class="pl">{_emoji(icon)} {e(name.capitalize())}</td><td class="pi">' + f'<span class="emoji">{e(icon)}</span>' * n + "</td></tr>"
+                   for (icon, name), n in zip(cats, counts))
+    return f'<div class="picto"><div class="pt">{e(title)}</div><table>{rows}</table><div class="pk">Each picture shows 1.</div></div>'
 
 
 # ---------------------------------------------------------------- pages

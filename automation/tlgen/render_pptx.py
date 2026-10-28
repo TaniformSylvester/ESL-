@@ -110,7 +110,7 @@ class Deck:
                 if sec["type"] in ("multiple_choice", "true_false", "math", "fill_blank") and not sec.get("teacher_script"):
                     qs += [(sec["type"], it) for it in sec["items"][:3]
                            if not (sec["type"] == "multiple_choice" and any(illustrations.is_emoji(str(o)) for o in it["options"]))
-                           and not (it.get("render") or {}).get("objects")]
+                           and not (it.get("render") or {}).get("objects") and not (it.get("render") or {}).get("pictograph")]
             if len(qs) >= 4:
                 break
         for n, (t, it) in enumerate(qs[:5], 1):

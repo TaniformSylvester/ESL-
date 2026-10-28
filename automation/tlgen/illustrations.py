@@ -324,3 +324,53 @@ def base10_png(h, t, o, unit=14):
                 d.line([(x + k * unit, y), (x + k * unit, y + ph)], fill=(224, 160, 96), width=1)
     img.save(out)
     return str(out)
+
+
+# ---------------------------------------------------------------- thermometer (0-40 °C, marks every 2 °C)
+def _thermo_geometry(h):
+    top, bottom = 28, h - 44            # y of 40 °C and 0 °C (room above for the °C label)
+    return top, bottom, (bottom - top) / 40
+
+
+def thermometer_svg(temp, h=210):
+    top, bottom, per = _thermo_geometry(h)
+    x = 34
+    y_t = bottom - temp * per
+    out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="96" height="{h}" viewBox="0 0 96 {h}">',
+           f'<rect x="{x - 9}" y="{top - 8}" width="18" height="{bottom - top + 20}" rx="9" fill="#fff" stroke="#172A6E" stroke-width="2.5"/>',
+           f'<circle cx="{x}" cy="{h - 24}" r="16" fill="#E5484D" stroke="#172A6E" stroke-width="2.5"/>',
+           f'<rect x="{x - 4.5}" y="{y_t:.1f}" width="9" height="{h - 24 - y_t:.1f}" fill="#E5484D"/>']
+    for v in range(0, 41, 2):
+        y = bottom - v * per
+        major = v % 10 == 0
+        out.append(f'<line x1="{x + 10}" y1="{y:.1f}" x2="{x + (22 if major else 16)}" y2="{y:.1f}" stroke="#172A6E" stroke-width="{1.6 if major else 1}"/>')
+        if major:
+            out.append(f'<text x="{x + 26}" y="{y + 4:.1f}" font-size="12" font-family="Nunito, Arial" font-weight="700" fill="#1C2541">{v}</text>')
+    out.append(f'<text x="{x - 8}" y="12" font-size="11" font-family="Nunito, Arial" font-weight="800" fill="#5B6478">°C</text></svg>')
+    return "".join(out)
+
+
+def thermometer_png(temp, h=420):
+    out = _cache(f"thermo-{temp}-{h}.png")
+    if out.exists():
+        return str(out)
+    k = h / 210
+    img = Image.new("RGBA", (int(96 * k), h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    top, bottom, per = _thermo_geometry(210)
+    x = 34
+    sc = lambda v: v * k
+    d.rounded_rectangle([sc(x - 9), sc(top - 8), sc(x + 9), sc(bottom + 12)], radius=sc(9), fill="white", outline=NAVY, width=max(2, int(2.5 * k)))
+    y_t = bottom - temp * per
+    d.rectangle([sc(x - 4.5), sc(y_t), sc(x + 4.5), sc(210 - 24)], fill=(229, 72, 77))
+    d.ellipse([sc(x - 16), sc(210 - 40), sc(x + 16), sc(210 - 8)], fill=(229, 72, 77), outline=NAVY, width=max(2, int(2.5 * k)))
+    font = ImageFont.truetype(config.ttf("nunito-latin-700-normal"), int(12 * k))
+    for v in range(0, 41, 2):
+        y = bottom - v * per
+        major = v % 10 == 0
+        d.line([(sc(x + 10), sc(y)), (sc(x + (22 if major else 16)), sc(y))], fill=NAVY, width=2 if major else 1)
+        if major:
+            d.text((sc(x + 26), sc(y)), str(v), font=font, fill=(28, 37, 65), anchor="lm")
+    d.text((sc(x - 8), sc(8)), "°C", font=font, fill=(91, 100, 120), anchor="lm")
+    img.save(out)
+    return str(out)

@@ -96,7 +96,8 @@ Fill the spec yourself. Never leave filler text.
   extra `slides`. Pro should be more comprehensive, not just longer.
 - Section types: `match`, `fill_blank` (needs `____`, optional
   `"word_bank": true`), `multiple_choice`, `true_false`, `short_answer`,
-  `label` (emoji + word), `sequence` (steps in the correct order; they are
+  `label` (emoji + word), `draw_write` (`"box": false` and `"lines": 10` gives a
+  lined writing space instead of a drawing box), `sequence` (steps in the correct order; they are
   shuffled when printed), `sort` (groups of words), `draw_write`, `math`.
 - Listening activities: add `"teacher_script": ["Number 1. Stand up, then
   clap your hands.", …]` to the section. The script prints in the answer key

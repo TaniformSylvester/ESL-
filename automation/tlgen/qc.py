@@ -22,10 +22,18 @@ SCORE_NOTE = ("Automated indicators only (structure, computed answers, readabili
 PAGE_BUDGET = {"free": (4, 14), "pro": (8, 32)}
 MAX_FILE = 25 * 1024 * 1024
 MAX_IMAGE = 3 * 1024 * 1024
-UNSAFE = {"kill", "killed", "gun", "guns", "blood", "bloody", "drunk", "beer", "wine", "cigarette", "smoke", "sexy", "stupid",
+UNSAFE = {"kill", "killed", "gun", "guns", "bloody", "drunk", "beer", "wine", "cigarette", "smoke", "sexy", "stupid",
           "idiot", "dumb", "hate", "die", "dead", "weapon", "bomb", "drugs", "casino", "gamble"}
 ALWAYS_OK = {"teachluma", "pdf", "docx", "pptx", "powerpoint", "esl", "ok", "worksheet", "worksheets", "flashcard", "flashcards",
-             "pre", "re", "e.g", "i.e", "vs", "etc", "min", "mins", "am", "pm", "pinterest", "facebook", "instagram", "tiktok"}
+             "pre", "re", "e.g", "i.e", "vs", "etc", "min", "mins", "am", "pm", "pinterest", "facebook", "instagram", "tiktok",
+             "multi", "non", "co", "sub", "semi",            # hyphen prefixes (multi-step, non-fiction)
+             "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+             "january", "february", "march", "april", "june", "july", "august", "september", "october", "november",
+             "december", "mr", "mrs", "ms", "dr", "celsius", "fahrenheit", "tv", "app", "apps", "online", "email"}
+# First names commonly used in classroom examples (proper nouns the dictionary lacks).
+COMMON_NAMES = {"sam", "mia", "leo", "max", "nina", "ali", "tom", "anna", "lily", "jack", "emma", "noah", "mai", "kai", "zoe",
+                "lucy", "maria", "luis", "sara", "amir", "yuki", "wei", "kim", "raj", "tim", "ella", "ravi", "aisha", "juan",
+                "sofia", "ahmed", "lena", "ming", "tara", "nadia", "pablo", "rosa", "ken", "amy", "liam", "olivia", "ethan"}
 
 
 def grade_number(grade):
@@ -60,7 +68,7 @@ def _spell_unknown(spec):
     from spellchecker import SpellChecker
     sp = SpellChecker()
     allow = {w.lower() for w in S.as_lines(spec.get("spelling_allow"))} | ALWAYS_OK
-    allow |= {n.lower() for n in mathgen.NAMES}
+    allow |= {n.lower() for n in mathgen.NAMES} | COMMON_NAMES
     for v in spec.get("vocabulary") or []:
         allow |= {w.lower() for w in re.findall(r"[A-Za-z']+", v["word"])}
     words = set()
@@ -68,6 +76,9 @@ def _spell_unknown(spec):
         text = re.sub(r"https?://\S+|#\w+|\b[\w-]+(\.[\w-]+)*\.(com|org|net)\b|\b\d+(st|nd|rd|th)\b", " ", text)
         for w in re.findall(r"[A-Za-z][A-Za-z'’-]*[A-Za-z]|[A-Za-z]", text):
             w = w.replace("’", "'")
+            # A word written in syllables (ba-NA-na, com-PU-ter) is checked as the joined word.
+            if "-" in w and w.replace("-", "").isalpha() and sp.known([w.replace("-", "").lower()]):
+                continue
             for part in w.split("-"):
                 p = part.lower()
                 p = re.sub(r"'(s|re|ve|ll|d|m|t)$", "", p) if p not in ("can't", "won't", "don't") else p
