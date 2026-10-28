@@ -25,7 +25,8 @@ cron jobs, Python or extra software.
 | Printable PDF: cover, lesson plan, worksheet, answer key | ✓ | ✓ |
 | Editable Word worksheet | ✓ | full pack |
 | Separate answer key PDF | ✓ | ✓ |
-| Quiz, homework, rubric, picture flashcards | | ✓ |
+| Quiz, homework and rubric (in the PDF) | | ✓ |
+| Picture flashcards: separate PDF, one A5 card per page | | ✓ |
 | Editable PowerPoint lesson slides | | ✓ |
 
 The thumbnail (1200×900, the 4:3 shape of the site's resource cards) and

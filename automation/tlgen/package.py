@@ -30,7 +30,7 @@ def render(spec, out_dir: Path, compact=0):
         docx = render_docx.build(spec, out_dir / f"{base}-editable-pack.docx")
         extras.append(("Editable Student Pages + Lesson Plan (Word)", docx))
         fc = render_pdf.html_to_pdf(render_html.flashcards_only(spec, compact), out_dir / f"{base}-flashcards.pdf")
-        extras.append(("Printable Flashcards (PDF)", fc))
+        extras.append(("Flashcards (PDF, A5, one card per page)", fc))
         components += ["flashcards"] + [p for p in ("quiz", "homework", "rubric") if spec.get(p)]
     else:
         docx = render_docx.build(spec, out_dir / f"{base}-editable-worksheet.docx")

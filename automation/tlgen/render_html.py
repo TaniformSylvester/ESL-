@@ -40,7 +40,7 @@ h1,h2,h3{{font-family:Fredoka,Nunito,sans-serif;color:var(--navy);margin:0}}
 .emoji{{font-family:'Noto Color Emoji';line-height:1}}
 .emoji img.pic{{height:1.15em;width:auto;vertical-align:-0.2em}}
 .emoji img.pic{{max-width:2.4em;object-fit:contain}}
-.card .emoji img.pic,.fc .emoji img.pic{{height:1.5em}}
+.card .emoji img.pic{{height:1.5em}}
 .cover .art img.pic{{height:1em;margin:0 2mm}}
 .opt .emoji{{font-size:22pt;vertical-align:middle}}
 .key .script{{background:#FFF6DD;border-left:4px solid var(--gold);padding:2mm 3mm;margin:0 0 2mm;border-radius:2mm}}
@@ -119,11 +119,6 @@ ol.items>li{{margin:0 0 calc(3.2mm*var(--gap));break-inside:avoid}}
 .cmp{{display:inline-block;width:9mm;height:9mm;border:2px solid var(--navy);border-radius:50%;vertical-align:middle;margin:0 2.5mm}}
 u.dig{{text-decoration:underline 2px var(--main);text-underline-offset:3px;color:var(--ink)}}
 .mq svg{{display:block;margin-top:1.5mm}}
-.flash{{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:78mm;gap:0}}
-.flash .fc{{border:1.5px dashed #9AA3B8;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:5mm}}
-.flash .fc .emoji{{font-size:62pt;margin-bottom:5mm}}
-.flash .fc .w{{font:700 26pt Fredoka;color:var(--navy)}}
-.flash .fc .d{{font-size:10pt;color:var(--muted);margin-top:2mm}}
 .rub th,.rub td{{border:1.5px solid #D5DAE8;padding:2.5mm;vertical-align:top;font-size:.93em}}
 .rub th{{background:var(--navy);color:#fff}}
 .rub td:first-child{{font-weight:800;background:var(--soft);width:30mm}}
@@ -262,7 +257,7 @@ def whats_included(spec):
     if m["tier"] == "pro":
         lines.append(f"Quiz / assessment ({len(spec['quiz']['sections'])} parts)")
         lines.append("Homework practice page")
-        lines.append(f"Printable flashcards ({len(spec['vocabulary'])} picture cards)")
+        lines.append(f"Printable flashcards: {len(spec['vocabulary'])} A5 picture cards (separate PDF)")
         lines.append("Assessment rubric (4 levels)")
         lines.append("Lesson slides (editable PowerPoint)")
         lines.append("Editable Word version of all student pages")
@@ -332,15 +327,32 @@ def _points(doc):
     return sum(len(s.get("items", [])) or sum(len(v) for v in s.get("groups", {}).values()) for s in doc["sections"])
 
 
-def flashcards(spec, standalone=False):
+A5_CARD_CSS = """
+@page{size:A5 landscape;margin:0;@bottom-left{content:none}@bottom-right{content:none}}
+.a5{width:210mm;height:148mm;padding:7mm;break-after:page;position:relative;overflow:hidden}
+.a5:last-child{break-after:auto}
+.a5 .inner{height:100%;border:2.5mm solid var(--soft);border-radius:7mm;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:5mm 12mm 12mm}
+.a5 .emoji{font-size:140pt;line-height:1}
+.a5 .emoji img.pic{height:1em;max-width:1.9em;object-fit:contain}
+.a5 .w{font-family:Fredoka;font-weight:700;color:var(--navy);line-height:1.05;margin-top:5mm}
+.a5 .d{font-size:14pt;color:var(--muted);margin-top:2.5mm;max-width:165mm}
+.a5 .foot{position:absolute;left:15mm;right:15mm;bottom:12mm;display:flex;justify-content:space-between;align-items:center;font:700 9pt Nunito;color:#9AA3B8}
+.a5 .foot img{height:5.5mm}
+"""
+
+
+def flashcards(spec):
+    """One picture card per A5 page (landscape), as a separate printable file."""
+    m = spec["meta"]
     vocab = spec["vocabulary"]
-    pages = []
-    for i in range(0, len(vocab), 6):
-        cards = "".join(f'<div class="fc">{_emoji(v.get("emoji", ""))}<div class="w">{e(v["word"])}</div><div class="d">{e(v["definition"])}</div></div>'
-                        for v in vocab[i:i + 6])
-        head = _head("Flashcards · cut along the dashed lines", spec["meta"]["topic"]) if i == 0 else ""
-        pages.append(f'<section class="page">{head}<div class="flash">{cards}</div></section>')
-    return "".join(pages)
+    cards = []
+    for n, v in enumerate(vocab, 1):
+        word = v["word"]
+        size = "54pt" if len(word) <= 12 else ("44pt" if len(word) <= 18 else "36pt")
+        cards.append(f'<section class="a5"><div class="inner">{_emoji(v.get("emoji", ""))}'
+                     f'<div class="w" style="font-size:{size}">{e(word)}</div><div class="d">{e(v["definition"])}</div></div>'
+                     f'<div class="foot"><img src="{config.LOGO_SVG.as_uri()}" alt=""><span>{e(m["topic"])} · {n}/{len(vocab)}</span></div></section>')
+    return "".join(cards)
 
 
 def rubric(spec):
@@ -366,15 +378,15 @@ def answer_key(spec, standalone=False):
     return "".join(out)
 
 
-def document(body, subject, compact=0, footer="", title=""):
-    return f'<!doctype html><html><head><meta charset="utf-8"><title>{e(title)}</title><style>{_css(subject, compact, footer)}</style></head><body>{body}</body></html>'
+def document(body, subject, compact=0, footer="", title="", extra_css=""):
+    return f'<!doctype html><html><head><meta charset="utf-8"><title>{e(title)}</title><style>{_css(subject, compact, footer)}{extra_css}</style></head><body>{body}</body></html>'
 
 
 def main_pack(spec, compact=0):
     m = spec["meta"]
     body = [cover(spec), lesson_plan(spec)] + [student_part(spec, p) for p in S.parts(spec)]
     if m["tier"] == "pro":
-        body += [flashcards(spec), rubric(spec)]
+        body.append(rubric(spec))          # flashcards are a separate A5 file
     body.append(answer_key(spec))
     return document("".join(body), m["subject"], compact, f"TeachLuma · {m['title']}", m["title"])
 
@@ -386,7 +398,7 @@ def key_only(spec, compact=0):
 
 def flashcards_only(spec, compact=0):
     m = spec["meta"]
-    return document(flashcards(spec, True), m["subject"], compact, f"TeachLuma · Flashcards · {m['topic']}", "Flashcards")
+    return document(flashcards(spec), m["subject"], compact, "", "Flashcards", extra_css=A5_CARD_CSS)
 
 
 # ---------------------------------------------------------------- cover cards (thumbnail)

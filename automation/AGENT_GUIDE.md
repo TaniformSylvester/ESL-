@@ -92,7 +92,7 @@ Fill the spec yourself. Never leave filler text.
   the overlap.
 - Free: lesson plan + worksheet with 5–6 varied activities (12+ items).
 - Pro: Free plus quiz, homework, rubric (4 criteria × 4 levels) and 6–10
-  vocabulary entries with emoji (used for flashcards and slides). Optional
+  vocabulary entries with emoji (used for the separate A5 flashcard file and the slides). Optional
   extra `slides`. Pro should be more comprehensive, not just longer.
 - Section types: `match`, `fill_blank` (needs `____`, optional
   `"word_bank": true`), `multiple_choice`, `true_false`, `short_answer`,
