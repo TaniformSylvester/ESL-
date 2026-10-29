@@ -58,6 +58,12 @@ PART_TITLES = {"worksheet": "Worksheet", "quiz": "Quiz", "homework": "Homework"}
 
 
 # ---------------------------------------------------------------- answer keys
+def _shown(option):
+    """How an option reads in an answer key: a "pic:" drawing is named, not coded."""
+    o = str(option)
+    return f"the {o[4:].replace('_', ' ')} picture" if o.startswith("pic:") else o
+
+
 def section_answers(sec, seed):
     """[(label, answer_text)] for one section, in the order items are printed."""
     t = sec["type"]
@@ -68,7 +74,7 @@ def section_answers(sec, seed):
     if t in ("fill_blank", "label"):
         return [(str(i + 1), str(it["answer"])) for i, it in enumerate(items)]
     if t == "multiple_choice":
-        return [(str(i + 1), f"{LETTERS[it['options'].index(it['answer'])]}) {it['answer']}") for i, it in enumerate(items)]
+        return [(str(i + 1), f"{LETTERS[it['options'].index(it['answer'])]}) {_shown(it['answer'])}") for i, it in enumerate(items)]
     if t == "true_false":
         return [(str(i + 1), "True" if it["answer"] else "False") for i, it in enumerate(items)]
     if t == "short_answer":

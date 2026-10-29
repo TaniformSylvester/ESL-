@@ -24,13 +24,15 @@ def _font_css():
 def _css(subject, compact=0, footer=""):
     c = config.SUBJECT_COLORS[subject]
     b = config.BRAND
+    # A CSS string, not HTML: escape backslashes and quotes only (an apostrophe must stay as is).
+    css_footer = footer.replace("\\", "\\\\").replace('"', '\\"').replace("<", "\\3c ")
     base = [11.5, 10.8, 10.2][compact]
     gap = [1.0, 0.75, 0.55][compact]
     return f"""
 {_font_css()}
 :root{{--main:{c['main']};--ink:{c['ink']};--soft:{c['soft']};--navy:{b['navy']};--gold:{b['gold']};--text:{b['ink']};--muted:{b['muted']};--gap:{gap};}}
 @page{{size:A4;margin:13mm 13mm 15mm 13mm;
-  @bottom-left{{content:"{escape(footer)}";font:600 8pt Nunito;color:#8A93A8;}}
+  @bottom-left{{content:"{css_footer}";font:600 8pt Nunito;color:#8A93A8;}}
   @bottom-right{{content:"Page " counter(page) " of " counter(pages);font:600 8pt Nunito;color:#8A93A8;}}}}
 @page cover{{margin:0;@bottom-left{{content:none}}@bottom-right{{content:none}}}}
 *{{box-sizing:border-box}}
@@ -224,7 +226,12 @@ def render_section(sec, n, seed):
         graph = next(((it.get("render") or {}).get("pictograph") for it in items if (it.get("render") or {}).get("pictograph")), None)
         if graph:
             out.append(pictograph_html(*graph))
-        has_pic = any(it.get("render") and "pictograph" not in it["render"] for it in items)
+        plot = next(((it.get("render") or {}).get("lineplot") for it in items if (it.get("render") or {}).get("lineplot")), None)
+        if plot:
+            title, things, unit = mathgen.LINEPLOT_THEMES[plot[0]]
+            out.append(f'<div class="picto"><div class="pt">{e(title)}</div>'
+                       f'{illustrations.lineplot_svg(mathgen.lineplot_data(*plot), f"{unit}s")}<div class="pk">Each X shows one of the {e(things)}.</div></div>')
+        has_pic = any(it.get("render") and "pictograph" not in it["render"] and "lineplot" not in it["render"] for it in items)
         # Three columns only for short prompts with a single blank (e.g. "29 + 12 = ____").
         cols = "" if has_pic or any(len(it["prompt"]) > 18 or it["prompt"].count("____") > 1 for it in items) else " cols3"
         cells = []
@@ -239,7 +246,7 @@ def render_section(sec, n, seed):
                 pic = illustrations.base10_svg(*r["base10"])
             elif "thermo" in r:
                 pic = illustrations.thermometer_svg(r["thermo"])
-            elif "pictograph" in r:
+            elif "pictograph" in r or "lineplot" in r:
                 pic = ""                      # drawn once above the questions
             elif "objects" in r:
                 thing, n = r["objects"]

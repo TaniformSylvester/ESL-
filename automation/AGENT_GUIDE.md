@@ -122,7 +122,11 @@ Fill the spec yourself. Never leave filler text.
 - Math generators include `add`, `sub`, `mult`, `div`, `compare`,
   `expanded_form`, `digit_value`, `from_place_values`, `base_ten_read`,
   `skip_count`, `odd_even`, `odd_even_objects`, `doubles`, `round`, clocks,
-  fractions, perimeter/area and word problems (`tlgen/mathgen.py`).
+  fractions, perimeter/area and word problems (`tlgen/mathgen.py`). Also
+  `pictograph` and `lineplot` (pass a `theme`; one graph per section),
+  `order_ops`, `div_remainder`, `thermometer_read`, `frac_div`, and integers:
+  `abs_value`, `opposite`, `order_ints`, `temp_change` (use negative `lo`).
+- Use US spelling (meters, organize, color): the spell checker is American.
 - `spelling_allow` is only for real words the spell checker doesn't know,
   such as "CVC". It shows in the QC report.
 

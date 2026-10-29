@@ -210,6 +210,12 @@ class Doc:
                         self.picture(run, illustrations.emoji_png(icon, 120), 0.7)
                 self._widths(g, [3.5, 13.5])
                 self.para("Each picture shows 1.", italic=True, color=config.BRAND["muted"], size=9)
+            plot = next(((it.get("render") or {}).get("lineplot") for it in items if (it.get("render") or {}).get("lineplot")), None)
+            if plot:
+                title, things, unit = mathgen.LINEPLOT_THEMES[plot[0]]
+                self.para(title, bold=True, color=config.BRAND["navy"])
+                self.picture(self.d.add_paragraph().add_run(), illustrations.lineplot_png(mathgen.lineplot_data(*plot), f"{unit}s"), 15)
+                self.para(f"Each X shows one of the {things}.", italic=True, color=config.BRAND["muted"], size=9)
             cols = 2
             t_ = self.d.add_table(rows=0, cols=cols)
             for i in range(0, len(items), cols):

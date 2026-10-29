@@ -12,6 +12,7 @@ slide:
 Teaching slides support several layouts (see AGENT_GUIDE.md):
   bullets (default), steps, compare, example, question, diagram.
 """
+import re
 from pathlib import Path
 
 from pptx import Presentation
@@ -29,6 +30,15 @@ WHITE = "#FFFFFF"
 def _rgb(h):
     h = h.lstrip("#")
     return RGBColor(int(h[:2], 16), int(h[2:4], 16), int(h[4:], 16))
+
+
+ANSWER_AFTER_QUOTE = re.compile(r'^(.*["”])\s*\(([^()]+)\)\s*$')
+
+
+def _split_answer(step):
+    """'Ask: "Which is colder?" (−9 °C)' → ('Ask: "Which is colder?"', '−9 °C'); otherwise (step, None)."""
+    m = ANSWER_AFTER_QUOTE.match(step)
+    return (m.group(1), m.group(2)) if m else (step, None)
 
 
 class Deck:
@@ -157,7 +167,8 @@ class Deck:
         steps = S.as_lines(st["steps"])
         s = self._slide(notes=f"{st['name']} ({st['minutes']} minutes).\n" + "\n".join(f"- {x}" for x in steps))
         self._bar(s, st["name"], f"{kicker} · {st['minutes']} min")
-        self._box(s, Inches(0.7), Inches(1.8), Inches(12), Inches(4.9), ["• " + x for x in steps], 24)
+        # Answers in brackets after a quoted question stay in the notes, off the screen.
+        self._box(s, Inches(0.7), Inches(1.8), Inches(12), Inches(4.9), ["• " + _split_answer(x)[0] for x in steps], 24)
 
     def vocab_overview(self):
         vocab = self.spec.get("vocabulary") or []
@@ -272,6 +283,8 @@ class Deck:
         if t == "match":
             return f"1. {it['left']}  →  ?", f"{it['left']} → {it['right']}"
         if t == "multiple_choice":
+            if any(illustrations.is_picture(str(o)) for o in it["options"]):    # drawings can't be written as slide text
+                return None, S._shown(it["answer"])
             return f"{it['q']}   ({' / '.join(map(str, it['options']))})", str(it["answer"])
         if t == "true_false":
             return it["statement"] + "   True or false?", "True" if it["answer"] else "False"
@@ -286,7 +299,7 @@ class Deck:
         if t == "draw_write":
             return it["prompt"], it.get("guidance", "")
         if t == "math":
-            if (it.get("render") or {}).get("pictograph"):
+            if (it.get("render") or {}).get("pictograph") or (it.get("render") or {}).get("lineplot"):
                 return None, str(it["answer"])
             return it["prompt"], str(it["answer"])
         return None, ans[0][1] if ans else None
@@ -319,14 +332,17 @@ class Deck:
 
     def quick_check(self):
         qs = []
-        for part in ("quiz", "worksheet", "homework"):
+        for part in ("worksheet", "homework"):     # never the quiz: it is the later assessment
             for sec in (self.spec.get(part) or {}).get("sections", []):
                 # Listening items need the teacher's voice, and picture options
                 # don't work as slide text, so those stay on paper.
                 if sec["type"] in ("multiple_choice", "true_false", "math", "fill_blank") and not sec.get("teacher_script"):
-                    qs += [(sec["type"], it) for it in sec["items"][:2]
+                    # The worksheet's first item is already the "let's try one together" sample.
+                    first = 1 if part == "worksheet" else 0
+                    qs += [(sec["type"], it) for it in sec["items"][first:first + 2]
                            if not (sec["type"] == "multiple_choice" and any(illustrations.is_emoji(str(o)) for o in it["options"]))
-                           and not (it.get("render") or {}).get("objects") and not (it.get("render") or {}).get("pictograph")]
+                           and not (it.get("render") or {}).get("objects") and not (it.get("render") or {}).get("pictograph")
+                           and not (it.get("render") or {}).get("lineplot")]
             if len(qs) >= 6:
                 break
         for n, (t, it) in enumerate(qs[:6], 1):
@@ -378,7 +394,8 @@ class Deck:
         last = self.spec["lesson_plan"]["stages"][-1]
         for step in S.as_lines(last["steps"]):
             if "exit" in step.lower() and ":" in step:
-                question = step.split(":", 1)[1].strip().strip('"“”')
+                question, answer = _split_answer(step.split(":", 1)[1].strip())
+                question = question.strip('"“”')
                 break
         if not question:
             for sec in self.spec["worksheet"]["sections"]:

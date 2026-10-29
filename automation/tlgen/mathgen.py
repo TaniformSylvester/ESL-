@@ -72,6 +72,36 @@ def picto_data(theme, seed):
             return counts
 
 
+def num(n) -> str:
+    """Integer with a real minus sign (−5), for printing."""
+    return str(n).replace("-", "−")
+
+
+def frac_str(f: Fraction) -> str:
+    """Simplest form; improper fractions as mixed numbers (7/2 → 3 1/2)."""
+    if f.denominator == 1:
+        return str(f.numerator)
+    whole, rest = divmod(f.numerator, f.denominator)
+    return f"{whole} {rest}/{f.denominator}" if whole else f"{rest}/{f.denominator}"
+
+
+LINEPLOT_THEMES = {
+    "ribbons": ("Length of ribbons (in meters)", "ribbons", "meter"),
+    "beans": ("Height of bean plants (in feet)", "bean plants", "foot"),
+    "water": ("Water in each bottle (in liters)", "bottles", "liter"),
+}
+
+
+def lineplot_data(theme, seed):
+    """Measurements in eighths, fixed by theme + seed so every question uses the same plot."""
+    rng = random.Random(f"lineplot:{theme}:{seed}")
+    values = [Fraction(1, 8), Fraction(1, 4), Fraction(3, 8), Fraction(1, 2), Fraction(5, 8), Fraction(3, 4)]
+    while True:
+        counts = {v: rng.randint(0, 4) for v in values}
+        if sum(counts.values()) >= 10 and sorted(counts.values())[-1] != sorted(counts.values())[-2] and min(counts.values()) >= 0:
+            return counts
+
+
 def fmt_time(h, m):
     return f"{h}:{m:02d}"
 
@@ -125,6 +155,29 @@ def solve(gen, p):
         return "even" if p["n"] % 2 == 0 else "odd"
     if gen == "thermometer_read":
         return p["t"]
+    if gen == "frac_div":
+        return frac_str(Fraction(p["n1"], p["d1"]) / Fraction(p["n2"], p["d2"]))
+    if gen == "abs_value":
+        return abs(p["n"])
+    if gen == "opposite":
+        return num(-p["n"])
+    if gen == "order_ints":
+        return ", ".join(num(x) for x in sorted(p["nums"]))
+    if gen == "temp_change":
+        return num(p["start"] + p["change"])
+    if gen == "lineplot":
+        counts = lineplot_data(p["theme"], p["data_seed"])
+        present = [v for v, c in counts.items() if c]
+        if p["q"] == "count":
+            return counts[Fraction(p["v"])]
+        if p["q"] == "total_items":
+            return sum(counts.values())
+        if p["q"] == "difference":
+            return frac_str(max(present) - min(present))
+        if p["q"] == "combined":
+            return frac_str(counts[Fraction(p["v"])] * Fraction(p["v"]))
+        if p["q"] == "most":
+            return frac_str(max(counts, key=lambda v: counts[v]))
     if gen == "order_ops":
         v = evaluate(p["expr"])
         assert v.denominator == 1 and v >= 0
@@ -212,7 +265,7 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         a, b = rng.randint(lo, hi), rng.randint(lo, hi)
         if rng.random() < 0.12:
             b = a
-        return _item("compare", {"a": a, "b": b}, f"{a}  ◯  {b}")
+        return _item("compare", {"a": a, "b": b}, f"{num(a)}  ◯  {num(b)}")
     if gen == "expanded_form":
         n = rng.randint(10 ** (digits - 1), 10 ** digits - 1)
         return _item("expanded_form", {"n": n}, f"{n} = ______________")
@@ -258,6 +311,53 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         n = rng.randint(1, d - 1)
         k = rng.randint(2, 4)
         return _item("equivalent_fraction", {"n": n, "d": d, "d2": d * k}, f"{n}/{d} = ____/{d * k}")
+    if gen == "frac_div":
+        kind = rng.choice(["ff", "ff", "wf", "fw"])
+        if kind == "wf":                        # whole ÷ fraction
+            n1, d1 = rng.randint(2, 6), 1
+            d2 = rng.choice([2, 3, 4, 5, 6, 8]); n2 = rng.randint(1, d2 - 1)
+        elif kind == "fw":                      # fraction ÷ whole
+            d1 = rng.choice([2, 3, 4, 5, 6, 8]); n1 = rng.randint(1, d1 - 1)
+            n2, d2 = rng.randint(2, 6), 1
+        else:
+            d1, d2 = rng.choice([2, 3, 4, 5, 6, 8]), rng.choice([2, 3, 4, 5, 6, 8])
+            n1, n2 = rng.randint(1, d1 - 1), rng.randint(1, d2 - 1)
+        show = lambda n, d: str(n) if d == 1 else f"{n}/{d}"
+        return _item(gen, {"n1": n1, "d1": d1, "n2": n2, "d2": d2}, f"{show(n1, d1)} ÷ {show(n2, d2)} = ____")
+    if gen == "abs_value":
+        n = -rng.randint(1, max(1, -lo)) if rng.random() < 0.7 else rng.randint(1, max(1, hi))
+        return _item(gen, {"n": n}, f"|{num(n)}| = ____")
+    if gen == "opposite":
+        n = rng.choice([x for x in range(lo, hi + 1) if x != 0])
+        return _item(gen, {"n": n}, f"The opposite of {num(n)} is ____")
+    if gen == "order_ints":
+        nums = rng.sample([x for x in range(lo, hi + 1)], 5)
+        return _item(gen, {"nums": nums}, "Order from least to greatest: " + ",  ".join(num(x) for x in nums) + "  ____")
+    if gen == "temp_change":
+        start = rng.randint(-12, 8)
+        change = rng.choice([x for x in range(-10, 11) if x != 0])
+        verb = f"rises by {change}" if change > 0 else f"falls by {-change}"
+        return _item(gen, {"start": start, "change": change},
+                     f"The temperature is {num(start)} °C. It {verb} degrees. What is the new temperature? ____ °C")
+    if gen == "lineplot":
+        title, things, unit = LINEPLOT_THEMES[theme]
+        counts = lineplot_data(theme, _seed)
+        present = [v for v, c in counts.items() if c]
+        q = rng.choice(["count", "count", "total_items", "difference", "combined", "most"])
+        params = {"theme": theme, "data_seed": _seed, "q": q}
+        if q == "count":
+            v = rng.choice(list(counts)); params["v"] = str(v)
+            prompt = f"How many {things} measured {v} {unit}? ____"
+        elif q == "total_items":
+            prompt = f"How many {things} were measured in all? ____"
+        elif q == "difference":
+            prompt = f"What is the difference between the longest and shortest measurement? ____ {unit}"
+        elif q == "combined":
+            v = rng.choice(present); params["v"] = str(v)
+            prompt = f"What is the total of all the {v} {unit} measurements? ____ {unit}"
+        else:
+            prompt = "Which measurement appears most often? ____"
+        return _item(gen, params, prompt, {"lineplot": [theme, _seed]})
     if gen == "thermometer_read":
         t = rng.randrange(max(0, lo), min(40, hi) + 1, 2)
         return _item(gen, {"t": t}, "What temperature does it show? ____ °C", {"thermo": t})

@@ -51,7 +51,13 @@ def emoji_png(char: str, size: int = 160) -> str:
 
 def is_emoji(s: str) -> bool:
     """True for a short emoji string or a built-in "pic:" drawing (both are pictures)."""
-    return is_picture(s) or (bool(s) and any(ord(c) > 0x2100 for c in s) and len(s) <= 8)
+    if is_picture(s):
+        return True
+    if not s or len(s) > 8:
+        return False
+    if "⃣" not in s and any(c.isascii() and c.isalnum() for c in s):   # "−5", "4 and −4" are text (keycaps aside)
+        return False
+    return any(ord(c) > 0x2100 and not 0x2200 <= ord(c) <= 0x22FF for c in s)   # math operators (− × ÷ ≤) aren't emoji
 
 
 def is_picture(s: str) -> bool:
@@ -145,7 +151,34 @@ def _draw_frog():
     return img
 
 
-PICTURES = {"frogspawn": _draw_frogspawn, "tadpole": _draw_tadpole, "tadpole_legs": _draw_tadpole_legs,
+_LEAF, _LEAF_DARK, _EGG_Y = (108, 178, 72, 255), (64, 128, 44, 255), (246, 236, 190, 255)
+
+
+def _draw_butterfly_eggs():
+    """Tiny eggs on a leaf (butterfly life cycle, stage 1)."""
+    img, d, pts, ell, k = _canvas()
+    d.polygon(pts(8, 62, 30, 34, 62, 24, 92, 30, 74, 60, 40, 76), fill=_LEAF)
+    d.line(pts(12, 60, 50, 46, 90, 31), fill=_LEAF_DARK, width=2 * 8)
+    for x, y in ((40, 42), (48, 38), (56, 36), (44, 52), (52, 48), (60, 45), (36, 56)):
+        ell(x, y, 3.6, 4.4, _EGG_Y, (196, 168, 90, 255), 0.6)
+    return img
+
+
+def _draw_chrysalis():
+    """A chrysalis hanging from a twig (butterfly life cycle, stage 3)."""
+    img, d, pts, ell, k = _canvas()
+    d.line(pts(10, 12, 90, 12), fill=(120, 84, 52, 255), width=5 * 8)              # twig
+    d.line(pts(50, 12, 50, 22), fill=(90, 120, 60, 255), width=2 * 8)              # silk pad
+    d.polygon(pts(50, 20, 62, 34, 64, 54, 58, 74, 50, 90, 42, 74, 36, 54, 38, 34), fill=(132, 186, 86, 255))
+    d.polygon(pts(50, 24, 56, 36, 57, 54, 53, 72, 50, 82, 47, 72, 43, 54, 44, 36), fill=(160, 206, 110, 255))
+    for y in (40, 50, 60):
+        d.line(pts(41, y, 59, y), fill=(98, 150, 64, 255), width=int(1.2 * 8))
+    for x, y in ((46, 30), (54, 30)):
+        ell(x, y, 1.6, 1.6, (232, 196, 60, 255))
+    return img
+
+
+PICTURES = {"butterfly_eggs": _draw_butterfly_eggs, "chrysalis": _draw_chrysalis, "frogspawn": _draw_frogspawn, "tadpole": _draw_tadpole, "tadpole_legs": _draw_tadpole_legs,
             "froglet": _draw_froglet, "frog": _draw_frog}
 
 
@@ -372,5 +405,56 @@ def thermometer_png(temp, h=420):
         if major:
             d.text((sc(x + 26), sc(y)), str(v), font=font, fill=(28, 37, 65), anchor="lm")
     d.text((sc(x - 8), sc(8)), "°C", font=font, fill=(91, 100, 120), anchor="lm")
+    img.save(out)
+    return str(out)
+
+
+# ---------------------------------------------------------------- line plot (eighths from 0 to 1)
+def _lp_label(k):
+    from fractions import Fraction
+    f = Fraction(k, 8)
+    return "0" if k == 0 else ("1" if k == 8 else f"{f.numerator}/{f.denominator}")
+
+
+def lineplot_svg(counts, unit_label):
+    """counts: {Fraction: n}. X marks stacked above a 0–1 number line marked in eighths."""
+    w, step, base = 620, 70, 170
+    x0 = 30
+    out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="230" viewBox="0 0 {w} 230">',
+           f'<line x1="{x0 - 10}" y1="{base}" x2="{x0 + 8 * step + 10}" y2="{base}" stroke="#172A6E" stroke-width="2.5"/>']
+    for k in range(9):
+        x = x0 + k * step
+        out.append(f'<line x1="{x}" y1="{base - 7}" x2="{x}" y2="{base + 7}" stroke="#172A6E" stroke-width="2"/>')
+        out.append(f'<text x="{x}" y="{base + 26}" font-size="15" font-family="Nunito, Arial" font-weight="700" text-anchor="middle" fill="#1C2541">{_lp_label(k)}</text>')
+    for v, n in counts.items():
+        x = x0 + int(v * 8) * step
+        for i in range(n):
+            out.append(f'<text x="{x}" y="{base - 14 - i * 24}" font-size="22" font-family="Nunito, Arial" font-weight="800" text-anchor="middle" fill="#F57C2B">X</text>')
+    out.append(f'<text x="{x0 + 4 * step}" y="{base + 46}" font-size="13" font-family="Nunito, Arial" font-weight="700" text-anchor="middle" fill="#5B6478">{unit_label}</text></svg>')
+    return "".join(out)
+
+
+def lineplot_png(counts, unit_label, scale=2):
+    from hashlib import md5
+    key = md5(repr(sorted((str(k), v) for k, v in counts.items())).encode()).hexdigest()[:10]
+    out = _cache(f"lineplot-{key}-{scale}.png")
+    if out.exists():
+        return str(out)
+    k = scale
+    w, step, base, x0 = 620, 70, 170, 30
+    img = Image.new("RGBA", (w * k, 230 * k), (255, 255, 255, 0))
+    d = ImageDraw.Draw(img)
+    f15 = ImageFont.truetype(config.ttf("nunito-latin-700-normal"), 15 * k)
+    f22 = ImageFont.truetype(config.ttf("nunito-latin-800-normal"), 22 * k)
+    d.line([((x0 - 10) * k, base * k), ((x0 + 8 * step + 10) * k, base * k)], fill=NAVY, width=3 * k)
+    for t in range(9):
+        x = (x0 + t * step) * k
+        d.line([(x, (base - 7) * k), (x, (base + 7) * k)], fill=NAVY, width=2 * k)
+        d.text((x, (base + 20) * k), _lp_label(t), font=f15, fill=(28, 37, 65), anchor="mm")
+    for v, n in counts.items():
+        x = (x0 + int(v * 8) * step) * k
+        for i in range(n):
+            d.text((x, (base - 22 - i * 24) * k), "X", font=f22, fill=(245, 124, 43), anchor="mm")
+    d.text(((x0 + 4 * step) * k, (base + 42) * k), unit_label, font=f15, fill=(91, 100, 120), anchor="mm")
     img.save(out)
     return str(out)
