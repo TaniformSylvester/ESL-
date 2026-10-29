@@ -99,6 +99,22 @@ Fill the spec yourself. Never leave filler text.
   `label` (emoji + word), `draw_write` (`"box": false` and `"lines": 10` gives a
   lined writing space instead of a drawing box), `sequence` (steps in the correct order; they are
   shuffled when printed), `sort` (groups of words), `draw_write`, `math`.
+- Pro teaching slides (`slides`, 4–6 required, each with `notes` of 40+
+  characters saying what to say and ask). Teach the core idea; don't repeat
+  the worksheet. Layouts (`type`):
+  - `bullets` (default): `title`, `bullets`, optional `emoji`.
+  - `steps`: `title`, `steps` (a process; 2–4 steps show as a flow).
+  - `compare`: `title`, `left` and `right`, each with `title`, `bullets` and
+    an optional `emoji`.
+  - `example`: `title`, `problem`, `steps`, `answer`. The problem shows
+    first; the solution is on the next slide.
+  - `question`: `question`, optional `answer` and `emoji` (think, pair,
+    share).
+  - `diagram`: `title`, `emoji` (picture or `pic:`), `labels`.
+
+  The deck adds the rest automatically: agenda, key-word slides, one slide
+  per worksheet activity with a worked first item, quick checks, summary
+  and exit ticket, all with speaker notes.
 - Listening activities: add `"teacher_script": ["Number 1. Stand up, then
   clap your hands.", …]` to the section. The script prints in the answer key
   for the teacher to read aloud. Two-step picture options use an arrow:

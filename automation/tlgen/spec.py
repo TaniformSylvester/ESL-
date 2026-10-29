@@ -138,6 +138,21 @@ def validate(spec):
                 errs.append(f"Pro resources need a {p}")
         if not spec.get("vocabulary") or len(spec["vocabulary"]) < 6:
             errs.append("Pro resources need 6+ vocabulary entries (flashcards and slides use them)")
+        slides = spec.get("slides") or []
+        if len(slides) < 4:
+            errs.append("Pro resources need 4+ teaching slides in spec.slides (see AGENT_GUIDE.md)")
+        need = {"bullets": ("title", "bullets"), "steps": ("title", "steps"), "compare": ("title", "left", "right"),
+                "example": ("title", "problem", "steps", "answer"), "question": ("question",), "diagram": ("title", "emoji", "labels")}
+        for i, sl in enumerate(slides):
+            kind = sl.get("type", "bullets")
+            if kind not in need:
+                errs.append(f"slides[{i}]: unknown type {kind!r}")
+                continue
+            missing = [f for f in need[kind] if not sl.get(f)]
+            if missing:
+                errs.append(f"slides[{i}] ({kind}) is missing {', '.join(missing)}")
+            if len(str(sl.get("notes", "")).strip()) < 40:
+                errs.append(f"slides[{i}] needs speaker notes (40+ characters: what to say and ask)")
 
     for part in ("worksheet", "quiz", "homework"):
         doc = spec.get(part)
