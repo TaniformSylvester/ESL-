@@ -6,6 +6,7 @@ differs. Answers are therefore computed, never typed by a person or model.
 """
 import ast
 import random
+from decimal import Decimal
 from fractions import Fraction
 from math import gcd
 
@@ -100,6 +101,15 @@ def lineplot_data(theme, seed):
         counts = {v: rng.randint(0, 4) for v in values}
         if sum(counts.values()) >= 10 and sorted(counts.values())[-1] != sorted(counts.values())[-2] and min(counts.values()) >= 0:
             return counts
+
+
+def dec_str(d) -> str:
+    """A decimal without trailing zeros (5.30 → 5.3, 4.0 → 4)."""
+    t = format(Decimal(str(d)).normalize(), "f")
+    return t
+
+
+SUPERSCRIPT = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
 
 
 def fmt_time(h, m):
@@ -209,6 +219,29 @@ def solve(gen, p):
         return p["a"] - p["b"]
     if gen == "word_mult":
         return p["groups"] * p["each"]
+    if gen == "frac_mult":
+        return frac_str(Fraction(p["n1"], p["d1"]) * Fraction(p["n2"], p["d2"]))
+    if gen == "dec_add":
+        return dec_str(Decimal(p["a"]) + Decimal(p["b"]))
+    if gen == "dec_sub":
+        return dec_str(Decimal(p["a"]) - Decimal(p["b"]))
+    if gen == "one_step_eq":
+        a, b = p["a"], p["b"]
+        return {"add": b - a, "sub": b + a, "mult": b // a, "div": b * a}[p["form"]]
+    if gen == "area_tri":
+        return p["b"] * p["h"] // 2           # generated with an even product
+    if gen == "area_para":
+        return p["b"] * p["h"]
+    if gen == "power":
+        return p["base"] ** p["exp"]
+    if gen == "tens_ones":
+        return p["t"] * 10 + p["o"]
+    if gen == "word_two_step":
+        if p["form"] == "add_sub":
+            return p["a"] + p["b"] - p["c"]
+        if p["form"] == "groups_sub":
+            return p["groups"] * p["each"] - p["c"]
+        return p["groups"] * p["each"] + p["c"]
     raise ValueError(f"unknown generator {gen}")
 
 
@@ -301,7 +334,7 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         n = rng.choice(list(parts))
         k = rng.randint(1, n - 1) if n > 1 else 1
         shape = rng.choice(["rect", "circle"])
-        return _item("fraction_shade", {"parts": n, "shaded": k}, "What fraction is shaded? ____", {"fraction": [n, k, shape]})
+        return _item("fraction_shade", {"parts": n, "shaded": k, "shape": shape}, "What fraction is shaded? ____", {"fraction": [n, k, shape]})
     if gen == "fraction_compare":
         d1, d2 = rng.choice(list(denominators)), rng.choice(list(denominators))
         n1, n2 = rng.randint(1, d1 - 1), rng.randint(1, d2 - 1)
@@ -447,6 +480,67 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
             return _item(gen, {"a": a, "b": b}, f"{name} has {a} {many}. {name} gives away {b}. How many {many} are left? ____")
         groups, each = rng.randint(2, 6), rng.choice(list(factors))
         return _item(gen, {"groups": groups, "each": each}, f"There are {groups} bags. Each bag has {each} {many}. How many {many} are there in all? ____")
+    if gen == "frac_mult":
+        d1, d2 = rng.choice(list(denominators)), rng.choice(list(denominators))
+        n1 = rng.choice([n for n in range(1, d1) if gcd(n, d1) == 1])
+        n2 = rng.choice([n for n in range(1, d2) if gcd(n, d2) == 1])
+        if rng.random() < 0.3:                  # whole × fraction
+            n1, d1 = rng.randint(2, 6), 1
+        show = lambda n, d: str(n) if d == 1 else f"{n}/{d}"
+        return _item(gen, {"n1": n1, "d1": d1, "n2": n2, "d2": d2}, f"{show(n1, d1)} × {show(n2, d2)} = ____")
+    if gen in ("dec_add", "dec_sub"):
+        places = rng.choice([1, 2]) if digits >= 2 else 1
+        q = Decimal(1).scaleb(-places)
+        while True:
+            a = (Decimal(rng.randint(lo * 10 ** places, hi * 10 ** places)) * q)
+            b = (Decimal(rng.randint(1, hi * 10 ** places)) * q)
+            if gen == "dec_sub" and b >= a:
+                a, b = b, a
+            if a != b and dec_str(a) != dec_str(a.to_integral_value()):
+                break
+        sign = "+" if gen == "dec_add" else "−"
+        return _item(gen, {"a": dec_str(a), "b": dec_str(b)}, f"{dec_str(a)} {sign} {dec_str(b)} = ____")
+    if gen == "one_step_eq":
+        form = rng.choice(["add", "sub", "mult", "div"])
+        a = rng.randint(2, 12)
+        x = a + rng.randint(1, max(3, hi)) if form == "sub" else rng.randint(2, max(3, hi))
+        if form == "div":
+            x = a * rng.randint(2, 12)
+        b = {"add": x + a, "sub": x - a, "mult": a * x, "div": x // a}[form]
+        shown = {"add": f"x + {a} = {b}", "sub": f"x − {a} = {b}", "mult": f"{a}x = {b}", "div": f"x ÷ {a} = {b}"}[form]
+        return _item(gen, {"form": form, "a": a, "b": b}, f"{shown}      x = ____")
+    if gen in ("area_tri", "area_para"):
+        while True:
+            b, h = rng.randint(3, max_side), rng.randint(2, max_side)
+            if gen == "area_para" or (b * h) % 2 == 0:
+                break
+        shape = "triangle" if gen == "area_tri" else "parallelogram"
+        return _item(gen, {"b": b, "h": h}, f"A {shape} has a base of {b} cm and a height of {h} cm. What is its area? ____ cm²")
+    if gen == "power":
+        base = rng.randint(2, 10)
+        exp = rng.randint(2, 3 if base > 5 else 4)
+        return _item(gen, {"base": base, "exp": exp}, f"{base}{str(exp).translate(SUPERSCRIPT)} = ____")
+    if gen == "tens_ones":
+        t, o = rng.randint(1, 9), rng.randint(0, 9)
+        if rng.random() < 0.5:
+            return _item(gen, {"t": t, "o": o, "show": "blocks"}, "What number do the blocks show? ____", {"base10": [0, t, o]})
+        unit = lambda n, word: f"{n} {word}" + ("" if n == 1 else "s")
+        return _item(gen, {"t": t, "o": o, "show": "words"}, f"{unit(t, 'ten')} and {unit(o, 'one')} = ____")
+    if gen == "word_two_step":
+        name, (one, many) = rng.choice(NAMES), rng.choice(THINGS)
+        form = rng.choice(["add_sub", "groups_sub", "groups_add"])
+        if form == "add_sub":
+            a, b = rng.randint(lo, hi), rng.randint(lo, hi)
+            c = rng.randint(2, a + b - 1)
+            return _item(gen, {"form": form, "a": a, "b": b, "c": c},
+                         f"{name} has {a} {many}. {name} gets {b} more, then gives {c} to a friend. How many {many} does {name} have now? ____")
+        groups, each = rng.randint(2, 9), rng.randint(2, 10)
+        c = rng.randint(2, groups * each - 1) if form == "groups_sub" else rng.randint(2, 20)
+        if form == "groups_sub":
+            text = f"{name} buys {groups} packs of {many}. Each pack has {each} {many}. {name} gives away {c} of them. How many {many} are left? ____"
+        else:
+            text = f"There are {groups} boxes with {each} {many} in each box. There are also {c} more {many} on the table. How many {many} are there in all? ____"
+        return _item(gen, {"form": form, "groups": groups, "each": each, "c": c}, text)
     raise ValueError(f"unknown generator {gen}")
 
 

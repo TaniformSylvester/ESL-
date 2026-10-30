@@ -28,12 +28,18 @@ ALWAYS_OK = {"teachluma", "pdf", "docx", "pptx", "powerpoint", "esl", "ok", "wor
              "pre", "re", "e.g", "i.e", "vs", "etc", "min", "mins", "am", "pm", "pinterest", "facebook", "instagram", "tiktok",
              "multi", "non", "co", "sub", "semi",            # hyphen prefixes (multi-step, non-fiction)
              "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+             "mondays", "tuesdays", "wednesdays", "thursdays", "fridays", "saturdays", "sundays",
+             "aren", "isn", "wasn", "weren", "doesn", "didn", "don", "hasn", "haven", "hadn", "couldn", "wouldn",
+             "shouldn", "mustn", "needn", "ll", "ve", "re", "handwashing", "homework", "classmate", "classmates", "website", "websites", "smartphone", "emoji",
              "january", "february", "march", "april", "june", "july", "august", "september", "october", "november",
              "december", "mr", "mrs", "ms", "dr", "celsius", "fahrenheit", "tv", "app", "apps", "online", "email"}
 # First names commonly used in classroom examples (proper nouns the dictionary lacks).
 COMMON_NAMES = {"sam", "mia", "leo", "max", "nina", "ali", "tom", "anna", "lily", "jack", "emma", "noah", "mai", "kai", "zoe",
                 "lucy", "maria", "luis", "sara", "amir", "yuki", "wei", "kim", "raj", "tim", "ella", "ravi", "aisha", "juan",
-                "sofia", "ahmed", "lena", "ming", "tara", "nadia", "pablo", "rosa", "ken", "amy", "liam", "olivia", "ethan"}
+                "sofia", "ahmed", "lena", "ming", "tara", "nadia", "pablo", "rosa", "ken", "amy", "liam", "olivia", "ethan",
+                "simon", "macdonald", "ben", "dan", "jake", "kate", "lisa", "mark", "paul", "peter", "sue", "tony", "omar",
+                "hassan", "fatima", "carlos", "diego", "elena", "hiro", "jin", "mei", "minh", "nam", "an", "linh", "chloe",
+                "grace", "harry", "jamie", "josh", "maya", "nora", "ryan", "sophie", "zara", "ivy", "finn", "ruby", "oscar"}
 
 
 def grade_number(grade):
