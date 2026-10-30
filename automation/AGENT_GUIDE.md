@@ -127,6 +127,12 @@ Fill the spec yourself. Never leave filler text.
   `order_ops`, `div_remainder`, `thermometer_read`, `frac_div`, and integers:
   `abs_value`, `opposite`, `order_ints`, `temp_change` (use negative `lo`).
 - Use US spelling (meters, organize, color): the spell checker is American.
+- Reading texts: add `"passage": ["paragraph 1", "paragraph 2"]` (and an optional
+  `"passage_title"`) to any section. It prints in a box above the questions, in
+  the Word file, and on its own slide before the activity.
+- Never print misspelled words as distractors (boxs, goed): spelling QC fails
+  them and `spelling_allow` is only for real words. Use real-word errors instead
+  ("There are three box.", "She cans swim.").
 - `spelling_allow` is only for real words the spell checker doesn't know,
   such as "CVC". It shows in the QC report.
 

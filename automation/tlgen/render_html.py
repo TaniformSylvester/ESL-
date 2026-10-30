@@ -79,6 +79,7 @@ h1,h2,h3{{font-family:Fredoka,Nunito,sans-serif;color:var(--navy);margin:0}}
 .grid div{{background:var(--soft);border-radius:3mm;padding:2.5mm 3mm}}
 .grid b{{display:block;font-size:8pt;text-transform:uppercase;color:var(--ink);letter-spacing:.05em}}
 .sect,.blk{{break-inside:avoid}}
+.sect.long{{break-inside:auto}}
 .lp{{font-size:.9em}}
 .lp table.t td{{padding-top:calc(1.6mm*var(--gap));padding-bottom:calc(1.6mm*var(--gap))}}
 h3.sec{{break-after:avoid;font-size:13pt;margin:calc(5mm*var(--gap)) 0 calc(2mm*var(--gap));display:flex;align-items:center;gap:2.5mm}}
@@ -116,6 +117,9 @@ ol.items>li{{margin:0 0 calc(3.2mm*var(--gap));break-inside:avoid}}
 .mathgrid.cols3{{grid-template-columns:1fr 1fr 1fr}}
 .mq{{display:flex;gap:2.5mm;align-items:flex-start;break-inside:avoid;font-size:1.06em;font-weight:700}}
 .mq .n{{color:var(--main);font-weight:800;min-width:6mm}}
+.passage{{border:2px solid var(--soft);border-radius:3mm;padding:3mm 5mm;margin:0 0 calc(4mm*var(--gap));font-size:12pt;line-height:1.55;break-inside:avoid}}
+.passage p{{margin:0 0 2mm}}
+.passage .pt{{font:700 13pt Fredoka;color:var(--navy);text-align:center;margin-bottom:2mm}}
 .picto{{border:2px solid var(--soft);border-radius:3mm;padding:3mm 4mm;margin:0 0 calc(4mm*var(--gap));break-inside:avoid}}
 .picto .pt{{font:700 13pt Fredoka;color:var(--navy);text-align:center;margin-bottom:2mm}}
 .picto table td{{border-bottom:1px solid #E1E5EF;padding:1.5mm 2mm}}
@@ -177,7 +181,12 @@ def render_section(sec, n, seed):
                                  "true_false": "True or false?", "short_answer": "Answer the questions", "label": "Label the pictures",
                                  "sequence": "Put them in order", "sort": "Sort the words", "draw_write": "Draw and write",
                                  "math": "Solve"}[t]
-    out = [f'<div class="sect"><h3 class="sec"><span class="num">{n}</span>{e(title)}</h3><p class="instr">{e(sec["instructions"])}</p>']
+    pics = sum(1 for it in sec.get("items") or [] if isinstance(it, dict) and set(it.get("render") or {}) & {"clock", "rect", "thermo", "base10", "objects", "fraction"})
+    long = " long" if pics > 4 or len(sec.get("items") or []) > 10 else ""   # tall sections may break between rows
+    out = [f'<div class="sect{long}"><h3 class="sec"><span class="num">{n}</span>{e(title)}</h3><p class="instr">{e(sec["instructions"])}</p>']
+    if sec.get("passage"):                     # a reading text printed before the questions
+        head = f'<div class="pt">{e(sec["passage_title"])}</div>' if sec.get("passage_title") else ""
+        out.append(f'<div class="passage">{head}' + "".join(f"<p>{_text(x)}</p>" for x in S.as_lines(sec["passage"])) + "</div>")
     bank = S.word_bank(sec, seed)
     if bank and t != "sort":
         out.append('<div class="bank"><b>Word bank:</b>' + "".join(f"<span>{e(w)}</span>" for w in bank) + "</div>")

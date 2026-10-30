@@ -128,6 +128,11 @@ class Doc:
         title = sec.get("title") or t.replace("_", " ").capitalize()
         self.d.add_heading(f"{n}. {title}", level=2)
         self.para(sec["instructions"], italic=True, color=config.BRAND["muted"])
+        if sec.get("passage"):
+            if sec.get("passage_title"):
+                self.para(sec["passage_title"], bold=True, color=self.color["ink"], size=13)
+            for line in S.as_lines(sec["passage"]):
+                self.para(line, size=12)
         bank = S.word_bank(sec, seed)
         if bank:
             self.para(("Words: " if t == "sort" else "Word bank: ") + "   ·   ".join(bank), bold=True, color=self.color["ink"])

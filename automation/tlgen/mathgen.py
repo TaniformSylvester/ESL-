@@ -466,7 +466,7 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
     if gen in ("perimeter_rect", "area_rect"):
         l, w = rng.randint(2, max_side), rng.randint(2, max_side)
         what = "perimeter" if gen == "perimeter_rect" else "area"
-        unit = "cm" if gen == "perimeter_rect" else "square units"
+        unit = "units" if gen == "perimeter_rect" else "square units"
         return _item(gen, {"l": l, "w": w}, f"A rectangle is {l} units long and {w} units wide. What is its {what}? ____ {unit}", {"rect": [l, w]})
     if gen in ("word_add", "word_sub", "word_mult"):
         name, (one, many) = rng.choice(NAMES), rng.choice(THINGS)

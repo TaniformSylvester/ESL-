@@ -315,6 +315,14 @@ class Deck:
                 notes += "\nTeacher script (read aloud twice):\n" + "\n".join(S.as_lines(sec["teacher_script"]))
             if answer:
                 notes += f"\nModel the first one together. Answer: {answer}"
+            if sec.get("passage"):                 # the reading text gets its own slide before the questions
+                lines = S.as_lines(sec["passage"])
+                words = sum(len(x.split()) for x in lines)
+                ps = self._slide(notes="Read the text aloud once while students follow, then let them read it again on their own. "
+                                       "Ask one question about the main idea before starting the activity.")
+                self._bar(ps, sec.get("passage_title") or title, f"{S.PART_TITLES[part]} · read")
+                self._box(ps, Inches(0.8), Inches(1.6), Inches(11.7), Inches(5.0), lines,
+                          20 if words < 120 else (17 if words < 180 else 14))
             s = self._slide(notes=notes)
             self._bar(s, title, f"{S.PART_TITLES[part]} · activity {i + 1} of {len(doc['sections'])}")
             self._shape(s, MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.7), Inches(1.75), Inches(11.9), Inches(1.1), self.c["soft"],

@@ -7,6 +7,7 @@ educational accuracy — that is the admin's job when approving a draft.
 """
 import json
 import re
+import unicodedata
 import subprocess
 import tempfile
 import zipfile
@@ -30,7 +31,7 @@ ALWAYS_OK = {"teachluma", "pdf", "docx", "pptx", "powerpoint", "esl", "ok", "wor
              "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
              "mondays", "tuesdays", "wednesdays", "thursdays", "fridays", "saturdays", "sundays",
              "aren", "isn", "wasn", "weren", "doesn", "didn", "don", "hasn", "haven", "hadn", "couldn", "wouldn",
-             "shouldn", "mustn", "needn", "ll", "ve", "re", "handwashing", "homework", "classmate", "classmates", "website", "websites", "smartphone", "emoji",
+             "shouldn", "mustn", "needn", "ll", "ve", "re", "cafe", "cafes", "cm", "mm", "km", "kg", "ml", "mph", "°c", "handwashing", "homework", "classmate", "classmates", "website", "websites", "smartphone", "emoji",
              "january", "february", "march", "april", "june", "july", "august", "september", "october", "november",
              "december", "mr", "mrs", "ms", "dr", "celsius", "fahrenheit", "tv", "app", "apps", "online", "email"}
 # First names commonly used in classroom examples (proper nouns the dictionary lacks).
@@ -80,6 +81,8 @@ def _spell_unknown(spec):
     words = set()
     for text in S.all_text(spec):
         text = re.sub(r"https?://\S+|#\w+|\b[\w-]+(\.[\w-]+)*\.(com|org|net)\b|\b\d+(st|nd|rd|th)\b", " ", text)
+        # Accented letters (café, piñata) are checked without their accents.
+        text = "".join(c for c in unicodedata.normalize("NFKD", text) if not unicodedata.combining(c))
         for w in re.findall(r"[A-Za-z][A-Za-z'’-]*[A-Za-z]|[A-Za-z]", text):
             w = w.replace("’", "'")
             # A word written in syllables (ba-NA-na, com-PU-ter) is checked as the joined word.
