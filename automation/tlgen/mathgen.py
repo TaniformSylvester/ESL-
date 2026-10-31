@@ -259,7 +259,8 @@ def solve(gen, p):
         return format(Decimal(p["n"]).quantize(q, rounding=ROUND_HALF_UP), "f")
     if gen == "dec_pow10":
         v = Decimal(p["n"]) * Decimal(p["p"]) if p["op"] == "mult" else Decimal(p["n"]) / Decimal(p["p"])
-        return dec_str(v)
+        whole, _, frac = dec_str(v).partition(".")
+        return f"{int(whole):,}" + (f".{frac}" if frac else "")
     if gen == "gcf":
         return gcd(p["a"], p["b"])
     if gen == "lcm":

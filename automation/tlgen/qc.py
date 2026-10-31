@@ -36,10 +36,15 @@ ALWAYS_OK = {"teachluma", "pdf", "docx", "pptx", "powerpoint", "esl", "ok", "wor
              "january", "february", "march", "april", "june", "july", "august", "september", "october", "november",
              "december", "mr", "mrs", "ms", "dr", "celsius", "fahrenheit", "tv", "app", "apps", "online", "email"}
 # Wording that would reveal how a resource was made (checked in every human-written string).
-TELLS = re.compile(r"\b(automatically|automated|auto-generated|computer-generated|machine-generated|ai-generated|"
-                   r"artificial intelligence|python|algorithm|chatbot|language model)\b|"
-                   r"\b(generated|computed|calculated)\b[^.]{0,40}\b(checked|verified|tested)\b|"
-                   r"\bchecked by (a )?(computer|machine|software)\b", re.I)
+# Ordinary subject words stay allowed: the "standard algorithm" in math, a python in a reptiles
+# pack, a heart that beats automatically.
+_MAKERS = r"(an? )?(algorithm|computer|program|script|software|machine|python|ai|bot)"
+_DONE = r"(generated|created|produced|written|made|checked|verified|tested|computed|calculated)"
+TELLS = re.compile(r"\b(automated|auto-generated|computer-generated|machine-generated|ai-generated|"
+                   r"artificial intelligence|chatbot|language model)\b|"
+                   r"\bautomatically " + _DONE + r"\b|"
+                   r"\b" + _DONE + r" (automatically|by " + _MAKERS + r")\b|"
+                   r"\b(generated|computed|calculated)\b[^.]{0,40}\b(checked|verified|tested)\b", re.I)
 TELLS_CASED = re.compile(r"\bAI\b|\bGPT\b|\bLLM\b")   # case-sensitive: phonics packs teach the vowel team "ai"
 # First names commonly used in classroom examples (proper nouns the dictionary lacks).
 COMMON_NAMES = {"sam", "mia", "leo", "max", "nina", "ali", "tom", "anna", "lily", "jack", "emma", "noah", "mai", "kai", "zoe",
