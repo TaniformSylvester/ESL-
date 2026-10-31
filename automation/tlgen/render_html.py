@@ -462,7 +462,8 @@ body{{background:linear-gradient(135deg,{b['navy']} 0%,{b['navy_dark']} 100%);fo
 .blob2{{position:absolute;right:-90px;bottom:-230px;width:420px;height:420px;border-radius:50%;background:{b['gold']};opacity:.9}}
 .art{{position:absolute;right:60px;top:36px;width:450px;height:330px;display:grid;grid-template-columns:1fr 1fr;justify-items:center;align-items:center;gap:10px 20px;font-family:'Noto Color Emoji';font-size:110px;line-height:1.1}}
 .art img.pic{{height:1.2em;max-width:1.85em;object-fit:contain;vertical-align:middle}}
-.logo{{position:absolute;left:{pad}px;top:60px;height:56px}}
+/* below the top corner, where the site's subject and access badges sit on cards */
+.logo{{position:absolute;left:{pad}px;top:210px;height:64px}}
 .txt{{position:absolute;left:{pad}px;right:{pad}px;top:470px}}
 h1{{font-family:Fredoka;font-weight:700;font-size:{size}px;line-height:1.06;margin:0 0 20px;overflow-wrap:break-word;text-shadow:0 3px 0 rgba(0,0,0,.18)}}
 .sub{{font-size:34px;font-weight:800;color:{b['gold']}}}

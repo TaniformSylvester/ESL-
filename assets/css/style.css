@@ -1665,6 +1665,7 @@ a.subject-card:hover {
 .resource-card .card-img-top,
 .resource-card .card-media-placeholder {
     width: 100%;
+    height: auto;          /* the img's height="300" attribute would otherwise beat aspect-ratio and crop the thumbnail */
     aspect-ratio: 4 / 3;
     object-fit: cover;
     display: block;
@@ -1736,6 +1737,7 @@ a.subject-card:hover {
 
 /* ---------------------------------------------------------------- Video cards & embedded player */
 .video-card .card-img-top {
+    height: auto;          /* see .resource-card .card-img-top */
     aspect-ratio: 16 / 9;
     object-fit: cover;
     border-radius: 0;
