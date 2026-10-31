@@ -69,6 +69,10 @@ class Client:
     def work_queue(self):
         return self._call("GET", "work_queue")
 
+    def item_spec(self, resource_id):
+        """Stored spec of an uploaded resource (read-only), for rebuilding clean files."""
+        return self._call("GET", f"item_spec&resource_id={int(resource_id)}")
+
     def duplicate_check(self, subject, grade, title, topic, file_hash=None):
         return self._call("POST", "duplicate_check", json_body={"subject": subject, "grade": grade, "title": title, "topic": topic, "file_hash": file_hash})
 

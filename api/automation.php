@@ -83,6 +83,7 @@ $actions = [
     'taxonomy'        => ['GET', 'catalog:read'],
     'catalog'         => ['GET', 'catalog:read'],
     'work_queue'      => ['GET', 'drafts:write'],
+    'item_spec'       => ['GET', 'drafts:write'],
     'duplicate_check' => ['POST', 'catalog:read'],
     'run_start'       => ['POST', 'drafts:write'],
     'run_heartbeat'   => ['POST', 'drafts:write'],
@@ -133,6 +134,22 @@ switch ($action) {
     case 'work_queue':
         automation_audit('work_queue', 200, null, $tokenId);
         api_out(200, ['ok' => true] + automation_work_queue());
+
+    case 'item_spec':
+        // Read-only: the spec stored when a generated resource was uploaded, so clean
+        // replacement files can be rebuilt. Changes nothing on the site.
+        $rid = (int)($_GET['resource_id'] ?? 0);
+        $st = getDB()->prepare('SELECT id, resource_id, idempotency_key, spec FROM automation_items
+                                WHERE resource_id = ? AND spec IS NOT NULL ORDER BY id DESC LIMIT 1');
+        $st->execute([$rid]);
+        $row = $st->fetch();
+        if (!$row) {
+            automation_audit('item_spec', 404, "resource #{$rid}", $tokenId);
+            api_out(404, ['ok' => false, 'error' => 'No stored spec for that resource.']);
+        }
+        automation_audit('item_spec', 200, "resource #{$rid}", $tokenId);
+        api_out(200, ['ok' => true, 'item_id' => (int)$row['id'], 'resource_id' => (int)$row['resource_id'],
+            'key' => $row['idempotency_key'], 'spec' => json_decode((string)$row['spec'], true)]);
 
     case 'duplicate_check':
         $d = api_json_body();
