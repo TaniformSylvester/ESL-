@@ -143,7 +143,8 @@ def solve(gen, p):
         return "even" if p["n"] % 2 == 0 else "odd"
     if gen == "round":
         n, to = p["n"], p["to"]
-        return (n + to // 2) // to * to
+        v = (n + to // 2) // to * to
+        return f"{v:,}" if v >= 10000 else v
     if gen in ("clock_read", "clock_draw"):
         return fmt_time(p["h"], p["m"])
     if gen == "elapsed":
@@ -242,6 +243,31 @@ def solve(gen, p):
         if p["form"] == "groups_sub":
             return p["groups"] * p["each"] - p["c"]
         return p["groups"] * p["each"] + p["c"]
+    if gen == "add3":
+        return p["a"] + p["b"] + p["c"]
+    if gen == "near_double":
+        return p["a"] + p["a"] + 1
+    if gen == "missing_sub":
+        return p["a"] - p["diff"] if p["blank"] == "b" else p["b"] + p["diff"]
+    if gen == "frac_add_like":
+        return frac_str(Fraction(p["n1"] + p["n2"], p["d"]))
+    if gen == "mult_big":
+        return f"{p['a'] * p['b']:,}"
+    if gen == "round_decimal":
+        q = Decimal(1).scaleb(-p["places"])
+        from decimal import ROUND_HALF_UP
+        return format(Decimal(p["n"]).quantize(q, rounding=ROUND_HALF_UP), "f")
+    if gen == "dec_pow10":
+        v = Decimal(p["n"]) * Decimal(p["p"]) if p["op"] == "mult" else Decimal(p["n"]) / Decimal(p["p"])
+        return dec_str(v)
+    if gen == "gcf":
+        return gcd(p["a"], p["b"])
+    if gen == "lcm":
+        return p["a"] * p["b"] // gcd(p["a"], p["b"])
+    if gen == "dec_div":
+        return dec_str(Decimal(p["a"]) / Decimal(p["b"]))
+    if gen == "distributive":
+        return p["a"] * (p["b"] + p["c"])
     raise ValueError(f"unknown generator {gen}")
 
 
@@ -271,7 +297,7 @@ def generate(gen, count=6, seed=1, **kw):
 
 
 def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, step=5, to=10, digits=3,
-         parts=(2, 3, 4), denominators=(2, 3, 4, 6, 8), max_side=10, theme="fruit", brackets=True, _seed=1, **_):
+         parts=(2, 3, 4), denominators=(2, 3, 4, 6, 8), max_side=10, theme="fruit", brackets=True, whole=False, _seed=1, **_):
     if gen == "add":
         while True:
             a, b = rng.randint(lo, hi), rng.randint(lo, hi)
@@ -321,7 +347,8 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         return _item("odd_even", {"n": n}, f"Is {n} odd or even? ____")
     if gen == "round":
         n = rng.randint(lo, hi)
-        return _item("round", {"n": n, "to": to}, f"Round {n} to the nearest {to}: ____")
+        shown = lambda x: f"{x:,}" if x >= 10000 else str(x)
+        return _item("round", {"n": n, "to": to}, f"Round {shown(n)} to the nearest {shown(to) if to >= 10000 else to}: ____")
     if gen in ("clock_read", "clock_draw"):
         h, m = rng.randint(1, 12), rng.randrange(0, 60, step)
         prompt = "What time does the clock show? ________" if gen == "clock_read" else f"Draw the hands to show {fmt_time(h, m)}."
@@ -484,7 +511,7 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         d1, d2 = rng.choice(list(denominators)), rng.choice(list(denominators))
         n1 = rng.choice([n for n in range(1, d1) if gcd(n, d1) == 1])
         n2 = rng.choice([n for n in range(1, d2) if gcd(n, d2) == 1])
-        if rng.random() < 0.3:                  # whole × fraction
+        if whole or rng.random() < 0.3:         # whole × fraction
             n1, d1 = rng.randint(2, 6), 1
         show = lambda n, d: str(n) if d == 1 else f"{n}/{d}"
         return _item(gen, {"n1": n1, "d1": d1, "n2": n2, "d2": d2}, f"{show(n1, d1)} × {show(n2, d2)} = ____")
@@ -541,6 +568,52 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         else:
             text = f"There are {groups} boxes with {each} {many} in each box. There are also {c} more {many} on the table. How many {many} are there in all? ____"
         return _item(gen, {"form": form, "groups": groups, "each": each, "c": c}, text)
+    if gen == "add3":
+        a, b, c = (rng.randint(lo, hi) for _ in range(3))
+        return _item(gen, {"a": a, "b": b, "c": c}, f"{a} + {b} + {c} = ____")
+    if gen == "near_double":
+        a = rng.randint(max(lo, 2), hi)
+        first, second = (a, a + 1) if rng.random() < 0.5 else (a + 1, a)
+        return _item(gen, {"a": a, "first": first}, f"{first} + {second} = ____")
+    if gen == "missing_sub":
+        a = rng.randint(max(lo, 6), hi)
+        diff = rng.randint(1, a - 1)
+        if rng.random() < 0.5:
+            return _item(gen, {"a": a, "diff": diff, "b": a - diff, "blank": "b"}, f"{a} − ____ = {diff}")
+        return _item(gen, {"a": a, "diff": diff, "b": a - diff, "blank": "a"}, f"____ − {a - diff} = {diff}")
+    if gen == "frac_add_like":
+        d = rng.choice(list(denominators))
+        n1 = rng.randint(1, d - 1)
+        n2 = rng.randint(1, d - 1)
+        return _item(gen, {"n1": n1, "n2": n2, "d": d}, f"{n1}/{d} + {n2}/{d} = ____")
+    if gen == "mult_big":
+        a, b = rng.randint(101, 999), rng.randint(11, 99)
+        return _item(gen, {"a": a, "b": b}, f"{a} × {b} = ____")
+    if gen == "round_decimal":
+        places = rng.choice([0, 1, 1, 2]) if digits >= 2 else rng.choice([0, 1])
+        n = Decimal(rng.randint(lo * 1000, hi * 1000)).scaleb(-3)
+        word = {0: "the nearest whole number", 1: "the nearest tenth", 2: "the nearest hundredth"}[places]
+        return _item(gen, {"n": dec_str(n), "places": places}, f"Round {dec_str(n)} to {word}: ____")
+    if gen == "dec_pow10":
+        n = Decimal(rng.randint(1, 9999)).scaleb(-rng.choice([1, 2]))
+        pw, op = rng.choice([10, 100, 1000]), rng.choice(["mult", "mult", "div"])
+        sign = "×" if op == "mult" else "÷"
+        return _item(gen, {"n": dec_str(n), "p": pw, "op": op}, f"{dec_str(n)} {sign} {pw:,} = ____")
+    if gen in ("gcf", "lcm"):
+        while True:
+            a, b = rng.randint(4, max(12, hi)), rng.randint(4, max(12, hi))
+            if a != b and (gen == "lcm" or gcd(a, b) > 1):
+                break
+        name = "greatest common factor" if gen == "gcf" else "least common multiple"
+        return _item(gen, {"a": a, "b": b}, f"The {name} of {a} and {b} is ____")
+    if gen == "dec_div":
+        b = rng.randint(2, 9)
+        q = Decimal(rng.randint(11, 999)).scaleb(-rng.choice([1, 2]))
+        a = q * b
+        return _item(gen, {"a": dec_str(a), "b": b}, f"{dec_str(a)} ÷ {b} = ____")
+    if gen == "distributive":
+        a, b, c = rng.randint(2, 9), rng.choice([10, 20, 30, 40]), rng.randint(1, 9)
+        return _item(gen, {"a": a, "b": b, "c": c}, f"{a} × ({b} + {c}) = {a} × {b} + {a} × {c} = ____")
     raise ValueError(f"unknown generator {gen}")
 
 

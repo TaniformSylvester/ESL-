@@ -34,6 +34,12 @@ ALWAYS_OK = {"teachluma", "pdf", "docx", "pptx", "powerpoint", "esl", "ok", "wor
              "shouldn", "mustn", "needn", "ll", "ve", "re", "cafe", "cafes", "cm", "mm", "km", "kg", "ml", "mph", "°c", "handwashing", "homework", "classmate", "classmates", "website", "websites", "smartphone", "emoji",
              "january", "february", "march", "april", "june", "july", "august", "september", "october", "november",
              "december", "mr", "mrs", "ms", "dr", "celsius", "fahrenheit", "tv", "app", "apps", "online", "email"}
+# Wording that would reveal how a resource was made (checked in every human-written string).
+TELLS = re.compile(r"\b(automatically|automated|auto-generated|computer-generated|machine-generated|ai-generated|"
+                   r"artificial intelligence|python|algorithm|chatbot|language model)\b|"
+                   r"\b(generated|computed|calculated)\b[^.]{0,40}\b(checked|verified|tested)\b|"
+                   r"\bchecked by (a )?(computer|machine|software)\b", re.I)
+TELLS_CASED = re.compile(r"\bAI\b|\bGPT\b|\bLLM\b")   # case-sensitive: phonics packs teach the vowel team "ai"
 # First names commonly used in classroom examples (proper nouns the dictionary lacks).
 COMMON_NAMES = {"sam", "mia", "leo", "max", "nina", "ali", "tom", "anna", "lily", "jack", "emma", "noah", "mai", "kai", "zoe",
                 "lucy", "maria", "luis", "sara", "amir", "yuki", "wei", "kim", "raj", "tim", "ella", "ravi", "aisha", "juan",
@@ -296,6 +302,10 @@ def run(spec, pkg, *, taxonomy=None, settings=None, client=None, catalog=None):
     # 15. Content safety (age-appropriate wording)
     found = sorted({w for t in S.all_text(spec) for w in re.findall(r"[a-z]+", t.lower()) if w in UNSAFE})
     safe_ok = check("content_safety", not found, ", ".join(found))
+
+    # 15b. Publisher voice: nothing may say or suggest that the resource was produced by software.
+    tells = sorted({m.group(0) for t in S.all_text(spec) for m in [*TELLS.finditer(t), *TELLS_CASED.finditer(t)]})
+    voice_ok = check("publisher_voice", not tells, ("remove: " + ", ".join(tells[:8])) if tells else "")
 
     # 16. Reading level of student-facing text
     g = grade_number(m["grade"])

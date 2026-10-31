@@ -13,6 +13,7 @@ Teaching slides support several layouts (see AGENT_GUIDE.md):
   bullets (default), steps, compare, example, question, diagram.
 """
 import re
+from datetime import datetime
 from pathlib import Path
 
 from pptx import Presentation
@@ -445,6 +446,14 @@ class Deck:
         self._pic(end, "🌟", Inches(5.9), Inches(4.0), Inches(1.6))
         self.p.core_properties.title = self.m["title"]
         self.p.core_properties.author = "TeachLuma"
+        # The library's template ships its own comment and last-modified name; clear them.
+        self.p.core_properties.last_modified_by = "TeachLuma"
+        self.p.core_properties.comments = ""
+        self.p.core_properties.keywords = ""
+        self.p.core_properties.subject = ""
+        self.p.core_properties.category = ""
+        self.p.core_properties.revision = 1
+        self.p.core_properties.created = self.p.core_properties.modified = datetime.now()
         self.p.save(out)
         return Path(out)
 

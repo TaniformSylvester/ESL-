@@ -3,6 +3,7 @@
 Emoji and diagrams are inserted as PNG pictures so they look the same in
 Word, Google Docs and LibreOffice (colour-emoji text support varies).
 """
+from datetime import datetime
 from pathlib import Path
 
 from docx import Document
@@ -300,6 +301,14 @@ class Doc:
     def save(self, out):
         self.d.core_properties.title = self.spec["meta"]["title"]
         self.d.core_properties.author = "TeachLuma"
+        # The library's template ships its own comment and last-modified name; clear them.
+        self.d.core_properties.last_modified_by = "TeachLuma"
+        self.d.core_properties.comments = ""
+        self.d.core_properties.keywords = ""
+        self.d.core_properties.subject = ""
+        self.d.core_properties.category = ""
+        self.d.core_properties.revision = 1
+        self.d.core_properties.created = self.d.core_properties.modified = datetime.now()
         self.d.save(out)
         return Path(out)
 

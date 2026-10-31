@@ -27,7 +27,21 @@ def html_to_pdf(html: str, out: Path) -> Path:
     src.write_text(html, encoding="utf-8")
     _run(["--no-pdf-header-footer", f"--print-to-pdf={out}", src.as_uri()], out)
     src.unlink()
+    _set_pdf_metadata(out)
     return out
+
+
+def _set_pdf_metadata(path: Path):
+    """Replace the browser's Creator/Producer fields with the publisher's name."""
+    from pypdf import PdfReader, PdfWriter
+    reader = PdfReader(path)
+    title = (reader.metadata or {}).get("/Title", "")
+    writer = PdfWriter(clone_from=reader)
+    writer.metadata = {"/Title": title, "/Author": "TeachLuma", "/Creator": "TeachLuma", "/Producer": "TeachLuma"}
+    tmp = path.with_suffix(".tmp.pdf")
+    with open(tmp, "wb") as f:
+        writer.write(f)
+    tmp.replace(path)
 
 
 def screenshot(html: str, out: Path, width: int, height: int) -> Path:

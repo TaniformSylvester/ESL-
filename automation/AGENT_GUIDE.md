@@ -130,6 +130,10 @@ Fill the spec yourself. Never leave filler text.
 - Reading texts: add `"passage": ["paragraph 1", "paragraph 2"]` (and an optional
   `"passage_title"`) to any section. It prints in a box above the questions, in
   the Word file, and on its own slide before the activity.
+- Write as the publisher. Nothing a teacher sees (titles, descriptions,
+  overviews, notes, social copy, file properties) may say or suggest that a
+  resource was generated, computed or checked by software. QC's
+  `publisher_voice` check fails phrases such as "generated and checked".
 - Never print misspelled words as distractors (boxs, goed): spelling QC fails
   them and `spelling_allow` is only for real words. Use real-word errors instead
   ("There are three box.", "She cans swim.").
