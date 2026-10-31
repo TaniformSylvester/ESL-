@@ -144,7 +144,7 @@ def solve(gen, p):
     if gen == "round":
         n, to = p["n"], p["to"]
         v = (n + to // 2) // to * to
-        return f"{v:,}" if v >= 10000 else v
+        return f"{v:,}" if v >= 1000 else v
     if gen in ("clock_read", "clock_draw"):
         return fmt_time(p["h"], p["m"])
     if gen == "elapsed":
@@ -347,8 +347,8 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         return _item("odd_even", {"n": n}, f"Is {n} odd or even? ____")
     if gen == "round":
         n = rng.randint(lo, hi)
-        shown = lambda x: f"{x:,}" if x >= 10000 else str(x)
-        return _item("round", {"n": n, "to": to}, f"Round {shown(n)} to the nearest {shown(to) if to >= 10000 else to}: ____")
+        shown = lambda x: f"{x:,}" if x >= 1000 else str(x)
+        return _item("round", {"n": n, "to": to}, f"Round {shown(n)} to the nearest {shown(to)}: ____")
     if gen in ("clock_read", "clock_draw"):
         h, m = rng.randint(1, 12), rng.randrange(0, 60, step)
         prompt = "What time does the clock show? ________" if gen == "clock_read" else f"Draw the hands to show {fmt_time(h, m)}."
@@ -561,8 +561,8 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
             c = rng.randint(2, a + b - 1)
             return _item(gen, {"form": form, "a": a, "b": b, "c": c},
                          f"{name} has {a} {many}. {name} gets {b} more, then gives {c} to a friend. How many {many} does {name} have now? ____")
-        groups, each = rng.randint(2, 9), rng.randint(2, 10)
-        c = rng.randint(2, groups * each - 1) if form == "groups_sub" else rng.randint(2, 20)
+        groups, each = rng.randint(2, 9), rng.randint(2, max(10, max_other))
+        c = rng.randint(2, groups * each - 1) if form == "groups_sub" else rng.randint(2, max(20, 2 * max_other))
         if form == "groups_sub":
             text = f"{name} buys {groups} packs of {many}. Each pack has {each} {many}. {name} gives away {c} of them. How many {many} are left? ____"
         else:
