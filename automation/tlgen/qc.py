@@ -31,7 +31,8 @@ ALWAYS_OK = {"teachluma", "pdf", "docx", "pptx", "powerpoint", "esl", "ok", "wor
              "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
              "mondays", "tuesdays", "wednesdays", "thursdays", "fridays", "saturdays", "sundays",
              "aren", "isn", "wasn", "weren", "doesn", "didn", "don", "hasn", "haven", "hadn", "couldn", "wouldn",
-             "shouldn", "mustn", "needn", "ll", "ve", "re", "cafe", "cafes", "cm", "mm", "km", "kg", "ml", "mph", "°c", "handwashing", "homework", "classmate", "classmates", "website", "websites", "smartphone", "emoji",
+             "shouldn", "mustn", "needn", "ll", "ve", "re", "th", "ch", "sh", "ph", "wh", "ck", "ng",       # letter clusters taught in phonics
+             "cafe", "cafes", "cm", "mm", "km", "kg", "ml", "mph", "°c", "handwashing", "homework", "classmate", "classmates", "website", "websites", "smartphone", "emoji",
              "january", "february", "march", "april", "june", "july", "august", "september", "october", "november",
              "december", "mr", "mrs", "ms", "dr", "celsius", "fahrenheit", "tv", "app", "apps", "online", "email"}
 # Wording that would reveal how a resource was made (checked in every human-written string).
@@ -92,7 +93,8 @@ def _spell_unknown(spec):
         for w in re.findall(r"[A-Za-z][A-Za-z'’-]*[A-Za-z]|[A-Za-z]", text):
             w = w.replace("’", "'")
             # A word written in syllables (ba-NA-na, com-PU-ter) is checked as the joined word.
-            if "-" in w and w.replace("-", "").isalpha() and sp.known([w.replace("-", "").lower()]):
+            joined = w.replace("-", "").lower()
+            if "-" in w and joined.isalpha() and (sp.known([joined]) or joined in allow):
                 continue
             for part in w.split("-"):
                 p = part.lower()
