@@ -1,0 +1,10 @@
+# Uploaded HTML games are code. Deny ALL direct web access: they are only
+# ever served by /play-game.php, which wraps them in a browser sandbox so a
+# game can't read visitors' login cookies or act on the site as them.
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>

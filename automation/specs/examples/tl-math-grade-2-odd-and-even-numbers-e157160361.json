@@ -1,0 +1,505 @@
+{
+  "version": 1,
+  "key": "tl-math-grade-2-odd-and-even-numbers-e157160361",
+  "meta": {
+    "subject": "math",
+    "grade": "Grade 2",
+    "category": "number-sense",
+    "topic": "Odd and Even Numbers",
+    "tier": "free",
+    "resource_type": "Worksheet",
+    "title": "Odd and Even Numbers: Pairs, Doubles and Counting by 2s",
+    "description": "A free Grade 2 lesson and worksheet on odd and even numbers: making pairs with objects up to 20, counting by 2s, writing even numbers as doubles and using the ones digit. Includes a timed lesson plan, a seven-activity worksheet, an editable Word version and an answer key.",
+    "overview": "Students find out whether a group of objects is odd or even by making pairs: if one is left over, the number is odd. They count by 2s, write even numbers as the sum of two equal addends (such as 14 = 7 + 7), and discover that the ones digit tells us whether any number is odd or even. Every math answer in the pack is calculated by the generator and checked automatically.",
+    "learning_objectives": [
+      "Decide whether a group of up to 20 objects is odd or even by making pairs or counting by 2s.",
+      "Write an even number as the sum of two equal addends (a double), such as 12 = 6 + 6.",
+      "Use the ones digit to tell whether a 2-digit number is odd or even."
+    ],
+    "how_to_use": [
+      "Teach the lesson with counters or cubes following the lesson plan.",
+      "Do activities 1–3 together, then let students finish activities 4–7 on their own.",
+      "Check the work with the answer key; use activity 7 to hear each student's reasoning."
+    ],
+    "suggested_duration": "45 minutes",
+    "recommended_level": "Grade 2 (ages 7–8)",
+    "skills_practiced": "Number sense, counting by 2s, doubles, reasoning and explaining",
+    "activity_ideas": [
+      "Partner check: call out a number of students; they try to make pairs and decide if the number is odd or even.",
+      "Stand or sit: say a number; students stand up for even and stay seated for odd.",
+      "Sock sort: give groups a pile of socks and ask them to find out if there is an odd or even number."
+    ],
+    "teacher_tips": "Let students touch and move counters before they use the ones digit rule. Ask \"Is anyone left without a partner?\" so the idea of odd and even stays concrete.",
+    "differentiation_notes": "Support: give students counters for activities 1 and 3 and a hundred chart for activity 4. Challenge: ask students to explain what happens when you add two odd numbers.",
+    "assessment_notes": "Activities 1–6 check pairing, counting by 2s, doubles and the ones digit (answer key included). Activity 7 shows whether students can explain their reasoning.",
+    "regenerates_item_id": 2
+  },
+  "cover_emoji": [
+    "🧦",
+    "🍎",
+    "⭐",
+    "🐞"
+  ],
+  "vocabulary": [
+    {
+      "word": "even number",
+      "emoji": "",
+      "definition": "a number you can split into pairs with none left over",
+      "example": "8 is even: 4 pairs and none left over."
+    },
+    {
+      "word": "odd number",
+      "emoji": "",
+      "definition": "a number that has one left over when you make pairs",
+      "example": "7 is odd: 3 pairs and 1 left over."
+    },
+    {
+      "word": "pair",
+      "emoji": "🧦",
+      "definition": "a group of two",
+      "example": "I have a pair of socks."
+    },
+    {
+      "word": "equal groups",
+      "emoji": "⚖️",
+      "definition": "groups that have the same number",
+      "example": "10 = 5 + 5 makes two equal groups."
+    },
+    {
+      "word": "double",
+      "emoji": "",
+      "definition": "a number added to itself",
+      "example": "6 + 6 is a double. It makes 12."
+    },
+    {
+      "word": "ones digit",
+      "emoji": "",
+      "definition": "the last digit of a number",
+      "example": "In 47, the ones digit is 7."
+    }
+  ],
+  "lesson_plan": {
+    "materials": [
+      "Counters or cubes (about 20 per pair of students)",
+      "Worksheet (one copy per student)",
+      "Board and markers",
+      "Hundred chart (optional, for support)"
+    ],
+    "stages": [
+      {
+        "name": "Warm-up",
+        "minutes": 5,
+        "steps": [
+          "Ask the class to stand up and find a partner. Ask: \"Is anyone left without a partner?\"",
+          "Count the students. Say: \"When everyone has a partner, the number is even. When one person is left over, the number is odd.\""
+        ]
+      },
+      {
+        "name": "Presentation",
+        "minutes": 10,
+        "steps": [
+          "Show 6 counters and make pairs: 3 pairs, none left over, so 6 is even. Show 7 counters: 3 pairs and 1 left over, so 7 is odd.",
+          "Split 6 counters into two equal groups and write 6 = 3 + 3. Explain that every even number can be written as a double.",
+          "Count by 2s to 20 and write the numbers on the board. Ask: \"What do you notice about the ones digits?\" (0, 2, 4, 6, 8)"
+        ]
+      },
+      {
+        "name": "Guided practice",
+        "minutes": 12,
+        "steps": [
+          "Do activity 1 together: circle pairs of pictures and decide odd or even.",
+          "Students complete activities 2 and 3 with a partner, using counters to check the doubles."
+        ]
+      },
+      {
+        "name": "Independent practice",
+        "minutes": 13,
+        "steps": [
+          "Students complete activities 4, 5 and 6 on their own.",
+          "Ask individual students: \"How do you know 58 is even?\" Look for the ones digit or a double (29 + 29)."
+        ]
+      },
+      {
+        "name": "Wrap-up",
+        "minutes": 5,
+        "steps": [
+          "Stand or sit game: say a number; students stand for even and stay seated for odd.",
+          "Students answer activity 7 to explain their thinking (finish for homework if needed)."
+        ]
+      }
+    ],
+    "differentiation": {
+      "support": [
+        "Use counters for activities 1 and 3 and a hundred chart for activity 4.",
+        "Start with numbers up to 10 before moving to numbers up to 20."
+      ],
+      "challenge": [
+        "Add two odd numbers several times (3 + 5, 7 + 9). Is the answer odd or even? Explain why.",
+        "Find a number between 40 and 60 that is even and has a ones digit greater than 5."
+      ]
+    },
+    "assessment": "Check activities 1–6 with the answer key. In activity 7, look for answers that use pairs, equal groups or the ones digit to explain."
+  },
+  "worksheet": {
+    "title": "Odd and Even Numbers",
+    "sections": [
+      {
+        "type": "math",
+        "title": "Make pairs",
+        "instructions": "Circle the pictures in pairs. If one is left over, the number is odd. Write odd or even.",
+        "generator": {
+          "type": "odd_even_objects",
+          "count": 4,
+          "seed": 1
+        },
+        "items": [
+          {
+            "gen": "odd_even_objects",
+            "params": {
+              "n": 15,
+              "thing": "🌸"
+            },
+            "prompt": "Circle pairs. Odd or even? ____",
+            "answer": "odd",
+            "render": {
+              "objects": [
+                "🌸",
+                15
+              ]
+            }
+          },
+          {
+            "gen": "odd_even_objects",
+            "params": {
+              "n": 17,
+              "thing": "🍪"
+            },
+            "prompt": "Circle pairs. Odd or even? ____",
+            "answer": "odd",
+            "render": {
+              "objects": [
+                "🍪",
+                17
+              ]
+            }
+          },
+          {
+            "gen": "odd_even_objects",
+            "params": {
+              "n": 6,
+              "thing": "🐟"
+            },
+            "prompt": "Circle pairs. Odd or even? ____",
+            "answer": "even",
+            "render": {
+              "objects": [
+                "🐟",
+                6
+              ]
+            }
+          },
+          {
+            "gen": "odd_even_objects",
+            "params": {
+              "n": 11,
+              "thing": "🌸"
+            },
+            "prompt": "Circle pairs. Odd or even? ____",
+            "answer": "odd",
+            "render": {
+              "objects": [
+                "🌸",
+                11
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "math",
+        "title": "Count by 2s",
+        "instructions": "Count by 2s. Write the missing number.",
+        "generator": {
+          "type": "skip_count",
+          "count": 4,
+          "seed": 1,
+          "factors": [
+            2
+          ]
+        },
+        "items": [
+          {
+            "gen": "skip_count",
+            "params": {
+              "start": 4,
+              "step": 2,
+              "blank_index": 4
+            },
+            "prompt": "4,  6,  8,  10,  ____,  14",
+            "answer": 12
+          },
+          {
+            "gen": "skip_count",
+            "params": {
+              "start": 8,
+              "step": 2,
+              "blank_index": 3
+            },
+            "prompt": "8,  10,  12,  ____,  16,  18",
+            "answer": 14
+          },
+          {
+            "gen": "skip_count",
+            "params": {
+              "start": 2,
+              "step": 2,
+              "blank_index": 3
+            },
+            "prompt": "2,  4,  6,  ____,  10,  12",
+            "answer": 8
+          },
+          {
+            "gen": "skip_count",
+            "params": {
+              "start": 12,
+              "step": 2,
+              "blank_index": 4
+            },
+            "prompt": "12,  14,  16,  18,  ____,  22",
+            "answer": 20
+          }
+        ]
+      },
+      {
+        "type": "math",
+        "title": "Doubles",
+        "instructions": "Even numbers split into two equal groups. Write each number as a double. Example: 8 = 4 + 4",
+        "generator": {
+          "type": "doubles",
+          "count": 6,
+          "seed": 1,
+          "lo": 4,
+          "hi": 20
+        },
+        "items": [
+          {
+            "gen": "doubles",
+            "params": {
+              "n": 16
+            },
+            "prompt": "16 = ____ + ____",
+            "answer": "8 + 8"
+          },
+          {
+            "gen": "doubles",
+            "params": {
+              "n": 6
+            },
+            "prompt": "6 = ____ + ____",
+            "answer": "3 + 3"
+          },
+          {
+            "gen": "doubles",
+            "params": {
+              "n": 4
+            },
+            "prompt": "4 = ____ + ____",
+            "answer": "2 + 2"
+          },
+          {
+            "gen": "doubles",
+            "params": {
+              "n": 18
+            },
+            "prompt": "18 = ____ + ____",
+            "answer": "9 + 9"
+          },
+          {
+            "gen": "doubles",
+            "params": {
+              "n": 10
+            },
+            "prompt": "10 = ____ + ____",
+            "answer": "5 + 5"
+          },
+          {
+            "gen": "doubles",
+            "params": {
+              "n": 12
+            },
+            "prompt": "12 = ____ + ____",
+            "answer": "6 + 6"
+          }
+        ]
+      },
+      {
+        "type": "math",
+        "title": "Look at the ones digit",
+        "instructions": "Look at the ones digit. Write odd or even.",
+        "generator": {
+          "type": "odd_even",
+          "count": 9,
+          "seed": 1,
+          "lo": 10,
+          "hi": 99
+        },
+        "items": [
+          {
+            "gen": "odd_even",
+            "params": {
+              "n": 62
+            },
+            "prompt": "Is 62 odd or even? ____",
+            "answer": "even"
+          },
+          {
+            "gen": "odd_even",
+            "params": {
+              "n": 18
+            },
+            "prompt": "Is 18 odd or even? ____",
+            "answer": "even"
+          },
+          {
+            "gen": "odd_even",
+            "params": {
+              "n": 38
+            },
+            "prompt": "Is 38 odd or even? ____",
+            "answer": "even"
+          },
+          {
+            "gen": "odd_even",
+            "params": {
+              "n": 92
+            },
+            "prompt": "Is 92 odd or even? ____",
+            "answer": "even"
+          },
+          {
+            "gen": "odd_even",
+            "params": {
+              "n": 54
+            },
+            "prompt": "Is 54 odd or even? ____",
+            "answer": "even"
+          },
+          {
+            "gen": "odd_even",
+            "params": {
+              "n": 45
+            },
+            "prompt": "Is 45 odd or even? ____",
+            "answer": "odd"
+          },
+          {
+            "gen": "odd_even",
+            "params": {
+              "n": 29
+            },
+            "prompt": "Is 29 odd or even? ____",
+            "answer": "odd"
+          },
+          {
+            "gen": "odd_even",
+            "params": {
+              "n": 57
+            },
+            "prompt": "Is 57 odd or even? ____",
+            "answer": "odd"
+          },
+          {
+            "gen": "odd_even",
+            "params": {
+              "n": 26
+            },
+            "prompt": "Is 26 odd or even? ____",
+            "answer": "even"
+          }
+        ]
+      },
+      {
+        "type": "sort",
+        "title": "Sort the numbers",
+        "instructions": "Write each number in the odd or even column.",
+        "groups": {
+          "Odd": [
+            "7",
+            "13",
+            "25",
+            "41",
+            "59"
+          ],
+          "Even": [
+            "4",
+            "18",
+            "30",
+            "56",
+            "72"
+          ]
+        }
+      },
+      {
+        "type": "true_false",
+        "title": "True or false?",
+        "instructions": "Read each sentence. Circle True or False.",
+        "items": [
+          {
+            "statement": "Even numbers end in 0, 2, 4, 6 or 8.",
+            "answer": true
+          },
+          {
+            "statement": "15 is an even number.",
+            "answer": false
+          },
+          {
+            "statement": "If you can make pairs with none left over, the number is even.",
+            "answer": true
+          },
+          {
+            "statement": "The number after an even number is always even.",
+            "answer": false
+          },
+          {
+            "statement": "Two equal groups of 7 make 14, so 14 is even.",
+            "answer": true
+          }
+        ]
+      },
+      {
+        "type": "short_answer",
+        "title": "Explain your thinking",
+        "instructions": "Write your answer on the lines.",
+        "lines": 2,
+        "items": [
+          {
+            "q": "There are 13 children. Can every child have a partner? Explain.",
+            "answer": "No. 13 is odd: 6 pairs make 12, so 1 child is left without a partner."
+          },
+          {
+            "q": "Is 30 odd or even? How do you know?",
+            "answer": "Even. Its ones digit is 0, and 30 = 15 + 15 (two equal groups)."
+          }
+        ]
+      }
+    ]
+  },
+  "social": {
+    "facebook_post": "🧦 FREE Grade 2 math lesson: Odd and Even Numbers!\n\nStudents make pairs with pictures, count by 2s, write even numbers as doubles (14 = 7 + 7) and use the ones digit. Includes a 45-minute lesson plan, a seven-activity worksheet, an editable Word version and an answer key. Every answer is calculated and checked.\n\nDownload it free on TeachLuma 👉 teachluma.com",
+    "pinterest_title": "Odd and Even Numbers Worksheet for Grade 2 (Free)",
+    "pinterest_description": "Free 2nd grade odd and even numbers lesson: pairing objects up to 20, counting by 2s, doubles and the ones digit rule. Includes a lesson plan, worksheet, editable Word version and answer key.",
+    "hashtags": [
+      "#TeachLuma",
+      "#OddAndEven",
+      "#Grade2Math",
+      "#2ndGradeMath",
+      "#FreeWorksheet",
+      "#MathForKids"
+    ],
+    "visual_suggestions": [
+      "Photo of a pile of socks being sorted into pairs next to the 'Make pairs' activity.",
+      "Pinterest pin: the cover page with the words FREE Odd and Even Numbers, Grade 2."
+    ]
+  },
+  "spelling_allow": []
+}
