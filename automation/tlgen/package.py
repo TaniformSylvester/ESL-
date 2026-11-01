@@ -25,18 +25,18 @@ def render(spec, out_dir: Path, compact=0):
     extras, components = [], ["main_pdf", "answer_key"]
     if pro:
         pptx = render_pptx.build(spec, out_dir / f"{base}-slides.pptx")
-        extras.append(("Lesson Slides (PowerPoint, editable)", pptx))
+        extras.append(("Lesson Slides", pptx))
         components.append("pptx")
         docx = render_docx.build(spec, out_dir / f"{base}-editable-pack.docx")
-        extras.append(("Editable Student Pages + Lesson Plan (Word)", docx))
+        extras.append(("Editable Student Pages and Lesson Plan", docx))
         fc = render_pdf.html_to_pdf(render_html.flashcards_only(spec, compact), out_dir / f"{base}-flashcards.pdf")
-        extras.append(("Flashcards (PDF, A5, one card per page)", fc))
+        extras.append(("A5 Flashcards", fc))
         components += ["flashcards"] + [p for p in ("quiz", "homework", "rubric") if spec.get(p)]
     else:
         docx = render_docx.build(spec, out_dir / f"{base}-editable-worksheet.docx")
-        extras.append(("Editable Worksheet (Word)", docx))
+        extras.append(("Editable Worksheet", docx))
     components.append("docx")
-    extras.append(("Answer Key (PDF)", key))
+    extras.append(("Answer Key", key))
 
     from pypdf import PdfReader
     pages = len(PdfReader(str(main)).pages)
