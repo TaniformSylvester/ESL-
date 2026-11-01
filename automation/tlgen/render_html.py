@@ -260,6 +260,8 @@ def render_section(sec, n, seed):
             elif "objects" in r:
                 thing, n = r["objects"]
                 pic = '<div class="objs">' + f'<span class="emoji">{e(thing)}</span>' * n + "</div>"
+            elif "numberline" in r:
+                pic = illustrations.numberline_svg(*r["numberline"])
             elif "rect" in r and max(r["rect"]) <= 12:
                 pic = illustrations.rect_svg(*r["rect"], unit=12)
             prompt = e(it["prompt"])

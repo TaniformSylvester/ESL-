@@ -375,6 +375,8 @@ class Deck:
                     pic = illustrations.thermometer_png(r["thermo"])
                 elif "base10" in r:
                     pic = illustrations.base10_png(*r["base10"])
+                elif "numberline" in r:
+                    pic = illustrations.numberline_png(*r["numberline"])
                 if illustrations.is_emoji(q):
                     self._pic(s, q, Inches(0.9), Inches(1.8), Inches(2.2))
                 else:

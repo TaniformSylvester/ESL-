@@ -269,7 +269,76 @@ def solve(gen, p):
         return dec_str(Decimal(p["a"]) / Decimal(p["b"]))
     if gen == "distributive":
         return p["a"] * (p["b"] + p["c"])
+    if gen == "length_units":
+        return p["a"] - p["b"] if p["form"] == "diff" else p["a"] + p["b"]
+    if gen == "ordinal":
+        n = {"next": p["n"] + 1, "before": p["n"] - 1, "write": p["n"]}[p["form"]]
+        return ordinal(n)
+    if gen == "frac_numberline":
+        return f"{p['k']}/{p['d']}"
+    if gen == "sub_zeros":
+        return _c(p["a"] - p["b"])
+    if gen == "mult_property":
+        f = p["form"]
+        if f == "identity":
+            return p["a"]
+        if f == "zero":
+            return 0
+        return {"comm": p["a"], "assoc": p["b"], "dist": p["c"]}[f]
+    if gen == "mult_2x2":
+        return _c(p["a"] * p["b"])
+    if gen == "time_convert":
+        f, a, b = p["form"], p["a"], p.get("b", 0)
+        return {"h_min": a * 60, "min_h": a // 60, "hm_min": a * 60 + b, "d_h": a * 24,
+                "w_d": a * 7, "min_s": a * 60, "h_min_left": f"{a // 60} h {a % 60} min"}[f]
+    if gen == "dec_compare":
+        a, b = Decimal(p["a"]), Decimal(p["b"])
+        return "<" if a < b else (">" if a > b else "=")
+    if gen == "dec_digit":
+        d = p["n"].split(".")[1][p["pos"] - 1]
+        return dec_str(Decimal(d).scaleb(-p["pos"]))
+    if gen == "volume_prism":
+        return _c(p["l"] * p["w"] * p["h"])
+    if gen == "surface_area":
+        l, w, h = p["l"], p["w"], p["h"]
+        return _c(2 * (l * w + l * h + w * h))
+    if gen == "metric_convert":
+        factor = {"m_cm": 100, "km_m": 1000, "kg_g": 1000, "l_ml": 1000, "cm_mm": 10}
+        f = p["form"]
+        if f in factor:
+            v = Decimal(p["v"]) * factor[f]
+        else:
+            v = Decimal(p["v"]) / {"cm_m": 100, "m_km": 1000, "g_kg": 1000, "ml_l": 1000, "mm_cm": 10}[f]
+        whole, _, frac = dec_str(v).partition(".")
+        return f"{int(whole):,}" + (f".{frac}" if frac else "")
+    if gen == "quadrant":
+        if p["form"] == "dist":
+            return abs(p["y1"] - p["y2"]) if p["x1"] == p["x2"] else abs(p["x1"] - p["x2"])
+        x, y = p["x"], p["y"]
+        return "I" if x > 0 and y > 0 else "II" if x < 0 < y else "III" if x < 0 and y < 0 else "IV"
+    if gen == "percent_of":
+        v = Fraction(p["pct"] * p["n"], 100)
+        return int(v) if v.denominator == 1 else frac_str(v)
     raise ValueError(f"unknown generator {gen}")
+
+
+def _c(n):
+    """Whole number with thousands commas from 1,000 up (matches the prompts)."""
+    return f"{n:,}" if n >= 1000 else n
+
+
+ORD_WORDS = {1: "first", 2: "second", 3: "third", 4: "fourth", 5: "fifth", 6: "sixth", 7: "seventh", 8: "eighth",
+             9: "ninth", 10: "tenth", 11: "eleventh", 12: "twelfth", 13: "thirteenth", 14: "fourteenth", 15: "fifteenth",
+             16: "sixteenth", 17: "seventeenth", 18: "eighteenth", 19: "nineteenth", 20: "twentieth"}
+
+
+def art(word: str) -> str:
+    return "an" if word[0] in "aeiou" else "a"
+
+
+def ordinal(n: int) -> str:
+    suf = "th" if 10 <= n % 100 <= 20 else {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+    return f"{n}{suf}"
 
 
 # ---------------------------------------------------------------- generators
@@ -298,7 +367,7 @@ def generate(gen, count=6, seed=1, **kw):
 
 
 def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, step=5, to=10, digits=3,
-         parts=(2, 3, 4), denominators=(2, 3, 4, 6, 8), max_side=10, theme="fruit", brackets=True, whole=False, _seed=1, **_):
+         parts=(2, 3, 4), denominators=(2, 3, 4, 6, 8), max_side=10, theme="fruit", brackets=True, whole=False, unit=False, _seed=1, **_):
     if gen == "add":
         while True:
             a, b = rng.randint(lo, hi), rng.randint(lo, hi)
@@ -373,8 +442,13 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         k = rng.randint(2, 4)
         return _item("equivalent_fraction", {"n": n, "d": d, "d2": d * k}, f"{n}/{d} = ____/{d * k}")
     if gen == "frac_div":
-        kind = rng.choice(["ff", "ff", "wf", "fw"])
-        if kind == "wf":                        # whole ÷ fraction
+        kind = rng.choice(["wf", "fw"] if unit else ["ff", "ff", "wf", "fw"])
+        if unit:                                # Grade 5: unit fraction ÷ whole, whole ÷ unit fraction
+            if kind == "wf":
+                n1, d1, n2, d2 = rng.randint(2, 9), 1, 1, rng.choice([2, 3, 4, 5, 6, 8])
+            else:
+                n1, d1, n2, d2 = 1, rng.choice([2, 3, 4, 5, 6, 8]), rng.randint(2, 6), 1
+        elif kind == "wf":                      # whole ÷ fraction
             n1, d1 = rng.randint(2, 6), 1
             d2 = rng.choice([2, 3, 4, 5, 6, 8]); n2 = rng.randint(1, d2 - 1)
         elif kind == "fw":                      # fraction ÷ whole
@@ -612,6 +686,109 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         q = Decimal(rng.randint(11, 999)).scaleb(-rng.choice([1, 2]))
         a = q * b
         return _item(gen, {"a": dec_str(a), "b": b}, f"{dec_str(a)} ÷ {b} = ____")
+    if gen == "length_units":
+        if rng.random() < 0.7:     # small things measured with small units
+            unit = rng.choice(["paper clips", "cubes"])
+            a1, a2 = rng.choice([("pencil", "crayon"), ("book", "eraser"), ("ribbon", "straw"), ("ruler", "glue stick"), ("shoe", "spoon")])
+        else:                      # big things measured with big units
+            unit = rng.choice(["hand spans", "footsteps"])
+            a1, a2 = rng.choice([("table", "chair"), ("rug", "mat"), ("door", "window"), ("bench", "box")])
+        a = rng.randint(max(lo, 4), hi); b = rng.randint(2, a - 1)
+        form = rng.choice(["diff", "total"])
+        if form == "diff":
+            q = f"{art(a1).capitalize()} {a1} is {a} {unit} long. {art(a2).capitalize()} {a2} is {b} {unit} long. How many {unit} longer is the {a1}? ____"
+        else:
+            q = f"Mia puts {art(a1)} {a1} ({a} {unit} long) and {art(a2)} {a2} ({b} {unit} long) end to end. How long are they together? ____ {unit}"
+        return _item(gen, {"form": form, "a": a, "b": b, "unit": unit}, q)
+    if gen == "ordinal":
+        form = rng.choice(["next", "before", "write"])
+        n = rng.randint(2 if form == "before" else 1, hi - (1 if form == "next" else 0))
+        words = {"next": f"What comes after {ordinal(n)}? ____", "before": f"What comes before {ordinal(n)}? ____",
+                 "write": f"Write {ORD_WORDS[n]} as a number with letters (like 1st): ____"}
+        return _item(gen, {"form": form, "n": n}, words[form])
+    if gen == "frac_numberline":
+        d = rng.choice(list(denominators)); k = rng.randint(1, d - 1)
+        return _item(gen, {"d": d, "k": k},
+                     "What fraction is at the dot? ____",
+                     {"numberline": [d, k]})
+    if gen == "sub_zeros":
+        while True:
+            h = rng.randint(2, 9)
+            a = rng.choice([h * 100, h * 100 + rng.randint(1, 9), h * 1000, h * 1000 + rng.randint(1, 9)])
+            if a > hi:
+                continue
+            b = rng.randint(a // 4, a - 11)
+            if b % 10 > a % 10:          # must borrow across the zero
+                return _item(gen, {"a": a, "b": b}, f"{_c(a)} − {_c(b)} = ____")
+    if gen == "mult_property":
+        form = rng.choice(["comm", "comm", "assoc", "dist", "dist", "identity", "zero"])
+        a, b, c = rng.randint(2, 9), rng.randint(2, 9), rng.randint(2, 9)
+        q = {"comm": f"{a} × {b} = {b} × ____", "assoc": f"({a} × {b}) × {c} = {a} × (____ × {c})",
+             "dist": f"{a} × {10 + c} = {a} × 10 + {a} × ____", "identity": f"{a} × 1 = ____", "zero": f"{a} × 0 = ____"}[form]
+        return _item(gen, {"form": form, "a": a, "b": b, "c": c}, q)
+    if gen == "mult_2x2":
+        a, b = rng.randint(max(lo, 11), min(hi, 99)), rng.randint(11, 99)
+        return _item(gen, {"a": a, "b": b}, f"{a} × {b} = ____")
+    if gen == "time_convert":
+        form = rng.choice(["h_min", "min_h", "hm_min", "d_h", "w_d", "min_s"])
+        if form == "min_h":
+            a = 60 * rng.randint(2, 8); q = f"{a} minutes = ____ hours"
+        elif form == "hm_min":
+            a = rng.randint(1, 5); b = rng.choice([10, 15, 20, 25, 30, 40, 45, 50]); q = f"{a} hours {b} minutes = ____ minutes"
+            return _item(gen, {"form": form, "a": a, "b": b}, q)
+        else:
+            a = rng.randint(2, 9)
+            q = {"h_min": f"{a} hours = ____ minutes", "d_h": f"{a} days = ____ hours", "w_d": f"{a} weeks = ____ days",
+                 "min_s": f"{a} minutes = ____ seconds"}[form]
+        return _item(gen, {"form": form, "a": a}, q)
+    if gen == "dec_compare":
+        while True:
+            a = Decimal(rng.randint(1, 99)).scaleb(-rng.choice([1, 2]))
+            b = Decimal(rng.randint(1, 99)).scaleb(-rng.choice([1, 2]))
+            if a != b:
+                return _item(gen, {"a": dec_str(a), "b": dec_str(b)}, f"{dec_str(a)} ____ {dec_str(b)}")
+    if gen == "dec_digit":
+        while True:
+            n = Decimal(rng.randint(101, 9999)).scaleb(-2)
+            t = format(n, "f"); fr = t.split(".")[1]
+            pos = rng.choice([1, 2]); d = fr[pos - 1]
+            if d != "0" and t.replace(".", "").count(d) == 1:
+                return _item(gen, {"n": t, "pos": pos}, f"What is the value of the {d} in {t}? ____")
+    if gen == "volume_prism":
+        l, w, h = rng.randint(2, max_side), rng.randint(2, max_side), rng.randint(2, max_side)
+        return _item(gen, {"l": l, "w": w, "h": h},
+                     f"A box is {l} cm long, {w} cm wide and {h} cm high. What is its volume? ____ cubic centimeters")
+    if gen == "surface_area":
+        l, w, h = rng.randint(2, max_side), rng.randint(2, max_side), rng.randint(2, max_side)
+        return _item(gen, {"l": l, "w": w, "h": h},
+                     f"A box is {l} cm long, {w} cm wide and {h} cm high. What is its surface area? ____ square centimeters")
+    if gen == "metric_convert":
+        form = rng.choice(["m_cm", "cm_m", "km_m", "m_km", "kg_g", "g_kg", "l_ml", "ml_l", "cm_mm", "mm_cm"])
+        unit = {"m_cm": ("m", "cm"), "cm_m": ("cm", "m"), "km_m": ("km", "m"), "m_km": ("m", "km"), "kg_g": ("kg", "g"),
+                "g_kg": ("g", "kg"), "l_ml": ("L", "mL"), "ml_l": ("mL", "L"), "cm_mm": ("cm", "mm"), "mm_cm": ("mm", "cm")}[form]
+        if form in ("m_cm", "km_m", "kg_g", "l_ml", "cm_mm"):
+            v = Decimal(rng.randint(2, 95)).scaleb(-rng.choice([0, 1]))
+        else:
+            v = Decimal(rng.randint(15, 950 if form == "mm_cm" else 9500))
+        shown = dec_str(v); whole, _, frac = shown.partition(".")
+        shown = f"{int(whole):,}" + (f".{frac}" if frac else "")
+        return _item(gen, {"form": form, "v": dec_str(v)}, f"{shown} {unit[0]} = ____ {unit[1]}")
+    if gen == "quadrant":
+        if rng.random() < 0.6:
+            x, y = rng.choice([-1, 1]) * rng.randint(1, 9), rng.choice([-1, 1]) * rng.randint(1, 9)
+            return _item(gen, {"form": "quad", "x": x, "y": y}, f"In which quadrant is the point ({num(x)}, {num(y)})? ____")
+        x1 = rng.randint(-8, 8); y1, y2 = rng.randint(1, 9), -rng.randint(1, 9)
+        if rng.random() < 0.5:
+            return _item(gen, {"form": "dist", "x1": x1, "y1": y1, "x2": x1, "y2": y2},
+                         f"How far apart are ({num(x1)}, {num(y1)}) and ({num(x1)}, {num(y2)})? ____ units")
+        return _item(gen, {"form": "dist", "x1": y2, "y1": x1, "x2": y1, "y2": x1},
+                     f"How far apart are ({num(y2)}, {num(x1)}) and ({num(y1)}, {num(x1)})? ____ units")
+    if gen == "percent_of":
+        while True:
+            pct = rng.choice([10, 20, 25, 50, 75, 5, 30, 40, 60, 15, 80, 90])
+            n = rng.randrange(20, 401, 4 if pct in (25, 75) else 10 if pct in (10, 30, 90) else 5 if pct in (20, 40, 60, 80) else 20)
+            if pct * n % 100 == 0:
+                return _item(gen, {"pct": pct, "n": n}, f"{pct}% of {n} = ____")
     if gen == "distributive":
         a, b, c = rng.randint(2, 9), rng.choice([10, 20, 30, 40]), rng.randint(1, 9)
         return _item(gen, {"a": a, "b": b, "c": c}, f"{a} × ({b} + {c}) = {a} × {b} + {a} × {c} = ____")

@@ -297,6 +297,44 @@ def fraction_png(parts, shaded, shape="rect", size=300):
     return str(out)
 
 
+# ---------------------------------------------------------------- fraction number line
+def numberline_svg(d, k, w=230):
+    """Number line from 0 to 1 in d equal parts, with a dot (and ?) at mark k."""
+    x0, x1, y = 14, w - 14, 30
+    step = (x1 - x0) / d
+    ticks = "".join(f'<line x1="{x0 + i * step:.1f}" y1="{y - 7}" x2="{x0 + i * step:.1f}" y2="{y + 7}" stroke="#172A6E" stroke-width="2"/>' for i in range(d + 1))
+    xk = x0 + k * step
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="62">'
+            f'<line x1="{x0}" y1="{y}" x2="{x1}" y2="{y}" stroke="#172A6E" stroke-width="3"/>{ticks}'
+            f'<circle cx="{xk:.1f}" cy="{y}" r="6" fill="#FBB829" stroke="#172A6E" stroke-width="2"/>'
+            f'<text x="{xk:.1f}" y="{y - 12}" font-size="14" font-weight="700" text-anchor="middle" fill="#172A6E">?</text>'
+            f'<text x="{x0}" y="{y + 24}" font-size="14" text-anchor="middle" fill="#172A6E">0</text>'
+            f'<text x="{x1}" y="{y + 24}" font-size="14" text-anchor="middle" fill="#172A6E">1</text></svg>')
+
+
+def numberline_png(d, k, w=600):
+    out = _cache(f"nl-{d}-{k}-{w}.png")
+    if out.exists():
+        return str(out)
+    h = int(w * 0.27)
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    dr = ImageDraw.Draw(img)
+    x0, x1, y = 30, w - 30, int(h * 0.48)
+    dr.line([x0, y, x1, y], fill=NAVY, width=6)
+    step = (x1 - x0) / d
+    for i in range(d + 1):
+        x = x0 + i * step
+        dr.line([x, y - 16, x, y + 16], fill=NAVY, width=4)
+    xk = x0 + k * step
+    dr.ellipse([xk - 13, y - 13, xk + 13, y + 13], fill=GOLD, outline=NAVY, width=4)
+    font = ImageFont.truetype(config.ttf("nunito-latin-700-normal"), 34)
+    for txt, x in (("0", x0), ("1", x1)):
+        dr.text((x, y + 40), txt, fill=NAVY, anchor="mm", font=font)
+    dr.text((xk, y - 40), "?", fill=NAVY, anchor="mm", font=font)
+    img.save(out)
+    return str(out)
+
+
 def rect_svg(l, w, unit=18):
     W, H = l * unit + 4, w * unit + 4
     cells = "".join(f'<line x1="{2 + i * unit}" y1="2" x2="{2 + i * unit}" y2="{H - 2}" stroke="#BFC8E6"/>' for i in range(1, l)) + \

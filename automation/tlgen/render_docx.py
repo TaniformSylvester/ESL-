@@ -235,6 +235,8 @@ class Doc:
                         self.picture(cells[j].add_paragraph().add_run(), illustrations.fraction_png(*r["fraction"], size=300), 3.2)
                     elif "thermo" in r:
                         self.picture(cells[j].add_paragraph().add_run(), illustrations.thermometer_png(r["thermo"]), 1.8)
+                    elif "numberline" in r:
+                        self.picture(cells[j].add_paragraph().add_run(), illustrations.numberline_png(*r["numberline"]), 5.0)
                     elif "objects" in r:
                         run = cells[j].add_paragraph().add_run()
                         for _ in range(r["objects"][1]):
