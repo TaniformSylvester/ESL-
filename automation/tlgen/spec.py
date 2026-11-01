@@ -234,9 +234,46 @@ def _section_errors(sec):
     return errs
 
 
+# Options that read naturally only at the end of a list stay there.
+_LAST_OPTION = re.compile(r"^(all of|none of|both|neither|they are (equal|the same)|not enough)", re.I)
+
+
+def balance_options(spec):
+    """Spread correct answers evenly across option positions (in place).
+
+    Writers tend to list the right answer first. Each multiple-choice section
+    draws answer positions from a shuffled bag, so every letter is used about
+    equally. The result depends only on the key, section and option set, so
+    rebuilding a spec never moves an answer again. Set "keep_order": true on a
+    section or item to keep the options exactly as written.
+    """
+    for part in ("worksheet", "quiz", "homework"):
+        for si, sec in enumerate((spec.get(part) or {}).get("sections", [])):
+            if sec.get("type") != "multiple_choice" or sec.get("keep_order"):
+                continue
+            rng = random.Random(f"{spec.get('key', '')}:{part}:{si}:options")
+            bags = {}
+            for it in sec.get("items", []):
+                opts, ans = list(it.get("options") or []), it.get("answer")
+                if it.get("keep_order") or ans not in opts:
+                    continue
+                last = [o for o in opts if _LAST_OPTION.match(str(o))]
+                movable = [o for o in opts if o not in last]
+                if ans not in movable or len(movable) < 2:
+                    continue
+                others = [o for o in movable if o != ans]
+                bag = bags.setdefault(len(movable), [])
+                if not bag:
+                    bag.extend(rng.sample(range(len(movable)), len(movable)))
+                others.insert(bag.pop(), ans)
+                it["options"] = others + last
+    return spec
+
+
 def prepare(spec):
     """Expand math generators and fill derived defaults (in place)."""
     mathgen.expand_sections(spec)
+    balance_options(spec)
     return spec
 
 
