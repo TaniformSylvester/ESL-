@@ -188,7 +188,8 @@ def run(spec, pkg, *, taxonomy=None, settings=None, client=None, catalog=None):
                 for it in sec["items"]:
                     math_items += 1
                     try:
-                        if mathgen.solve(it["gen"], it["params"]) != it["answer"]:
+                        # Thousands commas are formatting only: 1032 and "1,032" match.
+                        if str(mathgen.solve(it["gen"], it["params"])).replace(",", "") != str(it["answer"]).replace(",", ""):
                             bad.append(it["prompt"])
                     except Exception as exc:     # unknown generator / bad params
                         bad.append(f"{it.get('prompt')} ({exc})")

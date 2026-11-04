@@ -120,9 +120,9 @@ def fmt_time(h, m):
 def solve(gen, p):
     """Recompute the answer for an item from its parameters."""
     if gen == "add":
-        return p["a"] + p["b"]
+        return _c(p["a"] + p["b"])
     if gen == "sub":
-        return p["a"] - p["b"]
+        return _c(p["a"] - p["b"])
     if gen == "missing_addend":
         return p["total"] - p["a"]
     if gen == "mult":
@@ -372,12 +372,12 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         while True:
             a, b = rng.randint(lo, hi), rng.randint(lo, hi)
             if regroup is None or _carries(a, b) == regroup:
-                return _item("add", {"a": a, "b": b}, f"{a} + {b} = ____")
+                return _item("add", {"a": a, "b": b}, f"{_c(a)} + {_c(b)} = ____")
     if gen == "sub":
         while True:
             a, b = sorted((rng.randint(lo, hi), rng.randint(lo, hi)), reverse=True)
             if a != b and (regroup is None or _borrows(a, b) == regroup):
-                return _item("sub", {"a": a, "b": b}, f"{a} − {b} = ____")
+                return _item("sub", {"a": a, "b": b}, f"{_c(a)} − {_c(b)} = ____")
     if gen == "missing_addend":
         total = rng.randint(max(lo, 5), hi)
         a = rng.randint(1, total - 1)
@@ -389,7 +389,7 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         return _item("mult", {"a": a, "b": b}, f"{a} × {b} = ____")
     if gen == "div":
         b, q = rng.choice(list(factors)), rng.randint(1, max_other)
-        return _item("div", {"a": b * q, "b": b}, f"{b * q} ÷ {b} = ____")
+        return _item("div", {"a": b * q, "b": b}, f"{_c(b * q)} ÷ {b} = ____")
     if gen == "compare":
         a, b = rng.randint(lo, hi), rng.randint(lo, hi)
         if rng.random() < 0.12:
@@ -521,7 +521,7 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
             b = rng.choice(list(factors))
             a = rng.randint(max(lo, b * 2), hi)
             if a % b:
-                return _item(gen, {"a": a, "b": b}, f"{a} ÷ {b} = ____")
+                return _item(gen, {"a": a, "b": b}, f"{_c(a)} ÷ {b} = ____")
     if gen == "word_div":
         each = rng.choice(list(factors))
         total = each * rng.randint(max(2, lo), max_other)
