@@ -44,7 +44,13 @@ class Client:
             try:
                 body = r.json()
             except ValueError:
-                body = {"error": r.text[:300]}
+                # Shared hosts sometimes answer with an HTML page (a security
+                # filter or a busy server). Treat it as transient and retry.
+                body = {"error": f"not a JSON answer (HTTP {r.status_code}): {r.text[:200]}"}
+                if attempt < retries:
+                    time.sleep(2 ** (attempt + 1))
+                    continue
+                raise ApiError(r.status_code or 0, body)
             # Retry only transient failures; 4xx answers are final.
             if r.status_code in (502, 503, 504) and attempt < retries:
                 time.sleep(2 ** (attempt + 1))
