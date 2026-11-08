@@ -34,7 +34,8 @@ ALWAYS_OK = {"teachluma", "pdf", "docx", "pptx", "powerpoint", "esl", "ok", "wor
              "shouldn", "mustn", "needn", "ll", "ve", "re", "th", "ch", "sh", "ph", "wh", "ck", "ng",       # letter clusters taught in phonics
              "cafe", "cafes", "cm", "mm", "km", "kg", "ml", "mph", "°c", "handwashing", "homework", "classmate", "classmates", "website", "websites", "smartphone", "emoji",
              "january", "february", "march", "april", "june", "july", "august", "september", "october", "november",
-             "december", "mr", "mrs", "ms", "dr", "celsius", "fahrenheit", "tv", "app", "apps", "online", "email"}
+             "december", "mr", "mrs", "ms", "dr", "celsius", "fahrenheit", "tv", "app", "apps", "online", "email",
+             "uk", "british", "american", "english"}
 # Internationally neutral content: resources are sold worldwide (US-style
 # and British/international-school classrooms), so measurements are metric
 # and nothing depends on knowing the USA. A spec may list deliberate
@@ -120,6 +121,8 @@ def _spell_unknown(spec):
         text = "".join(c for c in unicodedata.normalize("NFKD", text) if not unicodedata.combining(c))
         for w in re.findall(r"[A-Za-z][A-Za-z'’-]*[A-Za-z]|[A-Za-z]", text):
             w = w.replace("’", "'")
+            if re.fullmatch(r"[IVXLCDM]{2,}", w):
+                continue        # a Roman numeral written in capitals (XIV, XC), not an English word
             # A word written in syllables (ba-NA-na, com-PU-ter) is checked as the joined word.
             joined = w.replace("-", "").lower()
             if "-" in w and joined.isalpha() and (sp.known([joined]) or joined in allow):

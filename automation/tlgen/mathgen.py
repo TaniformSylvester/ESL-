@@ -116,6 +116,23 @@ def fmt_time(h, m):
     return f"{h}:{m:02d}"
 
 
+ROMAN = [(1000, "M"), (900, "CM"), (500, "D"), (400, "CD"), (100, "C"), (90, "XC"), (50, "L"), (40, "XL"),
+         (10, "X"), (9, "IX"), (5, "V"), (4, "IV"), (1, "I")]
+
+
+def to_roman(n: int) -> str:
+    """Standard Roman numerals with subtractive pairs (4 = IV, 90 = XC), 1 to 3999."""
+    out = ""
+    for value, letters in ROMAN:
+        while n >= value:
+            out += letters
+            n -= value
+    return out
+
+
+QUAD_SHAPES = ("square", "rectangle", "kite", "quadrilateral")
+
+
 # ---------------------------------------------------------------- solvers
 def solve(gen, p):
     """Recompute the answer for an item from its parameters."""
@@ -319,6 +336,12 @@ def solve(gen, p):
     if gen == "percent_of":
         v = Fraction(p["pct"] * p["n"], 100)
         return int(v) if v.denominator == 1 else frac_str(v)
+    if gen == "roman_read":
+        return p["n"]
+    if gen == "roman_write":
+        return to_roman(p["n"])
+    if gen == "perimeter_quad":
+        return sum(p["sides"])
     raise ValueError(f"unknown generator {gen}")
 
 
@@ -792,6 +815,29 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
     if gen == "distributive":
         a, b, c = rng.randint(2, 9), rng.choice([10, 20, 30, 40]), rng.randint(1, 9)
         return _item(gen, {"a": a, "b": b, "c": c}, f"{a} × ({b} + {c}) = {a} × {b} + {a} × {c} = ____")
+    if gen in ("roman_read", "roman_write"):
+        n = rng.randint(max(1, lo), min(hi, 3999))
+        prompt = f"{to_roman(n)} = ____" if gen == "roman_read" else f"Write {n} in Roman numerals: ____"
+        return _item(gen, {"n": n}, prompt)
+    if gen == "perimeter_quad":
+        shape = rng.choice(QUAD_SHAPES)
+        a, b = rng.randint(2, max_side), rng.randint(2, max_side)
+        while b == a:
+            b = rng.randint(2, max_side)
+        if shape == "square":
+            sides = [a, a, a, a]
+            prompt = f"A square has sides of {a} cm. What is its perimeter? ____ cm"
+        elif shape == "rectangle":
+            sides = [a, b, a, b]
+            prompt = f"A rectangle is {max(a, b)} cm long and {min(a, b)} cm wide. What is its perimeter? ____ cm"
+        elif shape == "kite":
+            sides = [a, a, b, b]
+            prompt = f"A kite has two sides of {a} cm and two sides of {b} cm. What is its perimeter? ____ cm"
+        else:
+            sides = [a, b, rng.randint(2, max_side), rng.randint(2, max_side)]
+            prompt = ("A quadrilateral has sides of " + ", ".join(f"{x} cm" for x in sides[:3]) +
+                      f" and {sides[3]} cm. What is its perimeter? ____ cm")
+        return _item(gen, {"shape": shape, "sides": sides}, prompt)
     raise ValueError(f"unknown generator {gen}")
 
 
