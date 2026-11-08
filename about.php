@@ -2,7 +2,7 @@
 require_once __DIR__ . '/includes/init.php';
 
 $pageTitle = 'About Us';
-$pageDescription = 'Learn about ' . SITE_NAME . '\'s mission to help teachers across Southeast Asia save preparation time with ready-to-use resources and practical classroom guidance.';
+$pageDescription = 'Learn about ' . SITE_NAME . '\'s mission to help teachers everywhere save preparation time with ready-to-use resources and practical classroom guidance.';
 require_once __DIR__ . '/includes/header.php';
 ?>
 <section class="hero py-5">
@@ -35,7 +35,7 @@ require_once __DIR__ . '/includes/header.php';
                         <i class="fa-solid fa-users fa-lg text-primary mt-1"></i>
                         <h2 class="h4 fw-bold mb-0">Who We're For</h2>
                     </div>
-                    <p class="text-secondary mb-0"><?= e(SITE_NAME) ?> is built for teachers across Southeast Asia &mdash; ESL/EFL teachers, primary school teachers, international and bilingual school teachers, private tutors, and homeschool educators working in international, bilingual, and English Program classrooms in Thailand and neighboring countries, and anywhere else in the world. We cover English/ESL for Kindergarten through Grade 10, and Math and Science for Grades 1&ndash;6.</p>
+                    <p class="text-secondary mb-0"><?= e(SITE_NAME) ?> is built for teachers everywhere &mdash; ESL/EFL teachers, primary school teachers, international and bilingual school teachers, online and private tutors, and homeschool educators, from Thailand and the rest of Asia to the Middle East, Latin America, Europe and beyond. We cover English/ESL for Kindergarten through Grade 10, and Math and Science for Grades 1&ndash;6.</p>
                 </div>
             </div>
 

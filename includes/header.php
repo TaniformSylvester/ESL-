@@ -6,7 +6,7 @@
 require_once __DIR__ . '/ads-functions.php';
 
 $pageTitle = $pageTitle ?? SITE_NAME;
-$pageDescription = $pageDescription ?? SITE_DESCRIPTION;
+$pageDescription = $pageDescription ?? SITE_SUMMARY;
 $pageImage = $pageImage ?? asset_url('images/og-image.jpg');
 $pageRobots = $pageRobots ?? 'index, follow';
 $gaCustomEvents = array_merge($gaCustomEvents ?? [], ga_take_queued_events());

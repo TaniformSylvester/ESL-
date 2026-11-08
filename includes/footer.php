@@ -8,7 +8,7 @@
                     <img class="footer-logo" src="<?= e(versioned_asset_url('brand/teachluma-logo-white.svg')) ?>" alt="<?= e(SITE_NAME) ?>" width="228" height="44" loading="lazy">
                 </a>
                 <p class="footer-tagline mb-2">Teach better. Save time. Make learning engaging.</p>
-                <p class="small mb-3"><?= e(SITE_DESCRIPTION) ?></p>
+                <p class="small mb-3"><?= e(SITE_SUMMARY) ?></p>
                 <p class="small mb-0">
                     <i class="fa-solid fa-envelope me-1" aria-hidden="true"></i>
                     <a href="mailto:<?= e(CONTACT_EMAIL) ?>"><?= e(CONTACT_EMAIL) ?></a>
@@ -45,7 +45,7 @@
         </div>
         <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between gap-2">
             <p class="mb-0">&copy; <?= date('Y') ?> <?= e(SITE_NAME) ?>. All rights reserved.</p>
-            <p class="mb-0">ESL &middot; Math &middot; Science resources for classrooms across Southeast Asia</p>
+            <p class="mb-0">ESL &middot; Math &middot; Science resources for classrooms around the world</p>
         </div>
     </div>
 </footer>

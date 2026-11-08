@@ -65,7 +65,7 @@ $typeCounts = array_slice(get_resource_counts_by_type(), 0, 8, true);
 $typeTones = ['gold', 'teal', 'esl', 'math', 'science', 'games', 'videos', 'gold'];
 
 $pageTitle = 'Free ESL, Math & Science Teaching Resources';
-$pageDescription = 'Free ESL, Math and Science worksheets, lesson plans, PowerPoints and interactive classroom games for teachers across Southeast Asia. Download and teach today.';
+$pageDescription = 'Free ESL, Math and Science worksheets, lesson plans, PowerPoints and interactive classroom games for teachers everywhere. Download and teach today.';
 
 // Single source of truth for the FAQ accordion below — also drives the
 // FAQPage schema, so the structured data can never drift from what a
@@ -114,7 +114,7 @@ require_once __DIR__ . '/includes/header.php';
             <div class="col-lg-6 hero-copy">
                 <p class="hero-eyebrow"><span>Teach better</span><span>Save time</span><span>Engage learners</span></p>
                 <h1 id="hero-title">Quality Teaching Resources for <span class="text-highlight text-highlight-swoosh">Every Classroom</span></h1>
-                <p class="hero-lead">Ready-to-use lesson plans, worksheets, games and videos for ESL, Math and Science &mdash; made for classrooms across Southeast Asia.</p>
+                <p class="hero-lead">Ready-to-use lesson plans, worksheets, games and videos for ESL, Math and Science &mdash; made for classrooms around the world.</p>
                 <div class="hero-ctas">
                     <a href="<?= e(base_url('resources.php')) ?>" class="btn btn-accent btn-lg">
                         <i class="fa-solid fa-magnifying-glass me-2" aria-hidden="true"></i>Browse Resources
@@ -337,7 +337,7 @@ require_once __DIR__ . '/includes/header.php';
                     <img src="<?= e(versioned_asset_url('brand/teachluma-teacher-avatar.svg')) ?>" alt="" width="96" height="96" loading="lazy">
                     <div>
                         <h3>Made by a classroom teacher</h3>
-                        <p>TeachLuma is built for real classrooms in Thailand and across Southeast Asia &mdash; practical materials with the context you need to know whether a resource fits your lesson before you download it.</p>
+                        <p>TeachLuma is built for real classrooms around the world &mdash; practical materials with the context you need to know whether a resource fits your lesson before you download it.</p>
                     </div>
                 </div>
             </div>

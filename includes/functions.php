@@ -129,6 +129,13 @@ function format_currency($amount): string
     return SITE_CURRENCY_SYMBOL . number_format((float)$amount, 0);
 }
 
+/**
+ * The site's one-line description (footer and default meta description).
+ * Kept here rather than in config/config.php so wording changes reach the
+ * live site with a normal deployment, which never overwrites the config.
+ */
+const SITE_SUMMARY = 'Ready-to-teach English/ESL, Math and Science resources, plus practical teaching guidance, for teachers everywhere.';
+
 /** Plural of a resource-type name: Quiz → Quizzes, Activity → Activities, Homework → Homework. */
 function pluralize_label(string $word, int $count): string
 {

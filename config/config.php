@@ -34,7 +34,7 @@ if (ENVIRONMENT === 'development') {
 // -----------------------------------------------------------------------
 define('SITE_NAME', 'TeachLuma');
 define('SITE_TAGLINE', 'Save Time. Teach Better.');
-define('SITE_DESCRIPTION', 'Ready-to-teach English/ESL, Math and Science resources, plus practical teaching guidance, for teachers across Southeast Asia.');
+define('SITE_DESCRIPTION', 'Ready-to-teach English/ESL, Math and Science resources, plus practical teaching guidance, for teachers everywhere.');
 
 define('SITE_URL', 'https://teachluma.com');
 

@@ -217,7 +217,7 @@ function generate_videos_listing_seo(array $filters, ?array $subject, int $resul
     if ($label === '') {
         return [
             'title'       => 'Educational Videos',
-            'description' => 'Browse ' . SITE_NAME . '\'s library of educational videos — English/ESL, Math and Science lessons for classrooms across Southeast Asia.',
+            'description' => 'Browse ' . SITE_NAME . '\'s library of educational videos — English/ESL, Math and Science lessons for classrooms around the world.',
             'h1'          => 'Educational Videos',
             'noindex'     => $resultCount === 0,
         ];
