@@ -127,13 +127,13 @@ class Deck:
     def title(self):
         lp = self.spec["lesson_plan"]
         s = self._slide(config.BRAND["navy"], notes=(
-            f"{self.m['title']} ({self.m['grade']}, {self.m['suggested_duration']}).\n{self.m['overview']}\n"
+            f"{self.m['title']} ({S.grade_display(self.m['grade'])}, {self.m['suggested_duration']}).\n{self.m['overview']}\n"
             f"Materials: {'; '.join(S.as_lines(lp['materials']))}."))
         self._shape(s, MSO_SHAPE.OVAL, Inches(8.4), Inches(-1.6), Inches(6.6), Inches(6.6), self.c["main"])
         for i, em in enumerate((self.spec.get("cover_emoji") or [])[:4]):
             self._pic(s, em, Inches(9.5 + (i % 2) * 2.1), Inches(0.5 + (i // 2) * 2.0), Inches(1.7))
         self._box(s, Inches(0.7), Inches(1.9), Inches(7.6), Inches(2.7), self.m["title"], 44, True, WHITE)
-        self._box(s, Inches(0.7), Inches(4.7), Inches(7.6), Inches(0.7), f"{self.m['grade']} · {self.c['name']} · {self.m['suggested_duration']}",
+        self._box(s, Inches(0.7), Inches(4.7), Inches(7.6), Inches(0.7), f"{S.grade_display(self.m['grade'])} · {self.c['name']} · {self.m['suggested_duration']}",
                   22, True, config.BRAND["gold"])
         self._box(s, Inches(0.7), Inches(6.6), Inches(6), Inches(0.5), "TeachLuma · teachluma.com", 14, True, "#C9D2F0")
 

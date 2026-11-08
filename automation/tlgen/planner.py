@@ -14,6 +14,7 @@ curriculum topic bank (data/topics.json) and the dashboard settings. Rules:
 import hashlib
 import json
 import re
+import sys
 from collections import Counter
 from datetime import date
 
@@ -149,6 +150,9 @@ def plan(status, catalog, taxonomy, count=None, queue=None, only=None):
             for order, line in enumerate(bank.get(subject, {}).get(grade, [])):
                 category, topic = line.split("|", 1)
                 if category not in valid_cats.get(subject, set()):
+                    # Never skip silently: a renamed site category once hid dozens of bank topics.
+                    print(f"warning: topic bank entry '{line}' ({subject} {grade}) uses a category the site doesn't have; "
+                          f"skipped (fix tlgen/data/topics.json)", file=sys.stderr)
                     continue
                 if local_duplicates(catalog, subject, grade, topic, topic) or covered_by(catalog, subject, grade, topic, PLAN_COVERAGE):
                     continue

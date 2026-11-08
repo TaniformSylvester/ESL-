@@ -251,7 +251,7 @@ class Doc:
 
     def part(self, part):
         m, doc = self.spec["meta"], self.spec[part]
-        self.page(f"{S.PART_TITLES[part]} · {m['grade']}", doc.get("title") or m["topic"])
+        self.page(f"{S.PART_TITLES[part]} · {S.grade_display(m['grade'])}", doc.get("title") or m["topic"])
         self.namebar(_points(doc) if part == "quiz" else None)
         for i, sec in enumerate(doc["sections"]):
             self.section(sec, i + 1, S.seed_for(self.spec, part, i))
@@ -259,7 +259,7 @@ class Doc:
     def lesson_plan(self):
         m, lp = self.spec["meta"], self.spec["lesson_plan"]
         self.page("Teacher lesson plan", m["title"])
-        self.para(f"{m['grade']} · {config.SUBJECT_COLORS[m['subject']]['name']} · {m['suggested_duration']}", bold=True, color=self.color["ink"])
+        self.para(f"{S.grade_display(m['grade'])} · {config.SUBJECT_COLORS[m['subject']]['name']} · {m['suggested_duration']}", bold=True, color=self.color["ink"])
         self.para(m["overview"])
         self.d.add_heading("Learning objectives", level=2)
         self.bullets(m["learning_objectives"])

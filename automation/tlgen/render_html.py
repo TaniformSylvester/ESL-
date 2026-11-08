@@ -316,7 +316,7 @@ def cover(spec):
     inside = "".join(f"<li>{e(x)}</li>" for x in whats_included(spec))
     return f"""<section class="cover page"><div class="band"><img class="logo" src="{config.LOGO_WHITE_SVG.as_uri()}" alt="TeachLuma">
 <h1>{e(m['title'])}</h1><div class="sub">{e(m['topic'])}</div>
-<div class="badges"><span class="badge subj">{e(c['name'])}</span><span class="badge">{e(m['grade'])}</span>{tier}<span class="badge">{e(m['suggested_duration'])}</span></div></div>
+<div class="badges"><span class="badge subj">{e(c['name'])}</span><span class="badge">{e(S.grade_display(m['grade']))}</span>{tier}<span class="badge">{e(m['suggested_duration'])}</span></div></div>
 <div class="art">{art}</div>
 <div class="inside"><h3>Inside this pack</h3><ul>{inside}</ul></div>
 <div class="foot"><span>teachluma.com</span><span>For classroom use by the purchasing teacher</span></div></section>"""
@@ -326,8 +326,8 @@ def lesson_plan(spec):
     m, lp = spec["meta"], spec["lesson_plan"]
     out = [f'<section class="page lp">{_head("Teacher lesson plan", m["title"])}',
            '<div class="grid">' + "".join(f"<div><b>{k}</b>{e(v)}</div>" for k, v in (
-               ("Subject", config.SUBJECT_COLORS[m["subject"]]["name"]), ("Grade", m["grade"]),
-               ("Duration", m["suggested_duration"]), ("Level", m.get("recommended_level") or m["grade"]))) + "</div>",
+               ("Subject", config.SUBJECT_COLORS[m["subject"]]["name"]), ("Grade", S.grade_display(m["grade"])),
+               ("Duration", m["suggested_duration"]), ("Level", S.level_display(m)))) + "</div>",
            f'<p>{e(m["overview"])}</p>',
            '<div class="two blk"><div><h3 class="sec">Learning objectives</h3><ul class="tight">' + "".join(f"<li>{e(x)}</li>" for x in S.as_lines(m["learning_objectives"])) + "</ul></div>",
            '<div><h3 class="sec">Materials</h3><ul class="tight">' + "".join(f"<li>{e(x)}</li>" for x in S.as_lines(lp["materials"])) + "</ul></div></div>"]
@@ -355,7 +355,7 @@ def lesson_plan(spec):
 
 def student_part(spec, part):
     m, doc = spec["meta"], spec[part]
-    out = [f'<section class="page">{_head(S.PART_TITLES[part] + " · " + m["grade"], doc.get("title") or m["topic"])}',
+    out = [f'<section class="page">{_head(S.PART_TITLES[part] + " · " + S.grade_display(m["grade"]), doc.get("title") or m["topic"])}',
            '<div class="namebar"><span>Name:</span><span class="short">Date:</span>'
            + ('<span class="short">Score: &nbsp;&nbsp;&nbsp;&nbsp; / ' + str(_points(doc)) + "</span>" if part == "quiz" else "") + "</div>"]
     for i, sec in enumerate(doc["sections"]):
@@ -473,7 +473,7 @@ h1{{font-family:Fredoka;font-weight:700;font-size:{size}px;line-height:1.06;marg
 .badges span{{border-radius:40px;padding:12px 28px;font-weight:800;font-size:30px;background:#fff;color:{b['navy']}}}
 </style></head><body data-fit="pending"><div class="blob"></div><div class="blob2"></div><div class="art">{art}</div>
 <img class="logo" src="{config.LOGO_WHITE_SVG.as_uri()}" alt="">
-<div class="txt"><h1>{e(title)}</h1><div class="sub">{e(m['grade'])} · {e(c['name'])}</div></div>
+<div class="txt"><h1>{e(title)}</h1><div class="sub">{e(S.grade_display(m['grade']))} · {e(c['name'])}</div></div>
 <div class="badges"><span style="background:{c['main']};color:#fff">{e(m['resource_type'])}</span><span style="background:{tier[1]};color:{tier[2]}">{tier[0]}</span></div>
 <script>
 document.fonts.ready.then(function () {{

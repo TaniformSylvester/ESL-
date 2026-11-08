@@ -5,7 +5,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-from . import config, render_html, render_pdf
+from . import config, render_html, render_pdf, spec as S
 
 THUMB = (1200, 900)     # 4:3, the shape of the resource-card frame on the site
 PREVIEW = (1200, 900)
@@ -53,7 +53,7 @@ def preview(spec, main_pdf: Path, page_count: int, out: Path) -> Path:
     font = ImageFont.truetype(config.ttf("fredoka-latin-700-normal"), 40)
     small = ImageFont.truetype(config.ttf("nunito-latin-800-normal"), 24)
     d.text((60, 44), m["title"][:58] + ("…" if len(m["title"]) > 58 else ""), font=font, fill=config.BRAND["navy"])
-    d.text((60, 98), f"{m['grade']} · {sc['name']} · {'PRO' if m['tier'] == 'pro' else 'FREE'} · {page_count} pages + editable files",
+    d.text((60, 98), f"{S.grade_display(m['grade'])} · {sc['name']} · {'PRO' if m['tier'] == 'pro' else 'FREE'} · {page_count} pages + editable files",
            font=small, fill=sc["ink"])
     h = 640
     slots = [(40, 190, -5), (365, 175, 0), (675, 190, 5)] if len(pages) == 3 else [(250 + 360 * i, 175, 0) for i in range(len(pages))]

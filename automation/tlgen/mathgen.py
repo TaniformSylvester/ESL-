@@ -88,7 +88,7 @@ def frac_str(f: Fraction) -> str:
 
 LINEPLOT_THEMES = {
     "ribbons": ("Length of ribbons (in meters)", "ribbons", "meter"),
-    "beans": ("Height of bean plants (in feet)", "bean plants", "foot"),
+    "beans": ("Height of bean plants (in meters)", "bean plants", "meter"),
     "water": ("Water in each bottle (in liters)", "bottles", "liter"),
 }
 

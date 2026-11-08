@@ -84,6 +84,28 @@ Fill the spec yourself. Never leave filler text.
 - Nothing scary, violent, unhealthy, brand-related or culturally insensitive.
   Use names from many cultures.
 
+**International classrooms**
+Resources are sold worldwide, to US-style schools and to British-curriculum and
+international schools. Grades stay US-style in the spec (`"grade": "Grade 3"`);
+the printed files and the website add the UK equivalent automatically ("Grade 3 /
+Year 4"), so never type the Year yourself.
+- Metric units only (cm, m, km, g, kg, ml, l, °C). QC's `international` check
+  fails imperial units with numbers ("5 feet", "2 miles"), Fahrenheit and
+  US-only references (Thanksgiving, Fourth of July, ZIP codes...).
+- For a lesson that deliberately compares systems, list the exceptions in
+  `"international_allow": ["Fahrenheit", "°F"]`; they show in the QC report.
+- Avoid money unless the lesson is about money; dollar amounts only raise a
+  warning, but a currency-free context ("12 stickers", "48 kg of rice") suits
+  every country. Places, foods, festivals and names should come from many
+  countries, not one.
+- Keep US spelling (see below). Where US and UK English use different words
+  (eraser/rubber, cookie/biscuit, apartment/flat), prefer an example that needs
+  neither, or give both in a vocabulary list ("eraser (UK: rubber)").
+- Never write that a pack is aligned to, or part of, a named programme (for
+  example Cambridge, IB or Common Core): those are trademarks and an
+  alignment claim would need verification. "Suitable for American, British and
+  international school curricula" is fine.
+
 **Structure**
 - `lesson_plan.stages`: 4–6 stages. The minutes must add up to
   `suggested_duration`. Each stage needs concrete teacher actions and the
@@ -154,7 +176,7 @@ Mandatory (all must pass): `spec_valid`, `taxonomy`, `metadata`,
 `answers_complete`, `math_verified`, `lesson_timing`, `files_open` (also
 opened by LibreOffice), `no_blank_pages`, `page_budget` (Free 4–14, Pro 8–32
 pages), `images`, `file_sizes`, `spelling`, `tier_components`,
-`duplicate_check` (live site), `content_safety`, `reading_level`,
+`duplicate_check` (live site), `content_safety`, `international`, `reading_level`,
 `social_copy`.
 
 The 100-point score (accuracy 25, completeness 20, formatting 15, age

@@ -35,6 +35,29 @@ ALWAYS_OK = {"teachluma", "pdf", "docx", "pptx", "powerpoint", "esl", "ok", "wor
              "cafe", "cafes", "cm", "mm", "km", "kg", "ml", "mph", "°c", "handwashing", "homework", "classmate", "classmates", "website", "websites", "smartphone", "emoji",
              "january", "february", "march", "april", "june", "july", "august", "september", "october", "november",
              "december", "mr", "mrs", "ms", "dr", "celsius", "fahrenheit", "tv", "app", "apps", "online", "email"}
+# Internationally neutral content: resources are sold worldwide (US-style
+# and British/international-school classrooms), so measurements are metric
+# and nothing depends on knowing the USA. A spec may list deliberate
+# exceptions in "international_allow" (e.g. ["Fahrenheit"] for a lesson
+# that compares temperature scales); they show in the QC report.
+IMPERIAL_UNITS = re.compile(r"\b\d[\d,./]*\s*-?\s*(?:feet|foot|ft|inch|inches|yards?|yd|miles?|mph|ounces?|oz|pounds?|lbs?|gallons?|quarts?|pints?)\b", re.I)
+FAHRENHEIT = re.compile(r"°\s?F\b|\bFahrenheit\b", re.I)
+US_ONLY = re.compile(r"\b(?:Thanksgiving|Fourth of July|4th of July|Memorial Day|Labor Day|Presidents'? Day|Super Bowl|Groundhog Day|ZIP codes?|Social Security)\b", re.I)
+DOLLAR_AMOUNTS = re.compile(r"\$\s?\d|\b\d+\s*(?:cents?|dollars?)\b", re.I)
+
+
+def international_issues(spec):
+    """(blocking issues, dollar amounts) found in every human-written string."""
+    allow = [a.lower() for a in S.as_lines(spec.get("international_allow"))]
+    found = set()
+    for text in S.all_text(spec):
+        for rx in (IMPERIAL_UNITS, FAHRENHEIT, US_ONLY):
+            found |= {m.group(0) for m in rx.finditer(text)}
+    blocking = sorted(f for f in found if not any(a in f.lower() for a in allow))
+    dollars = sorted({m.group(0) for t in S.all_text(spec) for m in DOLLAR_AMOUNTS.finditer(t)})
+    return blocking, dollars
+
+
 # Wording that would reveal how a resource was made (checked in every human-written string).
 # Ordinary subject words stay allowed: the "standard algorithm" in math, a python in a reptiles
 # pack, a heart that beats automatically.
@@ -310,6 +333,16 @@ def run(spec, pkg, *, taxonomy=None, settings=None, client=None, catalog=None):
     # 15. Content safety (age-appropriate wording)
     found = sorted({w for t in S.all_text(spec) for w in re.findall(r"[a-z]+", t.lower()) if w in UNSAFE})
     safe_ok = check("content_safety", not found, ", ".join(found))
+
+    # 15a. Internationally neutral (metric units, no US-only references)
+    intl, dollars = international_issues(spec)
+    allowed = S.as_lines(spec.get("international_allow"))
+    check("international", not intl,
+          ("use metric units / international examples: " + ", ".join(intl[:8])) if intl
+          else (f"allowed by spec: {', '.join(allowed)}" if allowed else ""))
+    if dollars:
+        warnings.append("dollar amounts (" + ", ".join(dollars[:4]) + ") — fine in many countries, but prefer a "
+                        "currency-free context where the lesson isn't about money")
 
     # 15b. Publisher voice: nothing may say or suggest that the resource was produced by software.
     tells = sorted({m.group(0) for t in S.all_text(spec) for m in [*TELLS.finditer(t), *TELLS_CASED.finditer(t)]})

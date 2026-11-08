@@ -17,6 +17,33 @@ PRO_PARTS = ("quiz", "homework", "rubric")
 LETTERS = "abcdefghijklmnopqrstuvwxyz"
 
 
+def uk_year(grade):
+    """British-curriculum year for a US-style grade: Kindergarten = Year 1,
+    Grade 1 = Year 2 ... Grade 10 = Year 11 (same mapping as the website)."""
+    grade = (grade or "").strip()
+    if grade == "Kindergarten":
+        return "Year 1"
+    m = re.fullmatch(r"Grade (\d{1,2})", grade)
+    return f"Year {int(m.group(1)) + 1}" if m else None
+
+
+def grade_display(grade):
+    """"Grade 3 / Year 4" for printed files, so they suit US-style and
+    British/international-school classes alike."""
+    year = uk_year(grade)
+    return f"{grade} / {year}" if year else (grade or "")
+
+
+def level_display(meta):
+    """recommended_level with the UK year added after the grade:
+    "Grade 3 (ages 8–9)" -> "Grade 3 / Year 4 (ages 8–9)"."""
+    grade = meta.get("grade") or ""
+    level = meta.get("recommended_level") or grade
+    if grade and uk_year(grade) and "Year " not in level and level.startswith(grade):
+        return grade_display(grade) + level[len(grade):]
+    return level
+
+
 def load(path):
     with open(path, encoding="utf-8") as fh:
         spec = json.load(fh)
@@ -297,7 +324,7 @@ def all_text(spec):
     out = []
 
     def walk(v, key=""):
-        if key in ("gen", "params", "render", "emoji", "cover_emoji", "spelling_allow", "type", "generator", "key", "hashtags",
+        if key in ("gen", "params", "render", "emoji", "cover_emoji", "spelling_allow", "international_allow", "type", "generator", "key", "hashtags",
                    "subject", "category", "tier", "resource_type", "_path"):
             return
         if isinstance(v, str):
