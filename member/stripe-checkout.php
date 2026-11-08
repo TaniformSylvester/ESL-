@@ -20,7 +20,9 @@ if (too_many_attempts('stripe_checkout:' . $user['id'], 5, 600)) {
 record_attempt('stripe_checkout:' . $user['id']);
 
 $plan = in_array($_POST['plan'] ?? '', ['monthly', 'annual'], true) ? $_POST['plan'] : 'monthly';
-$result = create_stripe_checkout_session($user, $plan);
+// The currency the teacher saw the price in on the subscription page.
+$currency = normalize_currency($_POST['currency'] ?? '') ?? visitor_currency();
+$result = create_stripe_checkout_session($user, $plan, $currency);
 
 if (!$result['success'] || !$result['url']) {
     flash_set('error', $result['error'] ?? 'Could not start the Stripe checkout. Please try again.');

@@ -52,6 +52,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>window.APP_BASE_URL = <?= json_encode(rtrim(SITE_URL, '/')) ?>;</script>
+<script src="<?= e(versioned_asset_url('js/currency.js')) ?>"></script>
 <script src="<?= e(versioned_asset_url('js/main.js')) ?>"></script>
 <script src="<?= e(versioned_asset_url('js/favorites.js')) ?>"></script>
 <script src="<?= e(versioned_asset_url('js/reviews.js')) ?>"></script>

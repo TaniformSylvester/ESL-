@@ -135,10 +135,10 @@ function get_pending_payment(int $userId): ?array
  * Stripe's at-least-once webhook delivery: a session already recorded
  * (checked via gateway_reference) is a no-op, not a duplicate extension.
  * $plan comes from the Checkout Session's own metadata (see
- * create_stripe_checkout_session()), not assumed — Stripe charges are
- * always THB (config.php's CURRENCY) since PromptPay only supports THB.
+ * create_stripe_checkout_session()), not assumed. $currency is the
+ * session's own currency: THB, or USD for international teachers.
  */
-function record_stripe_payment(int $userId, float $amount, string $sessionId, string $plan = 'monthly'): void
+function record_stripe_payment(int $userId, float $amount, string $sessionId, string $plan = 'monthly', string $currency = CURRENCY): void
 {
     if (!array_key_exists($plan, PLAN_DAYS)) {
         $plan = 'monthly';
@@ -155,7 +155,7 @@ function record_stripe_payment(int $userId, float $amount, string $sessionId, st
     $db->prepare(
         "INSERT INTO payments (user_id, amount, currency, method, plan, reference_number, payment_date, status, gateway_reference, reviewed_at)
          VALUES (?, ?, ?, 'stripe', ?, ?, CURDATE(), 'approved', ?, NOW())"
-    )->execute([$userId, $amount, CURRENCY, $plan, $sessionId, $sessionId]);
+    )->execute([$userId, $amount, normalize_currency($currency) ?? CURRENCY, $plan, $sessionId, $sessionId]);
 
     $paymentId = (int)$db->lastInsertId();
 
@@ -172,11 +172,7 @@ function record_stripe_payment(int $userId, float $amount, string $sessionId, st
  */
 function format_payment_amount(array $payment): string
 {
-    if (($payment['currency'] ?? '') === 'USD') {
-        return '$' . number_format((float)$payment['amount'], 2);
-    }
-
-    return format_currency($payment['amount']);
+    return format_money($payment['amount'], $payment['currency'] ?? CURRENCY);
 }
 
 function get_user_payments(int $userId): array

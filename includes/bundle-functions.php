@@ -398,7 +398,7 @@ function set_bundle_resources(int $bundleId, array $resourceIds): void
  * succeeded. Idempotent against Stripe's at-least-once webhook delivery,
  * same pattern as record_stripe_payment().
  */
-function record_bundle_purchase(int $userId, int $bundleId, float $amount, string $sessionId): void
+function record_bundle_purchase(int $userId, int $bundleId, float $amount, string $sessionId, string $currency = CURRENCY): void
 {
     $db = getDB();
 
@@ -410,7 +410,7 @@ function record_bundle_purchase(int $userId, int $bundleId, float $amount, strin
 
     $db->prepare(
         'INSERT INTO bundle_purchases (user_id, bundle_id, amount, currency, gateway_reference) VALUES (?, ?, ?, ?, ?)'
-    )->execute([$userId, $bundleId, $amount, CURRENCY, $sessionId]);
+    )->execute([$userId, $bundleId, $amount, normalize_currency($currency) ?? CURRENCY, $sessionId]);
 }
 
 /** Whether this user has purchased any bundle that includes this resource — checked by can_download_resource(). */

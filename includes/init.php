@@ -20,8 +20,10 @@ require_once ROOT_PATH . '/config/analytics.php';
 require_once ROOT_PATH . '/includes/db.php';
 require_once ROOT_PATH . '/includes/security.php';
 require_once ROOT_PATH . '/includes/functions.php';
+require_once ROOT_PATH . '/includes/currency-functions.php';
 
 secure_session_start();
+handle_currency_switch();
 
 /**
  * In production, an uncaught exception or fatal error would otherwise

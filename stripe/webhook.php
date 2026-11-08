@@ -41,6 +41,8 @@ if ($event['type'] === 'checkout.session.completed') {
     $sessionId = (string)($session['id'] ?? '');
     $paymentStatus = (string)($session['payment_status'] ?? '');
     $amountTotal = (int)($session['amount_total'] ?? 0);
+    // Checkout runs in baht or dollars (see includes/currency-functions.php).
+    $currency = normalize_currency($session['currency'] ?? '') ?? CURRENCY;
 
     // payment_status may be "unpaid" for delayed payment methods (PromptPay
     // included) even once this event first fires — only credit access
@@ -53,12 +55,12 @@ if ($event['type'] === 'checkout.session.completed') {
             $bundle = $bundleId > 0 ? get_bundle_by_id($bundleId) : null;
 
             if ($bundle) {
-                record_bundle_purchase($userId, $bundleId, $amountTotal / 100, $sessionId);
+                record_bundle_purchase($userId, $bundleId, $amountTotal / 100, $sessionId, $currency);
                 send_bundle_purchase_email($user, $bundle);
             }
         } elseif ($user) {
             $plan = (string)($session['metadata']['plan'] ?? 'monthly');
-            record_stripe_payment($userId, $amountTotal / 100, $sessionId, $plan);
+            record_stripe_payment($userId, $amountTotal / 100, $sessionId, $plan, $currency);
 
             $membership = get_membership($userId);
             send_payment_approved_email($user, $membership['expiry_date'] ?? '');

@@ -42,12 +42,14 @@ function stripe_api_request(string $method, string $endpoint, array $params = []
 
 /**
  * Creates a one-time (mode=payment) Checkout Session for the given plan
- * (monthly or annual), priced in THB using config.php's PRICE_MONTHLY /
- * PRICE_ANNUAL — the same prices already shown on pricing.php, so a
- * teacher never sees a different amount at checkout than what was
- * advertised. Offers both 'card' and 'promptpay' as payment methods, so a
- * Thai customer can scan and pay via PromptPay directly inside Stripe's
- * hosted checkout, with no separate manual-transfer step. PromptPay is a
+ * (monthly or annual) in the visitor's currency (see
+ * includes/currency-functions.php): baht uses config.php's PRICE_MONTHLY /
+ * PRICE_ANNUAL, dollars use PRICE_MONTHLY_USD / PRICE_ANNUAL_USD — the same
+ * prices shown on pricing.php, so a teacher never sees a different amount
+ * at checkout than what was advertised. In baht it offers both 'card' and
+ * 'promptpay', so a Thai customer can scan and pay via PromptPay directly
+ * inside Stripe's hosted checkout; in dollars it is card only, because
+ * PromptPay only accepts baht. PromptPay is a
  * delayed-confirmation method — see stripe/webhook.php's payment_status
  * check, which already only credits membership once Stripe confirms the
  * PromptPay payment actually cleared, not just that checkout was opened.
@@ -55,18 +57,19 @@ function stripe_api_request(string $method, string $endpoint, array $params = []
  * caller redirects the browser to the returned url — Stripe hosts the
  * actual payment page, so card/bank details never touch this server.
  */
-function create_stripe_checkout_session(array $user, string $plan = 'monthly'): array
+function create_stripe_checkout_session(array $user, string $plan = 'monthly', string $currency = 'THB'): array
 {
     if (!array_key_exists($plan, PLAN_DAYS)) {
         $plan = 'monthly';
     }
+    $currency = normalize_currency($currency) ?? 'THB';
 
-    $price = $plan === 'annual' ? PRICE_ANNUAL : PRICE_MONTHLY;
+    $price = plan_price_in($plan, $currency);
     $planLabel = PLAN_LABELS[$plan] ?? (ucfirst($plan) . ' Plan');
 
     $params = [
         'mode'                 => 'payment',
-        'payment_method_types' => ['card', 'promptpay'],
+        'payment_method_types' => stripe_payment_methods_for($currency),
         'customer_email'       => $user['email'],
         'success_url'          => base_url('member/subscription.php?stripe=success&session_id={CHECKOUT_SESSION_ID}'),
         'cancel_url'           => base_url('member/subscription.php?stripe=cancelled'),
@@ -74,7 +77,7 @@ function create_stripe_checkout_session(array $user, string $plan = 'monthly'): 
             [
                 'quantity'   => 1,
                 'price_data' => [
-                    'currency'     => 'thb',
+                    'currency'     => strtolower($currency),
                     'unit_amount'  => (int)round($price * 100),
                     'product_data' => [
                         'name' => SITE_NAME . ' ' . $planLabel,
@@ -83,9 +86,10 @@ function create_stripe_checkout_session(array $user, string $plan = 'monthly'): 
             ],
         ],
         'metadata' => [
-            'type'    => 'membership',
-            'user_id' => (string)$user['id'],
-            'plan'    => $plan,
+            'type'     => 'membership',
+            'user_id'  => (string)$user['id'],
+            'plan'     => $plan,
+            'currency' => $currency,
         ],
     ];
 
@@ -102,24 +106,27 @@ function create_stripe_checkout_session(array $user, string $plan = 'monthly'): 
 /**
  * Creates a one-time Checkout Session for a resource bundle — same card +
  * PromptPay setup as the membership checkout, priced at the bundle's own
- * price (THB). metadata.type = 'bundle' is how stripe/webhook.php tells
+ * price (baht), or its derived dollar price for dollar visitors. metadata.type = 'bundle' is how stripe/webhook.php tells
  * this apart from a membership payment on the same shared endpoint.
  * Returns ['success' => bool, 'url' => ?string, 'error' => ?string].
  */
-function create_bundle_checkout_session(array $user, array $bundle): array
+function create_bundle_checkout_session(array $user, array $bundle, string $currency = 'THB'): array
 {
+    $currency = normalize_currency($currency) ?? 'THB';
+    $price = bundle_price_in((float)$bundle['price'], $currency);
+
     $params = [
         'mode'                 => 'payment',
-        'payment_method_types' => ['card', 'promptpay'],
+        'payment_method_types' => stripe_payment_methods_for($currency),
         'customer_email'       => $user['email'],
-        'success_url'          => base_url('bundle.php?slug=' . rawurlencode($bundle['slug']) . '&stripe=success'),
+        'success_url'          => base_url('bundle.php?slug=' . rawurlencode($bundle['slug']) . '&stripe=success&session_id={CHECKOUT_SESSION_ID}'),
         'cancel_url'           => base_url('bundle.php?slug=' . rawurlencode($bundle['slug']) . '&stripe=cancelled'),
         'line_items' => [
             [
                 'quantity'   => 1,
                 'price_data' => [
-                    'currency'     => 'thb',
-                    'unit_amount'  => (int)round((float)$bundle['price'] * 100),
+                    'currency'     => strtolower($currency),
+                    'unit_amount'  => (int)round($price * 100),
                     'product_data' => [
                         'name' => SITE_NAME . ' Bundle — ' . $bundle['title'],
                     ],
@@ -130,6 +137,7 @@ function create_bundle_checkout_session(array $user, array $bundle): array
             'type'      => 'bundle',
             'user_id'   => (string)$user['id'],
             'bundle_id' => (string)$bundle['id'],
+            'currency'  => $currency,
         ],
     ];
 
@@ -141,6 +149,61 @@ function create_bundle_checkout_session(array $user, array $bundle): array
     }
 
     return ['success' => true, 'url' => $result['url'] ?? null, 'error' => null];
+}
+
+/** PromptPay only accepts baht, so dollar checkouts are card only. */
+function stripe_payment_methods_for(string $currency): array
+{
+    return $currency === 'THB' ? ['card', 'promptpay'] : ['card'];
+}
+
+/**
+ * The GA4 'purchase' event for a Stripe Checkout Session the visitor has
+ * just returned from, or null. Asks Stripe for the session itself (the
+ * session id in the return URL is not trusted on its own), and only
+ * reports it when it belongs to this user and is actually paid. Each
+ * session is reported once per login session, so refreshing the page
+ * does not count a sale twice.
+ */
+function stripe_purchase_ga_event(string $sessionId, int $userId): ?array
+{
+    if (!STRIPE_ENABLED || $userId <= 0 || !preg_match('/^cs_[A-Za-z0-9_]{10,200}$/', $sessionId)) {
+        return null;
+    }
+    if (!empty($_SESSION['ga_reported_purchases'][$sessionId])) {
+        return null;
+    }
+
+    $session = stripe_api_request('GET', 'checkout/sessions/' . $sessionId);
+    if (!$session || isset($session['error'])
+        || (int)($session['metadata']['user_id'] ?? 0) !== $userId
+        || ($session['payment_status'] ?? '') !== 'paid') {
+        return null;
+    }
+
+    $_SESSION['ga_reported_purchases'][$sessionId] = true;
+
+    $value = round((int)($session['amount_total'] ?? 0) / 100, 2);
+    $currency = strtoupper((string)($session['currency'] ?? 'thb'));
+    $type = (string)($session['metadata']['type'] ?? 'membership');
+
+    if ($type === 'bundle') {
+        $item = ['item_id' => 'bundle_' . (int)($session['metadata']['bundle_id'] ?? 0), 'item_name' => 'Bundle', 'item_category' => 'bundle'];
+    } else {
+        $plan = (string)($session['metadata']['plan'] ?? 'monthly');
+        $item = ['item_id' => 'pro_' . $plan, 'item_name' => PLAN_LABELS[$plan] ?? 'Teacher Pro', 'item_category' => 'membership'];
+    }
+
+    return [
+        'name'   => 'purchase',
+        'params' => [
+            'transaction_id' => $sessionId,
+            'value'          => $value,
+            'currency'       => $currency,
+            'payment_type'   => 'stripe',
+            'items'          => [$item + ['price' => $value, 'quantity' => 1]],
+        ],
+    ];
 }
 
 /**

@@ -87,24 +87,27 @@ require_once __DIR__ . '/../includes/admin-header.php';
     </div>
 </div>
 
-<h2 class="h6 fw-bold text-secondary text-uppercase mb-3">Revenue <span class="text-secondary fw-normal text-lowercase">(THB, approved payments only)</span></h2>
+<h2 class="h6 fw-bold text-secondary text-uppercase mb-3">Revenue <span class="text-secondary fw-normal text-lowercase">(approved payments only; baht and US dollars are counted separately)</span></h2>
 <div class="row g-3 mb-4">
     <div class="col-sm-4">
         <div class="card shadow-sm border-0 stat-card h-100"><div class="card-body">
             <p class="text-secondary small text-uppercase mb-1">Total Approved Revenue</p>
             <p class="stat-value mb-0 text-primary"><?= format_currency($stats['revenue_total']) ?></p>
+            <?php if ($stats['revenue_total_usd'] > 0): ?><p class="mb-0 fw-semibold">+ <?= e(format_money($stats['revenue_total_usd'], 'USD')) ?></p><?php endif; ?>
         </div></div>
     </div>
     <div class="col-sm-4">
         <div class="card shadow-sm border-0 stat-card h-100"><div class="card-body">
             <p class="text-secondary small text-uppercase mb-1">From Monthly Plan</p>
             <p class="stat-value mb-0"><?= format_currency($stats['revenue_monthly_plan']) ?></p>
+            <?php if ($stats['revenue_monthly_plan_usd'] > 0): ?><p class="mb-0 fw-semibold">+ <?= e(format_money($stats['revenue_monthly_plan_usd'], 'USD')) ?></p><?php endif; ?>
         </div></div>
     </div>
     <div class="col-sm-4">
         <div class="card shadow-sm border-0 stat-card h-100"><div class="card-body">
             <p class="text-secondary small text-uppercase mb-1">From Annual Plan</p>
             <p class="stat-value mb-0"><?= format_currency($stats['revenue_annual_plan']) ?></p>
+            <?php if ($stats['revenue_annual_plan_usd'] > 0): ?><p class="mb-0 fw-semibold">+ <?= e(format_money($stats['revenue_annual_plan_usd'], 'USD')) ?></p><?php endif; ?>
         </div></div>
     </div>
 </div>

@@ -9,7 +9,7 @@ $pageTitle = $pageTitle ?? SITE_NAME;
 $pageDescription = $pageDescription ?? SITE_DESCRIPTION;
 $pageImage = $pageImage ?? asset_url('images/og-image.jpg');
 $pageRobots = $pageRobots ?? 'index, follow';
-$gaCustomEvents = $gaCustomEvents ?? [];
+$gaCustomEvents = array_merge($gaCustomEvents ?? [], ga_take_queued_events());
 $isLoggedIn = isset($_SESSION['user_id']);
 $userRole = $_SESSION['user_role'] ?? null;
 // A page sets $hideAds = true when it's shown to a class on the projector
@@ -63,7 +63,7 @@ $hubLinks = [
 $currentSearch = $currentScript === 'resources.php' ? trim((string)($_GET['search'] ?? '')) : '';
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-currency="<?= e(visitor_currency()) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

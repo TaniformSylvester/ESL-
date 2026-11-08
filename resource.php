@@ -341,9 +341,11 @@ require_once __DIR__ . '/includes/header.php';
                          the Pro-only gate, unchanged from before. -->
                     <div class="alert alert-warning">
                         <p class="fw-bold mb-1"><i class="fa-solid fa-lock me-1"></i> Members Only</p>
-                        <p class="mb-3">Upgrade to Teacher Pro (from <?= format_currency(PRICE_MONTHLY) ?>/month) to download this resource.</p>
+                        <p class="mb-3">Upgrade to Teacher Pro (from <?= plan_price_tag('monthly') ?>/month) to download this resource.</p>
                         <div class="d-flex gap-2 flex-wrap">
-                            <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-primary">Upgrade to Pro</a>
+                            <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-primary"
+                               data-ga-event="upgrade_click"
+                               data-ga-params="<?= e(json_encode(['location' => 'resource_paywall', 'resource_id' => (int)$resource['id']])) ?>">Upgrade to Pro</a>
                             <?php if (!$isLoggedIn): ?>
                                 <a href="<?= e(base_url('login.php')) ?>" class="btn btn-outline-secondary">Login</a>
                             <?php endif; ?>
@@ -352,8 +354,10 @@ require_once __DIR__ . '/includes/header.php';
                             <hr>
                             <p class="mb-2 small">Only need a few resources, not a full subscription? This one's also included in:</p>
                             <?php foreach ($availableBundles as $bundleOption): ?>
-                                <a href="<?= e(base_url('bundle.php?slug=' . urlencode($bundleOption['slug']))) ?>" class="btn btn-outline-primary btn-sm mb-1">
-                                    <?= e($bundleOption['title']) ?> &mdash; <?= e(format_currency($bundleOption['price'])) ?> one-time
+                                <a href="<?= e(base_url('bundle.php?slug=' . urlencode($bundleOption['slug']))) ?>" class="btn btn-outline-primary btn-sm mb-1"
+                                   data-ga-event="bundle_click"
+                                   data-ga-params="<?= e(json_encode(['location' => 'resource_paywall', 'resource_id' => (int)$resource['id'], 'bundle_id' => (int)$bundleOption['id']])) ?>">
+                                    <?= e($bundleOption['title']) ?> &mdash; <?= bundle_price_tag((float)$bundleOption['price']) ?> one-time
                                 </a>
                             <?php endforeach; ?>
                         <?php endif; ?>

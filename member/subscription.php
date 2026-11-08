@@ -7,6 +7,7 @@ require_once __DIR__ . '/../includes/download-functions.php';
 require_once __DIR__ . '/../includes/upload-functions.php';
 require_once __DIR__ . '/../includes/promptpay-functions.php';
 require_once __DIR__ . '/../includes/email.php';
+require_once __DIR__ . '/../includes/stripe-functions.php';
 
 require_login();
 $user = current_user();
@@ -14,6 +15,15 @@ $selectedPlan = in_array($_GET['plan'] ?? '', ['monthly', 'annual'], true) ? $_G
 $scanToPay = scan_to_pay_config();
 $scanErrors = [];
 $scanOld = [];
+$gaCustomEvents = [];
+
+// Back from Stripe Checkout: report the sale to GA4 once Stripe confirms it is paid.
+if (($_GET['stripe'] ?? '') === 'success' && isset($_GET['session_id'])) {
+    $purchaseEvent = stripe_purchase_ga_event((string)$_GET['session_id'], (int)$user['id']);
+    if ($purchaseEvent) {
+        $gaCustomEvents[] = $purchaseEvent;
+    }
+}
 
 // "Scan to pay" slip submission. A file bigger than PHP's post_max_size
 // arrives with $_POST empty (no CSRF token either), so catch that first
@@ -43,6 +53,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'scan_
     if ($result['success']) {
         send_admin_new_payment_email($user, $result['payment']);
         send_payment_submitted_email($user, $result['payment']);
+        // Not a 'purchase' yet: it only becomes one when an admin approves the slip.
+        ga_queue_event('payment_submitted', [
+            'payment_type' => 'promptpay',
+            'plan'         => $result['payment']['plan'],
+            'value'        => (float)$result['payment']['amount'],
+            'currency'     => CURRENCY,
+        ]);
         flash_set('success', "Thanks! We've received your payment slip. We'll check it and activate Teacher Pro, usually within a few hours, and email you when it's done.");
         redirect('member/subscription.php');
     }
@@ -67,7 +84,10 @@ require_once __DIR__ . '/../includes/header.php';
 ?>
 <div class="container py-5">
     <h1 class="fw-bold mb-1"><?= e(SITE_NAME) ?> Membership</h1>
-    <p class="text-secondary mb-4">Teacher Pro: <?= format_currency(PRICE_MONTHLY) ?>/month or <?= format_currency(PRICE_ANNUAL) ?>/year</p>
+    <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-4">
+        <p class="text-secondary mb-0">Teacher Pro: <?= plan_price_tag('monthly') ?>/month or <?= plan_price_tag('annual') ?>/year</p>
+        <?php if (STRIPE_ENABLED): ?><?= currency_switch_html() ?><?php endif; ?>
+    </div>
 
     <?php if (($_GET['stripe'] ?? '') === 'success'): ?>
         <div class="alert alert-success alert-dismissible fade show">
@@ -107,7 +127,8 @@ require_once __DIR__ . '/../includes/header.php';
                 <h2 class="h5 fw-bold mb-1">Upgrade to Teacher Pro</h2>
                 <p class="text-secondary mb-4">
                     <?php if (STRIPE_ENABLED && $scanToPay): ?>
-                        Pay by card and your membership activates instantly, or scan to pay with PromptPay from any Thai banking app and upload your slip.
+                        Pay by card and your membership activates instantly<span <?= currency_only_attrs('THB') ?>>, or scan to pay with PromptPay from any Thai banking app and upload your slip</span>.
+                        <span class="d-block small mt-1" <?= currency_only_attrs('USD') ?>>Paying from Thailand? Switch prices to ฿ THB above to pay with PromptPay.</span>
                     <?php elseif (STRIPE_ENABLED): ?>
                         Pay securely by card. Your membership activates automatically the moment payment is confirmed.
                     <?php else: ?>
@@ -119,19 +140,25 @@ require_once __DIR__ . '/../includes/header.php';
                         <div class="col-md-6">
                             <div class="border rounded p-3 h-100 d-flex flex-column <?= $selectedPlan === $plan ? 'border-primary' : '' ?>">
                                 <p class="fw-bold mb-1"><?= e($planLabel) ?><?php if ($plan === 'annual'): ?> <span class="badge bg-warning text-dark">Best Value</span><?php endif; ?></p>
-                                <p class="h4 fw-bold mb-3"><?= format_currency($planPrice) ?><span class="fs-6 fw-normal text-secondary"><?= e($planPer) ?></span></p>
+                                <p class="h4 fw-bold mb-3"><?= plan_price_tag($plan) ?><span class="fs-6 fw-normal text-secondary"><?= e($planPer) ?></span></p>
+                                <?php $checkoutItem = ['item_id' => 'pro_' . $plan, 'item_name' => PLAN_LABELS[$plan] ?? 'Teacher Pro', 'item_category' => 'membership']; ?>
                                 <div class="mt-auto d-grid gap-2">
                                     <?php if (STRIPE_ENABLED): ?>
-                                        <form method="post" action="<?= e(base_url('member/stripe-checkout.php')) ?>" class="d-grid">
+                                        <form method="post" action="<?= e(base_url('member/stripe-checkout.php')) ?>" class="d-grid"
+                                              data-ga-event="begin_checkout"
+                                              data-ga-params="<?= e(json_encode(['payment_type' => 'card', 'plan' => $plan, 'value_thb' => plan_price_in($plan, 'THB'), 'value_usd' => plan_price_in($plan, 'USD'), 'items' => [$checkoutItem]])) ?>">
                                             <?php csrf_field(); ?>
                                             <input type="hidden" name="plan" value="<?= e($plan) ?>">
+                                            <input type="hidden" name="currency" value="<?= e(visitor_currency()) ?>" data-follow-currency>
                                             <button type="submit" class="btn btn-primary"><i class="fa-regular fa-credit-card me-2" aria-hidden="true"></i>Pay by card</button>
                                         </form>
                                     <?php endif; ?>
                                     <?php if ($scanToPay): ?>
                                         <a class="btn <?= STRIPE_ENABLED ? 'btn-outline-primary' : 'btn-primary' ?>"
                                            href="<?= e(base_url('member/subscription.php?plan=' . $plan . '&pay=scan#scan-to-pay')) ?>"
-                                           data-open-scan="<?= e($plan) ?>"><i class="fa-solid fa-qrcode me-2" aria-hidden="true"></i>Scan to pay (PromptPay)</a>
+                                           data-open-scan="<?= e($plan) ?>" <?= STRIPE_ENABLED ? currency_only_attrs('THB') : '' ?>
+                                           data-ga-event="begin_checkout"
+                                           data-ga-params="<?= e(json_encode(['payment_type' => 'promptpay', 'plan' => $plan, 'value' => plan_price_in($plan, 'THB'), 'currency' => 'THB', 'items' => [$checkoutItem]])) ?>"><i class="fa-solid fa-qrcode me-2" aria-hidden="true"></i>Scan to pay (PromptPay)</a>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -146,6 +173,7 @@ require_once __DIR__ . '/../includes/header.php';
             $amountMonthly = SITE_CURRENCY_SYMBOL . number_format(PRICE_MONTHLY, 2);
             $amountAnnual = SITE_CURRENCY_SYMBOL . number_format(PRICE_ANNUAL, 2);
         ?>
+            <div <?= STRIPE_ENABLED ? currency_only_attrs('THB') : '' ?>>
             <section class="card shadow-sm border-0 mb-4 scan-to-pay" id="scan-to-pay" <?= $scanOpen ? '' : 'hidden' ?>
                      data-amount-monthly="<?= e($amountMonthly) ?>" data-amount-annual="<?= e($amountAnnual) ?>"
                      data-file-prefix="<?= e(strtolower(SITE_NAME)) ?>-promptpay" aria-labelledby="scan-to-pay-title">
@@ -248,6 +276,7 @@ require_once __DIR__ . '/../includes/header.php';
                     </div>
                 </div>
             </section>
+            </div>
             <?php if ($scanToPay['mode'] === 'generated'): ?>
                 <script src="<?= e(versioned_asset_url('js/vendor/qrcode-generator.js')) ?>" defer></script>
             <?php endif; ?>

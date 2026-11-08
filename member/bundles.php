@@ -24,7 +24,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <a href="<?= e(base_url('bundle.php?slug=' . urlencode($purchase['slug']))) ?>" class="list-group-item list-group-item-action d-flex flex-wrap justify-content-between align-items-center gap-2">
                     <span><?= e($purchase['title']) ?></span>
                     <span class="text-secondary small text-nowrap">
-                        <?= e(format_currency($purchase['amount'])) ?> &middot; Purchased <?= e(format_date($purchase['purchased_at'])) ?>
+                        <?= e(format_money($purchase['amount'], $purchase['currency'] ?? CURRENCY)) ?> &middot; Purchased <?= e(format_date($purchase['purchased_at'])) ?>
                     </span>
                 </a>
             <?php endforeach; ?>

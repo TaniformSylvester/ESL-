@@ -39,6 +39,10 @@ function get_dashboard_stats(): array
         'revenue_total'  => (float)$db->query("SELECT COALESCE(SUM(amount), 0) FROM payments WHERE status = 'approved' AND currency = 'THB'")->fetchColumn(),
         'revenue_monthly_plan' => (float)$db->query("SELECT COALESCE(SUM(amount), 0) FROM payments WHERE status = 'approved' AND currency = 'THB' AND plan = 'monthly'")->fetchColumn(),
         'revenue_annual_plan'  => (float)$db->query("SELECT COALESCE(SUM(amount), 0) FROM payments WHERE status = 'approved' AND currency = 'THB' AND plan = 'annual'")->fetchColumn(),
+        // Card payments from teachers outside Thailand are in US dollars (includes/currency-functions.php).
+        'revenue_total_usd'        => (float)$db->query("SELECT COALESCE(SUM(amount), 0) FROM payments WHERE status = 'approved' AND currency = 'USD'")->fetchColumn(),
+        'revenue_monthly_plan_usd' => (float)$db->query("SELECT COALESCE(SUM(amount), 0) FROM payments WHERE status = 'approved' AND currency = 'USD' AND plan = 'monthly'")->fetchColumn(),
+        'revenue_annual_plan_usd'  => (float)$db->query("SELECT COALESCE(SUM(amount), 0) FROM payments WHERE status = 'approved' AND currency = 'USD' AND plan = 'annual'")->fetchColumn(),
 
         // Resources / downloads
         'total_resources'      => (int)$db->query('SELECT COUNT(*) FROM resources')->fetchColumn(),

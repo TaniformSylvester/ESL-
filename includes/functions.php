@@ -129,6 +129,52 @@ function format_currency($amount): string
     return SITE_CURRENCY_SYMBOL . number_format((float)$amount, 0);
 }
 
+/** Plural of a resource-type name: Quiz → Quizzes, Activity → Activities, Homework → Homework. */
+function pluralize_label(string $word, int $count): string
+{
+    if ($count === 1 || $word === '') {
+        return $word;
+    }
+
+    $lower = strtolower($word);
+    foreach (['homework', 'information', 'equipment', 'series'] as $uncountable) {
+        if (str_ends_with($lower, $uncountable)) {
+            return $word;
+        }
+    }
+    if (preg_match('/[^aeiou]y$/i', $word)) {
+        return substr($word, 0, -1) . 'ies';
+    }
+    if (preg_match('/iz$/i', $word)) {
+        return $word . 'zes';
+    }
+    if (preg_match('/(s|x|z|ch|sh)$/i', $word)) {
+        return $word . 'es';
+    }
+
+    return $word . 's';
+}
+
+/**
+ * Queues a GA4 event to send on the next page the visitor sees — for
+ * actions that end in a redirect (e.g. a payment slip upload), where the
+ * page that handled the action never renders. includes/header.php sends
+ * and clears the queue.
+ */
+function ga_queue_event(string $name, array $params = []): void
+{
+    $_SESSION['ga_queued_events'][] = ['name' => $name, 'params' => $params];
+}
+
+/** Returns and clears the queued GA4 events. */
+function ga_take_queued_events(): array
+{
+    $events = $_SESSION['ga_queued_events'] ?? [];
+    unset($_SESSION['ga_queued_events']);
+
+    return is_array($events) ? $events : [];
+}
+
 function format_date($date, string $format = 'd M Y'): string
 {
     if (empty($date)) {

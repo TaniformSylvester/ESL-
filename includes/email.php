@@ -49,7 +49,8 @@ function send_welcome_email(array $user): bool
     $body = '<p>Hi ' . e($user['first_name']) . ',</p>'
         . '<p>Thanks for creating your ' . e(SITE_NAME) . ' account! Free resources are unlimited for everyone, and your account also lets you save favorites, write reviews, and track your download history.</p>'
         . '<p><a href="' . e(base_url('member/subscription.php')) . '">Upgrade to Teacher Pro</a> '
-        . 'any time (from ' . e(format_currency(PRICE_MONTHLY)) . '/month, or ' . e(format_currency(PRICE_ANNUAL)) . '/year) to unlock members-only resources.</p>';
+        . 'any time (from ' . e(format_money(plan_price_in('monthly', currency_for_user($user)), currency_for_user($user))) . '/month, or '
+        . e(format_money(plan_price_in('annual', currency_for_user($user)), currency_for_user($user))) . '/year) to unlock members-only resources.</p>';
 
     return send_email($user['email'], $subject, $body);
 }

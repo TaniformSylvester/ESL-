@@ -10,11 +10,14 @@ $typeCounts = get_resource_type_counts();
 $subjectCounts = get_resource_counts_by_subject();
 
 $scanToPayOn = scan_to_pay_config() !== null;
-$annualMonthlyEquivalent = PRICE_ANNUAL / 12;
-$annualSavings = (PRICE_MONTHLY * 12) - PRICE_ANNUAL;
+// Each figure in both currencies; price_tag() shows the visitor's one.
+$annualMonthlyEquivalent = ['THB' => PRICE_ANNUAL / 12, 'USD' => PRICE_ANNUAL_USD / 12];
+$annualSavings = ['THB' => (PRICE_MONTHLY * 12) - PRICE_ANNUAL, 'USD' => round((PRICE_MONTHLY_USD * 12) - PRICE_ANNUAL_USD, 2)];
+$yearOfMonthly = ['THB' => PRICE_MONTHLY * 12, 'USD' => round(PRICE_MONTHLY_USD * 12, 2)];
+$upgradeParams = fn (string $where, string $plan) => e(json_encode(['location' => $where, 'plan' => $plan]));
 
 $pageTitle = 'Pricing — Free & Teacher Pro Plans';
-$pageDescription = 'Free resources are unlimited for every teacher, no account needed. Teacher Pro unlocks members-only resources for ' . format_currency(PRICE_MONTHLY) . '/month or ' . format_currency(PRICE_ANNUAL) . '/year.';
+$pageDescription = 'Free resources are unlimited for every teacher, no account needed. Teacher Pro unlocks members-only resources for ' . plan_price_text_both('monthly') . ' a month or ' . plan_price_text_both('annual') . ' a year.';
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container py-5">
@@ -24,6 +27,7 @@ require_once __DIR__ . '/includes/header.php';
             TeachLuma gives teachers ready-to-use teaching resources so you can spend less time preparing and more time teaching.
         </p>
         <p class="fw-bold text-primary">Find it. Download it. Teach it.</p>
+        <?php if (STRIPE_ENABLED): ?><?= currency_switch_html() ?><?php endif; ?>
     </div>
 
     <div class="row justify-content-center g-4 mb-5">
@@ -32,7 +36,7 @@ require_once __DIR__ . '/includes/header.php';
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body p-4 d-flex flex-column">
                     <h2 class="h5 fw-bold text-uppercase text-secondary">Free</h2>
-                    <p class="display-5 fw-bold mb-0">฿0</p>
+                    <p class="display-5 fw-bold mb-0"><?= price_tag(0, 0) ?></p>
                     <p class="text-secondary mb-4">forever</p>
                     <ul class="list-unstyled small mb-4 flex-grow-1">
                         <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Browse the complete resource library</li>
@@ -54,7 +58,7 @@ require_once __DIR__ . '/includes/header.php';
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body p-4 d-flex flex-column">
                     <h2 class="h5 fw-bold text-uppercase text-secondary">Teacher Pro</h2>
-                    <p class="display-5 fw-bold text-primary mb-0"><?= format_currency(PRICE_MONTHLY) ?></p>
+                    <p class="display-5 fw-bold text-primary mb-0"><?= plan_price_tag('monthly') ?></p>
                     <p class="text-secondary mb-4">per month</p>
                     <ul class="list-unstyled small mb-4 flex-grow-1">
                         <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>Unlimited</strong> downloads</li>
@@ -63,7 +67,8 @@ require_once __DIR__ . '/includes/header.php';
                         <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Mathematics &amp; Science Grade 1&ndash;6</li>
                         <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>New resources added regularly</li>
                     </ul>
-                    <a href="<?= e(base_url($isLoggedIn ? 'member/subscription.php?plan=monthly' : 'register.php')) ?>" class="btn btn-primary w-100">Go Pro &mdash; <?= format_currency(PRICE_MONTHLY) ?>/month</a>
+                    <a href="<?= e(base_url($isLoggedIn ? 'member/subscription.php?plan=monthly' : 'register.php')) ?>" class="btn btn-primary w-100"
+                       data-ga-event="upgrade_click" data-ga-params="<?= $upgradeParams('pricing_page', 'monthly') ?>">Go Pro &mdash; <?= plan_price_tag('monthly') ?>/month</a>
                 </div>
             </div>
         </div>
@@ -74,16 +79,17 @@ require_once __DIR__ . '/includes/header.php';
                 <span class="badge bg-warning text-dark position-absolute top-0 start-50 translate-middle px-3 py-2">🏆 BEST VALUE</span>
                 <div class="card-body p-4 d-flex flex-column">
                     <h2 class="h5 fw-bold text-uppercase text-primary mt-2">Teacher Pro Annual</h2>
-                    <p class="display-5 fw-bold text-primary mb-0"><?= format_currency(PRICE_ANNUAL) ?></p>
-                    <p class="text-secondary mb-1">per year &mdash; only about ฿<?= number_format($annualMonthlyEquivalent, 0) ?>/month</p>
-                    <p class="fw-bold text-success mb-4">SAVE <?= format_currency($annualSavings) ?>/YEAR</p>
+                    <p class="display-5 fw-bold text-primary mb-0"><?= plan_price_tag('annual') ?></p>
+                    <p class="text-secondary mb-1">per year &mdash; only about <?= price_tag(round($annualMonthlyEquivalent['THB']), round($annualMonthlyEquivalent['USD'], 2)) ?>/month</p>
+                    <p class="fw-bold text-success mb-4">SAVE <?= price_tag($annualSavings['THB'], $annualSavings['USD']) ?>/YEAR</p>
                     <ul class="list-unstyled small mb-4 flex-grow-1">
                         <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Everything in Teacher Pro Monthly</li>
                         <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>Unlimited</strong> downloads, all year</li>
                         <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Pay once, forget about it for 12 months</li>
                     </ul>
-                    <a href="<?= e(base_url($isLoggedIn ? 'member/subscription.php?plan=annual' : 'register.php')) ?>" class="btn btn-primary w-100">Get Annual Pro &mdash; <?= format_currency(PRICE_ANNUAL) ?></a>
-                    <p class="text-secondary small text-center mt-2 mb-0"><?= format_currency(PRICE_MONTHLY) ?> &times; 12 = <?= format_currency(PRICE_MONTHLY * 12) ?>. Annual = <?= format_currency(PRICE_ANNUAL) ?>. Savings = <?= format_currency($annualSavings) ?>.</p>
+                    <a href="<?= e(base_url($isLoggedIn ? 'member/subscription.php?plan=annual' : 'register.php')) ?>" class="btn btn-primary w-100"
+                       data-ga-event="upgrade_click" data-ga-params="<?= $upgradeParams('pricing_page', 'annual') ?>">Get Annual Pro &mdash; <?= plan_price_tag('annual') ?></a>
+                    <p class="text-secondary small text-center mt-2 mb-0"><?= plan_price_tag('monthly') ?> &times; 12 = <?= price_tag($yearOfMonthly['THB'], $yearOfMonthly['USD']) ?>. Annual = <?= plan_price_tag('annual') ?>. Savings = <?= price_tag($annualSavings['THB'], $annualSavings['USD']) ?>.</p>
                 </div>
             </div>
         </div>
@@ -127,7 +133,7 @@ require_once __DIR__ . '/includes/header.php';
             <h2 class="h4 fw-bold mb-4"><?= (int)$totalResources ?>+ Ready-to-Use Resources</h2>
             <div class="d-flex flex-wrap justify-content-center gap-2">
                 <?php foreach ($typeCounts as $type => $count): ?>
-                    <span class="badge bg-light text-dark border px-3 py-2"><?= (int)$count ?>+ <?= e($type) ?><?= $count === 1 ? '' : 's' ?></span>
+                    <span class="badge bg-light text-dark border px-3 py-2"><?= (int)$count ?>+ <?= e(pluralize_label($type, (int)$count)) ?></span>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -145,7 +151,7 @@ require_once __DIR__ . '/includes/header.php';
                     <li class="mb-2">Pay securely by card &mdash; handled by Stripe. Your membership activates immediately once payment is confirmed, no waiting.</li>
                 <?php endif; ?>
                 <?php if ($scanToPayOn): ?>
-                    <li class="mb-2"><?= STRIPE_ENABLED ? 'Or scan to pay' : 'Scan to pay' ?> with PromptPay from any Thai banking app, then upload your slip. We'll check it and activate your membership, usually within a few hours.</li>
+                    <li class="mb-2" <?= STRIPE_ENABLED ? currency_only_attrs('THB') : '' ?>><?= STRIPE_ENABLED ? 'Or scan to pay' : 'Scan to pay' ?> with PromptPay from any Thai banking app, then upload your slip. We'll check it and activate your membership, usually within a few hours.</li>
                 <?php endif; ?>
                 <li class="mb-2">Renew before your membership expires to keep access to members-only resources &mdash; if it lapses, your account simply reverts to the Free plan (still unlimited free downloads) rather than being locked out.</li>
             </ol>

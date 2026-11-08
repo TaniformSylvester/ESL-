@@ -5,6 +5,7 @@ require_once __DIR__ . '/includes/bundle-functions.php';
 require_once __DIR__ . '/includes/resource-functions.php';
 require_once __DIR__ . '/includes/favorites-functions.php';
 require_once __DIR__ . '/includes/seo-functions.php';
+require_once __DIR__ . '/includes/stripe-functions.php';
 
 $slug = trim((string)($_GET['slug'] ?? ''));
 $bundle = $slug !== '' ? get_published_bundle_by_slug($slug) : null;
@@ -35,6 +36,16 @@ $bundleHasSavings = !empty($bundle['original_price']) && (float)$bundle['origina
 $bundleSavingsPct = $bundleHasSavings
     ? (int)round((((float)$bundle['original_price'] - (float)$bundle['price']) / (float)$bundle['original_price']) * 100)
     : 0;
+
+// Back from Stripe Checkout: report the sale to GA4 once Stripe confirms it is paid.
+$gaCustomEvents = [];
+if ($isLoggedIn && ($_GET['stripe'] ?? '') === 'success' && isset($_GET['session_id'])) {
+    $purchaseEvent = stripe_purchase_ga_event((string)$_GET['session_id'], (int)$_SESSION['user_id']);
+    if ($purchaseEvent) {
+        $purchaseEvent['params']['items'][0]['item_name'] = $bundle['title'];
+        $gaCustomEvents[] = $purchaseEvent;
+    }
+}
 
 $pageTitle = $bundle['title'];
 $pageDescription = !empty($bundle['description'])
@@ -134,9 +145,9 @@ require_once __DIR__ . '/includes/header.php';
             <div class="card shadow-sm border-0">
                 <div class="card-body p-4 text-center">
                     <p class="h3 fw-bold mb-1">
-                        <?= e(format_currency($bundle['price'])) ?>
+                        <?= bundle_price_tag((float)$bundle['price']) ?>
                         <?php if ($bundleHasSavings): ?>
-                            <span class="fs-6 fw-normal text-secondary text-decoration-line-through"><?= e(format_currency($bundle['original_price'])) ?></span>
+                            <span class="fs-6 fw-normal text-secondary text-decoration-line-through"><?= bundle_price_tag((float)$bundle['original_price']) ?></span>
                         <?php endif; ?>
                     </p>
                     <?php if ($bundleHasSavings): ?>
@@ -149,12 +160,16 @@ require_once __DIR__ . '/includes/header.php';
                     <?php elseif (!STRIPE_ENABLED): ?>
                         <p class="alert alert-warning mb-0">Purchases are temporarily unavailable. Please contact <a href="mailto:<?= e(CONTACT_EMAIL) ?>"><?= e(CONTACT_EMAIL) ?></a>.</p>
                     <?php elseif ($isLoggedIn): ?>
-                        <form method="post" action="<?= e(base_url('member/bundle-checkout.php')) ?>">
+                        <form method="post" action="<?= e(base_url('member/bundle-checkout.php')) ?>"
+                              data-ga-event="begin_checkout"
+                              data-ga-params="<?= e(json_encode(['payment_type' => 'card', 'value_thb' => (float)$bundle['price'], 'value_usd' => usd_price_for_thb((float)$bundle['price']), 'items' => [['item_id' => 'bundle_' . (int)$bundle['id'], 'item_name' => $bundle['title'], 'item_category' => 'bundle']]])) ?>">
                             <?php csrf_field(); ?>
                             <input type="hidden" name="bundle_id" value="<?= (int)$bundle['id'] ?>">
+                            <input type="hidden" name="currency" value="<?= e(visitor_currency()) ?>" data-follow-currency>
                             <button type="submit" class="btn btn-primary btn-lg w-100">Buy with Stripe</button>
                         </form>
-                        <p class="text-secondary small mt-2 mb-0">Pay by card or scan to pay with PromptPay.</p>
+                        <p class="text-secondary small mt-2 mb-0">Pay by card<span <?= currency_only_attrs('THB') ?>> or scan to pay with PromptPay</span>.</p>
+                        <div class="mt-2"><?= currency_switch_html() ?></div>
                     <?php else: ?>
                         <a href="<?= e(base_url('login.php?redirect=' . urlencode($_SERVER['REQUEST_URI']))) ?>" class="btn btn-primary btn-lg w-100">Login to Buy</a>
                         <p class="text-secondary small mt-2 mb-0">Don't have an account? <a href="<?= e(base_url('register.php')) ?>">Register free</a>.</p>

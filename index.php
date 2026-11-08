@@ -461,7 +461,7 @@ require_once __DIR__ . '/includes/header.php';
                 <div class="cta-card tone-gold">
                     <span class="icon-bubble mb-3" aria-hidden="true"><i class="fa-solid fa-crown"></i></span>
                     <h2>Free to start. Affordable to grow.</h2>
-                    <p class="mb-4">Every free resource is unlimited, no account required. When you're ready for the full members-only library, Teacher Pro is <?= e(format_currency(PRICE_MONTHLY)) ?>/month or <?= e(format_currency(PRICE_ANNUAL)) ?>/year.</p>
+                    <p class="mb-4">Every free resource is unlimited, no account required. When you're ready for the full members-only library, Teacher Pro is <?= plan_price_tag('monthly') ?>/month or <?= plan_price_tag('annual') ?>/year.</p>
                     <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-primary">See Pricing &amp; Plans</a>
                 </div>
             </div>

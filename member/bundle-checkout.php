@@ -32,7 +32,9 @@ if (too_many_attempts('bundle_checkout:' . $user['id'], 5, 600)) {
 }
 record_attempt('bundle_checkout:' . $user['id']);
 
-$result = create_bundle_checkout_session($user, $bundle);
+// The currency the teacher saw the price in on the bundle page.
+$currency = normalize_currency($_POST['currency'] ?? '') ?? visitor_currency();
+$result = create_bundle_checkout_session($user, $bundle, $currency);
 
 if (!$result['success'] || !$result['url']) {
     flash_set('error', $result['error'] ?? 'Could not start the Stripe checkout. Please try again.');
