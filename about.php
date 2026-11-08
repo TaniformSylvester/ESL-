@@ -35,7 +35,7 @@ require_once __DIR__ . '/includes/header.php';
                         <i class="fa-solid fa-users fa-lg text-primary mt-1"></i>
                         <h2 class="h4 fw-bold mb-0">Who We're For</h2>
                     </div>
-                    <p class="text-secondary mb-0"><?= e(SITE_NAME) ?> is built for teachers everywhere &mdash; ESL/EFL teachers, primary school teachers, international and bilingual school teachers, online and private tutors, and homeschool educators, from Thailand and the rest of Asia to the Middle East, Latin America, Europe and beyond. We cover English/ESL for Kindergarten through Grade 10, and Math and Science for Grades 1&ndash;6.</p>
+                    <p class="text-secondary mb-0"><?= e(SITE_NAME) ?> is built for teachers everywhere &mdash; ESL/EFL teachers, primary school teachers, international and bilingual school teachers, online and private tutors, and homeschool educators, from Thailand and the rest of Asia to the Middle East, Latin America, Europe and beyond. We cover English/ESL for Kindergarten through Grade 10 (UK Years 1&ndash;11), and Math (Maths) and Science for Grades 1&ndash;6 (UK Years 2&ndash;7). Grades follow the US system; the UK Year equivalent is shown next to each grade.</p>
                 </div>
             </div>
 

@@ -72,7 +72,7 @@ require_once __DIR__ . '/includes/header.php';
         <div class="col-lg-8 mx-auto">
             <div class="mb-2">
                 <?php if (!empty($video['grade_level'])): ?>
-                    <span class="badge bg-light text-dark border"><?= e($video['grade_level']) ?></span>
+                    <span class="badge bg-light text-dark border"><?= e(grade_label($video['grade_level'])) ?></span>
                 <?php endif; ?>
                 <span class="badge bg-light text-dark border"><?= e($video['subject_name']) ?></span>
                 <?php if (!empty($video['topic'])): ?>

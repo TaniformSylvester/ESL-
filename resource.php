@@ -257,7 +257,7 @@ require_once __DIR__ . '/includes/header.php';
                 <?php endif; ?>
                 <span class="badge bg-light text-dark border"><?= e($resource['resource_type']) ?></span>
                 <?php if (!empty($resource['grade_level'])): ?>
-                    <span class="badge bg-light text-dark border"><?= e($resource['grade_level']) ?></span>
+                    <span class="badge bg-light text-dark border"><?= e(grade_label($resource['grade_level'])) ?></span>
                 <?php endif; ?>
             </div>
 

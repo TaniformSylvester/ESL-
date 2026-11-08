@@ -49,7 +49,7 @@ function generate_resource_seo_title(array $resource): string
 
     $context = [];
     if (!empty($resource['grade_level'])) {
-        $context[] = $resource['grade_level'];
+        $context[] = grade_label($resource['grade_level']); // "Grade 3 (Year 4)" for UK-curriculum searches
     }
     if (!empty($resource['subject_name'])) {
         $context[] = $resource['subject_name'];
@@ -70,7 +70,7 @@ function generate_resource_seo_description(array $resource): string
     }
 
     $type = !empty($resource['resource_type']) ? strtolower($resource['resource_type']) : 'resource';
-    $subjectGrade = trim(($resource['grade_level'] ?? '') . ' ' . ($resource['subject_name'] ?? ''));
+    $subjectGrade = trim(grade_label($resource['grade_level'] ?? '') . ' ' . subject_label_with_uk($resource['subject_name'] ?? ''));
     $focus = $resource['topic'] ?? ($resource['category_name'] ?? '');
 
     $lead = 'Download this ' . $type;
@@ -145,7 +145,7 @@ function generate_video_seo_title(array $video): string
 
     $context = [];
     if (!empty($video['grade_level'])) {
-        $context[] = $video['grade_level'];
+        $context[] = grade_label($video['grade_level']);
     }
     if (!empty($video['subject_name'])) {
         $context[] = $video['subject_name'];
@@ -165,7 +165,7 @@ function generate_video_seo_description(array $video): string
         return $video['meta_description'];
     }
 
-    $subjectGrade = trim(($video['grade_level'] ?? '') . ' ' . ($video['subject_name'] ?? ''));
+    $subjectGrade = trim(grade_label($video['grade_level'] ?? '') . ' ' . subject_label_with_uk($video['subject_name'] ?? ''));
     $focus = $video['topic'] ?? '';
 
     $lead = 'Watch this educational video';
@@ -195,7 +195,7 @@ function generate_videos_listing_seo(array $filters, ?array $subject, int $resul
     $labelParts = [];
 
     if (!empty($filters['grade'])) {
-        $labelParts[] = $filters['grade'];
+        $labelParts[] = grade_label($filters['grade']);
     }
     if ($subject) {
         $labelParts[] = $subject['name'];
@@ -246,17 +246,24 @@ function generate_resources_listing_seo(array $filters, ?array $subject, ?array 
     $labelParts = [];
 
     if (!empty($filters['grade'])) {
-        $labelParts[] = $filters['grade'];
+        $labelParts[] = grade_label($filters['grade']);
     }
     if ($subject) {
         $labelParts[] = $subject['name'];
     }
+    // Same label with British spellings ("Math (Maths)") for the meta description.
+    $descriptionLabelParts = $labelParts;
+    if ($subject) {
+        $descriptionLabelParts[array_key_last($descriptionLabelParts)] = subject_label_with_uk($subject['name']);
+    }
     if ($category) {
         $labelParts[] = $category['name'];
+        $descriptionLabelParts[] = $category['name'];
     }
     $typeLabel = !empty($filters['resource_type']) ? pluralize_resource_type($filters['resource_type']) : '';
     if ($typeLabel !== '') {
         $labelParts[] = $typeLabel;
+        $descriptionLabelParts[] = $typeLabel;
     }
 
     $isSearch = trim((string)($filters['search'] ?? '')) !== '';
@@ -304,7 +311,7 @@ function generate_resources_listing_seo(array $filters, ?array $subject, ?array 
     }
     $intro = 'Browse ready-to-use ' . ($isFree ? 'free ' : '') . $label . ($typeLabel !== '' ? '' : ' resources') . ' for your classroom.';
     $description = seo_truncate_at_word(
-        'Download ' . ($isFree ? 'free ' : '') . $label . ($typeLabel !== '' ? '' : ' resources') . ' on ' . SITE_NAME . ' — ready-to-use, printable and made for real classrooms.',
+        'Download ' . ($isFree ? 'free ' : '') . implode(' ', $descriptionLabelParts) . ($typeLabel !== '' ? '' : ' resources') . ' on ' . SITE_NAME . ' — ready-to-use, printable and made for real classrooms.',
         160
     );
 

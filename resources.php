@@ -98,7 +98,7 @@ require_once __DIR__ . '/includes/header.php';
             <select id="filter-grade" name="grade" class="form-select">
                 <option value="">All Grades</option>
                 <?php foreach (GRADE_LEVELS as $grade): ?>
-                    <option value="<?= e($grade) ?>" <?= $filters['grade'] === $grade ? 'selected' : '' ?>><?= e($grade) ?></option>
+                    <option value="<?= e($grade) ?>" <?= $filters['grade'] === $grade ? 'selected' : '' ?>><?= e(grade_label($grade)) ?></option>
                 <?php endforeach; ?>
             </select>
         </div>

@@ -3,6 +3,7 @@ require_once __DIR__ . '/includes/init.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/resource-functions.php';
 require_once __DIR__ . '/includes/promptpay-functions.php';
+require_once __DIR__ . '/includes/seo-functions.php';
 
 $isLoggedIn = is_logged_in();
 $totalResources = get_published_resource_count();
@@ -63,8 +64,8 @@ require_once __DIR__ . '/includes/header.php';
                     <ul class="list-unstyled small mb-4 flex-grow-1">
                         <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>Unlimited</strong> downloads</li>
                         <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Complete access to members-only resources</li>
-                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>English/ESL Kindergarten&ndash;Grade 10</li>
-                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Mathematics &amp; Science Grade 1&ndash;6</li>
+                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>English/ESL Kindergarten&ndash;Grade 10 (UK Years 1&ndash;11)</li>
+                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Maths &amp; Science Grade 1&ndash;6 (UK Years 2&ndash;7)</li>
                         <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>New resources added regularly</li>
                     </ul>
                     <a href="<?= e(base_url($isLoggedIn ? 'member/subscription.php?plan=monthly' : 'register.php')) ?>" class="btn btn-primary w-100"
@@ -103,26 +104,26 @@ require_once __DIR__ . '/includes/header.php';
                 <div class="col-md-4">
                     <div class="card border-0 shadow-sm h-100"><div class="card-body">
                         <h3 class="h6 fw-bold mb-1">English / ESL</h3>
-                        <p class="text-secondary small mb-0">Kindergarten &rarr; Grade 10</p>
+                        <p class="text-secondary small mb-0">Kindergarten &rarr; Grade 10 <span class="d-block">(UK Years 1&ndash;11)</span></p>
                         <?php if (!empty($subjectCounts['ESL'])): ?><p class="small fw-bold text-primary mb-0"><?= (int)$subjectCounts['ESL'] ?>+ resources</p><?php endif; ?>
                     </div></div>
                 </div>
                 <div class="col-md-4">
                     <div class="card border-0 shadow-sm h-100"><div class="card-body">
-                        <h3 class="h6 fw-bold mb-1">Mathematics</h3>
-                        <p class="text-secondary small mb-0">Grade 1 &rarr; Grade 6</p>
+                        <h3 class="h6 fw-bold mb-1">Mathematics (Maths)</h3>
+                        <p class="text-secondary small mb-0">Grade 1 &rarr; Grade 6 <span class="d-block">(UK Years 2&ndash;7)</span></p>
                         <?php if (!empty($subjectCounts['Math'])): ?><p class="small fw-bold text-primary mb-0"><?= (int)$subjectCounts['Math'] ?>+ resources</p><?php endif; ?>
                     </div></div>
                 </div>
                 <div class="col-md-4">
                     <div class="card border-0 shadow-sm h-100"><div class="card-body">
                         <h3 class="h6 fw-bold mb-1">Science</h3>
-                        <p class="text-secondary small mb-0">Grade 1 &rarr; Grade 6</p>
+                        <p class="text-secondary small mb-0">Grade 1 &rarr; Grade 6 <span class="d-block">(UK Years 2&ndash;7)</span></p>
                         <?php if (!empty($subjectCounts['Science'])): ?><p class="small fw-bold text-primary mb-0"><?= (int)$subjectCounts['Science'] ?>+ resources</p><?php endif; ?>
                     </div></div>
                 </div>
             </div>
-            <p class="text-secondary">Whether you teach Kindergarten English, Grade 5 Mathematics, Grade 6 Science or Grade 10 ESL, TeachLuma gives you ready-to-use classroom materials in one place.</p>
+            <p class="text-secondary">Whether you teach Kindergarten English, Grade 5 (Year 6) Maths, Grade 6 Science or Grade 10 ESL, TeachLuma gives you ready-to-use classroom materials in one place.</p>
         </div>
     </div>
 
@@ -133,7 +134,7 @@ require_once __DIR__ . '/includes/header.php';
             <h2 class="h4 fw-bold mb-4"><?= (int)$totalResources ?>+ Ready-to-Use Resources</h2>
             <div class="d-flex flex-wrap justify-content-center gap-2">
                 <?php foreach ($typeCounts as $type => $count): ?>
-                    <span class="badge bg-light text-dark border px-3 py-2"><?= (int)$count ?>+ <?= e(pluralize_label($type, (int)$count)) ?></span>
+                    <span class="badge bg-light text-dark border px-3 py-2"><?= (int)$count ?>+ <?= e((int)$count === 1 ? $type : pluralize_resource_type($type)) ?></span>
                 <?php endforeach; ?>
             </div>
         </div>

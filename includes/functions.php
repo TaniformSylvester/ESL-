@@ -136,30 +136,53 @@ function format_currency($amount): string
  */
 const SITE_SUMMARY = 'Ready-to-teach English/ESL, Math and Science resources, plus practical teaching guidance, for teachers everywhere.';
 
-/** Plural of a resource-type name: Quiz → Quizzes, Activity → Activities, Homework → Homework. */
-function pluralize_label(string $word, int $count): string
+/**
+ * British-curriculum equivalents for the site's US-style grades, so teachers
+ * who search with UK terms ("Year 4 maths worksheet") — common in the UK
+ * and in British-curriculum international schools — still find the right
+ * resources. US Kindergarten = Year 1, Grade 1 = Year 2 ... Grade 10 = Year 11.
+ * The grades stored in the database never change; this is display only.
+ */
+function uk_year_for_grade(?string $grade): ?string
 {
-    if ($count === 1 || $word === '') {
-        return $word;
+    $grade = trim((string)$grade);
+    if ($grade === 'Kindergarten') {
+        return 'Year 1';
+    }
+    if (preg_match('/^Grade (\d{1,2})$/', $grade, $m)) {
+        return 'Year ' . ((int)$m[1] + 1);
     }
 
-    $lower = strtolower($word);
-    foreach (['homework', 'information', 'equipment', 'series'] as $uncountable) {
-        if (str_ends_with($lower, $uncountable)) {
-            return $word;
-        }
-    }
-    if (preg_match('/[^aeiou]y$/i', $word)) {
-        return substr($word, 0, -1) . 'ies';
-    }
-    if (preg_match('/iz$/i', $word)) {
-        return $word . 'zes';
-    }
-    if (preg_match('/(s|x|z|ch|sh)$/i', $word)) {
-        return $word . 'es';
+    return null;
+}
+
+/** "Grade 3 (Year 4)", "Kindergarten (Year 1)"; any other value unchanged. */
+function grade_label(?string $grade): string
+{
+    $grade = trim((string)$grade);
+    $year = uk_year_for_grade($grade);
+
+    return $year ? $grade . ' (' . $year . ')' : $grade;
+}
+
+/** "Years 2–7" for a grade range, or '' if either end has no equivalent. */
+function uk_year_range(?string $minGrade, ?string $maxGrade): string
+{
+    $from = uk_year_for_grade($minGrade);
+    $to = uk_year_for_grade($maxGrade);
+    if (!$from || !$to) {
+        return '';
     }
 
-    return $word . 's';
+    return 'Years ' . substr($from, 5) . '–' . substr($to, 5);
+}
+
+/** A subject name with its British spelling where it differs: "Math" → "Math (Maths)". */
+function subject_label_with_uk(?string $subject): string
+{
+    $subject = trim((string)$subject);
+
+    return strcasecmp($subject, 'Math') === 0 ? 'Math (Maths)' : $subject;
 }
 
 /**

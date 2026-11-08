@@ -81,11 +81,11 @@ $faqItems = [
     ],
     [
         'question' => 'What subjects does TeachLuma cover?',
-        'answer'   => 'TeachLuma provides English and ESL resources from Kindergarten to Grade 10, plus Mathematics and Science resources for Grades 1–6.',
+        'answer'   => 'TeachLuma provides English and ESL resources from Kindergarten to Grade 10 (UK Years 1–11), plus Mathematics (Maths) and Science resources for Grades 1–6 (UK Years 2–7).',
     ],
     [
         'question' => 'How do I pay?',
-        'answer'   => 'Pay securely by card or scan to pay with PromptPay — handled by Stripe. Your Teacher Pro membership activates automatically the moment payment is confirmed, no waiting for approval.',
+        'answer'   => 'Pay securely by card from anywhere in the world, or with PromptPay in Thailand — handled by Stripe. Your Teacher Pro membership activates automatically the moment payment is confirmed, no waiting for approval.',
     ],
     [
         'question' => 'Can I cancel anytime?',
@@ -241,7 +241,8 @@ require_once __DIR__ . '/includes/header.php';
                         <div class="subject-card-top d-flex align-items-center justify-content-between">
                             <span class="icon-bubble" aria-hidden="true"><i class="fa-solid <?= e($subjectIcons[$subject['slug']] ?? 'fa-book') ?>"></i></span>
                             <?php if ($range !== ''): ?>
-                                <span class="badge badge-subject-<?= e($tone) ?> bg-white"><?= e($range) ?></span>
+                                <?php $ukRange = uk_year_range($subject['min_grade'] ?? null, $subject['max_grade'] ?? null); ?>
+                                <span class="badge badge-subject-<?= e($tone) ?> bg-white"><?= e($range) ?><?= $ukRange !== '' ? ' (' . e($ukRange) . ')' : '' ?></span>
                             <?php endif; ?>
                         </div>
                         <div class="subject-card-body">
