@@ -103,6 +103,30 @@ def lineplot_data(theme, seed):
             return counts
 
 
+PIE_THEMES = {   # title, people noun, verb phrase, categories
+    "sports": ("Favorite sports in Class 5B", "students", "chose", ["football", "swimming", "basketball", "badminton", "running"]),
+    "fruit": ("Favorite fruit at the school picnic", "children", "chose", ["mango", "apple", "banana", "watermelon", "orange"]),
+    "transport": ("How students travel to school", "students", "travel by", ["bus", "car", "bike", "scooter", "train"]),
+    "pets": ("Pets owned by families in Year 6", "families", "have a", ["cat", "dog", "fish", "rabbit", "bird"]),
+}
+PIE_SPLITS = [   # eighths that add up to 8, biggest slice unique
+    (4, 2, 1, 1), (3, 2, 2, 1), (4, 2, 2), (2, 2, 1, 1, 2), (3, 3, 1, 1), (5, 2, 1), (4, 1, 1, 1, 1), (3, 2, 1, 1, 1),
+]
+
+
+def pie_data(theme, seed):
+    """[(category, eighths)] and the total number of people, fixed by theme + seed."""
+    rng = random.Random(f"pie:{theme}:{seed}")
+    while True:
+        split = list(rng.choice(PIE_SPLITS))
+        rng.shuffle(split)
+        if sorted(split)[-1] != sorted(split)[-2]:
+            break
+    cats = rng.sample(PIE_THEMES[theme][3], len(split))
+    total = rng.choice([24, 32, 40, 48, 64, 80])
+    return list(zip(cats, split)), total
+
+
 def dec_str(d) -> str:
     """A decimal without trailing zeros (5.30 → 5.3, 4.0 → 4)."""
     t = format(Decimal(str(d)).normalize(), "f")
@@ -120,6 +144,15 @@ ROMAN = [(1000, "M"), (900, "CM"), (500, "D"), (400, "CD"), (100, "C"), (90, "XC
          (10, "X"), (9, "IX"), (5, "V"), (4, "IV"), (1, "I")]
 
 
+def fmt_12h(h24, m):
+    """24-hour clock (0-23) to a 12-hour time with a.m./p.m. (midnight is 12:00 a.m., noon is 12:00 p.m.)."""
+    return f"{(h24 - 1) % 12 + 1}:{m:02d} {'a.m.' if h24 < 12 else 'p.m.'}"
+
+
+def fmt_24h(h24, m):
+    return f"{h24:02d}:{m:02d}"
+
+
 def to_roman(n: int) -> str:
     """Standard Roman numerals with subtractive pairs (4 = IV, 90 = XC), 1 to 3999."""
     out = ""
@@ -131,6 +164,41 @@ def to_roman(n: int) -> str:
 
 
 QUAD_SHAPES = ("square", "rectangle", "kite", "quadrilateral")
+
+SYMMETRY_LINES = {"square": 4, "rectangle": 2, "equilateral triangle": 3, "isosceles triangle": 1, "scalene triangle": 0,
+                  "regular pentagon": 5, "regular hexagon": 6, "regular octagon": 8, "kite": 1, "rhombus": 2,
+                  "parallelogram": 0}
+
+IO_OPS = {"+": lambda x, k: x + k, "−": lambda x, k: x - k, "×": lambda x, k: x * k, "÷": lambda x, k: x // k}
+
+
+def seq_terms(start, step, n):
+    """First n terms of an arithmetic sequence as printable strings (decimals and negatives allowed)."""
+    a, d = Decimal(start), Decimal(step)
+    return [num(dec_str(a + d * i)) for i in range(n)]
+
+
+def seq_rule_text(step):
+    d = Decimal(step)
+    return f"add {dec_str(d)}" if d > 0 else f"subtract {dec_str(-d)}"
+
+
+def io_apply(rule, x):
+    """rule is a list of [op, k] steps, applied in order."""
+    for op, k in rule:
+        x = IO_OPS[op](x, k)
+    return x
+
+
+def io_rule_text(rule):
+    return ", then ".join(f"{op} {k}" for op, k in rule)
+
+
+def _io_unique_rule(pairs):
+    """True when exactly one one-step rule (+, −, ×, ÷ by 1–20) fits every input-output pair."""
+    fits = [(op, k) for op in IO_OPS for k in range(1, 21)
+            if all((op != "÷" or a % k == 0) and IO_OPS[op](a, k) == b for a, b in pairs)]
+    return len(fits) == 1
 
 
 # ---------------------------------------------------------------- solvers
@@ -342,6 +410,45 @@ def solve(gen, p):
         return to_roman(p["n"])
     if gen == "perimeter_quad":
         return sum(p["sides"])
+    if gen == "symmetry_lines":
+        return SYMMETRY_LINES[p["shape"]]
+    if gen == "pie":
+        data, total = pie_data(p["theme"], p["data_seed"])
+        parts = dict(data)
+        if p["q"] == "fraction":
+            return frac_str(Fraction(parts[p["a"]], 8))
+        if p["q"] == "count":
+            return total * parts[p["a"]] // 8
+        if p["q"] == "more":
+            return total * (parts[p["a"]] - parts[p["b"]]) // 8
+        if p["q"] == "percent":
+            return dec_str(Decimal(parts[p["a"]]) * 100 / 8) + "%"
+        if p["q"] == "most":
+            return max(data, key=lambda x: x[1])[0]
+    if gen == "seq_next":
+        return seq_terms(p["start"], p["step"], 5)[4]
+    if gen == "seq_missing":
+        return seq_terms(p["start"], p["step"], 6)[p["blank"]]
+    if gen == "seq_rule":
+        return seq_rule_text(p["step"])
+    if gen == "seq_term":
+        return seq_terms(p["start"], p["step"], p["n"])[-1]
+    if gen == "translate_point":
+        return f"({p['x'] + p['dx']}, {p['y'] + p['dy']})"
+    if gen == "reflect_point":
+        if p["axis"] == "x":            # vertical mirror line x = k
+            return f"({2 * p['k'] - p['x']}, {p['y']})"
+        return f"({p['x']}, {2 * p['k'] - p['y']})"
+    if gen in ("io_out", "io_two"):
+        return io_apply(p["rule"], p["x"])
+    if gen == "io_in":
+        return p["x"]
+    if gen == "io_rule":
+        return io_rule_text(p["rule"])
+    if gen == "time_24_to_12":
+        return fmt_12h(p["h"], p["m"])
+    if gen == "time_12_to_24":
+        return fmt_24h(p["h"], p["m"])
     raise ValueError(f"unknown generator {gen}")
 
 
@@ -838,6 +945,118 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
             prompt = ("A quadrilateral has sides of " + ", ".join(f"{x} cm" for x in sides[:3]) +
                       f" and {sides[3]} cm. What is its perimeter? ____ cm")
         return _item(gen, {"shape": shape, "sides": sides}, prompt)
+    if gen == "pie":
+        title, people, verb, _cats = PIE_THEMES[theme]
+        data, total = pie_data(theme, _seed)
+        names = [c for c, _ in data]
+        q = rng.choice(["fraction", "count", "count", "more", "percent", "most"])
+        params = {"theme": theme, "data_seed": _seed, "q": q}
+        if q in ("fraction", "count", "percent"):
+            params["a"] = rng.choice(names)
+            ask = {"fraction": "What fraction of the {p} {v} {a}? ____",
+                   "count": "How many {p} {v} {a}? ____",
+                   "percent": "What percentage of the {p} {v} {a}? ____"}[q]
+            prompt = ask.format(p=people, v=verb, a=params["a"])
+        elif q == "more":
+            parts = dict(data)
+            a, b = rng.sample(names, 2)
+            if parts[a] == parts[b]:
+                return _one(gen, rng, theme=theme, _seed=_seed)
+            if parts[a] < parts[b]:
+                a, b = b, a
+            params.update(a=a, b=b)
+            prompt = f"How many more {people} {verb} {a} than {b}? ____"
+        else:
+            prompt = f"Which is the biggest group? ____"
+        return _item(gen, params, prompt, {"pie": [theme, _seed]})
+    if gen in ("seq_next", "seq_missing", "seq_rule", "seq_term"):
+        kind = rng.choice(["int", "int", "dec", "neg"])
+        if kind == "int":
+            step = rng.choice([-1, 1]) * rng.randint(3, 25)
+            start = rng.randint(30, 150) if step < 0 else rng.randint(1, 60)
+        elif kind == "dec":
+            step = rng.choice(["0.2", "0.5", "1.5", "0.25", "2.5", "0.3"])
+            if rng.random() < 0.4:
+                step = "-" + step
+            start = dec_str(Decimal(rng.randint(10, 80)) / 2) if step.startswith("-") else dec_str(Decimal(rng.randint(0, 20)) / 2)
+        else:                                  # counting down through zero
+            step = -rng.randint(2, 9)
+            start = abs(step) * rng.randint(1, 3) + rng.randint(0, abs(step) - 1)
+        if gen == "seq_term":
+            n = rng.choice([8, 10, 12, 15, 20])
+            if kind == "neg" or (Decimal(str(step)) < 0 and Decimal(str(start)) + Decimal(str(step)) * (n - 1) < 0):
+                step = abs(Decimal(str(step)))
+            return _item(gen, {"start": str(start), "step": str(step), "n": n},
+                         f"A sequence starts at {num(dec_str(Decimal(str(start))))} and the rule is {seq_rule_text(step)}. What is term {n}? ____")
+        terms = seq_terms(start, step, 6)
+        if gen == "seq_next":
+            return _item(gen, {"start": str(start), "step": str(step)}, ",  ".join(terms[:4]) + ",  ____")
+        if gen == "seq_missing":
+            blank = rng.randint(1, 4)
+            shown = ["____" if i == blank else t for i, t in enumerate(terms)]
+            return _item(gen, {"start": str(start), "step": str(step), "blank": blank}, ",  ".join(shown))
+        return _item(gen, {"start": str(start), "step": str(step)}, ",  ".join(terms[:5]) + "  Rule: ________")
+    if gen == "translate_point":
+        while True:
+            x, y = rng.randint(0, 10), rng.randint(0, 10)
+            dx, dy = rng.randint(-6, 6), rng.randint(-6, 6)
+            if (dx or dy) and 0 <= x + dx <= 10 and 0 <= y + dy <= 10:
+                break
+        sq = lambda n: f"{abs(n)} square{'' if abs(n) == 1 else 's'}"
+        moves = [f"{sq(dx)} {'right' if dx > 0 else 'left'}"] if dx else []
+        moves += [f"{sq(dy)} {'up' if dy > 0 else 'down'}"] if dy else []
+        return _item(gen, {"x": x, "y": y, "dx": dx, "dy": dy},
+                     f"Translate ({x}, {y}) {' and '.join(moves)}. New point: ____")
+    if gen == "reflect_point":
+        while True:
+            axis, k = rng.choice(["x", "y"]), rng.randint(2, 8)
+            x, y = rng.randint(0, 10), rng.randint(0, 10)
+            v = x if axis == "x" else y
+            if v != k and 0 <= 2 * k - v <= 10:
+                break
+        line = f"the vertical mirror line x = {k}" if axis == "x" else f"the horizontal mirror line y = {k}"
+        return _item(gen, {"axis": axis, "k": k, "x": x, "y": y}, f"Reflect ({x}, {y}) in {line}. New point: ____")
+    if gen == "symmetry_lines":
+        shape = rng.choice(sorted(SYMMETRY_LINES))
+        return _item(gen, {"shape": shape}, f"How many lines of symmetry does this {shape} have? ____", {"shape": shape})
+    if gen in ("io_out", "io_in", "io_rule", "io_two"):
+        def one_step():
+            op = rng.choice(["+", "−", "×", "÷"])
+            k = rng.randint(2, 10) if op in "×÷" else rng.randint(3, 25)
+            return [op, k]
+        while True:
+            if gen == "io_two":
+                rule = [["×", rng.randint(2, 5)], [rng.choice(["+", "−"]), rng.randint(1, 9)]]
+            else:
+                rule = [one_step()]
+            op, k = rule[0]
+            x = rng.randint(1, 12) * (k if op == "÷" else 1) if gen != "io_two" else rng.randint(2, 12)
+            if op == "−" and x <= k:
+                x += k + rng.randint(1, 10)
+            y = io_apply(rule, x)
+            if y < 0:
+                continue
+            r = io_rule_text(rule)
+            if gen == "io_out" or gen == "io_two":
+                return _item(gen, {"rule": rule, "x": x}, f"Rule: {r}.   In: {x}  →  Out: ____")
+            if gen == "io_in":
+                return _item(gen, {"rule": rule, "x": x}, f"Rule: {r}.   In: ____  →  Out: {y}")
+            ins = sorted(rng.sample(range(1, 13), 3))
+            if op == "÷":
+                ins = [i * k for i in ins]
+            if op == "−":
+                ins = [i + k for i in ins]
+            pairs = [(a, io_apply(rule, a)) for a in ins]
+            if _io_unique_rule(pairs):
+                shown = ",   ".join(f"{a} → {b}" for a, b in pairs)
+                return _item(gen, {"rule": rule, "ins": ins}, f"{shown}.   Rule: ________")
+    if gen in ("time_24_to_12", "time_12_to_24"):
+        # mostly afternoon/evening times (the hard part), with some mornings, noon and midnight hours
+        h = rng.choice([0, 12] if rng.random() < 0.15 else list(range(1, 12)) if rng.random() < 0.3 else list(range(13, 24)))
+        m = rng.randrange(0, 60, step)
+        if gen == "time_24_to_12":
+            return _item(gen, {"h": h, "m": m}, f"Write {fmt_24h(h, m)} as a 12-hour time: ________")
+        return _item(gen, {"h": h, "m": m}, f"Write {fmt_12h(h, m)} as a 24-hour time: ________")
     raise ValueError(f"unknown generator {gen}")
 
 

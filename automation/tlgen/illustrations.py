@@ -447,6 +447,103 @@ def thermometer_png(temp, h=420):
     return str(out)
 
 
+# ---------------------------------------------------------------- 2-D shapes (symmetry)
+def _regular(n, r=44, cx=50, cy=52, start=-90):
+    return [(cx + r * math.cos(math.radians(start + 360 * i / n)), cy + r * math.sin(math.radians(start + 360 * i / n))) for i in range(n)]
+
+
+# outline points in a 100 x 100 box; each shape's lines of symmetry are fixed by its geometry
+SHAPE_POINTS = {
+    "square": [(14, 14), (86, 14), (86, 86), (14, 86)],
+    "rectangle": [(6, 26), (94, 26), (94, 74), (6, 74)],
+    "equilateral triangle": _regular(3, 48, 50, 60),
+    "isosceles triangle": [(50, 6), (78, 94), (22, 94)],
+    "scalene triangle": [(8, 88), (92, 88), (30, 20)],
+    "regular pentagon": _regular(5),
+    "regular hexagon": _regular(6, start=0),
+    "regular octagon": _regular(8, start=22.5),
+    "kite": [(50, 6), (80, 36), (50, 94), (20, 36)],
+    "rhombus": [(50, 4), (80, 50), (50, 96), (20, 50)],
+    "parallelogram": [(28, 24), (96, 24), (72, 76), (4, 76)],
+}
+
+
+def shape_svg(name, size=96):
+    pts = " ".join(f"{x * size / 100:.1f},{y * size / 100:.1f}" for x, y in SHAPE_POINTS[name])
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="-3 -3 {size + 6} {size + 6}">'
+            f'<polygon points="{pts}" fill="#E6EEFF" stroke="#172A6E" stroke-width="3" stroke-linejoin="round"/></svg>')
+
+
+def shape_png(name, size=300):
+    out = _cache(f"shape-{name.replace(' ', '-')}-{size}.png")
+    if out.exists():
+        return str(out)
+    pad = size * 0.04
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    k = (size - 2 * pad) / 100
+    pts = [(pad + x * k, pad + y * k) for x, y in SHAPE_POINTS[name]]
+    d.polygon(pts, fill=(230, 238, 255), outline=NAVY, width=max(3, size // 80))
+    img.save(out)
+    return str(out)
+
+
+# ---------------------------------------------------------------- pie chart (slices in eighths)
+PIE_COLORS = ["#4C7BF4", "#FBB829", "#2BB673", "#E5484D", "#9B6BEF", "#20B2C8"]
+
+
+def pie_svg(data, size=220):
+    """data: [(label, eighths)]. Slices start at 12 o'clock and go clockwise; legend on the right."""
+    r, cx, cy = size / 2 - 6, size / 2, size / 2
+    out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{size + 190}" height="{size}" viewBox="0 0 {size + 190} {size}">']
+    start = 0
+    for i, (label, n) in enumerate(data):
+        a0, a1 = math.radians(start * 45 - 90), math.radians((start + n) * 45 - 90)
+        x0, y0, x1, y1 = cx + r * math.cos(a0), cy + r * math.sin(a0), cx + r * math.cos(a1), cy + r * math.sin(a1)
+        big = 1 if n > 4 else 0
+        out.append(f'<path d="M{cx},{cy} L{x0:.1f},{y0:.1f} A{r},{r} 0 {big} 1 {x1:.1f},{y1:.1f} Z" fill="{PIE_COLORS[i]}" stroke="#fff" stroke-width="2.5"/>')
+        start += n
+    for k in range(8):                     # faint eighth marks round the edge help estimating
+        a = math.radians(k * 45 - 90)
+        out.append(f'<line x1="{cx + (r - 7) * math.cos(a):.1f}" y1="{cy + (r - 7) * math.sin(a):.1f}" x2="{cx + r * math.cos(a):.1f}" y2="{cy + r * math.sin(a):.1f}" stroke="#172A6E" stroke-width="1.2"/>')
+    out.append(f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="#172A6E" stroke-width="2.5"/>')
+    for i, (label, _n) in enumerate(data):
+        y = 30 + i * 32
+        out.append(f'<rect x="{size + 14}" y="{y - 13}" width="18" height="18" rx="3" fill="{PIE_COLORS[i]}"/>'
+                   f'<text x="{size + 40}" y="{y + 1}" font-size="15" font-family="Nunito, Arial" font-weight="700" fill="#1C2541">{label.capitalize()}</text>')
+    out.append("</svg>")
+    return "".join(out)
+
+
+def pie_png(data, scale=3):
+    import hashlib as _h
+    out = _cache("pie-" + _h.md5(repr(data).encode()).hexdigest()[:12] + f"-{scale}.png")
+    if out.exists():
+        return str(out)
+    size = 220
+    W, H = (size + 190) * scale, size * scale
+    img = Image.new("RGBA", (W, H), (255, 255, 255, 0))
+    d = ImageDraw.Draw(img)
+    r, cx, cy = (size / 2 - 6) * scale, size / 2 * scale, size / 2 * scale
+    box = [cx - r, cy - r, cx + r, cy + r]
+    start = 0
+    rgb = lambda h: tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
+    for i, (label, n) in enumerate(data):
+        d.pieslice(box, start * 45 - 90, (start + n) * 45 - 90, fill=rgb(PIE_COLORS[i]), outline="white", width=int(2.5 * scale))
+        start += n
+    for k in range(8):
+        a = math.radians(k * 45 - 90)
+        d.line([(cx + (r - 7 * scale) * math.cos(a), cy + (r - 7 * scale) * math.sin(a)), (cx + r * math.cos(a), cy + r * math.sin(a))], fill=NAVY, width=max(2, int(1.2 * scale)))
+    d.ellipse(box, outline=NAVY, width=int(2.5 * scale))
+    font = ImageFont.truetype(config.ttf("nunito-latin-700-normal"), 15 * scale)
+    for i, (label, _n) in enumerate(data):
+        y = (30 + i * 32) * scale
+        d.rounded_rectangle([(size + 14) * scale, y - 13 * scale, (size + 32) * scale, y + 5 * scale], radius=3 * scale, fill=rgb(PIE_COLORS[i]))
+        d.text(((size + 40) * scale, y - 4 * scale), label.capitalize(), font=font, fill=(28, 37, 65), anchor="lm")
+    img.save(out)
+    return str(out)
+
+
 # ---------------------------------------------------------------- line plot (eighths from 0 to 1)
 def _lp_label(k):
     from fractions import Fraction

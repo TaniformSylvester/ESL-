@@ -300,7 +300,7 @@ class Deck:
         if t == "draw_write":
             return it["prompt"], it.get("guidance", "")
         if t == "math":
-            if (it.get("render") or {}).get("pictograph") or (it.get("render") or {}).get("lineplot"):
+            if set(it.get("render") or {}) & {"pictograph", "lineplot", "pie"}:
                 return None, str(it["answer"])
             return it["prompt"], str(it["answer"])
         return None, ans[0][1] if ans else None
@@ -351,7 +351,7 @@ class Deck:
                     qs += [(sec["type"], it) for it in sec["items"][first:first + 2]
                            if not (sec["type"] == "multiple_choice" and any(illustrations.is_emoji(str(o)) for o in it["options"]))
                            and not (it.get("render") or {}).get("objects") and not (it.get("render") or {}).get("pictograph")
-                           and not (it.get("render") or {}).get("lineplot")]
+                           and not (it.get("render") or {}).get("lineplot") and not (it.get("render") or {}).get("pie")]
             if len(qs) >= 6:
                 break
         for n, (t, it) in enumerate(qs[:6], 1):
@@ -377,6 +377,8 @@ class Deck:
                     pic = illustrations.base10_png(*r["base10"])
                 elif "numberline" in r:
                     pic = illustrations.numberline_png(*r["numberline"])
+                elif "shape" in r:
+                    pic = illustrations.shape_png(r["shape"])
                 if illustrations.is_emoji(q):
                     self._pic(s, q, Inches(0.9), Inches(1.8), Inches(2.2))
                 else:

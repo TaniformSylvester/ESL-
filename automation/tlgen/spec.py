@@ -110,7 +110,9 @@ def section_answers(sec, seed):
         order = shuffled(items, seed)
         return [(f"{LETTERS[order.index(step)]}", f"{i + 1} — {step}") for i, step in enumerate(items)]
     if t == "sort":
-        return [(g, ", ".join(words)) for g, words in sec["groups"].items()]
+        # whole sentences already end in punctuation, so join them with a space
+        return [(g, (" " if any(str(w).rstrip().endswith((".", "!", "?")) for w in words) else ", ").join(words))
+                for g, words in sec["groups"].items()]
     if t == "draw_write":
         return [(str(i + 1), it.get("guidance") or "Answers will vary.") for i, it in enumerate(items)]
     if t == "math":

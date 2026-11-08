@@ -222,6 +222,11 @@ class Doc:
                 self.para(title, bold=True, color=config.BRAND["navy"])
                 self.picture(self.d.add_paragraph().add_run(), illustrations.lineplot_png(mathgen.lineplot_data(*plot), f"{unit}s"), 15)
                 self.para(f"Each X shows one of the {things}.", italic=True, color=config.BRAND["muted"], size=9)
+            pie = next(((it.get("render") or {}).get("pie") for it in items if (it.get("render") or {}).get("pie")), None)
+            if pie:
+                data, total = mathgen.pie_data(*pie)
+                self.para(f"{mathgen.PIE_THEMES[pie[0]][0]} ({total} {mathgen.PIE_THEMES[pie[0]][1]})", bold=True, color=config.BRAND["navy"])
+                self.picture(self.d.add_paragraph().add_run(), illustrations.pie_png(data), 11)
             cols = 2
             t_ = self.d.add_table(rows=0, cols=cols)
             for i in range(0, len(items), cols):
@@ -237,6 +242,8 @@ class Doc:
                         self.picture(cells[j].add_paragraph().add_run(), illustrations.thermometer_png(r["thermo"]), 1.8)
                     elif "numberline" in r:
                         self.picture(cells[j].add_paragraph().add_run(), illustrations.numberline_png(*r["numberline"]), 5.0)
+                    elif "shape" in r:
+                        self.picture(cells[j].add_paragraph().add_run(), illustrations.shape_png(r["shape"]), 2.6)
                     elif "objects" in r:
                         run = cells[j].add_paragraph().add_run()
                         for _ in range(r["objects"][1]):

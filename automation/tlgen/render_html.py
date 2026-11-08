@@ -181,7 +181,7 @@ def render_section(sec, n, seed):
                                  "true_false": "True or false?", "short_answer": "Answer the questions", "label": "Label the pictures",
                                  "sequence": "Put them in order", "sort": "Sort the words", "draw_write": "Draw and write",
                                  "math": "Solve"}[t]
-    pics = sum(1 for it in sec.get("items") or [] if isinstance(it, dict) and set(it.get("render") or {}) & {"clock", "rect", "thermo", "base10", "objects", "fraction"})
+    pics = sum(1 for it in sec.get("items") or [] if isinstance(it, dict) and set(it.get("render") or {}) & {"clock", "rect", "thermo", "base10", "objects", "fraction", "shape"})
     long = " long" if pics > 4 or len(sec.get("items") or []) > 10 else ""   # tall sections may break between rows
     out = [f'<div class="sect{long}"><h3 class="sec"><span class="num">{n}</span>{e(title)}</h3><p class="instr">{e(sec["instructions"])}</p>']
     if sec.get("passage"):                     # a reading text printed before the questions
@@ -240,7 +240,12 @@ def render_section(sec, n, seed):
             title, things, unit = mathgen.LINEPLOT_THEMES[plot[0]]
             out.append(f'<div class="picto"><div class="pt">{e(title)}</div>'
                        f'{illustrations.lineplot_svg(mathgen.lineplot_data(*plot), f"{unit}s")}<div class="pk">Each X shows one of the {e(things)}.</div></div>')
-        has_pic = any(it.get("render") and "pictograph" not in it["render"] and "lineplot" not in it["render"] for it in items)
+        pie = next(((it.get("render") or {}).get("pie") for it in items if (it.get("render") or {}).get("pie")), None)
+        if pie:
+            data, total = mathgen.pie_data(*pie)
+            out.append(f'<div class="picto"><div class="pt">{e(mathgen.PIE_THEMES[pie[0]][0])} ({total} {e(mathgen.PIE_THEMES[pie[0]][1])})</div>'
+                       f'{illustrations.pie_svg(data)}</div>')
+        has_pic = any(it.get("render") and not set(it["render"]) & {"pictograph", "lineplot", "pie"} for it in items)
         # Three columns only for short prompts with a single blank (e.g. "29 + 12 = ____").
         cols = "" if has_pic or any(len(it["prompt"]) > 18 or it["prompt"].count("____") > 1 for it in items) else " cols3"
         cells = []
@@ -255,13 +260,15 @@ def render_section(sec, n, seed):
                 pic = illustrations.base10_svg(*r["base10"])
             elif "thermo" in r:
                 pic = illustrations.thermometer_svg(r["thermo"])
-            elif "pictograph" in r or "lineplot" in r:
+            elif "pictograph" in r or "lineplot" in r or "pie" in r:
                 pic = ""                      # drawn once above the questions
             elif "objects" in r:
                 thing, n = r["objects"]
                 pic = '<div class="objs">' + f'<span class="emoji">{e(thing)}</span>' * n + "</div>"
             elif "numberline" in r:
                 pic = illustrations.numberline_svg(*r["numberline"])
+            elif "shape" in r:
+                pic = illustrations.shape_svg(r["shape"])
             elif "rect" in r and max(r["rect"]) <= 12:
                 pic = illustrations.rect_svg(*r["rect"], unit=12)
             prompt = e(it["prompt"])
