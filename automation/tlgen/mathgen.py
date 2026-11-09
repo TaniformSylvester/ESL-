@@ -412,6 +412,42 @@ def solve(gen, p):
         return sum(p["sides"])
     if gen == "symmetry_lines":
         return SYMMETRY_LINES[p["shape"]]
+    if gen == "angle_missing":
+        return {"triangle": lambda: 180 - sum(p["known"]), "line": lambda: 180 - sum(p["known"]),
+                "point": lambda: 360 - sum(p["known"]), "isosceles_apex": lambda: (180 - p["known"][0]) // 2,
+                "isosceles_base": lambda: 180 - 2 * p["known"][0]}[p["form"]]()
+    if gen == "speed":
+        f = p["form"]
+        if f == "speed":
+            return _c(p["d"] // p["t"])
+        if f == "distance":
+            return _c(p["s"] * p["t"])
+        return p["d"] // p["s"]
+    if gen == "map_scale":
+        f = p["form"]
+        if f == "to_real":
+            return dec_str(Decimal(p["map"]) * p["per"])
+        if f == "to_map":
+            return dec_str(Decimal(p["real"]) / p["per"])
+        return dec_str(Decimal(p["map"]) * p["ratio"] / 100000)      # 1 : n ratio, map cm → real km
+    if gen == "prob_fraction":
+        return frac_str(Fraction(p["want"], p["total"]))
+    if gen == "prob_word":
+        f = Fraction(p["want"], p["total"])
+        return ("impossible" if f == 0 else "certain" if f == 1 else "even chance" if f == Fraction(1, 2)
+                else "unlikely" if f < Fraction(1, 2) else "likely")
+    if gen == "formula":
+        f, v = p["form"], p["v"]
+        return {"perim": lambda: 2 * (v["l"] + v["w"]), "area": lambda: v["l"] * v["w"],
+                "cook": lambda: 40 * v["m"] + 20, "chairs": lambda: 4 * v["t"] + 2,
+                "linear": lambda: v["a"] * v["x"] + v["b"], "game": lambda: 5 * v["n"] + 10,
+                "area_back": lambda: v["A"] // v["l"]}[f]()
+    if gen == "tri_sides":
+        n = len(set(p["sides"]))
+        return {1: "equilateral", 2: "isosceles", 3: "scalene"}[n]
+    if gen == "tri_angles":
+        m = max(p["angles"])
+        return "right" if m == 90 else ("obtuse" if m > 90 else "acute")
     if gen == "pie":
         data, total = pie_data(p["theme"], p["data_seed"])
         parts = dict(data)
@@ -945,6 +981,142 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
             prompt = ("A quadrilateral has sides of " + ", ".join(f"{x} cm" for x in sides[:3]) +
                       f" and {sides[3]} cm. What is its perimeter? ____ cm")
         return _item(gen, {"shape": shape, "sides": sides}, prompt)
+    if gen == "angle_missing":
+        forms = _.get("forms") or ["triangle", "line", "point", "isosceles_apex", "isosceles_base"]
+        f = rng.choice(list(forms))
+        if f == "triangle":
+            a = rng.randint(20, 110); b = rng.randint(15, 160 - a)
+            return _item(gen, {"form": f, "known": [a, b]}, f"A triangle has angles of {a}° and {b}°. The third angle = ____°")
+        if f == "line":
+            if rng.random() < 0.5:
+                a = rng.randint(15, 165)
+                return _item(gen, {"form": f, "known": [a]}, f"Two angles make a straight line. One is {a}°. The other = ____°")
+            a = rng.randint(20, 100); b = rng.randint(15, 160 - a)
+            return _item(gen, {"form": f, "known": [a, b]}, f"Three angles on a straight line: {a}°, {b}° and ____°")
+        if f == "point":
+            a = rng.randint(60, 150); b = rng.randint(40, 300 - a - 20); 
+            return _item(gen, {"form": f, "known": [a, b]}, f"Three angles meet at a point: {a}°, {b}° and ____°")
+        if f == "isosceles_apex":
+            base = rng.randrange(30, 86, 5)
+            return _item(gen, {"form": f, "known": [180 - 2 * base]},
+                         f"An isosceles triangle has a top angle of {180 - 2 * base}°. Each base angle = ____°")
+        base = rng.randrange(25, 86, 5)
+        return _item(gen, {"form": f, "known": [base]}, f"An isosceles triangle has two base angles of {base}°. The top angle = ____°")
+    if gen == "speed":
+        f = rng.choice(["speed", "speed", "distance", "time"])
+        ctx = rng.choice([("A cyclist", "km", "h", "km/h", (10, 30), (1, 5)), ("A runner", "m", "s", "m/s", (3, 8), (10, 60)),
+                          ("A train", "km", "h", "km/h", (60, 200), (1, 4)), ("A snail", "cm", "min", "cm/min", (2, 9), (3, 20)),
+                          ("A car", "km", "h", "km/h", (40, 110), (1, 4)), ("A swimmer", "m", "s", "m/s", (1, 2), (20, 100))])
+        who, du, tu, su, (s_lo, s_hi), (t_lo, t_hi) = ctx
+        sp, t = rng.randint(s_lo, s_hi), rng.randint(t_lo, t_hi)
+        if su == "km/h" and sp > 30:
+            sp = sp // 5 * 5
+        tname = {"h": "hours", "s": "seconds", "min": "minutes"}[tu]
+        if t == 1:
+            t_lo = 2
+            t = 2
+        dist = sp * t
+        if f == "speed":
+            return _item(gen, {"form": f, "d": dist, "t": t}, f"{who} travels {dist:,} {du} in {t} {tname}. Speed = ____ {su}")
+        if f == "distance":
+            return _item(gen, {"form": f, "s": sp, "t": t}, f"{who} travels at {sp} {su} for {t} {tname}. Distance = ____ {du}")
+        return _item(gen, {"form": f, "d": dist, "s": sp}, f"{who} travels {dist:,} {du} at {sp} {su}. Time = ____ {tname}")
+    if gen == "map_scale":
+        f = rng.choice(["to_real", "to_real", "to_map", "ratio"])
+        unit = rng.choice(["km", "km", "m"])
+        if f == "ratio":
+            ratio = rng.choice([25000, 50000, 100000, 200000])
+            m = rng.choice([2, 3, 4, 5, 6, 8, 10, 12]) if ratio != 25000 else rng.choice([4, 8, 12, 2, 6])
+            return _item(gen, {"form": f, "map": m, "ratio": ratio},
+                         f"Map scale 1 : {ratio:,}. Two towns are {m} cm apart on the map. Real distance: ____ km")
+        per = rng.choice([2, 5, 10, 20, 25, 50]) if unit == "km" else rng.choice([10, 20, 50, 100, 200])
+        if f == "to_real":
+            m = rng.choice(["1.5", "2", "3", "4", "4.5", "6", "7", "8", "9", "12"])
+            return _item(gen, {"form": f, "map": m, "per": per},
+                         f"Scale: 1 cm = {per} {unit}. Map distance {m} cm. Real distance: ____ {unit}")
+        real = per * rng.choice([2, 3, 4, 5, 6, 8, 10, 11])
+        if rng.random() < 0.3 and per % 2 == 0:     # half-centimeter map distances only
+            real = real + per // 2
+        return _item(gen, {"form": f, "real": real, "per": per},
+                     f"Scale: 1 cm = {per} {unit}. Real distance {real} {unit}. Map distance: ____ cm")
+    if gen in ("prob_fraction", "prob_word"):
+        kind = rng.choice(["bag", "bag", "dice", "spinner"])
+        if kind == "dice":
+            ask = rng.choice([("an even number", 3), ("a 6", 1), ("a number less than 5", 4), ("a number greater than 6", 0),
+                              ("a number from 1 to 6", 6), ("a 3 or a 4", 2), ("an odd number", 3), ("a number greater than 1", 5)])
+            prm = {"kind": "dice", "event": ask[0], "want": ask[1], "total": 6}
+            text = f"You roll a normal dice with the numbers 1 to 6. Rolling {ask[0]}"
+        elif kind == "spinner":
+            n = rng.choice([4, 5, 8, 10])
+            k = rng.randint(0, n)
+            col = rng.choice(["red", "blue", "green", "yellow"])
+            prm = {"kind": "spinner", "want": k, "total": n, "color": col}
+            text = f"A spinner has {n} equal parts and {k} of them {'is' if k == 1 else 'are'} {col}. Landing on {col}"
+        else:
+            a, b = rng.randint(0, 9), rng.randint(1, 9)
+            c1, c2 = rng.sample(["red", "blue", "green", "yellow"], 2)
+            prm = {"kind": "bag", "want": a, "total": a + b, "color": c1, "other": c2, "b": b}
+            cnt = lambda n, c: f"{n} {c} counter{'' if n == 1 else 's'}"
+            text = f"A bag has {cnt(a, c1)} and {cnt(b, c2)}. Picking a {c1} counter"
+        if gen == "prob_fraction":
+            return _item(gen, prm, f"{text}: probability = ____")
+        return _item(gen, prm, f"{text} is impossible, unlikely, an even chance, likely or certain? ________")
+    if gen == "formula":
+        forms = kw_forms if (kw_forms := _.get("forms")) else ["perim", "area", "cook", "chairs", "linear", "game", "area_back"]
+        f = rng.choice(list(forms))
+        if f == "perim":
+            w = rng.randint(2, 15)
+            v = {"l": rng.randint(w + 1, 25), "w": w}
+            prompt = f"P = 2 × (l + w). Find P when l = {v['l']} cm and w = {v['w']} cm. P = ____ cm"
+        elif f == "area":
+            v = {"l": rng.randint(3, 15), "w": rng.randint(2, 12)}
+            prompt = f"A = l × w. Find A when l = {v['l']} m and w = {v['w']} m. A = ____ m²"
+        elif f == "cook":
+            v = {"m": rng.randint(1, 6)}
+            prompt = f"Cooking time T = 40m + 20 (T in minutes, m in kg). Find T when m = {v['m']}. T = ____ minutes"
+        elif f == "chairs":
+            v = {"t": rng.randint(2, 15)}
+            prompt = f"Chairs needed c = 4t + 2 (t = number of tables). Find c when t = {v['t']}. c = ____"
+        elif f == "linear":
+            v = {"a": rng.randint(2, 9), "x": rng.randint(2, 12), "b": rng.randint(1, 20)}
+            prompt = f"y = {v['a']}x + {v['b']}. Find y when x = {v['x']}. y = ____"
+        elif f == "game":
+            v = {"n": rng.randint(2, 20)}
+            prompt = f"Points p = 5n + 10 (n = stars collected). Find p when n = {v['n']}. p = ____"
+        else:
+            l, w = rng.randint(3, 12), rng.randint(2, 12)
+            v = {"A": l * w, "l": l}
+            prompt = f"A = l × w. A rectangle has A = {l * w} cm² and l = {l} cm. Find w. w = ____ cm"
+        return _item(gen, {"form": f, "v": v}, prompt)
+    if gen == "tri_sides":
+        kind = rng.choice(["equilateral", "isosceles", "isosceles", "scalene", "scalene"])
+        while True:
+            a = rng.randint(3, 12)
+            if kind == "equilateral":
+                sides = [a, a, a]
+            elif kind == "isosceles":
+                b = rng.randint(2, 2 * a - 1)
+                sides = [a, a, b]
+            else:
+                sides = rng.sample(range(3, 15), 3)
+            x, y, z = sorted(sides)
+            if x + y > z and len(set(sides)) == {"equilateral": 1, "isosceles": 2, "scalene": 3}[kind]:
+                break
+        rng.shuffle(sides)
+        return _item(gen, {"sides": sides}, f"A triangle has sides of {sides[0]} cm, {sides[1]} cm and {sides[2]} cm. Is it equilateral, isosceles or scalene? ________")
+    if gen == "tri_angles":
+        kind = rng.choice(["acute", "right", "obtuse"])
+        while True:
+            if kind == "right":
+                a = rng.randrange(15, 76, 5); angles = [90, a, 90 - a]
+            elif kind == "obtuse":
+                big = rng.randrange(95, 151, 5); a = rng.randrange(10, 180 - big - 5 + 1, 5); angles = [big, a, 180 - big - a]
+            else:
+                a = rng.randrange(40, 86, 5); b = rng.randrange(40, 86, 5); angles = [a, b, 180 - a - b]
+            if all(0 < t < 180 for t in angles) and (kind != "acute" or max(angles) < 90):
+                break
+        rng.shuffle(angles)
+        return _item(gen, {"angles": angles}, f"A triangle has angles of {angles[0]}°, {angles[1]}° and {angles[2]}°. Is it acute, right or obtuse? ________")
     if gen == "pie":
         title, people, verb, _cats = PIE_THEMES[theme]
         data, total = pie_data(theme, _seed)
