@@ -29,6 +29,9 @@ ALWAYS_OK = {"teachluma", "pdf", "docx", "pptx", "powerpoint", "esl", "ok", "wor
              "pre", "re", "e.g", "i.e", "vs", "etc", "min", "mins", "am", "pm", "pinterest", "facebook", "instagram", "tiktok",
              "multi", "non", "co", "sub", "semi",            # hyphen prefixes (multi-step, non-fiction)
              "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+             "january", "february", "march", "april", "may", "june", "july", "august", "september", "october",
+             "november", "december",
+             "christmas", "christmases", "santa", "hanukkah", "diwali", "kwanzaa", "hogmanay", "eid", "ramadan",   # festivals
              "mondays", "tuesdays", "wednesdays", "thursdays", "fridays", "saturdays", "sundays",
              "aren", "isn", "wasn", "weren", "doesn", "didn", "don", "hasn", "haven", "hadn", "couldn", "wouldn",
              "shouldn", "mustn", "needn", "ll", "ve", "re", "th", "ch", "sh", "ph", "wh", "ck", "ng",       # letter clusters taught in phonics

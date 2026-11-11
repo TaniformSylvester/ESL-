@@ -36,7 +36,11 @@ def chromium() -> str:
     env = os.environ.get("TLGEN_CHROMIUM")
     if env:
         return env
-    for pattern in ("/opt/pw-browsers/chromium-*/chrome-linux/chrome", "/root/.cache/ms-playwright/chromium-*/chrome-linux/chrome"):
+    # The headless shell prints PDFs reliably; the full browser can hang in some containers.
+    for pattern in ("/opt/pw-browsers/chromium_headless_shell-*/chrome-headless-shell-linux*/chrome-headless-shell",
+                    "/opt/pw-browsers/chromium-*/chrome-linux*/chrome",
+                    "/root/.cache/ms-playwright/chromium_headless_shell-*/chrome-headless-shell-linux*/chrome-headless-shell",
+                    "/root/.cache/ms-playwright/chromium-*/chrome-linux*/chrome"):
         hits = sorted(glob.glob(pattern))
         if hits:
             return hits[-1]
