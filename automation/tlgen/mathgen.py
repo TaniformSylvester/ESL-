@@ -22,6 +22,15 @@ THING_SETS = {   # pass things="christmas" to a word-problem generator for seaso
 WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 
+MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+
+
+def _dnorm(d):
+    """Decimal without trailing zeros: 31.40 -> 31.4, 7.00 -> 7."""
+    t = format(Decimal(d).quantize(Decimal("0.01")).normalize(), "f")
+    return t
+
+
 def _things(kw):
     return THING_SETS.get(kw.get("things"), THINGS)
 
@@ -350,6 +359,37 @@ def solve(gen, p):
         v = {"+": p["x"] + p["a"], "-": p["x"] - p["a"], "*": p["x"] * p["a"]}[p["op"]]
         ok = {"<": v < p["c"], ">": v > p["c"], "≤": v <= p["c"], "≥": v >= p["c"]}[p["sym"]]
         return "yes" if ok else "no"
+    if gen == "month_after":
+        return MONTHS[(MONTHS.index(p["month"]) + p["n"]) % 12]
+    if gen == "ten_more_less":
+        return p["n"] + 10 if p["dir"] == "more" else p["n"] - 10
+    if gen == "prime_check":
+        n = p["n"]
+        return "prime" if n > 1 and all(n % k for k in range(2, int(n ** 0.5) + 1)) else "composite"
+    if gen == "square_num":
+        return p["n"] * p["n"]
+    if gen == "is_square":
+        return "yes" if int(p["n"] ** 0.5) ** 2 == p["n"] else "no"
+    if gen == "fdp_convert":
+        v = Fraction(p["num"], p["den"])
+        if p["to"] == "percent":
+            return f"{_dnorm(Decimal(v.numerator) * 100 / Decimal(v.denominator))}%"
+        if p["to"] == "decimal":
+            return _dnorm(Decimal(v.numerator) / Decimal(v.denominator))
+        return f"{v.numerator}/{v.denominator}"
+    if gen == "two_step_eq":
+        return p["x"]
+    if gen == "circle":
+        r = Decimal(p["r"])
+        if p["ask"] == "diameter":
+            return _dnorm(2 * r)
+        if p["ask"] == "radius":
+            return _dnorm(r)
+        return _dnorm(Decimal("3.14") * 2 * r)
+    if gen in ("compensate", "bridge_ten"):
+        return p["a"] + p["b"]
+    if gen == "dec_order":
+        return ", ".join(sorted(p["nums"], key=Decimal))
     if gen == "tens_ones":
         return p["t"] * 10 + p["o"]
     if gen == "word_two_step":
@@ -879,6 +919,65 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
             return _item(gen, {"a": a, "c": c, "op": op, "sym": sym}, f"Solve: {lhs} {sym} {c}     ____")
         x = rng.randint(1, 20)
         return _item(gen, {"a": a, "c": c, "op": op, "sym": sym, "x": x}, f"Is x = {x} a solution of {lhs} {sym} {c}? (yes or no) ____")
+    if gen == "month_after":
+        m = rng.choice(MONTHS); n = rng.choice(list(_.get("steps") or [1]))
+        word = "comes after" if n == 1 else f"is {n} months after"
+        return _item(gen, {"month": m, "n": n}, f"Which month {word} {m}? ________")
+    if gen == "ten_more_less":
+        n = rng.randint(max(lo, 11), min(hi, 89)); d = rng.choice(list(_.get("dirs") or ["more", "less"]))
+        return _item(gen, {"n": n, "dir": d}, f"10 {d} than {n} is ____")
+    if gen == "prime_check":
+        n = rng.randint(max(lo, 2), hi)
+        return _item(gen, {"n": n}, f"Is {n} prime or composite? ________")
+    if gen == "square_num":
+        n = rng.randint(max(lo, 1), min(hi, 12))
+        return _item(gen, {"n": n}, f"{n}² = {n} × {n} = ____")
+    if gen == "is_square":
+        n = rng.choice([k * k for k in range(2, 11)]) if rng.random() < 0.5 else rng.choice([k for k in range(5, 101) if int(k ** 0.5) ** 2 != k])
+        return _item(gen, {"n": n}, f"Is {n} a square number? (yes or no) ____")
+    if gen == "fdp_convert":
+        to = rng.choice(list(_.get("convert_to") or ["percent", "decimal", "fraction"]))
+        den = rng.choice([2, 4, 5, 10, 20, 25])
+        num = rng.choice([k for k in range(1, den) if gcd(k, den) == 1])
+        v = Fraction(num, den)
+        if to == "fraction":
+            src = rng.choice(["percent", "decimal"])
+            shown = f"{_dnorm(Decimal(num) * 100 / Decimal(den))}%" if src == "percent" else _dnorm(Decimal(num) / Decimal(den))
+            return _item(gen, {"num": num, "den": den, "to": to, "from": src}, f"Write {shown} as a fraction in simplest form. ____")
+        return _item(gen, {"num": num, "den": den, "to": to}, f"Write {num}/{den} as a {to}. ____")
+    if gen == "two_step_eq":
+        a, x = rng.randint(2, 9), rng.randint(1, 12); b = rng.randint(1, 20); sign = rng.choice(["+", "-"])
+        if sign == "-" and a * x - b < 0:
+            sign = "+"
+        c = a * x + b if sign == "+" else a * x - b
+        return _item(gen, {"a": a, "b": b, "c": c, "sign": sign, "x": x}, f"{a}x {'+' if sign == '+' else '−'} {b} = {c}      x = ____")
+    if gen == "circle":
+        ask = rng.choice(list(_.get("asks") or ["diameter", "radius", "circumference"]))
+        r = rng.randint(2, 15)
+        if ask == "diameter":
+            return _item(gen, {"r": r, "ask": ask}, f"A circle has a radius of {r} cm. What is its diameter? ____ cm")
+        if ask == "radius":
+            return _item(gen, {"r": r, "ask": ask}, f"A circle has a diameter of {2 * r} cm. What is its radius? ____ cm")
+        given = rng.choice(["radius", "diameter"])
+        v = r if given == "radius" else 2 * r
+        return _item(gen, {"r": r, "ask": ask, "given": given}, f"A circle has a {given} of {v} cm. Use π ≈ 3.14. Circumference = ____ cm")
+    if gen == "compensate":
+        a = rng.randint(max(lo, 11), min(hi, 79)); b = rng.choice(list(_.get("adds") or [9, 19, 11, 21]))
+        hint = f"add {b + 1}, then take away 1" if b % 10 == 9 else f"add {b - 1}, then add 1 more"
+        return _item(gen, {"a": a, "b": b}, f"{a} + {b} = ____   ({hint})")
+    if gen == "bridge_ten":
+        while True:
+            a, b = rng.randint(5, 9), rng.randint(3, 9)
+            if a + b > 10:
+                break
+        return _item(gen, {"a": a, "b": b}, f"{a} + {b} = {a} + {10 - a} + {b - (10 - a)} = ____")
+    if gen == "dec_order":
+        while True:
+            whole = rng.randint(0, 3)
+            nums = {dec_str(Decimal(whole) + (Decimal(rng.randint(1, 9)).scaleb(-1) if rng.random() < 0.5 else Decimal(rng.randint(1, 99)).scaleb(-2))) for _i in range(3)}
+            if len(nums) == 3:
+                nums = list(nums); rng.shuffle(nums)
+                return _item(gen, {"nums": nums}, f"Order from smallest to largest: {',  '.join(nums)}   ____")
     if gen == "tens_ones":
         t, o = rng.randint(1, 9), rng.randint(0, 9)
         if rng.random() < 0.5:
@@ -1077,8 +1176,8 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         a = rng.randint(1, 20); b = rng.randint(a + 3, 31 if month in ("December", "January") else 28)
         return _item(gen, {"a": a, "b": b, "month": month}, f"How many days is it from {month} {a} to {month} {b}? ____ days")
     if gen == "weekday_after":
-        day = rng.choice(WEEKDAYS); n = rng.choice([2, 3, 5, 7, 8, 9, 10, 14, 15, 21])
-        return _item(gen, {"day": day, "n": n}, f"Today is {day}. What day will it be in {n} days? ________")
+        day = rng.choice(WEEKDAYS); n = rng.choice(list(_.get("days") or [2, 3, 5, 7, 8, 9, 10, 14, 15, 21]))
+        return _item(gen, {"day": day, "n": n}, f"Today is {day}. What day will it be in {n} {'day' if n == 1 else 'days'}? ________")
     if gen == "frac_of":
         d = rng.choice([2, 3, 4, 5, 6, 8, 10]) if not _.get("denoms") else rng.choice(list(_.get("denoms")))
         n = 1 if _.get("unit") else rng.choice([k for k in range(2 if _.get("nonunit") else 1, d) if gcd(k, d) == 1] or [1])
