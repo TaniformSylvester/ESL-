@@ -13,6 +13,17 @@ from math import gcd
 NAMES = ["Ana", "Ben", "Chen", "Dara", "Eli", "Fatima", "Gus", "Hana", "Ivan", "Jia", "Kofi", "Lina", "Mateo", "Nok", "Omar", "Priya"]
 THINGS = [("apple", "apples"), ("pencil", "pencils"), ("sticker", "stickers"), ("marble", "marbles"), ("book", "books"),
           ("shell", "shells"), ("crayon", "crayons"), ("card", "cards"), ("button", "buttons"), ("balloon", "balloons")]
+THING_SETS = {   # pass things="christmas" to a word-problem generator for seasonal objects
+    "christmas": [("ornament", "ornaments"), ("candy cane", "candy canes"), ("cookie", "cookies"), ("present", "presents"),
+                  ("bell", "bells"), ("star", "stars"), ("candle", "candles"), ("card", "cards")],
+}
+
+
+WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+
+def _things(kw):
+    return THING_SETS.get(kw.get("things"), THINGS)
 
 
 def _carries(a, b):
@@ -320,6 +331,25 @@ def solve(gen, p):
         return p["b"] * p["h"]
     if gen == "power":
         return p["base"] ** p["exp"]
+    if gen == "mass_cubes":
+        heavy, light = (p["x"], p["y"]) if p["a"] > p["b"] else (p["y"], p["x"])
+        return {"heavier": heavy, "lighter": light, "diff": abs(p["a"] - p["b"])}[p["ask"]]
+    if gen == "estimate":
+        r = lambda n: (n + p["place"] // 2) // p["place"] * p["place"]
+        return r(p["a"]) + r(p["b"]) if p["op"] == "+" else r(p["a"]) - r(p["b"])
+    if gen == "improper_to_mixed":
+        w, r = divmod(p["n"], p["d"])
+        return f"{w} {r}/{p['d']}"
+    if gen == "mixed_to_improper":
+        return f"{p['w'] * p['d'] + p['n']}/{p['d']}"
+    if gen == "ineq_solve":
+        a, c = p["a"], p["c"]
+        bound = {"+": c - a, "-": c + a, "*": c // a}[p["op"]]
+        return f"x {p['sym']} {bound}"
+    if gen == "ineq_check":
+        v = {"+": p["x"] + p["a"], "-": p["x"] - p["a"], "*": p["x"] * p["a"]}[p["op"]]
+        ok = {"<": v < p["c"], ">": v > p["c"], "≤": v <= p["c"], "≥": v >= p["c"]}[p["sym"]]
+        return "yes" if ok else "no"
     if gen == "tens_ones":
         return p["t"] * 10 + p["o"]
     if gen == "word_two_step":
@@ -412,6 +442,21 @@ def solve(gen, p):
         return sum(p["sides"])
     if gen == "symmetry_lines":
         return SYMMETRY_LINES[p["shape"]]
+    if gen == "date_diff":
+        return p["b"] - p["a"]
+    if gen == "weekday_after":
+        return WEEKDAYS[(WEEKDAYS.index(p["day"]) + p["n"]) % 7]
+    if gen == "frac_of":
+        return _c(p["total"] * p["n"] // p["d"])
+    if gen == "recipe_scale":
+        v = Fraction(p["q"]) * p["to"] / p["serves"]
+        return int(v) if v.denominator == 1 else dec_str(Decimal(v.numerator) / v.denominator)
+    if gen == "nth_rule":
+        a, d = p["a"], p["d"]
+        c = a - d
+        return f"{d}n" + ("" if c == 0 else f" + {c}" if c > 0 else f" − {-c}")
+    if gen == "nth_value":
+        return _c(p["m"] * p["n"] + p["c"])
     if gen == "angle_missing":
         return {"triangle": lambda: 180 - sum(p["known"]), "line": lambda: 180 - sum(p["known"]),
                 "point": lambda: 360 - sum(p["known"]), "isosceles_apex": lambda: (180 - p["known"][0]) // 2,
@@ -635,11 +680,15 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         nums = rng.sample([x for x in range(lo, hi + 1)], 5)
         return _item(gen, {"nums": nums}, "Order from least to greatest: " + ",  ".join(num(x) for x in nums) + "  ____")
     if gen == "temp_change":
-        start = rng.randint(-12, 8)
-        change = rng.choice([x for x in range(-10, 11) if x != 0])
+        if _.get("nonneg"):   # younger grades: whole positive temperatures only
+            start = rng.randint(4, 32)
+            change = rng.choice([x for x in range(-10, 11) if x != 0 and 0 <= start + x <= 40])
+        else:
+            start = rng.randint(-12, 8)
+            change = rng.choice([x for x in range(-10, 11) if x != 0])
         verb = f"rises by {change}" if change > 0 else f"falls by {-change}"
         return _item(gen, {"start": start, "change": change},
-                     f"The temperature is {num(start)} °C. It {verb} degrees. What is the new temperature? ____ °C")
+                     f"The temperature is {num(start)} °C. It {verb} {'degree' if abs(change) == 1 else 'degrees'}. What is the new temperature? ____ °C")
     if gen == "lineplot":
         title, things, unit = LINEPLOT_THEMES[theme]
         counts = lineplot_data(theme, _seed)
@@ -737,7 +786,7 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         unit = "units" if gen == "perimeter_rect" else "square units"
         return _item(gen, {"l": l, "w": w}, f"A rectangle is {l} units long and {w} units wide. What is its {what}? ____ {unit}", {"rect": [l, w]})
     if gen in ("word_add", "word_sub", "word_mult"):
-        name, (one, many) = rng.choice(NAMES), rng.choice(THINGS)
+        name, (one, many) = rng.choice(NAMES), rng.choice(_things(_))
         if gen == "word_add":
             a, b = rng.randint(lo, hi), rng.randint(lo, hi)
             return _item(gen, {"a": a, "b": b}, f"{name} has {a} {many if a != 1 else one}. A friend gives {name} {b} more. How many {many} does {name} have now? ____")
@@ -788,6 +837,48 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         base = rng.randint(2, 10)
         exp = rng.randint(2, 3 if base > 5 else 4)
         return _item(gen, {"base": base, "exp": exp}, f"{base}{str(exp).translate(SUPERSCRIPT)} = ____")
+    if gen == "mass_cubes":
+        x, y = rng.sample(["apple", "book", "shoe", "banana", "cup", "orange", "toy car", "potato", "brush", "lemon"], 2)
+        a, b = rng.sample(range(max(2, lo), max(hi, lo + 3) + 1), 2)
+        ask = rng.choice(list(kw_ask)) if (kw_ask := _.get("ask")) else rng.choice(["heavier", "lighter", "diff"])
+        q = {"heavier": "Which is heavier? ____", "lighter": "Which is lighter? ____",
+             "diff": "How many more cubes is the heavier one? ____"}[ask]
+        return _item(gen, {"x": x, "y": y, "a": a, "b": b, "ask": ask}, f"The {x} weighs {a} cubes. The {y} weighs {b} cubes. {q}")
+    if gen == "estimate":
+        place = _.get("place", 10)
+        op = rng.choice(list(_.get("ops", ["+", "-"])))
+        while True:
+            a, b = rng.randint(lo, hi), rng.randint(lo, hi)
+            if op == "-":
+                a, b = max(a, b), min(a, b)
+            ra, rb = (a + place // 2) // place, (b + place // 2) // place
+            if a % place and b % place and ra != rb and (a % place) * 2 != place and (b % place) * 2 != place:
+                break
+        word = "hundred" if place == 100 else "ten"
+        return _item(gen, {"a": a, "b": b, "op": op, "place": place},
+                     f"Round to the nearest {word}, then estimate: {_c(a)} {'+' if op == '+' else '−'} {_c(b)} ≈ ____")
+    if gen == "improper_to_mixed":
+        d = rng.choice(list(denominators))
+        while True:
+            n = rng.randint(d + 1, d * max(3, hi))
+            if n % d and gcd(n % d, d) == 1:
+                break
+        return _item(gen, {"n": n, "d": d}, f"{n}/{d} = ____ (mixed number)")
+    if gen == "mixed_to_improper":
+        d = rng.choice(list(denominators))
+        w = rng.randint(1, max(2, hi))
+        n = rng.choice([k for k in range(1, d) if gcd(k, d) == 1])
+        return _item(gen, {"w": w, "n": n, "d": d}, f"{w} {n}/{d} = ____ (improper fraction)")
+    if gen in ("ineq_solve", "ineq_check"):
+        op = rng.choice(list(_.get("ops", ["+", "-", "*"])))
+        sym = rng.choice(["<", ">", "≤", "≥"])
+        a = rng.randint(2, 9)
+        c = a * rng.randint(2, 12) if op == "*" else rng.randint(a + 2, 30)
+        lhs = {"+": f"x + {a}", "-": f"x − {a}", "*": f"{a}x"}[op]
+        if gen == "ineq_solve":
+            return _item(gen, {"a": a, "c": c, "op": op, "sym": sym}, f"Solve: {lhs} {sym} {c}     ____")
+        x = rng.randint(1, 20)
+        return _item(gen, {"a": a, "c": c, "op": op, "sym": sym, "x": x}, f"Is x = {x} a solution of {lhs} {sym} {c}? (yes or no) ____")
     if gen == "tens_ones":
         t, o = rng.randint(1, 9), rng.randint(0, 9)
         if rng.random() < 0.5:
@@ -795,7 +886,7 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         unit = lambda n, word: f"{n} {word}" + ("" if n == 1 else "s")
         return _item(gen, {"t": t, "o": o, "show": "words"}, f"{unit(t, 'ten')} and {unit(o, 'one')} = ____")
     if gen == "word_two_step":
-        name, (one, many) = rng.choice(NAMES), rng.choice(THINGS)
+        name, (one, many) = rng.choice(NAMES), rng.choice(_things(_))
         form = rng.choice(["add_sub", "groups_sub", "groups_add"])
         if form == "add_sub":
             a, b = rng.randint(lo, hi), rng.randint(lo, hi)
@@ -896,7 +987,7 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         a, b = rng.randint(max(lo, 11), min(hi, 99)), rng.randint(11, 99)
         return _item(gen, {"a": a, "b": b}, f"{a} × {b} = ____")
     if gen == "time_convert":
-        form = rng.choice(["h_min", "min_h", "hm_min", "d_h", "w_d", "min_s"])
+        form = rng.choice(list(_.get("forms") or ["h_min", "min_h", "hm_min", "d_h", "w_d", "min_s"]))
         if form == "min_h":
             a = 60 * rng.randint(2, 8); q = f"{a} minutes = ____ hours"
         elif form == "hm_min":
@@ -929,7 +1020,7 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         return _item(gen, {"l": l, "w": w, "h": h},
                      f"A box is {l} cm long, {w} cm wide and {h} cm high. What is its surface area? ____ square centimeters")
     if gen == "metric_convert":
-        form = rng.choice(["m_cm", "cm_m", "km_m", "m_km", "kg_g", "g_kg", "l_ml", "ml_l", "cm_mm", "mm_cm"])
+        form = rng.choice(list(_.get("forms") or ["m_cm", "cm_m", "km_m", "m_km", "kg_g", "g_kg", "l_ml", "ml_l", "cm_mm", "mm_cm"]))
         unit = {"m_cm": ("m", "cm"), "cm_m": ("cm", "m"), "km_m": ("km", "m"), "m_km": ("m", "km"), "kg_g": ("kg", "g"),
                 "g_kg": ("g", "kg"), "l_ml": ("L", "mL"), "ml_l": ("mL", "L"), "cm_mm": ("cm", "mm"), "mm_cm": ("mm", "cm")}[form]
         if form in ("m_cm", "km_m", "kg_g", "l_ml", "cm_mm"):
@@ -981,6 +1072,49 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
             prompt = ("A quadrilateral has sides of " + ", ".join(f"{x} cm" for x in sides[:3]) +
                       f" and {sides[3]} cm. What is its perimeter? ____ cm")
         return _item(gen, {"shape": shape, "sides": sides}, prompt)
+    if gen == "date_diff":
+        month = _.get("month") or "December"
+        a = rng.randint(1, 20); b = rng.randint(a + 3, 31 if month in ("December", "January") else 28)
+        return _item(gen, {"a": a, "b": b, "month": month}, f"How many days is it from {month} {a} to {month} {b}? ____ days")
+    if gen == "weekday_after":
+        day = rng.choice(WEEKDAYS); n = rng.choice([2, 3, 5, 7, 8, 9, 10, 14, 15, 21])
+        return _item(gen, {"day": day, "n": n}, f"Today is {day}. What day will it be in {n} days? ________")
+    if gen == "frac_of":
+        d = rng.choice([2, 3, 4, 5, 6, 8, 10]) if not _.get("denoms") else rng.choice(list(_.get("denoms")))
+        n = 1 if _.get("unit") else rng.choice([k for k in range(2 if _.get("nonunit") else 1, d) if gcd(k, d) == 1] or [1])
+        total = d * rng.randint(2, 12)
+        one, many = rng.choice(_things(_))
+        return _item(gen, {"n": n, "d": d, "total": total}, f"What is {n}/{d} of {total} {many}? ____ {many}")
+    if gen == "recipe_scale":
+        serves = rng.choice([2, 4, 6, 8])
+        to = rng.choice([x for x in (2, 3, 4, 6, 8, 10, 12) if x != serves])
+        ing = rng.choice([("flour", "g", [100, 200, 240, 300, 400, 480]), ("milk", "ml", [200, 240, 300, 400, 600]),
+                          ("sugar", "g", [80, 120, 160, 200]), ("butter", "g", [40, 80, 100, 120, 200]),
+                          ("eggs", "", [2, 4, 6]), ("ginger", "teaspoons", [1, 2, 4])])
+        name, unit, qs = ing
+        while True:
+            q = rng.choice(qs)
+            v = Fraction(q) * to / serves
+            if (unit == "" and v.denominator == 1) or (unit and (v * 2).denominator == 1):
+                break
+            serves = rng.choice([2, 4, 6, 8]); to = rng.choice([x for x in (2, 3, 4, 6, 8, 10, 12) if x != serves])
+        amount = f"{q} {unit} of {name}" if unit else f"{q} {name}"
+        ask = f"How many {name}" if unit == "" else f"How much {name}"
+        tail = f"____ {unit}" if unit else "____"
+        return _item(gen, {"q": q, "serves": serves, "to": to, "ing": name},
+                     f"A recipe for {serves} people uses {amount}. {ask} do you need for {to} people? {tail}")
+    if gen in ("nth_rule", "nth_value"):
+        d = rng.randint(2, 9)
+        c = rng.randint(-5, 9)
+        if gen == "nth_rule":
+            a = d + c
+            if a <= 0:
+                c = rng.randint(1, 9); a = d + c
+            terms = ",  ".join(str(a + d * i) for i in range(4))
+            return _item(gen, {"a": a, "d": d}, f"{terms}, …   nth term = ________")
+        n = rng.choice([10, 12, 15, 20, 25, 50, 100])
+        rule = f"{d}n" + ("" if c == 0 else f" + {c}" if c > 0 else f" − {-c}")
+        return _item(gen, {"m": d, "c": c, "n": n}, f"The nth term is {rule}. Find term {n}: ____")
     if gen == "angle_missing":
         forms = _.get("forms") or ["triangle", "line", "point", "isosceles_apex", "isosceles_base"]
         f = rng.choice(list(forms))
