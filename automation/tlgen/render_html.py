@@ -42,7 +42,7 @@ def _css(subject, compact=0, footer=""):
 @page cover{{margin:0;@bottom-left{{content:none}}@bottom-right{{content:none}}}}
 *{{box-sizing:border-box}}
 html,body{{margin:0;padding:0}}
-body{{font-family:Nunito,Arial,sans-serif;font-size:{base}pt;color:var(--text);line-height:1.42;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-variant-numeric:lining-nums}}
+body{{font-family:Nunito,Arial,sans-serif;font-size:{base}pt;color:var(--text);line-height:1.38;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-variant-numeric:lining-nums}}
 h1,h2,h3{{font-family:Fredoka,Nunito,sans-serif;color:var(--head);margin:0;font-weight:700;letter-spacing:-.005em}}
 p{{margin:0 0 calc(2.5mm*var(--gap))}}
 .emoji{{font-family:'Noto Color Emoji';line-height:1}}
@@ -74,12 +74,12 @@ img.pic.vec{{height:1.08em!important;width:auto!important;max-width:none!importa
 .cover .inside ul{{margin:0;padding-left:5mm;columns:2;column-gap:10mm}}
 .cover .inside li{{margin:1mm 0;font-weight:600}}
 .cover .foot{{position:absolute;bottom:12mm;left:18mm;right:18mm;display:flex;justify-content:space-between;font:700 10pt Nunito;color:var(--muted)}}
-.head{{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:2.5mm;margin-bottom:calc(5mm*var(--gap));
+.head{{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:2mm;margin-bottom:calc(5mm*var(--gap));
   border-bottom:1.2mm solid var(--soft);box-shadow:inset 0 -.6mm 0 var(--main)}}
-.head .kicker{{font:800 8.5pt Nunito;letter-spacing:.09em;text-transform:uppercase;color:var(--ink);display:flex;align-items:center;gap:1.8mm;margin-bottom:.8mm}}
-.head .kicker svg{{width:4.6mm;height:4.6mm;flex:none}}
+.head .kicker{{font:800 8.5pt Nunito;letter-spacing:.09em;text-transform:uppercase;color:var(--ink);display:flex;align-items:center;gap:1.6mm;height:3.4mm}}
+.head .kicker svg{{width:3.4mm;height:3.4mm;flex:none}}
 .head>div{{flex:1;padding-right:6mm}}
-.head h2{{font-size:20pt;line-height:1.12}}
+.head h2{{font-size:19pt;line-height:1.12}}
 .head img{{height:8mm;flex:none}}
 .namebar{{display:flex;gap:6mm;margin:0 0 calc(5mm*var(--gap));font-weight:700}}
 .namebar span{{flex:1;border-bottom:1.5px solid #A9ADB5;padding-bottom:1mm;color:var(--head)}}
@@ -93,7 +93,7 @@ img.pic.vec{{height:1.08em!important;width:auto!important;max-width:none!importa
 .lp table.t td{{padding-top:calc(1.6mm*var(--gap));padding-bottom:calc(1.6mm*var(--gap))}}
 h3.sec{{break-after:avoid;font-size:13pt;margin:calc(5mm*var(--gap)) 0 calc(2mm*var(--gap));display:flex;align-items:center;gap:2.5mm}}
 h3.sec .num{{background:var(--ink);color:#fff;border-radius:2.2mm;width:7.5mm;height:7.5mm;display:inline-flex;align-items:center;justify-content:center;font-size:11pt;flex:none}}
-.instr{{color:var(--muted);font-weight:700;margin:0 0 calc(3mm*var(--gap));padding-left:10mm}}
+.instr{{color:var(--muted);font-weight:700;margin:0 0 calc(3mm*var(--gap))}}
 ul.tight,ol.tight{{margin:0 0 calc(3mm*var(--gap));padding-left:6mm}}
 ul.tight li,ol.tight li{{margin:calc(1mm*var(--gap)) 0}}
 table{{border-collapse:collapse;width:100%}}
