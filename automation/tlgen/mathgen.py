@@ -361,6 +361,24 @@ def solve(gen, p):
         return "yes" if ok else "no"
     if gen == "month_after":
         return MONTHS[(MONTHS.index(p["month"]) + p["n"]) % 12]
+    if gen == "one_more_less":
+        return p["n"] + 1 if p["dir"] == "more" else p["n"] - 1
+    if gen == "turns":
+        compass = ["north", "east", "south", "west"]
+        steps = {"quarter": 1, "half": 2, "three-quarter": 3}[p["turn"]] * (1 if p["way"] == "clockwise" else -1)
+        return compass[(compass.index(p["start"]) + steps) % 4]
+    if gen == "capacity_cups":
+        big, small = (p["x"], p["y"]) if p["a"] > p["b"] else (p["y"], p["x"])
+        return {"more": big, "less": small, "diff": abs(p["a"] - p["b"])}[p["ask"]]
+    if gen == "prime_factor":
+        n, f, k = p["n"], [], 2
+        while n > 1:
+            while n % k == 0:
+                f.append(k); n //= k
+            k += 1
+        return " × ".join(str(x) for x in f)
+    if gen == "area_trap":
+        return (p["a"] + p["b"]) * p["h"] // 2
     if gen == "ten_more_less":
         return p["n"] + 10 if p["dir"] == "more" else p["n"] - 10
     if gen == "prime_check":
@@ -923,6 +941,34 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         m = rng.choice(MONTHS); n = rng.choice(list(_.get("steps") or [1]))
         word = "comes after" if n == 1 else f"is {n} months after"
         return _item(gen, {"month": m, "n": n}, f"Which month {word} {m}? ________")
+    if gen == "one_more_less":
+        n = rng.randint(max(lo, 1), min(hi, 99)); d = rng.choice(list(_.get("dirs") or ["more", "less"]))
+        return _item(gen, {"n": n, "dir": d}, f"1 {d} than {n} is ____")
+    if gen == "turns":
+        start = rng.choice(["north", "east", "south", "west"])
+        turn = rng.choice(list(_.get("turn_sizes") or ["quarter", "half", "three-quarter"]))
+        way = rng.choice(["clockwise", "counterclockwise"])
+        return _item(gen, {"start": start, "turn": turn, "way": way},
+                     f"Face {start}. Make a {turn} turn {way}. Now you face ________")
+    if gen == "capacity_cups":
+        x, y = rng.sample(["jug", "bottle", "bucket", "bowl", "mug", "teapot", "vase", "watering can", "glass", "pan"], 2)
+        a, b = rng.sample(range(max(2, lo), max(hi, lo + 3) + 1), 2)
+        ask = rng.choice(list(kw_ask)) if (kw_ask := _.get("ask")) else rng.choice(["more", "less", "diff"])
+        q = {"more": "Which holds more? ____", "less": "Which holds less? ____",
+             "diff": "How many more cups does the bigger one hold? ____"}[ask]
+        return _item(gen, {"x": x, "y": y, "a": a, "b": b, "ask": ask}, f"The {x} holds {a} cups. The {y} holds {b} cups. {q}")
+    if gen == "prime_factor":
+        while True:
+            n = rng.randint(max(lo, 6), max(hi, 12))
+            if any(n % k == 0 for k in range(2, int(n ** 0.5) + 1)) and len(solve(gen, {"n": n}).split(" × ")) >= 2:
+                return _item(gen, {"n": n}, f"Write {n} as a product of prime factors: {n} = ____________")
+    if gen == "area_trap":
+        while True:
+            a, b = sorted(rng.sample(range(2, max_side + 1), 2))
+            h = rng.randint(2, max_side)
+            if (a + b) * h % 2 == 0:
+                return _item(gen, {"a": a, "b": b, "h": h},
+                             f"A trapezoid has parallel sides of {a} cm and {b} cm and a height of {h} cm. What is its area? ____ cm²")
     if gen == "ten_more_less":
         n = rng.randint(max(lo, 11), min(hi, 89)); d = rng.choice(list(_.get("dirs") or ["more", "less"]))
         return _item(gen, {"n": n, "dir": d}, f"10 {d} than {n} is ____")

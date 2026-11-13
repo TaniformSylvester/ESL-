@@ -29,7 +29,7 @@ POINT = config.SUBJECT_COLORS["esl"]["ink"]
 GRID = "#D9DEE6"
 TEXT = config.PALETTE["text"]
 
-SUPPORTED = {"area_tri", "area_para", "angle_missing", "circle", "perimeter_quad",
+SUPPORTED = {"area_tri", "area_para", "area_trap", "angle_missing", "circle", "perimeter_quad",
              "volume_prism", "surface_area", "reflect_point", "translate_point"}
 
 
@@ -106,6 +106,22 @@ def _area_para(ax, p):
     _label(ax, W / 2, -0.32, f"{b} cm")
     _label(ax, s + 0.12, H / 2, f"{h} cm", color=ACCENT, ha="left")
     return (-0.3, W + s + 0.3), (-0.6, H + 0.25)
+
+
+def _area_trap(ax, p):
+    a, b, h = p["a"], p["b"], p["h"]           # a = short parallel side (top), b = long (bottom)
+    W, H = _fit(b, h)
+    top = W * a / b
+    x0 = (W - top) * 0.35                      # slightly off-centre, like a textbook figure
+    xs, ys = [0, W, x0 + top, x0, 0], [0, 0, H, H, 0]
+    ax.fill(xs, ys, color=FILL, zorder=1)
+    ax.plot(xs, ys, color=STROKE, lw=1.5, zorder=2)
+    ax.plot([x0, x0], [0, H], color=ACCENT, lw=1.6, ls=(0, (4, 3)), zorder=3)
+    _right_angle(ax, x0, 0, 1, 1, 0.22)
+    _label(ax, W / 2, -0.32, f"{b} cm")
+    _label(ax, x0 + top / 2, H + 0.3, f"{a} cm")
+    _label(ax, x0 + 0.12, H / 2, f"{h} cm", color=ACCENT, ha="left")
+    return (-0.3, W + 0.3), (-0.6, H + 0.6)
 
 
 def _arc(ax, cx, cy, r, a0, a1, text, color=ACCENT, label_r=None):
@@ -276,7 +292,7 @@ def _coord(ax, p):
     return (-1.0, n + 1.4), (-0.9, n + 1.4)
 
 
-_DRAW = {"area_tri": _area_tri, "area_para": _area_para, "angle_missing": _angle_missing, "circle": _circle,
+_DRAW = {"area_tri": _area_tri, "area_para": _area_para, "area_trap": _area_trap, "angle_missing": _angle_missing, "circle": _circle,
          "perimeter_quad": _perimeter_quad, "volume_prism": _box, "surface_area": _box,
          "reflect_point": _coord, "translate_point": _coord}
 # Figure width in inches = its printed width, so label sizes are true print sizes.
