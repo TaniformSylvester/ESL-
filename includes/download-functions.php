@@ -5,17 +5,29 @@
  * isMemberActive()).
  */
 
+/** Free Pro Preview credits a new account starts with (the column default in migrations/add_pro_trial_credits.sql). */
+if (!defined('PRO_TRIAL_CREDITS_TOTAL')) {
+    define('PRO_TRIAL_CREDITS_TOTAL', 3);
+}
+
 /**
  * The single source of truth for "can this resource be downloaded right
- * now" — used by both resource.php and member/download.php so they never
- * drift apart. Free resources are always downloadable — unlimited, no
- * login required. A members-only resource (is_free = 0) needs either an
- * active Pro membership or a one-time bundle purchase that includes it
- * (see includes/bundle-functions.php) — bundle access never expires, since
- * it's a purchase, not a subscription.
+ * now, without spending anything" — used by resource.php and both
+ * download endpoints so they never drift apart.
+ *
+ * Every download needs an account (lead capture). Free resources are then
+ * unlimited. A members-only resource (is_free = 0) needs an active Pro
+ * membership, a one-time bundle purchase that includes it (see
+ * includes/bundle-functions.php; bundle access never expires), or an
+ * earlier Free Pro Preview unlock of that same resource. A user who could
+ * still unlock it with a credit gets false here; see can_use_pro_trial().
  */
 function can_download_resource(array $resource): bool
 {
+    if (!is_logged_in()) {
+        return false;
+    }
+
     if (is_admin() || isMemberActive()) {
         return true;
     }
@@ -24,7 +36,115 @@ function can_download_resource(array $resource): bool
         return true;
     }
 
-    return is_logged_in() && has_bundle_access((int)$_SESSION['user_id'], (int)$resource['id']);
+    $userId = (int)$_SESSION['user_id'];
+    $resourceId = (int)$resource['id'];
+
+    return has_bundle_access($userId, $resourceId) || has_pro_trial_unlock($userId, $resourceId);
+}
+
+// -----------------------------------------------------------------------
+// FREE PRO PREVIEW CREDITS
+// -----------------------------------------------------------------------
+
+/** Remaining Free Pro Preview credits for this account (never negative). */
+function get_pro_trial_credits(int $userId): int
+{
+    $stmt = getDB()->prepare('SELECT pro_trial_credits FROM users WHERE id = ?');
+    $stmt->execute([$userId]);
+
+    return max(0, (int)$stmt->fetchColumn());
+}
+
+/** Whether this user already unlocked this members-only resource with a credit. */
+function has_pro_trial_unlock(int $userId, int $resourceId): bool
+{
+    $stmt = getDB()->prepare('SELECT 1 FROM pro_trial_unlocks WHERE user_id = ? AND resource_id = ? LIMIT 1');
+    $stmt->execute([$userId, $resourceId]);
+
+    return (bool)$stmt->fetchColumn();
+}
+
+/**
+ * Whether the logged-in user could download this resource by spending a
+ * Free Pro Preview credit: a members-only resource they aren't otherwise
+ * entitled to, a non-Pro account, and at least one credit left.
+ */
+function can_use_pro_trial(array $resource): bool
+{
+    if (!is_logged_in() || is_admin() || isMemberActive() || !empty($resource['is_free'])) {
+        return false;
+    }
+
+    if (can_download_resource($resource)) {
+        return false; // already entitled: nothing to spend
+    }
+
+    return get_pro_trial_credits((int)$_SESSION['user_id']) > 0;
+}
+
+/**
+ * Spends one credit to unlock a members-only resource for this user, and
+ * returns whether the user now has it unlocked. Server-side only (the
+ * download endpoints); never trust a client-supplied count.
+ *
+ * One transaction: the unlock row is inserted first, and its unique key
+ * means a resource is only ever charged once, even for two simultaneous
+ * requests. The decrement re-checks the balance in its own WHERE clause,
+ * so credits can never go below zero. If no credit is left, the unlock row
+ * is rolled back. An already-unlocked resource returns true without
+ * charging.
+ *
+ * $charged is set to true only when this call actually spent a credit.
+ */
+function try_unlock_with_pro_trial(int $userId, int $resourceId, ?bool &$charged = null): bool
+{
+    $charged = false;
+    $db = getDB();
+    $db->beginTransaction();
+
+    try {
+        $insert = $db->prepare('INSERT IGNORE INTO pro_trial_unlocks (user_id, resource_id) VALUES (?, ?)');
+        $insert->execute([$userId, $resourceId]);
+
+        if ($insert->rowCount() === 0) {
+            $db->commit();
+            return true; // unlocked before: no second charge
+        }
+
+        $spend = $db->prepare('UPDATE users SET pro_trial_credits = pro_trial_credits - 1 WHERE id = ? AND pro_trial_credits > 0');
+        $spend->execute([$userId]);
+
+        if ($spend->rowCount() === 0) {
+            $db->rollBack();
+            return false; // no credits left
+        }
+
+        $db->commit();
+        $charged = true;
+        return true;
+    } catch (Throwable $e) {
+        if ($db->inTransaction()) {
+            $db->rollBack();
+        }
+        error_log('Pro trial unlock failed for user #' . $userId . ', resource #' . $resourceId . ': ' . $e->getMessage());
+        return false;
+    }
+}
+
+/** Badge text, e.g. "2/3 Free Pro Preview Credits Remaining" (shared by resource.php, dashboard.php and the status API). */
+function pro_trial_credits_label(int $remaining): string
+{
+    return $remaining . '/' . PRO_TRIAL_CREDITS_TOTAL . ' Free Pro Preview Credit' . (PRO_TRIAL_CREDITS_TOTAL === 1 ? '' : 's') . ' Remaining';
+}
+
+/**
+ * Where a logged-out visitor goes to download: registration, returning to
+ * the resource page afterwards (a redirect straight to the file would leave
+ * the browser on the registration page).
+ */
+function download_signup_url(array $resource): string
+{
+    return 'register.php?redirect=' . urlencode('/resource.php?slug=' . $resource['slug']);
 }
 
 /**
@@ -111,12 +231,12 @@ function has_downloaded_resource(int $userId, int $resourceId): bool
     return (bool)$stmt->fetch();
 }
 
-function record_download(?int $userId, int $resourceId): void
+function record_download(?int $userId, int $resourceId, bool $viaProTrial = false): void
 {
     $db = getDB();
 
-    $db->prepare('INSERT INTO downloads (user_id, resource_id, ip_address) VALUES (?, ?, ?)')
-        ->execute([$userId, $resourceId, $_SERVER['REMOTE_ADDR'] ?? null]);
+    $db->prepare('INSERT INTO downloads (user_id, resource_id, ip_address, via_pro_trial) VALUES (?, ?, ?, ?)')
+        ->execute([$userId, $resourceId, $_SERVER['REMOTE_ADDR'] ?? null, $viaProTrial ? 1 : 0]);
 
     $db->prepare('UPDATE resources SET download_count = download_count + 1 WHERE id = ?')
         ->execute([$resourceId]);
@@ -161,7 +281,7 @@ function get_user_downloads(int $userId, int $page, int $perPage): array
     $offset = ($page - 1) * $perPage;
 
     $stmt = $db->prepare(
-        "SELECT d.downloaded_at, r.id AS resource_id, r.title, r.slug, r.resource_type, r.is_published, r.status
+        "SELECT d.downloaded_at, d.via_pro_trial, r.id AS resource_id, r.title, r.slug, r.resource_type, r.is_published, r.status
          FROM downloads d
          INNER JOIN resources r ON r.id = d.resource_id
          WHERE d.user_id = ?

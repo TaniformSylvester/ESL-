@@ -79,6 +79,19 @@ $availableBundles = !$canDownload ? get_published_bundles_containing_resource((i
 $resourceVideos = get_published_videos_for_resource((int)$resource['id']);
 $primaryVideo = $resourceVideos[0] ?? null;
 $isPro = $isLoggedIn && isMemberActive();
+
+// Lead capture: every download needs an account. Logged-out visitors get
+// the sign-up modal, which falls back to these links without JavaScript.
+$resourcePath = '/resource.php?slug=' . $resource['slug'];
+$signupUrl = base_url(download_signup_url($resource));
+$loginUrl = base_url('login.php?redirect=' . urlencode($resourcePath));
+
+// Free Pro Previews: only relevant to a logged-in, non-Pro account on a
+// members-only resource.
+$showProTrial = $isLoggedIn && !$isPro && !is_admin() && !$resource['is_free'];
+$proTrialCredits = $showProTrial ? get_pro_trial_credits((int)$_SESSION['user_id']) : 0;
+$canUseProTrial = $showProTrial && !$canDownload && $proTrialCredits > 0;
+$proTrialUnlocked = $showProTrial && has_pro_trial_unlock((int)$_SESSION['user_id'], (int)$resource['id']);
 $gaAccountState = !$isLoggedIn ? 'guest' : (is_admin() ? 'admin' : ($isPro ? 'pro' : 'free'));
 $isFavorited = $isLoggedIn && is_favorited((int)$_SESSION['user_id'], (int)$resource['id']);
 $previewUrl = !empty($resource['preview_image']) ? UPLOAD_PREVIEW_URL . '/' . rawurlencode($resource['preview_image']) : null;
@@ -317,37 +330,74 @@ require_once __DIR__ . '/includes/header.php';
             </dl>
 
             <div class="mt-4">
-                <?php if ($canDownload): ?>
+                <?php if ($showProTrial): ?>
+                    <p class="mb-2">
+                        <span class="badge rounded-pill bg-warning text-dark js-pro-trial-remaining"><i class="fa-solid fa-gift me-1"></i><?= e(pro_trial_credits_label($proTrialCredits)) ?></span>
+                    </p>
+                <?php endif; ?>
+
+                <?php if ($canDownload || $canUseProTrial): ?>
                     <a href="<?= e(base_url('member/download.php?id=' . (int)$resource['id'])) ?>" class="btn btn-primary btn-lg px-4 js-download-link"
                        data-resource-id="<?= (int)$resource['id'] ?>"
                        data-resource-title="<?= e($resource['title']) ?>"
                        data-is-free="<?= $resource['is_free'] ? '1' : '0' ?>"
                        data-account-state="<?= e($gaAccountState) ?>"
+                       data-pro-trial="<?= $canUseProTrial ? '1' : '0' ?>"
                        data-initial-count="<?= (int)$resource['download_count'] ?>"
                        data-csrf="<?= e(generate_csrf_token()) ?>">
-                        <i class="fa-solid fa-download me-2"></i>Download
+                        <i class="fa-solid fa-download me-2"></i><span class="js-download-label"><?= $canUseProTrial ? 'Download with a Free Pro Preview' : 'Download' ?></span>
                     </a>
-                    <?php if ($resource['is_free']): ?>
+                    <?php if ($canUseProTrial): ?>
+                        <p class="small text-secondary mt-2 mb-0 js-pro-trial-note">
+                            <i class="fa-solid fa-circle-info me-1"></i>Uses 1 credit. It unlocks this whole resource, including its additional files, and re-downloads are free.
+                            Want everything? <a href="<?= e(base_url('pricing.php')) ?>" data-ga-event="upgrade_click"
+                               data-ga-params="<?= e(json_encode(['location' => 'resource_pro_trial', 'resource_id' => (int)$resource['id']])) ?>">Upgrade to Teacher Pro</a>.
+                        </p>
+                    <?php elseif ($proTrialUnlocked): ?>
                         <p class="small text-secondary mt-2 mb-0">
-                            <i class="fa-solid fa-circle-check text-success me-1"></i>Free download &mdash; no account required.
+                            <i class="fa-solid fa-circle-check text-success me-1"></i>Unlocked with a Free Pro Preview &mdash; download it again any time.
+                        </p>
+                    <?php elseif ($resource['is_free']): ?>
+                        <p class="small text-secondary mt-2 mb-0">
+                            <i class="fa-solid fa-circle-check text-success me-1"></i>Free download &mdash; unlimited with your free account.
                         </p>
                     <?php endif; ?>
                     <p class="small text-secondary mt-2 mb-0">
                         <i class="fa-solid fa-shuffle me-1"></i>Teaching this in class? Try our free <a href="<?= e(base_url('teacher-tools.php')) ?>">Random Name Picker &amp; Timer</a>.
                     </p>
+                <?php elseif (!$isLoggedIn && $resource['is_free']): ?>
+                    <a href="<?= e($signupUrl) ?>" class="btn btn-primary btn-lg px-4"
+                       data-bs-toggle="modal" data-bs-target="#downloadSignupModal"
+                       data-ga-event="download_signup_prompt"
+                       data-ga-params="<?= e(json_encode(['resource_id' => (int)$resource['id'], 'is_free' => 1])) ?>">
+                        <i class="fa-solid fa-download me-2"></i>Download Free
+                    </a>
+                    <p class="small text-secondary mt-2 mb-0">
+                        <i class="fa-solid fa-circle-check text-success me-1"></i>Free with a TeachLuma account &mdash; it takes a minute.
+                    </p>
                 <?php else: ?>
-                    <!-- Only reachable for a members-only resource now: free
-                         resources are always downloadable, so this branch is
-                         the Pro-only gate, unchanged from before. -->
+                    <!-- Members-only resource the visitor can't download:
+                         logged out, or logged in with no Free Pro Previews left. -->
                     <div class="alert alert-warning">
                         <p class="fw-bold mb-1"><i class="fa-solid fa-lock me-1"></i> Members Only</p>
-                        <p class="mb-3">Upgrade to Teacher Pro (from <?= plan_price_tag('monthly') ?>/month) to download this resource.</p>
+                        <?php if (!$isLoggedIn): ?>
+                            <p class="mb-3">Create a free account to download this resource with one of your <?= (int)PRO_TRIAL_CREDITS_TOTAL ?> Free Pro Previews, or upgrade to Teacher Pro (from <?= plan_price_tag('monthly') ?>/month) for the whole library.</p>
+                        <?php elseif ($showProTrial && $proTrialCredits === 0): ?>
+                            <p class="mb-3">You've used all <?= (int)PRO_TRIAL_CREDITS_TOTAL ?> of your Free Pro Previews. Upgrade to Teacher Pro (from <?= plan_price_tag('monthly') ?>/month) to download this resource.</p>
+                        <?php else: ?>
+                            <p class="mb-3">Upgrade to Teacher Pro (from <?= plan_price_tag('monthly') ?>/month) to download this resource.</p>
+                        <?php endif; ?>
                         <div class="d-flex gap-2 flex-wrap">
-                            <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-primary"
+                            <?php if (!$isLoggedIn): ?>
+                                <a href="<?= e($signupUrl) ?>" class="btn btn-primary"
+                                   data-ga-event="download_signup_prompt"
+                                   data-ga-params="<?= e(json_encode(['resource_id' => (int)$resource['id'], 'is_free' => 0])) ?>">Create Free Account</a>
+                            <?php endif; ?>
+                            <a href="<?= e(base_url('pricing.php')) ?>" class="btn <?= $isLoggedIn ? 'btn-primary' : 'btn-outline-primary' ?>"
                                data-ga-event="upgrade_click"
                                data-ga-params="<?= e(json_encode(['location' => 'resource_paywall', 'resource_id' => (int)$resource['id']])) ?>">Upgrade to Pro</a>
                             <?php if (!$isLoggedIn): ?>
-                                <a href="<?= e(base_url('login.php')) ?>" class="btn btn-outline-secondary">Login</a>
+                                <a href="<?= e($loginUrl) ?>" class="btn btn-outline-secondary">Login</a>
                             <?php endif; ?>
                         </div>
                         <?php if (!empty($availableBundles)): ?>
@@ -441,9 +491,14 @@ require_once __DIR__ . '/includes/header.php';
                 <ul class="list-unstyled mb-0">
                     <?php foreach ($additionalFiles as $extraFile): ?>
                         <li class="mb-2">
-                            <?php if ($canDownload): ?>
+                            <?php if ($canDownload || $canUseProTrial): ?>
                                 <a href="<?= e(base_url('member/download-extra.php?id=' . (int)$extraFile['id'])) ?>" class="btn btn-sm btn-outline-primary">
                                     <i class="fa-solid <?= e(file_type_icon($extraFile['file_type'])) ?> me-1"></i><?= e($extraFile['label'] ?: $extraFile['file_name']) ?>
+                                    <span class="text-secondary">(<?= e(strtoupper($extraFile['file_type'])) ?>)</span>
+                                </a>
+                            <?php elseif (!$isLoggedIn && $resource['is_free']): ?>
+                                <a href="<?= e($signupUrl) ?>" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#downloadSignupModal">
+                                    <i class="fa-solid fa-lock me-1"></i><?= e($extraFile['label'] ?: $extraFile['file_name']) ?>
                                     <span class="text-secondary">(<?= e(strtoupper($extraFile['file_type'])) ?>)</span>
                                 </a>
                             <?php else: ?>
@@ -452,7 +507,35 @@ require_once __DIR__ . '/includes/header.php';
                         </li>
                     <?php endforeach; ?>
                 </ul>
+                <?php if ($canUseProTrial): ?>
+                    <p class="small text-secondary mt-2 mb-0">Downloading any of these files also uses your 1 Free Pro Preview credit for this resource (only once).</p>
+                <?php endif; ?>
             <?php endif; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <?php if (!$isLoggedIn): ?>
+    <div class="modal fade" id="downloadSignupModal" tabindex="-1" aria-labelledby="downloadSignupModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h2 class="modal-title h5 fw-bold" id="downloadSignupModalLabel">Create a free account to download</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-secondary">Your free <?= e(SITE_NAME) ?> account gives you:</p>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Unlimited downloads of every free resource</li>
+                        <li class="mb-2"><i class="fa-solid fa-gift text-warning me-2"></i><strong><?= (int)PRO_TRIAL_CREDITS_TOTAL ?> Free Pro Previews</strong> of members-only resources</li>
+                        <li class="mb-2"><i class="fa-solid fa-heart text-danger me-2"></i>Favorites and your download history</li>
+                    </ul>
+                </div>
+                <div class="modal-footer border-0 pt-0 flex-column align-items-stretch gap-2">
+                    <a href="<?= e($signupUrl) ?>" class="btn btn-primary w-100 m-0">Create Free Account</a>
+                    <a href="<?= e($loginUrl) ?>" class="btn btn-outline-secondary w-100 m-0">I already have an account &mdash; Log in</a>
+                </div>
+            </div>
         </div>
     </div>
     <?php endif; ?>

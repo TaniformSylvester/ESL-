@@ -73,7 +73,7 @@ $pageDescription = 'Free ESL, Math and Science worksheets, lesson plans, PowerPo
 $faqItems = [
     [
         'question' => 'How many resources can I download for free?',
-        'answer'   => 'Free resources are unlimited for everyone — no account required. Only members-only resources require a Teacher Pro membership.',
+        'answer'   => 'Free resources are unlimited with a free TeachLuma account, and every free account also gets 3 Free Pro Previews of members-only resources. Beyond that, members-only resources need a Teacher Pro membership.',
     ],
     [
         'question' => 'What do I get with TeachLuma Pro?',
@@ -144,7 +144,7 @@ require_once __DIR__ . '/includes/header.php';
                          fetchpriority="high" decoding="async">
                     <div class="hero-art-badge badge-a" aria-hidden="true">
                         <span class="icon-bubble tone-science"><i class="fa-solid fa-circle-check"></i></span>
-                        <span>Free to download<small>No login needed</small></span>
+                        <span>Free to download<small>With a free account</small></span>
                     </div>
                     <div class="hero-art-badge badge-b" aria-hidden="true">
                         <span class="icon-bubble tone-games"><i class="fa-solid fa-display"></i></span>
@@ -462,7 +462,7 @@ require_once __DIR__ . '/includes/header.php';
                 <div class="cta-card tone-gold">
                     <span class="icon-bubble mb-3" aria-hidden="true"><i class="fa-solid fa-crown"></i></span>
                     <h2>Free to start. Affordable to grow.</h2>
-                    <p class="mb-4">Every free resource is unlimited, no account required. When you're ready for the full members-only library, Teacher Pro is <?= plan_price_tag('monthly') ?>/month or <?= plan_price_tag('annual') ?>/year.</p>
+                    <p class="mb-4">Every free resource is unlimited with a free account, plus 3 Free Pro Previews. When you're ready for the full members-only library, Teacher Pro is <?= plan_price_tag('monthly') ?>/month or <?= plan_price_tag('annual') ?>/year.</p>
                     <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-primary">See Pricing &amp; Plans</a>
                 </div>
             </div>

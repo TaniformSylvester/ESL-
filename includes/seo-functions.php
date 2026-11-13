@@ -284,9 +284,9 @@ function generate_resources_listing_seo(array $filters, ?array $subject, ?array 
     if ($label === '' && $isFree) {
         return [
             'title'       => 'Free Teaching Resources — Worksheets & Lesson Plans',
-            'description' => 'Free ESL, Math and Science worksheets, lesson plans, PowerPoints and classroom activities. Unlimited downloads for every teacher, no account needed.',
+            'description' => 'Free ESL, Math and Science worksheets, lesson plans, PowerPoints and classroom activities. Unlimited downloads with a free teacher account.',
             'h1'          => 'Free Teaching Resources',
-            'intro'       => 'Every resource on this page is free to download, as many times as you like.',
+            'intro'       => 'Every resource on this page is free to download with a free account, as many times as you like.',
             'noindex'     => $resultCount === 0,
         ];
     }

@@ -59,8 +59,8 @@ define('PRICE_ANNUAL', 999);
 define('PLAN_DAYS', ['monthly' => 30, 'annual' => 365]);
 define('PLAN_LABELS', ['monthly' => 'Teacher Pro Monthly', 'annual' => 'Teacher Pro Annual']);
 
-// NOT currently enforced: free resources are unlimited for everyone,
-// including anonymous visitors (see can_download_resource() in
+// NOT currently enforced: free resources are unlimited for every logged-in
+// account (see can_download_resource() in
 // includes/download-functions.php). Retained, along with the dormant
 // get_free_download_usage()/try_consume_free_download() functions and the
 // users.free_downloads_* columns, only in case a future quota/rate-limit

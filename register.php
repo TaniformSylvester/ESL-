@@ -2,8 +2,14 @@
 require_once __DIR__ . '/includes/init.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/email.php';
+require_once __DIR__ . '/includes/download-functions.php';
 
 require_guest();
+
+// Where to return after signing up, e.g. the resource a logged-out visitor
+// tried to download (member/download.php sends them here). Internal paths
+// only (safe_internal_path), passed on through login.
+$redirectPath = safe_internal_path($_POST['redirect'] ?? $_GET['redirect'] ?? null, '');
 
 $errors = [];
 $old = [
@@ -30,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             send_admin_new_registration_email($newTeacher);
 
             flash_set('success', 'Your account has been created. Please log in to continue.');
-            redirect('login.php?registered=1');
+            redirect('login.php?registered=1' . ($redirectPath !== '' ? '&redirect=' . urlencode('/' . $redirectPath) : ''));
         }
 
         $errors = $result['errors'];
@@ -50,6 +56,9 @@ $pageRobots = 'noindex, follow';
 $gaCustomEvents = $_SERVER['REQUEST_METHOD'] !== 'POST'
     ? [['name' => 'registration_started', 'params' => []]]
     : [];
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' && str_starts_with($redirectPath, 'resource.php')) {
+    $gaCustomEvents[] = ['name' => 'download_login_required', 'params' => ['page' => 'register']];
+}
 
 require_once __DIR__ . '/includes/header.php';
 ?>
@@ -59,14 +68,20 @@ require_once __DIR__ . '/includes/header.php';
             <div class="card shadow-sm border-0">
                 <div class="card-body p-4 p-md-5">
                     <h1 class="h3 fw-bold mb-1">Create Your Account</h1>
-                    <p class="text-secondary mb-4">Join <?= e(SITE_NAME) ?> to browse and download teaching resources.</p>
+                    <p class="text-secondary mb-<?= str_starts_with($redirectPath, 'resource.php') ? '3' : '4' ?>">Join <?= e(SITE_NAME) ?> to browse and download teaching resources.</p>
+                    <?php if (str_starts_with($redirectPath, 'resource.php')): ?>
+                        <div class="alert alert-info small mb-4">
+                            <i class="fa-solid fa-gift me-1"></i>A free account downloads every free resource, unlimited, and includes
+                            <strong><?= (int)PRO_TRIAL_CREDITS_TOTAL ?> Free Pro Previews</strong> of members-only resources. You'll go straight back to your resource afterwards.
+                        </div>
+                    <?php endif; ?>
 
                     <?php if (!empty($errors['general'])): ?>
                         <div class="alert alert-danger"><?= e($errors['general']) ?></div>
                     <?php endif; ?>
 
                     <?php if (GOOGLE_ENABLED): ?>
-                        <a href="<?= e(base_url('google-login.php')) ?>" class="btn btn-outline-secondary w-100 py-2 mb-3 d-flex align-items-center justify-content-center gap-2">
+                        <a href="<?= e(base_url('google-login.php' . ($redirectPath !== '' ? '?redirect=' . urlencode('/' . $redirectPath) : ''))) ?>" class="btn btn-outline-secondary w-100 py-2 mb-3 d-flex align-items-center justify-content-center gap-2">
                             <i class="fa-brands fa-google"></i> Continue with Google
                         </a>
                         <div class="d-flex align-items-center gap-3 mb-3">
@@ -76,6 +91,9 @@ require_once __DIR__ . '/includes/header.php';
 
                     <form method="post" action="<?= e(base_url('register.php')) ?>" novalidate>
                         <?php csrf_field(); ?>
+                        <?php if ($redirectPath !== ''): ?>
+                            <input type="hidden" name="redirect" value="<?= e('/' . $redirectPath) ?>">
+                        <?php endif; ?>
 
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -137,7 +155,7 @@ require_once __DIR__ . '/includes/header.php';
                     </form>
 
                     <p class="text-center text-secondary mt-4 mb-0">
-                        Already have an account? <a href="<?= e(base_url('login.php')) ?>">Log in</a>
+                        Already have an account? <a href="<?= e(base_url('login.php' . ($redirectPath !== '' ? '?redirect=' . urlencode('/' . $redirectPath) : ''))) ?>">Log in</a>
                     </p>
                 </div>
             </div>

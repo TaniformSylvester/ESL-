@@ -16,17 +16,22 @@ if (!$file || !$resource || !$resource['is_published'] || $resource['status'] !=
     exit;
 }
 
-// Additional files share the same access rule as the resource's main
-// file: free resources are unlimited and require no login, so this block
-// is only reachable now for a members-only resource the visitor isn't
-// entitled to (same Pro-only gate as member/download.php).
-if (!can_download_resource($resource)) {
-    if (!is_logged_in()) {
-        redirect('login.php?redirect=' . urlencode($_SERVER['REQUEST_URI']));
-    }
+// Additional files share the main file's access rule (see
+// member/download.php): an account is always required, and a Free Pro
+// Preview credit unlocks the whole resource, so a credit spent here also
+// covers the main file and every other additional file of this resource.
+if (!is_logged_in()) {
+    flash_set('info', 'Create a free account (or log in) to download this resource.');
+    redirect(download_signup_url($resource));
+}
 
-    flash_set('warning', 'This resource is available to Teacher Pro members. Upgrade to download it.');
-    redirect('resource.php?slug=' . urlencode($resource['slug']));
+$useProTrial = false;
+if (!can_download_resource($resource)) {
+    if (!can_use_pro_trial($resource)) {
+        flash_set('warning', 'This resource is available to Teacher Pro members. Upgrade to download it.');
+        redirect('resource.php?slug=' . urlencode($resource['slug']));
+    }
+    $useProTrial = true;
 }
 
 $filePath = UPLOAD_PROTECTED_PATH . '/' . $file['file_path'];
@@ -35,6 +40,19 @@ if (!is_file($filePath)) {
     error_log("Download error: additional file missing on disk for resource #{$resource['id']}, file #{$id}: {$filePath}");
     flash_set('error', 'This file is not currently available for download. Please contact support.');
     redirect('resource.php?slug=' . urlencode($resource['slug']));
+}
+
+if ($useProTrial) {
+    $spentCredit = false;
+    if (!try_unlock_with_pro_trial((int)$_SESSION['user_id'], (int)$resource['id'], $spentCredit)) {
+        flash_set('warning', "You've used all your Free Pro Preview credits. Upgrade to Teacher Pro to download this resource.");
+        redirect('resource.php?slug=' . urlencode($resource['slug']));
+    }
+    // Additional files aren't otherwise logged, but the download that
+    // spends a credit is, so the credit always shows in download history.
+    if ($spentCredit) {
+        record_download((int)$_SESSION['user_id'], (int)$resource['id'], true);
+    }
 }
 
 $downloadName = $file['file_name'] ?: ('file-' . $id . '.' . $file['file_type']);

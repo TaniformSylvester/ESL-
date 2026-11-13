@@ -9,6 +9,8 @@
  */
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/membership.php';
+require_once __DIR__ . '/../includes/bundle-functions.php';
 require_once __DIR__ . '/../includes/resource-functions.php';
 require_once __DIR__ . '/../includes/download-functions.php';
 require_once __DIR__ . '/../includes/review-functions.php';
@@ -21,11 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// No login check here — free resources are downloadable by anonymous
-// visitors too (see includes/download-functions.php), and this endpoint
-// only reports already-recorded state, so an anonymous poll is just as
-// safe as a logged-in one. The CSRF token is session-based regardless of
-// login state, so it still protects this endpoint.
+// No login check here: this endpoint only reports already-recorded state,
+// so an anonymous poll is harmless (downloads themselves need an account;
+// see includes/download-functions.php). The CSRF token is session-based
+// regardless of login state, so it still protects this endpoint.
 if (!verify_csrf_token($_POST['csrf_token'] ?? null)) {
     http_response_code(403);
     echo json_encode(['success' => false, 'error' => 'Invalid request.']);
@@ -48,6 +49,18 @@ $myReview = $isLoggedIn ? get_user_review((int)$_SESSION['user_id'], $resourceId
 $canWriteReview = $isLoggedIn && can_review_resource((int)$_SESSION['user_id'], $resourceId);
 $reviewErrors = [];
 
+// Free Pro Preview state, so the page can update its credit badge after a
+// download that spent a credit (null when it doesn't apply).
+$proTrial = null;
+if ($isLoggedIn && !is_admin() && !isMemberActive() && !$resource['is_free']) {
+    $credits = get_pro_trial_credits((int)$_SESSION['user_id']);
+    $proTrial = [
+        'credits'  => $credits,
+        'label'    => pro_trial_credits_label($credits),
+        'unlocked' => has_pro_trial_unlock((int)$_SESSION['user_id'], $resourceId),
+    ];
+}
+
 ob_start();
 require __DIR__ . '/../includes/review-box.php';
 $reviewBoxHtml = ob_get_clean();
@@ -57,4 +70,5 @@ echo json_encode([
     'download_count'  => (int)$resource['download_count'],
     'can_review'      => $canWriteReview,
     'review_box_html' => $reviewBoxHtml,
+    'pro_trial'       => $proTrial,
 ]);

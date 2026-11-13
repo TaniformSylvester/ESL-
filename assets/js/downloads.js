@@ -51,6 +51,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     var changed = false;
 
+                    // A Free Pro Preview download: once the server confirms
+                    // the unlock, show the new credit balance and relabel
+                    // the button (re-downloads cost nothing).
+                    if (data.pro_trial && data.pro_trial.unlocked && link.dataset.proTrial === '1') {
+                        document.querySelectorAll('.js-pro-trial-remaining').forEach(function (badge) {
+                            var icon = badge.querySelector('i');
+                            badge.textContent = ' ' + data.pro_trial.label;
+                            if (icon) {
+                                badge.prepend(icon);
+                            }
+                        });
+                        var label = link.querySelector('.js-download-label');
+                        if (label) {
+                            label.textContent = 'Download';
+                        }
+                        var note = document.querySelector('.js-pro-trial-note');
+                        if (note) {
+                            note.textContent = 'Unlocked with a Free Pro Preview \u2014 download it again any time.';
+                        }
+                        link.dataset.proTrial = '0';
+                    }
+
                     if (data.download_count > knownCount) {
                         knownCount = data.download_count;
                         var countEl = document.getElementById('resource-download-count');

@@ -16,7 +16,7 @@ require_once __DIR__ . '/includes/header.php';
             <h2 class="h5 fw-bold mt-4">1. Plans</h2>
             <p><?= e(SITE_NAME) ?> offers a Free plan and a paid Teacher Pro plan (Monthly or Annual):</p>
             <ul>
-                <li><strong>Free:</strong> browse the complete resource library and download every free resource, unlimited, with no account required.</li>
+                <li><strong>Free:</strong> browse the complete resource library and download every free resource, unlimited, with a free account. Each free account also includes 3 Free Pro Preview credits, each of which unlocks one members-only resource (credits do not renew).</li>
                 <li><strong>Teacher Pro Monthly / Annual:</strong> unlimited downloads of every "Members Only" resource for as long as the membership remains active.</li>
             </ul>
 

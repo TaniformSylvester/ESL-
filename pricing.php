@@ -18,7 +18,7 @@ $yearOfMonthly = ['THB' => PRICE_MONTHLY * 12, 'USD' => round(PRICE_MONTHLY_USD 
 $upgradeParams = fn (string $where, string $plan) => e(json_encode(['location' => $where, 'plan' => $plan]));
 
 $pageTitle = 'Pricing — Free & Teacher Pro Plans';
-$pageDescription = 'Free resources are unlimited for every teacher, no account needed. Teacher Pro unlocks members-only resources for ' . plan_price_text_both('monthly') . ' a month or ' . plan_price_text_both('annual') . ' a year.';
+$pageDescription = 'Free resources are unlimited with a free account, plus 3 Free Pro Previews. Teacher Pro unlocks members-only resources for ' . plan_price_text_both('monthly') . ' a month or ' . plan_price_text_both('annual') . ' a year.';
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container py-5">
@@ -42,8 +42,9 @@ require_once __DIR__ . '/includes/header.php';
                     <ul class="list-unstyled small mb-4 flex-grow-1">
                         <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Browse the complete resource library</li>
                         <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Search and filter by subject &amp; grade</li>
-                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>Unlimited</strong> downloads of every free resource, no account required</li>
-                        <li class="mb-2 text-secondary"><i class="fa-solid fa-xmark me-2"></i>Members-only resources</li>
+                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>Unlimited</strong> downloads of every free resource</li>
+                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>3 Free Pro Previews</strong> of members-only resources</li>
+                        <li class="mb-2 text-secondary"><i class="fa-solid fa-xmark me-2"></i>Full members-only library</li>
                     </ul>
                     <?php if ($isLoggedIn): ?>
                         <a href="<?= e(base_url('dashboard.php')) ?>" class="btn btn-outline-secondary w-100">Go to Dashboard</a>
@@ -146,7 +147,7 @@ require_once __DIR__ . '/includes/header.php';
             <h2 class="h4 fw-bold mb-3">How Membership Works</h2>
             <p>Here's how it works:</p>
             <ol>
-                <li class="mb-2">Free resources are unlimited for everyone &mdash; download them right away, no account required.</li>
+                <li class="mb-2">Create a free account and download every free resource, unlimited. Your account also includes 3 Free Pro Previews of members-only resources.</li>
                 <li class="mb-2">When you're ready to unlock members-only resources, go to your <strong>Subscription</strong> page and choose Monthly or Annual.</li>
                 <?php if (STRIPE_ENABLED): ?>
                     <li class="mb-2">Pay securely by card &mdash; handled by Stripe. Your membership activates immediately once payment is confirmed, no waiting.</li>

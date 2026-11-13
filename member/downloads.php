@@ -34,7 +34,12 @@ require_once __DIR__ . '/../includes/header.php';
                     <tbody>
                         <?php foreach ($result['items'] as $row): ?>
                             <tr>
-                                <td><?= e($row['title']) ?></td>
+                                <td>
+                                    <?= e($row['title']) ?>
+                                    <?php if (!empty($row['via_pro_trial'])): ?>
+                                        <span class="badge rounded-pill bg-warning text-dark ms-1"><i class="fa-solid fa-gift me-1"></i>Pro Preview</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td class="small text-secondary"><?= e($row['resource_type']) ?></td>
                                 <td class="small text-secondary"><?= e(format_date($row['downloaded_at'], 'd M Y, g:i a')) ?></td>
                                 <td class="text-end">

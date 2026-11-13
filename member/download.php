@@ -15,18 +15,24 @@ if (!$resource || !$resource['is_published'] || $resource['status'] !== 'active'
     exit;
 }
 
-// can_download_resource() now returns true unconditionally for free
-// resources (see includes/download-functions.php), so this block is only
-// ever reachable for a members-only resource that the visitor isn't
-// entitled to — the login redirect below preserves the existing Pro-only
-// protection exactly as it was, it just no longer runs for free resources.
-if (!can_download_resource($resource)) {
-    if (!is_logged_in()) {
-        redirect('login.php?redirect=' . urlencode($_SERVER['REQUEST_URI']));
-    }
+// Every download needs an account (lead capture). A logged-out visitor is
+// sent to registration, which returns them to the resource page afterwards.
+if (!is_logged_in()) {
+    flash_set('info', 'Create a free account (or log in) to download this resource.');
+    redirect(download_signup_url($resource));
+}
 
-    flash_set('warning', 'This resource is available to Teacher Pro members. Upgrade to download it.');
-    redirect('resource.php?slug=' . urlencode($resource['slug']));
+// A members-only resource the user isn't entitled to can still be
+// downloaded by spending a Free Pro Preview credit. The credit is only
+// spent further down, once the file is confirmed to exist, so a missing
+// file never costs one.
+$useProTrial = false;
+if (!can_download_resource($resource)) {
+    if (!can_use_pro_trial($resource)) {
+        flash_set('warning', 'This resource is available to Teacher Pro members. Upgrade to download it.');
+        redirect('resource.php?slug=' . urlencode($resource['slug']));
+    }
+    $useProTrial = true;
 }
 
 if (empty($resource['file_path'])) {
@@ -43,10 +49,15 @@ if (!is_file($filePath)) {
     redirect('resource.php?slug=' . urlencode($resource['slug']));
 }
 
-// Free resources are unlimited now — no quota to consume. The visitor
-// may or may not be logged in; record_download() already accepts a null
-// user_id for an anonymous downloader (downloads.user_id is nullable).
-record_download(is_logged_in() ? (int)$_SESSION['user_id'] : null, $id);
+$userId = (int)$_SESSION['user_id'];
+$spentCredit = false;
+
+if ($useProTrial && !try_unlock_with_pro_trial($userId, $id, $spentCredit)) {
+    flash_set('warning', "You've used all your Free Pro Preview credits. Upgrade to Teacher Pro to download this resource.");
+    redirect('resource.php?slug=' . urlencode($resource['slug']));
+}
+
+record_download($userId, $id, $spentCredit);
 
 $downloadName = $resource['file_name'] ?: ($resource['slug'] . '.' . $resource['file_type']);
 $downloadName = str_replace(['"', "\r", "\n"], '', $downloadName);

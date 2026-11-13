@@ -46,7 +46,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     if (($_GET['registered'] ?? '') === '1') {
         $gaCustomEvents[] = ['name' => 'registration_completed', 'params' => []];
     }
-    if (str_starts_with($redirectPath, 'member/download.php')) {
+    if (str_starts_with($redirectPath, 'resource.php')) {
+        // Downloads now send logged-out visitors to registration with the
+        // resource page as the return path; its "Log in" link lands here.
+        $gaCustomEvents[] = ['name' => 'download_login_required', 'params' => ['page' => 'login']];
+    } elseif (str_starts_with($redirectPath, 'member/download.php')) {
         $downloadQuery = parse_url($redirectPath, PHP_URL_QUERY);
         parse_str($downloadQuery ?? '', $downloadParams);
         $gaCustomEvents[] = [
@@ -71,7 +75,7 @@ require_once __DIR__ . '/includes/header.php';
                     <?php endif; ?>
 
                     <?php if (GOOGLE_ENABLED): ?>
-                        <a href="<?= e(base_url('google-login.php?redirect=' . urlencode($redirectPath))) ?>" class="btn btn-outline-secondary w-100 py-2 mb-3 d-flex align-items-center justify-content-center gap-2">
+                        <a href="<?= e(base_url('google-login.php?redirect=' . urlencode('/' . $redirectPath))) ?>" class="btn btn-outline-secondary w-100 py-2 mb-3 d-flex align-items-center justify-content-center gap-2">
                             <i class="fa-brands fa-google"></i> Continue with Google
                         </a>
                         <div class="d-flex align-items-center gap-3 mb-3">
@@ -81,7 +85,8 @@ require_once __DIR__ . '/includes/header.php';
 
                     <form method="post" action="<?= e(base_url('login.php')) ?>" novalidate>
                         <?php csrf_field(); ?>
-                        <input type="hidden" name="redirect" value="<?= e($redirectPath) ?>">
+                        <?php // safe_internal_path() strips the leading slash; it must go back on, or the POST fails the same check and falls back to the dashboard. ?>
+                        <input type="hidden" name="redirect" value="<?= e('/' . $redirectPath) ?>">
 
                         <div class="mb-3">
                             <label class="form-label" for="email">Email</label>
@@ -100,7 +105,7 @@ require_once __DIR__ . '/includes/header.php';
                     </form>
 
                     <p class="text-center text-secondary mt-4 mb-0">
-                        Don't have an account? <a href="<?= e(base_url('register.php')) ?>">Join Now</a>
+                        Don't have an account? <a href="<?= e(base_url('register.php' . ($redirectPath !== 'dashboard.php' ? '?redirect=' . urlencode('/' . $redirectPath) : ''))) ?>">Join Now</a>
                     </p>
                 </div>
             </div>

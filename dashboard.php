@@ -10,6 +10,7 @@ require_login();
 $user = current_user();
 $membership = get_membership($user['id']) ?? ['status' => 'inactive', 'expiry_date' => null];
 $isActive = isMemberActive($user['id']);
+$proTrialCredits = $isActive ? 0 : get_pro_trial_credits((int)$user['id']);
 
 $totalResources = get_published_resource_count();
 $recentResources = get_featured_resources(4);
@@ -41,6 +42,16 @@ require_once __DIR__ . '/includes/header.php';
                     <?php else: ?>
                         <span class="badge bg-secondary mb-2">Free Plan</span>
                         <p class="small mb-1">Unlimited downloads of every free resource.</p>
+                        <p class="mb-1">
+                            <span class="badge rounded-pill bg-warning text-dark"><i class="fa-solid fa-gift me-1"></i><?= e(pro_trial_credits_label($proTrialCredits)) ?></span>
+                        </p>
+                        <p class="small mb-1">
+                            <?php if ($proTrialCredits > 0): ?>
+                                Download any members-only resource free: 1 credit per resource. <a href="<?= e(base_url('resources.php?access=members')) ?>">Browse Pro resources &rarr;</a>
+                            <?php else: ?>
+                                You've used all your Free Pro Previews.
+                            <?php endif; ?>
+                        </p>
                         <p class="small mb-0"><a href="<?= e(base_url('member/subscription.php')) ?>">Upgrade to Pro for members-only resources &rarr;</a></p>
                     <?php endif; ?>
                 </div>

@@ -32,6 +32,10 @@ CREATE TABLE IF NOT EXISTS users (
     -- and try_consume_free_download() in includes/download-functions.php.
     free_downloads_used INT UNSIGNED NOT NULL DEFAULT 0,
     free_downloads_month CHAR(7) NULL,
+    -- Free Pro Preview credits: members-only resources a non-Pro account
+    -- may still download (1 credit = 1 resource). See pro_trial_unlocks and
+    -- try_unlock_with_pro_trial() in includes/download-functions.php.
+    pro_trial_credits INT NOT NULL DEFAULT 3,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -432,11 +436,30 @@ CREATE TABLE IF NOT EXISTS downloads (
     resource_id INT UNSIGNED NOT NULL,
     downloaded_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     ip_address VARCHAR(45) NULL,
+    -- 1 on the download that spent a Free Pro Preview credit.
+    via_pro_trial TINYINT(1) NOT NULL DEFAULT 0,
     PRIMARY KEY (id),
     KEY idx_downloads_resource (resource_id),
     KEY idx_downloads_user (user_id),
     CONSTRAINT fk_downloads_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL,
     CONSTRAINT fk_downloads_resource FOREIGN KEY (resource_id) REFERENCES resources (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
+-- pro_trial_unlocks (members-only resources a non-Pro user unlocked with a
+-- Free Pro Preview credit; one row per user per resource, so re-downloads
+-- and additional files never cost a second credit)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS pro_trial_unlocks (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    user_id INT UNSIGNED NOT NULL,
+    resource_id INT UNSIGNED NOT NULL,
+    unlocked_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_pro_trial_unlocks_user_resource (user_id, resource_id),
+    KEY idx_pro_trial_unlocks_resource (resource_id),
+    CONSTRAINT fk_pro_trial_unlocks_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    CONSTRAINT fk_pro_trial_unlocks_resource FOREIGN KEY (resource_id) REFERENCES resources (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------------------------
