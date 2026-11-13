@@ -77,6 +77,8 @@ $membership = get_membership($user['id']) ?? ['status' => 'inactive', 'expiry_da
 $isActive = isMemberActive($user['id']);
 $payments = get_user_payments($user['id']);
 $pendingPayment = get_pending_payment((int)$user['id']);
+// Receipt for school expense claims: the latest paid membership payment.
+$latestPaidPayment = $isActive ? get_latest_paid_payment((int)$user['id']) : null;
 $scanOpen = $scanToPay && (($_GET['pay'] ?? '') === 'scan' || !empty($scanErrors) || !STRIPE_ENABLED);
 
 $pageTitle = 'Subscription';
@@ -108,6 +110,17 @@ require_once __DIR__ . '/../includes/header.php';
                     <span class="badge bg-success mb-2">⭐ Teacher Pro<?= !empty($membership['plan']) ? ' (' . e(ucfirst($membership['plan'])) . ')' : '' ?></span>
                     <p class="mb-0">Unlimited downloads. Active until <strong><?= e(format_date($membership['expiry_date'])) ?></strong>
                         (<?= (int)membership_days_remaining($membership) ?> days remaining)</p>
+                    <div class="mt-3">
+                    <?php if ($latestPaidPayment): ?>
+                        <a href="<?= e(base_url('member/receipt.php?id=' . (int)$latestPaidPayment['id'])) ?>" class="btn btn-outline-primary" target="_blank" rel="noopener"
+                           data-ga-event="receipt_open" data-ga-params="<?= e(json_encode(['location' => 'subscription_status'])) ?>">
+                            <i class="fa-solid fa-file-invoice me-2" aria-hidden="true"></i>Download Official School Invoice / Receipt
+                        </a>
+                        <p class="small text-secondary mt-1 mb-0">For claiming the cost from your school. Opens a printable receipt you can save as PDF.</p>
+                    <?php else: ?>
+                        <p class="small text-secondary mb-0">Need a receipt for your school? Email <a href="mailto:<?= e(CONTACT_EMAIL) ?>"><?= e(CONTACT_EMAIL) ?></a>.</p>
+                    <?php endif; ?>
+                    </div>
                 <?php else: ?>
                     <span class="badge <?= e(membership_status_badge_class($membership)) ?> mb-2">Free Plan<?= $membership['status'] === 'pending' ? ' &mdash; Payment Pending' : '' ?></span>
                     <?php if ($membership['status'] === 'pending'): ?>
@@ -300,6 +313,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <th>Method</th>
                         <th>Reference</th>
                         <th>Status</th>
+                        <th class="text-end">Receipt</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -314,6 +328,11 @@ require_once __DIR__ . '/../includes/header.php';
                                 <span class="badge <?= e(payment_status_badge_class($payment['status'])) ?>"><?= e(ucfirst($payment['status'])) ?></span>
                                 <?php if ($payment['status'] === 'rejected' && !empty($payment['admin_note'])): ?>
                                     <div class="small text-secondary mt-1"><?= e($payment['admin_note']) ?></div>
+                                <?php endif; ?>
+                            </td>
+                            <td class="text-end">
+                                <?php if ($payment['status'] === 'approved'): ?>
+                                    <a href="<?= e(base_url('member/receipt.php?id=' . (int)$payment['id'])) ?>" class="small" target="_blank" rel="noopener"><i class="fa-solid fa-file-invoice me-1" aria-hidden="true"></i>Receipt</a>
                                 <?php endif; ?>
                             </td>
                         </tr>

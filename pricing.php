@@ -17,8 +17,8 @@ $annualSavings = ['THB' => (PRICE_MONTHLY * 12) - PRICE_ANNUAL, 'USD' => round((
 $yearOfMonthly = ['THB' => PRICE_MONTHLY * 12, 'USD' => round(PRICE_MONTHLY_USD * 12, 2)];
 $upgradeParams = fn (string $where, string $plan) => e(json_encode(['location' => $where, 'plan' => $plan]));
 
-$pageTitle = 'Pricing — Free & Teacher Pro Plans';
-$pageDescription = 'Free resources are unlimited with a free account, plus 3 Free Pro Previews. Teacher Pro unlocks members-only resources for ' . plan_price_text_both('monthly') . ' a month or ' . plan_price_text_both('annual') . ' a year.';
+$pageTitle = 'Pricing — Free, Teacher Pro & School Plans';
+$pageDescription = 'Free resources are unlimited with a free account, plus 3 Free Pro Previews. Teacher Pro unlocks members-only resources for ' . plan_price_text_both('monthly') . ' a month or ' . plan_price_text_both('annual') . ' a year. School and Department Passes cover whole teams.';
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container py-5">
@@ -28,10 +28,26 @@ require_once __DIR__ . '/includes/header.php';
             TeachLuma gives teachers ready-to-use teaching resources so you can spend less time preparing and more time teaching.
         </p>
         <p class="fw-bold text-primary">Find it. Download it. Teach it.</p>
-        <?php if (STRIPE_ENABLED): ?><?= currency_switch_html() ?><?php endif; ?>
     </div>
 
-    <div class="row justify-content-center g-4 mb-5">
+    <ul class="nav nav-pills justify-content-center gap-2 mb-4" id="planTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active px-4" id="tab-teachers" data-bs-toggle="pill" data-bs-target="#plans-teachers" type="button" role="tab" aria-controls="plans-teachers" aria-selected="true">
+                <i class="fa-solid fa-user me-2" aria-hidden="true"></i>Individual Teachers
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link px-4" id="tab-schools" data-bs-toggle="pill" data-bs-target="#plans-schools" type="button" role="tab" aria-controls="plans-schools" aria-selected="false"
+                    data-ga-event="pricing_tab" data-ga-params="<?= e(json_encode(['tab' => 'schools'])) ?>">
+                <i class="fa-solid fa-school me-2" aria-hidden="true"></i>School &amp; Department Plans
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content mb-5">
+    <div class="tab-pane fade show active" id="plans-teachers" role="tabpanel" aria-labelledby="tab-teachers" tabindex="0">
+    <?php if (STRIPE_ENABLED): ?><div class="text-center mb-4"><?= currency_switch_html() ?></div><?php endif; ?>
+    <div class="row justify-content-center g-4">
         <!-- FREE -->
         <div class="col-lg-4">
             <div class="card shadow-sm border-0 h-100">
@@ -96,6 +112,85 @@ require_once __DIR__ . '/includes/header.php';
             </div>
         </div>
     </div>
+    <p class="text-center text-secondary small mt-4 mb-0">
+        <i class="fa-solid fa-school me-1" aria-hidden="true"></i>Buying for several teachers?
+        <a href="#plans-schools" class="js-show-schools">See School &amp; Department Plans</a>.
+    </p>
+    </div>
+
+    <!-- SCHOOL & DEPARTMENT PLANS -->
+    <div class="tab-pane fade" id="plans-schools" role="tabpanel" aria-labelledby="tab-schools" tabindex="0">
+        <p class="text-center text-secondary mx-auto mb-4" style="max-width:640px;">
+            One payment covers your whole team. Every teacher gets their own Teacher Pro login, and your school gets one invoice and receipt.
+        </p>
+        <div class="row justify-content-center g-4">
+            <!-- DEPARTMENT -->
+            <div class="col-lg-5">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body p-4 d-flex flex-column">
+                        <h2 class="h5 fw-bold text-uppercase text-secondary">Department Pass</h2>
+                        <p class="display-5 fw-bold text-primary mb-0"><?= e(format_money(PRICE_DEPARTMENT_USD, 'USD')) ?></p>
+                        <p class="text-secondary mb-1">per year &mdash; up to <?= (int)DEPARTMENT_PASS_SEATS ?> teachers</p>
+                        <p class="fw-bold text-success mb-4">About <?= e(format_money(round(PRICE_DEPARTMENT_USD / DEPARTMENT_PASS_SEATS, 2), 'USD')) ?> per teacher per year (vs <?= e(format_money(PRICE_ANNUAL_USD, 'USD')) ?> each)</p>
+                        <ul class="list-unstyled small mb-4 flex-grow-1">
+                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Teacher Pro for up to <strong><?= (int)DEPARTMENT_PASS_SEATS ?> teachers</strong>, each with their own login</li>
+                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>Unlimited</strong> downloads of every members-only resource</li>
+                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>ESL, Maths &amp; Science in one plan</li>
+                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>One invoice and receipt for your school</li>
+                        </ul>
+                        <a href="<?= e(base_url('contact.php?plan=department')) ?>" class="btn btn-primary w-100"
+                           data-ga-event="team_plan_click" data-ga-params="<?= e(json_encode(['plan' => 'department'])) ?>">Request a Department Pass</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCHOOL -->
+            <div class="col-lg-5">
+                <div class="card shadow border-primary h-100 position-relative" style="border-width:2px;">
+                    <span class="badge bg-warning text-dark position-absolute top-0 start-50 translate-middle px-3 py-2">🏫 WHOLE SCHOOL</span>
+                    <div class="card-body p-4 d-flex flex-column">
+                        <h2 class="h5 fw-bold text-uppercase text-primary mt-2">School Pass</h2>
+                        <p class="display-5 fw-bold text-primary mb-0"><?= e(format_money(PRICE_SCHOOL_USD, 'USD')) ?></p>
+                        <p class="text-secondary mb-1">per year &mdash; unlimited teachers</p>
+                        <p class="fw-bold text-success mb-4">Every teacher at one school</p>
+                        <ul class="list-unstyled small mb-4 flex-grow-1">
+                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Teacher Pro for <strong>every teacher</strong> at your school</li>
+                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Add new staff at any time during the year</li>
+                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>Unlimited</strong> downloads of every members-only resource</li>
+                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>One invoice and receipt for your school</li>
+                        </ul>
+                        <a href="<?= e(base_url('contact.php?plan=school')) ?>" class="btn btn-primary w-100"
+                           data-ga-event="team_plan_click" data-ga-params="<?= e(json_encode(['plan' => 'school'])) ?>">Request a School Pass</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center mt-5">
+            <div class="col-lg-8">
+                <h2 class="h5 fw-bold mb-3">How School &amp; Department Plans work</h2>
+                <ol class="mb-3">
+                    <li class="mb-2">Send us a request with your school's name and how many teachers need access.</li>
+                    <li class="mb-2">We reply with an invoice and payment details.</li>
+                    <li class="mb-2">Once it's paid, we activate Teacher Pro for 12 months on each teacher's account. Teachers just create a free account with their school email.</li>
+                </ol>
+                <p class="small text-secondary mb-0">Prices are in US dollars. Need a quote in another currency, or a plan for more than one school? <a href="<?= e(base_url('contact.php?plan=school')) ?>">Just ask</a>.</p>
+            </div>
+        </div>
+    </div>
+    </div>
+    <script>
+        // Open the School & Department tab from a #schools / #plans-schools link.
+        document.addEventListener('DOMContentLoaded', function () {
+            var tab = document.getElementById('tab-schools');
+            if (!tab || typeof bootstrap === 'undefined') { return; }
+            var show = function () { bootstrap.Tab.getOrCreateInstance(tab).show(); };
+            if (location.hash === '#schools' || location.hash === '#plans-schools') { show(); }
+            document.querySelectorAll('.js-show-schools').forEach(function (link) {
+                link.addEventListener('click', function (event) { event.preventDefault(); show(); tab.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+            });
+        });
+    </script>
 
     <!-- SUBJECT VALUE -->
     <div class="row justify-content-center mb-5">

@@ -6,6 +6,18 @@ $errors = [];
 $submitted = false;
 $old = ['name' => '', 'email' => '', 'subject' => '', 'message' => ''];
 
+// "Request a Department / School Pass" on pricing.php links here with
+// ?plan=...; prefill the form so the request arrives with what we need.
+$teamPlans = [
+    'department' => ['label' => 'Department Pass', 'size' => 'Number of teachers (up to ' . DEPARTMENT_PASS_SEATS . '):'],
+    'school'     => ['label' => 'School Pass', 'size' => 'Approximate number of teachers:'],
+];
+$teamPlan = $teamPlans[$_GET['plan'] ?? ''] ?? null;
+if ($teamPlan && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+    $old['subject'] = $teamPlan['label'] . ' request';
+    $old['message'] = "School name:\nCountry:\n" . $teamPlan['size'] . "\nYour role:\nAnything else we should know (e.g. purchase order, invoice details):\n";
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_csrf();
 

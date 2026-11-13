@@ -24,12 +24,20 @@ function get_setting(string $key, string $default = ''): string
     return ($value !== null && $value !== '') ? $value : $default;
 }
 
-/** @param array<string,string> $values setting_key => new value */
+/**
+ * Saves settings, creating any key that doesn't exist yet (settings has a
+ * unique key on setting_key), so new settings need no migration.
+ *
+ * @param array<string,string> $values setting_key => new value
+ */
 function update_settings(array $values): void
 {
-    $stmt = getDB()->prepare('UPDATE settings SET setting_value = ? WHERE setting_key = ?');
+    $stmt = getDB()->prepare(
+        'INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)
+         ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)'
+    );
 
     foreach ($values as $key => $value) {
-        $stmt->execute([$value, $key]);
+        $stmt->execute([$key, $value]);
     }
 }

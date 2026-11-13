@@ -305,3 +305,58 @@ function reject_payment(int $paymentId, int $adminId, string $note): ?array
 
     return $payment;
 }
+
+// -----------------------------------------------------------------------
+// RECEIPTS (member/receipt.php)
+// -----------------------------------------------------------------------
+
+/** "TL-2026-000123": stable, unique per payment, readable on a school expense form. */
+function receipt_number(array $payment): string
+{
+    $date = $payment['payment_date'] ?: $payment['created_at'];
+
+    return 'TL-' . date('Y', strtotime((string)$date)) . '-' . str_pad((string)(int)$payment['id'], 6, '0', STR_PAD_LEFT);
+}
+
+/**
+ * A paid (approved) payment with the buyer details a receipt needs, or
+ * null. Only the payment's own teacher, or an admin, may see it, so a
+ * guessed id never reveals someone else's receipt.
+ */
+function get_receipt_payment(int $paymentId, int $viewerId, bool $viewerIsAdmin): ?array
+{
+    $stmt = getDB()->prepare(
+        "SELECT p.*, u.first_name, u.last_name, u.email, u.school_name, u.country
+         FROM payments p
+         INNER JOIN users u ON u.id = p.user_id
+         WHERE p.id = ? AND p.status = 'approved' LIMIT 1"
+    );
+    $stmt->execute([$paymentId]);
+    $payment = $stmt->fetch();
+
+    if (!$payment || (!$viewerIsAdmin && (int)$payment['user_id'] !== $viewerId)) {
+        return null;
+    }
+
+    return $payment;
+}
+
+/** The teacher's most recent paid membership payment, for the subscription page's receipt button. */
+function get_latest_paid_payment(int $userId): ?array
+{
+    $stmt = getDB()->prepare(
+        "SELECT * FROM payments WHERE user_id = ? AND status = 'approved'
+         ORDER BY COALESCE(reviewed_at, created_at) DESC, id DESC LIMIT 1"
+    );
+    $stmt->execute([$userId]);
+
+    return $stmt->fetch() ?: null;
+}
+
+/** Line-item description, e.g. "Teacher Pro membership, Annual plan (12 months)". */
+function receipt_line_description(array $payment): string
+{
+    $plan = ($payment['plan'] ?? 'monthly') === 'annual' ? 'annual' : 'monthly';
+
+    return (PLAN_LABELS[$plan] ?? 'Teacher Pro') . ' membership (' . ($plan === 'annual' ? '12 months' : '1 month') . ')';
+}

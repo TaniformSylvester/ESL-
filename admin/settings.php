@@ -21,6 +21,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'bank_account_number'  => clean_input($_POST['bank_account_number'] ?? ''),
         'promptpay_number'     => clean_input($_POST['promptpay_number'] ?? ''),
         'payment_instructions' => clean_input($_POST['payment_instructions'] ?? ''),
+        // Printed on teachers' receipts (member/receipt.php).
+        'receipt_business_name'    => clean_input($_POST['receipt_business_name'] ?? ''),
+        'receipt_business_address' => clean_input($_POST['receipt_business_address'] ?? ''),
+        'receipt_tax_id'           => clean_input($_POST['receipt_tax_id'] ?? ''),
+        'receipt_note'             => clean_input($_POST['receipt_note'] ?? ''),
     ];
 
     if ($values['promptpay_number'] !== '' && promptpay_target($values['promptpay_number']) === null) {
@@ -55,6 +60,10 @@ $bankAccountNumber = get_setting('bank_account_number');
 $promptPayNumber = $errors ? ($values['promptpay_number'] ?? '') : get_setting('promptpay_number');
 $qrCodeImage = get_setting('qr_code_image');
 $paymentInstructions = get_setting('payment_instructions');
+$receiptBusinessName = get_setting('receipt_business_name');
+$receiptBusinessAddress = get_setting('receipt_business_address');
+$receiptTaxId = get_setting('receipt_tax_id');
+$receiptNote = get_setting('receipt_note');
 $scanToPay = $errors ? null : scan_to_pay_config();
 
 $pageTitle = 'Settings';
@@ -114,6 +123,31 @@ require_once __DIR__ . '/../includes/admin-header.php';
                             <label class="form-label" for="payment_instructions">Extra note for teachers <span class="text-secondary">(optional)</span></label>
                             <div class="form-text mt-0 mb-2">Shown under the Scan to pay steps, e.g. "Slips are checked 8am&ndash;8pm Bangkok time."</div>
                             <textarea class="form-control" id="payment_instructions" name="payment_instructions" rows="4"><?= e($paymentInstructions) ?></textarea>
+                        </div>
+                    </div>
+
+                    <h3 class="h6 fw-bold mt-5 mb-1">Receipt details</h3>
+                    <p class="text-secondary small mb-3">
+                        Printed on the receipts teachers download from their Subscription page to claim the cost from their school.
+                        Your site address and <?= e(CONTACT_EMAIL) ?> are always shown. Leave a field blank to leave it off.
+                    </p>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="receipt_business_name">Business / legal name</label>
+                            <input type="text" class="form-control" id="receipt_business_name" name="receipt_business_name" value="<?= e($receiptBusinessName) ?>" maxlength="150" placeholder="<?= e(SITE_NAME) ?>">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="receipt_tax_id">Tax ID <span class="text-secondary">(optional)</span></label>
+                            <input type="text" class="form-control" id="receipt_tax_id" name="receipt_tax_id" value="<?= e($receiptTaxId) ?>" maxlength="50">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="receipt_business_address">Business address <span class="text-secondary">(optional)</span></label>
+                            <textarea class="form-control" id="receipt_business_address" name="receipt_business_address" rows="3"><?= e($receiptBusinessAddress) ?></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="receipt_note">Note on every receipt <span class="text-secondary">(optional)</span></label>
+                            <div class="form-text mt-0 mb-2">For example your tax wording, such as whether prices include VAT. Nothing about tax is printed unless you add it here.</div>
+                            <textarea class="form-control" id="receipt_note" name="receipt_note" rows="2"><?= e($receiptNote) ?></textarea>
                         </div>
                     </div>
 

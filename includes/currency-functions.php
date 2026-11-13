@@ -28,6 +28,18 @@ if (!defined('PRICE_MONTHLY_USD')) {
 if (!defined('PRICE_ANNUAL_USD')) {
     define('PRICE_ANNUAL_USD', 29.00);
 }
+// School & Department plans (pricing.php). Sold on request, in US dollars:
+// the school contacts us, pays one invoice, and an admin activates Teacher
+// Pro on each teacher's account (Admin > Users).
+if (!defined('PRICE_DEPARTMENT_USD')) {
+    define('PRICE_DEPARTMENT_USD', 99.00);
+}
+if (!defined('PRICE_SCHOOL_USD')) {
+    define('PRICE_SCHOOL_USD', 249.00);
+}
+if (!defined('DEPARTMENT_PASS_SEATS')) {
+    define('DEPARTMENT_PASS_SEATS', 5);
+}
 // Used only to derive bundle prices in dollars from their baht price.
 if (!defined('THB_PER_USD')) {
     define('THB_PER_USD', 33);
