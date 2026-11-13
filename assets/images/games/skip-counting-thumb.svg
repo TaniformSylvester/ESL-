@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" role="img" aria-label="Skip Counting Challenge">
+  <defs>
+    <linearGradient id="scBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#5b21b6"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="225" fill="url(#scBg)"/>
+
+  <!-- soft background texture -->
+  <circle cx="30" cy="30" r="55" fill="#ffffff" opacity="0.06"/>
+  <circle cx="370" cy="200" r="60" fill="#ffffff" opacity="0.06"/>
+
+  <!-- sequence tiles: 5, 10, 15, ? -->
+  <g transform="translate(70,112)">
+    <rect x="-32" y="-38" width="64" height="76" rx="12" fill="#ffffff"/>
+    <text x="0" y="13" font-family="Arial, sans-serif" font-size="34" font-weight="800" fill="#5b21b6" text-anchor="middle">5</text>
+  </g>
+  <g transform="translate(150,112)">
+    <rect x="-32" y="-38" width="64" height="76" rx="12" fill="#ffffff"/>
+    <text x="0" y="13" font-family="Arial, sans-serif" font-size="34" font-weight="800" fill="#5b21b6" text-anchor="middle">10</text>
+  </g>
+  <g transform="translate(230,112)">
+    <rect x="-32" y="-38" width="64" height="76" rx="12" fill="#ffffff"/>
+    <text x="0" y="13" font-family="Arial, sans-serif" font-size="34" font-weight="800" fill="#5b21b6" text-anchor="middle">15</text>
+  </g>
+  <g transform="translate(320,112)">
+    <rect x="-34" y="-40" width="68" height="80" rx="14" fill="#fffbeb" stroke="#f59e0b" stroke-width="5" stroke-dasharray="8 6"/>
+    <text x="0" y="14" font-family="Arial, sans-serif" font-size="38" font-weight="800" fill="#b45309" text-anchor="middle">?</text>
+  </g>
+
+  <!-- +5 arrows between tiles -->
+  <text x="110" y="70" font-family="Arial, sans-serif" font-size="16" font-weight="800" fill="#ffffff" opacity="0.75" text-anchor="middle">+5</text>
+  <text x="190" y="70" font-family="Arial, sans-serif" font-size="16" font-weight="800" fill="#ffffff" opacity="0.75" text-anchor="middle">+5</text>
+  <text x="275" y="70" font-family="Arial, sans-serif" font-size="16" font-weight="800" fill="#ffffff" opacity="0.75" text-anchor="middle">+5</text>
+</svg>

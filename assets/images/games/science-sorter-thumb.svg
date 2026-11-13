@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" role="img" aria-label="Science Sorter">
+  <defs><linearGradient id="ssBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2EA45B"/><stop offset="100%" stop-color="#1B7A40"/></linearGradient></defs>
+  <rect width="400" height="225" fill="url(#ssBg)"/>
+  <circle cx="365" cy="32" r="62" fill="#fff" opacity=".07"/><circle cx="28" cy="198" r="52" fill="#fff" opacity=".07"/>
+  <!-- item card: leaf -->
+  <g transform="translate(200 72)">
+    <rect x="-56" y="-44" width="112" height="88" rx="18" fill="#fff"/>
+    <path d="M-20 22C-26-6-6-28 26-28C26 4 8 24-20 22Z" fill="#2EA45B"/><path d="M-20 22C-6 6 6-6 18-18" stroke="#1B7A40" stroke-width="4" stroke-linecap="round" fill="none"/>
+  </g>
+  <path d="M170 124l-40 28M230 124l40 28" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-dasharray="2 12" opacity=".9"/>
+  <!-- bins -->
+  <g transform="translate(108 178)"><path d="M-62-24h124l-10 44h-104z" fill="#fffbeb" stroke="#FBB829" stroke-width="5" stroke-linejoin="round"/>
+    <text x="0" y="6" font-family="Arial, sans-serif" font-size="19" font-weight="800" fill="#1B7A40" text-anchor="middle">LIVING</text></g>
+  <g transform="translate(292 178)"><path d="M-62-24h124l-10 44h-104z" fill="#fff" stroke="#fff" stroke-width="5" stroke-linejoin="round"/>
+    <text x="0" y="6" font-family="Arial, sans-serif" font-size="16" font-weight="800" fill="#1B7A40" text-anchor="middle">NON-LIVING</text></g>
+  <g transform="translate(62 58)"><path d="M0-22C8-8 14 0 14 8a14 14 0 0 1-28 0C-14 0-8-8 0-22z" fill="#fff" opacity=".9"/></g>
+  <g transform="translate(338 96)"><circle r="7" fill="#FBB829"/><ellipse rx="22" ry="8" fill="none" stroke="#fff" stroke-width="3"/><ellipse rx="22" ry="8" fill="none" stroke="#fff" stroke-width="3" transform="rotate(60)"/><ellipse rx="22" ry="8" fill="none" stroke="#fff" stroke-width="3" transform="rotate(-60)"/></g>
+</svg>

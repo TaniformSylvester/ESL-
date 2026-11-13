@@ -1,0 +1,1000 @@
+{
+  "version": 1,
+  "key": "tl-math-grade-2-place-value-hundreds-tens-and-ones-d2e67b75fe",
+  "meta": {
+    "subject": "math",
+    "grade": "Grade 2",
+    "category": "number-sense",
+    "topic": "Place Value: Hundreds, Tens and Ones",
+    "tier": "pro",
+    "resource_type": "Worksheet",
+    "title": "Place Value: Hundreds, Tens and Ones",
+    "description": "A complete Grade 2 place value pack for 3-digit numbers: base-ten blocks, building numbers, expanded form, digit value and comparing with >, < and =. Includes a lesson plan, worksheet, quiz, homework, flashcards, rubric, editable slides and Word files, and answer keys.",
+    "overview": "Students learn that the three digits in a number such as 346 stand for hundreds, tens and ones. They read numbers shown with base-ten blocks, build numbers from hundreds, tens and ones, write numbers in expanded form, find the value of a digit, and compare 3-digit numbers by looking at the hundreds first, then the tens, then the ones. Every answer in the pack is calculated by the generator and checked automatically.",
+    "learning_objectives": [
+      "Read and build 3-digit numbers shown as hundreds, tens and ones (with base-ten blocks and in words).",
+      "Write 3-digit numbers in expanded form and give the value of each digit.",
+      "Compare two 3-digit numbers using >, < and = by comparing hundreds, then tens, then ones."
+    ],
+    "how_to_use": [
+      "Teach the lesson with the slides and the lesson plan (base-ten blocks or drawings help a lot).",
+      "Use the worksheet for guided and independent practice in class.",
+      "Give the quiz at the end of the lesson or the next day, and score it with the answer key and rubric.",
+      "Send the homework page home for extra practice, and use the flashcards for quick daily review."
+    ],
+    "suggested_duration": "45 minutes",
+    "recommended_level": "Grade 2 (ages 7–8)",
+    "skills_practiced": "Place value, base-ten reasoning, expanded form, comparing numbers, explaining thinking",
+    "activity_ideas": [
+      "Place value race: roll three dice to make a 3-digit number, build it with blocks, then say it aloud.",
+      "Human number line: give students cards with 3-digit numbers and ask them to stand in order from least to greatest.",
+      "Greater or less: pairs each draw a card, read their numbers and decide who has the greater number."
+    ],
+    "teacher_tips": "Always say numbers in two ways: \"three hundred forty-six\" and \"3 hundreds, 4 tens and 6 ones\". Watch for numbers with a zero, such as 405, which students often write as 45.",
+    "differentiation_notes": "Support: let students use real or paper base-ten blocks and a place value chart for every question. Challenge: ask students to find all the 3-digit numbers they can make with the digits 2, 5 and 8, and put them in order.",
+    "assessment_notes": "The quiz checks every objective (20 points); the rubric describes four levels for reading numbers, expanded form and digit value, comparing numbers and explaining thinking."
+  },
+  "cover_emoji": [
+    "💯",
+    "🔟",
+    "🧮",
+    "✏️"
+  ],
+  "vocabulary": [
+    {
+      "word": "digit",
+      "emoji": "🔢",
+      "definition": "one of the symbols 0 to 9 we use to write numbers",
+      "example": "The number 472 has three digits."
+    },
+    {
+      "word": "place value",
+      "emoji": "📊",
+      "definition": "the value a digit has because of where it is in a number",
+      "example": "In 472, the 4 is worth 400."
+    },
+    {
+      "word": "hundreds",
+      "emoji": "💯",
+      "definition": "groups of one hundred; the first digit in a 3-digit number",
+      "example": "There are 4 hundreds in 472."
+    },
+    {
+      "word": "tens",
+      "emoji": "🔟",
+      "definition": "groups of ten; the middle digit in a 3-digit number",
+      "example": "There are 7 tens in 472."
+    },
+    {
+      "word": "ones",
+      "emoji": "☝️",
+      "definition": "single units; the last digit in a 3-digit number",
+      "example": "There are 2 ones in 472."
+    },
+    {
+      "word": "expanded form",
+      "emoji": "➕",
+      "definition": "a number written as the sum of the value of each digit",
+      "example": "472 = 400 + 70 + 2"
+    },
+    {
+      "word": "compare",
+      "emoji": "⚖️",
+      "definition": "to decide which number is greater, less or equal",
+      "example": "Compare 472 and 427."
+    },
+    {
+      "word": "greater than",
+      "emoji": "🐊",
+      "definition": "bigger than; we write it with the sign >",
+      "example": "472 > 427"
+    }
+  ],
+  "lesson_plan": {
+    "materials": [
+      "Base-ten blocks (or the paper blocks drawn on the worksheet)",
+      "Lesson slides (PowerPoint) and a board",
+      "Worksheet, quiz and homework pages",
+      "Flashcards (cut out before the lesson)"
+    ],
+    "stages": [
+      {
+        "name": "Warm-up",
+        "minutes": 5,
+        "steps": [
+          "Count aloud by tens from 10 to 100, then by hundreds from 100 to 900.",
+          "Ask: \"How many tens make one hundred?\" (10) and \"How many ones make one ten?\" (10)."
+        ]
+      },
+      {
+        "name": "Presentation",
+        "minutes": 10,
+        "steps": [
+          "Show 346 with base-ten blocks: 3 flats, 4 rods and 6 cubes. Say it both ways: \"three hundred forty-six\" and \"3 hundreds, 4 tens and 6 ones\".",
+          "Write 346 in a place value chart, then write it in expanded form: 300 + 40 + 6.",
+          "Show how to compare 346 and 364: the hundreds are the same, so look at the tens. 4 tens is less than 6 tens, so 346 < 364. Use the crocodile mouth: it opens toward the greater number."
+        ]
+      },
+      {
+        "name": "Guided practice",
+        "minutes": 12,
+        "steps": [
+          "Do worksheet activities 1 and 2 together. Students build each number with blocks before they write it.",
+          "Pairs complete activity 3 (expanded form). Ask two pairs to explain one answer on the board."
+        ]
+      },
+      {
+        "name": "Independent practice",
+        "minutes": 13,
+        "steps": [
+          "Students complete activities 4 and 5 on their own.",
+          "Check in with students who write numbers with a zero (such as 405) and ask them to build the number with blocks."
+        ]
+      },
+      {
+        "name": "Wrap-up",
+        "minutes": 5,
+        "steps": [
+          "Flashcard review: hold up a vocabulary card and ask students to give an example with a 3-digit number.",
+          "Exit question: \"In 507, what is the value of the 5? What does the 0 tell us?\""
+        ]
+      }
+    ],
+    "differentiation": {
+      "support": [
+        "Use base-ten blocks and a place value chart for every question.",
+        "Start with numbers that have no zeros, then add numbers like 405 and 650."
+      ],
+      "challenge": [
+        "Find all the 3-digit numbers you can make with the digits 2, 5 and 8, then order them from least to greatest.",
+        "Write a number in expanded form with the parts in a different order (6 + 300 + 40) and ask a partner to find the number."
+      ]
+    },
+    "assessment": "Use the quiz (20 points) at the end of the lesson or the next day. Score open answers with the rubric. A score of 16 or more shows the student is ready to move on to adding and subtracting within 1,000."
+  },
+  "worksheet": {
+    "title": "Hundreds, Tens and Ones",
+    "sections": [
+      {
+        "type": "math",
+        "title": "Read the blocks",
+        "instructions": "A flat is 100, a rod is 10 and a cube is 1. Write the number the blocks show.",
+        "generator": {
+          "type": "base_ten_read",
+          "count": 4,
+          "seed": 1
+        },
+        "items": [
+          {
+            "gen": "base_ten_read",
+            "params": {
+              "h": 2,
+              "t": 2,
+              "o": 5
+            },
+            "prompt": "What number do the blocks show? ____",
+            "answer": 225,
+            "render": {
+              "base10": [
+                2,
+                2,
+                5
+              ]
+            }
+          },
+          {
+            "gen": "base_ten_read",
+            "params": {
+              "h": 1,
+              "t": 3,
+              "o": 7
+            },
+            "prompt": "What number do the blocks show? ____",
+            "answer": 137,
+            "render": {
+              "base10": [
+                1,
+                3,
+                7
+              ]
+            }
+          },
+          {
+            "gen": "base_ten_read",
+            "params": {
+              "h": 3,
+              "t": 5,
+              "o": 7
+            },
+            "prompt": "What number do the blocks show? ____",
+            "answer": 357,
+            "render": {
+              "base10": [
+                3,
+                5,
+                7
+              ]
+            }
+          },
+          {
+            "gen": "base_ten_read",
+            "params": {
+              "h": 3,
+              "t": 2,
+              "o": 5
+            },
+            "prompt": "What number do the blocks show? ____",
+            "answer": 325,
+            "render": {
+              "base10": [
+                3,
+                2,
+                5
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "math",
+        "title": "Build the number",
+        "instructions": "Write the number.",
+        "generator": {
+          "type": "from_place_values",
+          "count": 6,
+          "seed": 1
+        },
+        "items": [
+          {
+            "gen": "from_place_values",
+            "params": {
+              "h": 7,
+              "t": 3,
+              "o": 7
+            },
+            "prompt": "7 hundreds, 3 tens and 7 ones = ____",
+            "answer": 737
+          },
+          {
+            "gen": "from_place_values",
+            "params": {
+              "h": 7,
+              "t": 7,
+              "o": 0
+            },
+            "prompt": "7 hundreds, 7 tens and 0 ones = ____",
+            "answer": 770
+          },
+          {
+            "gen": "from_place_values",
+            "params": {
+              "h": 7,
+              "t": 1,
+              "o": 7
+            },
+            "prompt": "7 hundreds, 1 ten and 7 ones = ____",
+            "answer": 717
+          },
+          {
+            "gen": "from_place_values",
+            "params": {
+              "h": 5,
+              "t": 5,
+              "o": 7
+            },
+            "prompt": "5 hundreds, 5 tens and 7 ones = ____",
+            "answer": 557
+          },
+          {
+            "gen": "from_place_values",
+            "params": {
+              "h": 3,
+              "t": 0,
+              "o": 3
+            },
+            "prompt": "3 hundreds, 0 tens and 3 ones = ____",
+            "answer": 303
+          },
+          {
+            "gen": "from_place_values",
+            "params": {
+              "h": 2,
+              "t": 9,
+              "o": 2
+            },
+            "prompt": "2 hundreds, 9 tens and 2 ones = ____",
+            "answer": 292
+          }
+        ]
+      },
+      {
+        "type": "math",
+        "title": "Expanded form",
+        "instructions": "Write each number in expanded form. Example: 352 = 300 + 50 + 2",
+        "generator": {
+          "type": "expanded_form",
+          "count": 6,
+          "seed": 1,
+          "digits": 3
+        },
+        "items": [
+          {
+            "gen": "expanded_form",
+            "params": {
+              "n": 483
+            },
+            "prompt": "483 = ______________",
+            "answer": "400 + 80 + 3"
+          },
+          {
+            "gen": "expanded_form",
+            "params": {
+              "n": 147
+            },
+            "prompt": "147 = ______________",
+            "answer": "100 + 40 + 7"
+          },
+          {
+            "gen": "expanded_form",
+            "params": {
+              "n": 793
+            },
+            "prompt": "793 = ______________",
+            "answer": "700 + 90 + 3"
+          },
+          {
+            "gen": "expanded_form",
+            "params": {
+              "n": 676
+            },
+            "prompt": "676 = ______________",
+            "answer": "600 + 70 + 6"
+          },
+          {
+            "gen": "expanded_form",
+            "params": {
+              "n": 593
+            },
+            "prompt": "593 = ______________",
+            "answer": "500 + 90 + 3"
+          },
+          {
+            "gen": "expanded_form",
+            "params": {
+              "n": 463
+            },
+            "prompt": "463 = ______________",
+            "answer": "400 + 60 + 3"
+          }
+        ]
+      },
+      {
+        "type": "math",
+        "title": "What is the digit worth?",
+        "instructions": "Write the value of the digit.",
+        "generator": {
+          "type": "digit_value",
+          "count": 6,
+          "seed": 1,
+          "digits": 3
+        },
+        "items": [
+          {
+            "gen": "digit_value",
+            "params": {
+              "n": 472,
+              "pos": 0
+            },
+            "prompt": "What is the value of the 4 in 472?",
+            "answer": 400,
+            "render": {
+              "underline": 0
+            }
+          },
+          {
+            "gen": "digit_value",
+            "params": {
+              "n": 134,
+              "pos": 0
+            },
+            "prompt": "What is the value of the 1 in 134?",
+            "answer": 100,
+            "render": {
+              "underline": 0
+            }
+          },
+          {
+            "gen": "digit_value",
+            "params": {
+              "n": 239,
+              "pos": 1
+            },
+            "prompt": "What is the value of the 3 in 239?",
+            "answer": 30,
+            "render": {
+              "underline": 1
+            }
+          },
+          {
+            "gen": "digit_value",
+            "params": {
+              "n": 108,
+              "pos": 2
+            },
+            "prompt": "What is the value of the 8 in 108?",
+            "answer": 8,
+            "render": {
+              "underline": 2
+            }
+          },
+          {
+            "gen": "digit_value",
+            "params": {
+              "n": 893,
+              "pos": 2
+            },
+            "prompt": "What is the value of the 3 in 893?",
+            "answer": 3,
+            "render": {
+              "underline": 2
+            }
+          },
+          {
+            "gen": "digit_value",
+            "params": {
+              "n": 931,
+              "pos": 1
+            },
+            "prompt": "What is the value of the 3 in 931?",
+            "answer": 30,
+            "render": {
+              "underline": 1
+            }
+          }
+        ]
+      },
+      {
+        "type": "math",
+        "title": "Compare the numbers",
+        "instructions": "Write >, < or = in the circle. Look at the hundreds first, then the tens, then the ones.",
+        "generator": {
+          "type": "compare",
+          "count": 6,
+          "seed": 1,
+          "lo": 100,
+          "hi": 999
+        },
+        "items": [
+          {
+            "gen": "compare",
+            "params": {
+              "a": 688,
+              "b": 742
+            },
+            "prompt": "688  ◯  742",
+            "answer": "<"
+          },
+          {
+            "gen": "compare",
+            "params": {
+              "a": 971,
+              "b": 247
+            },
+            "prompt": "971  ◯  247",
+            "answer": ">"
+          },
+          {
+            "gen": "compare",
+            "params": {
+              "a": 673,
+              "b": 800
+            },
+            "prompt": "673  ◯  800",
+            "answer": "<"
+          },
+          {
+            "gen": "compare",
+            "params": {
+              "a": 986,
+              "b": 278
+            },
+            "prompt": "986  ◯  278",
+            "answer": ">"
+          },
+          {
+            "gen": "compare",
+            "params": {
+              "a": 731,
+              "b": 468
+            },
+            "prompt": "731  ◯  468",
+            "answer": ">"
+          },
+          {
+            "gen": "compare",
+            "params": {
+              "a": 913,
+              "b": 270
+            },
+            "prompt": "913  ◯  270",
+            "answer": ">"
+          }
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "title": "Place Value Quiz",
+    "sections": [
+      {
+        "type": "multiple_choice",
+        "title": "Choose the answer",
+        "instructions": "Circle the correct answer.",
+        "items": [
+          {
+            "q": "In the number 582, which digit is in the tens place?",
+            "options": [
+              "5",
+              "8",
+              "2"
+            ],
+            "answer": "8"
+          },
+          {
+            "q": "Which number has 4 hundreds, 0 tens and 6 ones?",
+            "options": [
+              "460",
+              "406",
+              "46"
+            ],
+            "answer": "406"
+          },
+          {
+            "q": "What does the 0 in 309 tell us?",
+            "options": [
+              "there are no tens",
+              "there are no ones",
+              "there are no hundreds"
+            ],
+            "answer": "there are no tens"
+          },
+          {
+            "q": "Which number is the greatest?",
+            "options": [
+              "519",
+              "591",
+              "195"
+            ],
+            "answer": "591"
+          }
+        ]
+      },
+      {
+        "type": "math",
+        "title": "Digit value",
+        "instructions": "Write the value of the digit.",
+        "generator": {
+          "type": "digit_value",
+          "count": 4,
+          "seed": 2,
+          "digits": 3
+        },
+        "items": [
+          {
+            "gen": "digit_value",
+            "params": {
+              "n": 726,
+              "pos": 1
+            },
+            "prompt": "What is the value of the 2 in 726?",
+            "answer": 20,
+            "render": {
+              "underline": 1
+            }
+          },
+          {
+            "gen": "digit_value",
+            "params": {
+              "n": 983,
+              "pos": 1
+            },
+            "prompt": "What is the value of the 8 in 983?",
+            "answer": 80,
+            "render": {
+              "underline": 1
+            }
+          },
+          {
+            "gen": "digit_value",
+            "params": {
+              "n": 105,
+              "pos": 0
+            },
+            "prompt": "What is the value of the 1 in 105?",
+            "answer": 100,
+            "render": {
+              "underline": 0
+            }
+          },
+          {
+            "gen": "digit_value",
+            "params": {
+              "n": 567,
+              "pos": 1
+            },
+            "prompt": "What is the value of the 6 in 567?",
+            "answer": 60,
+            "render": {
+              "underline": 1
+            }
+          }
+        ]
+      },
+      {
+        "type": "math",
+        "title": "Expanded form",
+        "instructions": "Write each number in expanded form.",
+        "generator": {
+          "type": "expanded_form",
+          "count": 4,
+          "seed": 2,
+          "digits": 3
+        },
+        "items": [
+          {
+            "gen": "expanded_form",
+            "params": {
+              "n": 274
+            },
+            "prompt": "274 = ______________",
+            "answer": "200 + 70 + 4"
+          },
+          {
+            "gen": "expanded_form",
+            "params": {
+              "n": 229
+            },
+            "prompt": "229 = ______________",
+            "answer": "200 + 20 + 9"
+          },
+          {
+            "gen": "expanded_form",
+            "params": {
+              "n": 765
+            },
+            "prompt": "765 = ______________",
+            "answer": "700 + 60 + 5"
+          },
+          {
+            "gen": "expanded_form",
+            "params": {
+              "n": 257
+            },
+            "prompt": "257 = ______________",
+            "answer": "200 + 50 + 7"
+          }
+        ]
+      },
+      {
+        "type": "math",
+        "title": "Compare",
+        "instructions": "Write >, < or = in the circle.",
+        "generator": {
+          "type": "compare",
+          "count": 4,
+          "seed": 2,
+          "lo": 100,
+          "hi": 999
+        },
+        "items": [
+          {
+            "gen": "compare",
+            "params": {
+              "a": 465,
+              "b": 685
+            },
+            "prompt": "465  ◯  685",
+            "answer": "<"
+          },
+          {
+            "gen": "compare",
+            "params": {
+              "a": 173,
+              "b": 202
+            },
+            "prompt": "173  ◯  202",
+            "answer": "<"
+          },
+          {
+            "gen": "compare",
+            "params": {
+              "a": 645,
+              "b": 769
+            },
+            "prompt": "645  ◯  769",
+            "answer": "<"
+          },
+          {
+            "gen": "compare",
+            "params": {
+              "a": 858,
+              "b": 251
+            },
+            "prompt": "858  ◯  251",
+            "answer": ">"
+          }
+        ]
+      },
+      {
+        "type": "math",
+        "title": "Build the number",
+        "instructions": "Write the number.",
+        "generator": {
+          "type": "from_place_values",
+          "count": 4,
+          "seed": 2
+        },
+        "items": [
+          {
+            "gen": "from_place_values",
+            "params": {
+              "h": 4,
+              "t": 8,
+              "o": 5
+            },
+            "prompt": "4 hundreds, 8 tens and 5 ones = ____",
+            "answer": 485
+          },
+          {
+            "gen": "from_place_values",
+            "params": {
+              "h": 9,
+              "t": 7,
+              "o": 7
+            },
+            "prompt": "9 hundreds, 7 tens and 7 ones = ____",
+            "answer": 977
+          },
+          {
+            "gen": "from_place_values",
+            "params": {
+              "h": 8,
+              "t": 2,
+              "o": 3
+            },
+            "prompt": "8 hundreds, 2 tens and 3 ones = ____",
+            "answer": 823
+          },
+          {
+            "gen": "from_place_values",
+            "params": {
+              "h": 4,
+              "t": 9,
+              "o": 4
+            },
+            "prompt": "4 hundreds, 9 tens and 4 ones = ____",
+            "answer": 494
+          }
+        ]
+      }
+    ]
+  },
+  "homework": {
+    "title": "Place Value Practice at Home",
+    "sections": [
+      {
+        "type": "math",
+        "title": "Skip count",
+        "instructions": "Count by tens or hundreds. Write the missing number.",
+        "generator": {
+          "type": "skip_count",
+          "count": 4,
+          "seed": 3,
+          "factors": [
+            10,
+            100
+          ]
+        },
+        "items": [
+          {
+            "gen": "skip_count",
+            "params": {
+              "start": 0,
+              "step": 100,
+              "blank_index": 5
+            },
+            "prompt": "0,  100,  200,  300,  400,  ____",
+            "answer": 500
+          },
+          {
+            "gen": "skip_count",
+            "params": {
+              "start": 600,
+              "step": 100,
+              "blank_index": 3
+            },
+            "prompt": "600,  700,  800,  ____,  1000,  1100",
+            "answer": 900
+          },
+          {
+            "gen": "skip_count",
+            "params": {
+              "start": 200,
+              "step": 100,
+              "blank_index": 2
+            },
+            "prompt": "200,  300,  ____,  500,  600,  700",
+            "answer": 400
+          },
+          {
+            "gen": "skip_count",
+            "params": {
+              "start": 200,
+              "step": 100,
+              "blank_index": 4
+            },
+            "prompt": "200,  300,  400,  500,  ____,  700",
+            "answer": 600
+          }
+        ]
+      },
+      {
+        "type": "math",
+        "title": "Read the blocks",
+        "instructions": "Write the number the blocks show.",
+        "generator": {
+          "type": "base_ten_read",
+          "count": 3,
+          "seed": 3
+        },
+        "items": [
+          {
+            "gen": "base_ten_read",
+            "params": {
+              "h": 1,
+              "t": 3,
+              "o": 2
+            },
+            "prompt": "What number do the blocks show? ____",
+            "answer": 132,
+            "render": {
+              "base10": [
+                1,
+                3,
+                2
+              ]
+            }
+          },
+          {
+            "gen": "base_ten_read",
+            "params": {
+              "h": 2,
+              "t": 1,
+              "o": 9
+            },
+            "prompt": "What number do the blocks show? ____",
+            "answer": 219,
+            "render": {
+              "base10": [
+                2,
+                1,
+                9
+              ]
+            }
+          },
+          {
+            "gen": "base_ten_read",
+            "params": {
+              "h": 2,
+              "t": 5,
+              "o": 1
+            },
+            "prompt": "What number do the blocks show? ____",
+            "answer": 251,
+            "render": {
+              "base10": [
+                2,
+                5,
+                1
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "short_answer",
+        "title": "Think and explain",
+        "instructions": "Write your answer on the lines.",
+        "lines": 2,
+        "items": [
+          {
+            "q": "Write a 3-digit number that has 6 in the tens place.",
+            "answer": "Answers will vary. Any 3-digit number with 6 as the middle digit, such as 462 or 865."
+          },
+          {
+            "q": "Ana says 250 is greater than 205. Is she right? Explain how you know.",
+            "answer": "Yes. Both numbers have 2 hundreds, but 250 has 5 tens and 205 has 0 tens, so 250 > 205."
+          }
+        ]
+      }
+    ]
+  },
+  "rubric": {
+    "criteria": [
+      {
+        "name": "Reading and building numbers",
+        "levels": [
+          "Reads and builds every 3-digit number correctly, including numbers with zeros.",
+          "Reads and builds most numbers; one or two small mistakes.",
+          "Needs blocks or a chart to read and build most numbers.",
+          "Cannot yet read or build 3-digit numbers without help."
+        ]
+      },
+      {
+        "name": "Expanded form and digit value",
+        "levels": [
+          "Writes expanded form and digit values correctly every time.",
+          "Mostly correct; may mix up the value of one digit.",
+          "Often writes the digit instead of its value (4 instead of 40).",
+          "Does not yet connect a digit's place with its value."
+        ]
+      },
+      {
+        "name": "Comparing numbers",
+        "levels": [
+          "Compares all numbers correctly and uses >, < and = correctly.",
+          "Compares most numbers correctly; may reverse a sign once.",
+          "Compares when the hundreds are different, but not when they are the same.",
+          "Cannot yet compare 3-digit numbers."
+        ]
+      },
+      {
+        "name": "Explaining thinking",
+        "levels": [
+          "Explains clearly using the words hundreds, tens and ones.",
+          "Explains with some place value words.",
+          "Gives an answer with a very short or unclear reason.",
+          "Gives an answer with no reason."
+        ]
+      }
+    ]
+  },
+  "slides": [
+    {
+      "title": "The place value chart",
+      "emoji": "📊",
+      "bullets": [
+        "Hundreds | Tens | Ones",
+        "346 → 3 hundreds, 4 tens, 6 ones",
+        "346 = 300 + 40 + 6"
+      ]
+    },
+    {
+      "title": "Comparing numbers",
+      "emoji": "🐊",
+      "bullets": [
+        "Look at the hundreds first.",
+        "If they are the same, look at the tens, then the ones.",
+        "346 < 364 because 4 tens < 6 tens"
+      ]
+    }
+  ],
+  "social": {
+    "facebook_post": "💯 New PRO pack for Grade 2: Place Value with Hundreds, Tens and Ones!\n\nEverything you need for a full lesson: base-ten block pictures, building numbers, expanded form, digit value and comparing with >, < and =. Includes a lesson plan, worksheet, quiz, homework, picture flashcards, a 4-level rubric, editable PowerPoint slides and Word files, and full answer keys.\n\nGet it on TeachLuma 👉 teachluma.com",
+    "pinterest_title": "Grade 2 Place Value Pack: Hundreds, Tens and Ones",
+    "pinterest_description": "A complete 2nd grade place value pack for 3-digit numbers: base-ten blocks, expanded form, digit value and comparing numbers. Lesson plan, worksheet, quiz, homework, flashcards, rubric, editable slides and answer keys.",
+    "hashtags": [
+      "#TeachLuma",
+      "#PlaceValue",
+      "#Grade2Math",
+      "#2ndGradeMath",
+      "#MathWorksheets",
+      "#TeacherResources"
+    ],
+    "visual_suggestions": [
+      "Photo of real base-ten blocks next to the 'Read the blocks' worksheet page.",
+      "Carousel post: cover, worksheet page, quiz page and the crocodile 'greater than' flashcard."
+    ]
+  },
+  "spelling_allow": []
+}

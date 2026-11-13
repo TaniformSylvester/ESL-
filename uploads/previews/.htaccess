@@ -1,0 +1,11 @@
+# Preview images are public, but block any script file from ever being
+# executed here — defense in depth in case an upload bug ever let one through.
+<FilesMatch "\.(php|php\d|phtml|pht|phar|cgi|pl|py|sh)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>

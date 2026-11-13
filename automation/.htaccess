@@ -1,0 +1,9 @@
+# The resource generator runs in Claude Code sessions, never on the web
+# server. Deny all direct web access in case this folder is ever uploaded.
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>
