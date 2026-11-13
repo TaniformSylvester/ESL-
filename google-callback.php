@@ -58,7 +58,8 @@ if (!$user['is_active']) {
 login_user_session($user);
 
 if ($result['is_new']) {
-    send_welcome_email($user);
+    // Queued and sent after the redirect (see send_email_deferred()).
+    send_welcome_drip_email((int)$user['id'], $user['email'], $user['first_name']);
     send_admin_new_registration_email($user);
 }
 

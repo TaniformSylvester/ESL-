@@ -14,7 +14,7 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 
     <div class="row g-4 justify-content-center">
-        <div class="col-lg-6">
+        <div class="col-lg-6" id="name-picker">
             <div class="card shadow-sm border-0 h-100 teacher-tool-card">
                 <div class="card-body p-4">
                     <h2 class="h4 fw-bold mb-1">Random Name Picker</h2>
@@ -43,7 +43,7 @@ require_once __DIR__ . '/includes/header.php';
             </div>
         </div>
 
-        <div class="col-lg-6">
+        <div class="col-lg-6" id="classroom-timer">
             <div class="card shadow-sm border-0 h-100 teacher-tool-card">
                 <div class="card-body p-4">
                     <h2 class="h4 fw-bold mb-1">Classroom Timer</h2>

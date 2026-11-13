@@ -32,7 +32,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'last_name'  => clean_input($_POST['last_name'] ?? ''),
                 'email'      => strtolower(clean_input($_POST['email'] ?? '')),
             ];
-            send_welcome_email($newTeacher);
+            // Both are queued and sent after the redirect has gone to the
+            // browser (send_email_deferred()), so a slow mail server never
+            // delays sign-up; failures are logged to logs/php-error.log.
+            send_welcome_drip_email((int)$result['user_id'], $newTeacher['email'], $newTeacher['first_name']);
             send_admin_new_registration_email($newTeacher);
 
             flash_set('success', 'Your account has been created. Please log in to continue.');
