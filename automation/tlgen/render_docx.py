@@ -13,7 +13,7 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
 
-from . import config, illustrations, mathgen, spec as S
+from . import config, diagrams, illustrations, mathgen, spec as S
 
 
 def _rgb(hexcode):
@@ -248,6 +248,8 @@ class Doc:
                         run = cells[j].add_paragraph().add_run()
                         for _ in range(r["objects"][1]):
                             self.picture(run, illustrations.emoji_png(r["objects"][0], 120), 0.75)
+                    elif diagrams.supports(it) and diagrams.png(it):
+                        self.picture(cells[j].add_paragraph().add_run(), diagrams.png(it), 4.6 if it["gen"] in ("reflect_point", "translate_point") else 4.2)
                     elif "base10" in r:
                         png = illustrations.base10_png(*r["base10"])
                         from PIL import Image

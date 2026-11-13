@@ -13,7 +13,7 @@ import tempfile
 import zipfile
 from pathlib import Path
 
-from . import config, images, mathgen, planner, spec as S
+from . import config, diagrams, images, mathgen, planner, spec as S
 
 SCORE_MAX = {"educational_accuracy": 25, "completeness": 20, "formatting": 15, "age_appropriateness": 15,
              "visual_quality": 10, "metadata": 15}
@@ -390,7 +390,8 @@ def run(spec, pkg, *, taxonomy=None, settings=None, client=None, catalog=None):
     want_items = 30 if m["tier"] == "pro" else 12
     stages = spec["lesson_plan"]["stages"]
     visuals = json.dumps(spec, ensure_ascii=False).count('"emoji"') + sum(
-        1 for p in S.parts(spec) for sec in spec[p]["sections"] for it in sec.get("items", []) if isinstance(it, dict) and it.get("render"))
+        1 for p in S.parts(spec) for sec in spec[p]["sections"] for it in sec.get("items", [])
+        if isinstance(it, dict) and (it.get("render") or (sec["type"] == "math" and diagrams.supports(it))))
     if visuals < 3:
         warnings.append("few pictures/diagrams in the student pages")
     if aligned < len(objs):

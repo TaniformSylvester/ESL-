@@ -30,9 +30,42 @@ cron jobs, Python or extra software.
 | Editable PowerPoint lesson slides | | ✓ |
 
 The thumbnail (1200×900, the 4:3 shape of the site's resource cards) and
-the preview (1200×900) are generated from the real pages. The thumbnail title
-shrinks to fit inside a safe margin, and QC fails the package if it still
-doesn't fit.
+the preview (1200×900) are generated from the real pages:
+- **Thumbnail:** a mockup of the first student page and the lesson plan,
+  fanned with soft shadows, beside the title. The title shrinks to fit
+  inside a safe margin, and QC fails the package if it still doesn't fit.
+- **Preview:** the cover, the lesson plan and the first student page, on a
+  small stack of sheets with rounded corners and layered shadows.
+
+## How pages are drawn
+
+The PDFs are HTML/CSS printed by headless Chromium (`render_html.py`,
+`render_pdf.py`).
+- **Palette:** a warm print palette in `config.py`. Subject colours are a
+  slate blue (ESL), a muted coral (Math) and a sage green (Science), with
+  charcoal text and deep slate headings. The `ink` shades used for text
+  meet WCAG AA contrast.
+- **Callout boxes:** Teacher Tips, Vocabulary Focus and Important Notes
+  (`render_html.callout()`).
+- **Icons:** page headers and callouts use small vector icons
+  (`icons.py`, original line drawings).
+- **Emoji:** drawn from the vector Noto Color Emoji artwork
+  (`vector_emoji.py`). Each emoji is inlined as SVG, so it prints sharply at
+  any size and looks the same in every PDF viewer. The Word and PowerPoint
+  files get PNGs rasterized from the same vectors. `bootstrap.sh` fetches the
+  artwork (npm, OFL-1.1); without it, the bitmap emoji font is used.
+- **Geometry and coordinate diagrams** (`diagrams.py`, matplotlib): triangle
+  and parallelogram area, missing angles, circles, labelled squares and
+  rectangles, 3-D boxes for volume and surface area, and coordinate grids
+  for reflection and translation. Each figure is drawn to scale at its print
+  size and placed beside its question. It is vector in the PDF and a PNG in
+  Word and PowerPoint. It shows only the given values, with unknowns marked
+  "?". Questions that ask students to reason from numbers alone (classify a
+  triangle, compare fractions) get no figure, because an accurate drawing
+  would give the answer away.
+- **Other diagrams:** clocks, fraction shapes, number lines, base-ten blocks,
+  thermometers, pie charts and line plots are hand-drawn SVG
+  (`illustrations.py`).
 
 ## One-time setup
 
@@ -139,9 +172,9 @@ is uploaded. You can request regeneration from the dashboard.
 - **Accuracy:** automated checks catch structural, arithmetic, layout and
   reading-level problems. They cannot fully verify facts or teaching quality,
   which is why every resource needs your approval.
-- **Pictures:** only emoji (Noto Color Emoji, Apache 2.0/OFL) and diagrams
-  drawn by the generator, so there are no licensing worries but the visual
-  style is limited.
+- **Pictures:** only emoji (Noto Color Emoji, OFL-1.1) and diagrams drawn by
+  the generator, so there are no licensing worries but the visual style is
+  limited.
 
 ## Files
 

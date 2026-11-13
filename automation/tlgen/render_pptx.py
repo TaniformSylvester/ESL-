@@ -22,7 +22,7 @@ from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.util import Inches, Pt
 
-from . import config, illustrations, spec as S
+from . import config, diagrams, illustrations, spec as S
 
 W, H = Inches(13.333), Inches(7.5)
 WHITE = "#FFFFFF"
@@ -379,6 +379,8 @@ class Deck:
                     pic = illustrations.numberline_png(*r["numberline"])
                 elif "shape" in r:
                     pic = illustrations.shape_png(r["shape"])
+                elif diagrams.supports(it):
+                    pic = diagrams.png(it)
                 if illustrations.is_emoji(q):
                     self._pic(s, q, Inches(0.9), Inches(1.8), Inches(2.2))
                 else:

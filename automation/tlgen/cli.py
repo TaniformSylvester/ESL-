@@ -73,6 +73,9 @@ def cmd_check(a):
         ok &= bool(shutil.which(tool))
     print(("✓ " if config.EMOJI_FONT else "✗ ") + f"Noto Color Emoji: {config.EMOJI_FONT or 'missing (apt-get install fonts-noto-color-emoji)'}")
     ok &= bool(config.EMOJI_FONT)
+    from . import vector_emoji        # optional: sharper emoji; falls back to the font above
+    print(("✓ " if vector_emoji.available() else "• ") + "Vector emoji: "
+          + ("installed" if vector_emoji.available() else "not installed, PDFs use the bitmap emoji font (run bootstrap.sh)"))
     print(f"• token: {'TEACHLUMA_API_TOKEN environment variable' if config.API_TOKEN else 'network secret (added by the proxy, not visible here)'}")
     try:
         st = _client().status()

@@ -7,3 +7,5 @@ pyspellchecker==0.8.1
 fonttools==4.55.0
 brotli==1.1.0
 requests==2.32.3
+matplotlib==3.9.2
+cairosvg==2.7.1

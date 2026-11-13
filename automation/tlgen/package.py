@@ -40,7 +40,7 @@ def render(spec, out_dir: Path, compact=0):
 
     from pypdf import PdfReader
     pages = len(PdfReader(str(main)).pages)
-    thumb = images.thumbnail(spec, out_dir / "thumbnail.jpg")
+    thumb = images.thumbnail(spec, out_dir / "thumbnail.jpg", main, pages)
     thumb_fit = images.thumbnail_fits(spec, out_dir / "thumb-check")
     prev = images.preview(spec, main, pages, out_dir / "preview.jpg")
 

@@ -18,4 +18,14 @@ if [ ! -x .venv/bin/python ]; then
 fi
 .venv/bin/pip install -q -r requirements.txt
 
+# Vector emoji artwork (Noto Color Emoji, OFL-1.1) for sharp pictures in the
+# PDFs; see tlgen/vector_emoji.py. Optional: without it the bitmap emoji font is used.
+EMOJI_VER=5.3.2
+if [ ! -d .cache/noto-color-emoji/package/files ] && command -v npm >/dev/null; then
+    mkdir -p .cache/noto-color-emoji
+    (cd .cache/noto-color-emoji && npm pack -q "@fontsource/noto-color-emoji@${EMOJI_VER}" >/dev/null \
+        && tar xzf "fontsource-noto-color-emoji-${EMOJI_VER}.tgz" && rm -f package/files/*.woff "fontsource-noto-color-emoji-${EMOJI_VER}.tgz") \
+        || echo "Vector emoji not installed (npm unavailable); PDFs will use the bitmap emoji font."
+fi
+
 .venv/bin/python -m tlgen check
