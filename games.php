@@ -29,6 +29,7 @@ $gamesListSchema = [
     ], $games, array_keys($games)),
 ];
 
+$showConversionBanner = true; // sticky upgrade banner (includes/conversion-banner.php)
 require_once __DIR__ . '/includes/header.php';
 ?>
 <script type="application/ld+json"><?= json_encode($breadcrumbSchema, JSON_UNESCAPED_SLASHES) ?></script>

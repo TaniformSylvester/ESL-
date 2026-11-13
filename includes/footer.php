@@ -50,6 +50,8 @@
     </div>
 </footer>
 
+<?php if (!empty($showConversionBanner)) { require __DIR__ . '/conversion-banner.php'; } ?>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>window.APP_BASE_URL = <?= json_encode(rtrim(SITE_URL, '/')) ?>;</script>
 <script src="<?= e(versioned_asset_url('js/currency.js')) ?>"></script>

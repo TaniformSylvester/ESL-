@@ -1223,3 +1223,21 @@ function unarchive_resource(int $id): void
         "UPDATE resources SET status = 'active', redirect_resource_id = NULL, archived_at = NULL WHERE id = ?"
     )->execute([$id]);
 }
+
+/** Published, active members-only (Pro) resources: what upgrading unlocks. Used for marketing copy. */
+function get_published_members_only_count(): int
+{
+    return (int)getDB()->query("SELECT COUNT(*) FROM resources WHERE is_published = 1 AND status = 'active' AND is_free = 0")->fetchColumn();
+}
+
+/** A count rounded down for "1,200+" style copy: hundreds from 200, tens from 20, exact below that. */
+function marketing_count(int $count): string
+{
+    if ($count < 20) {
+        return number_format(max($count, 0));
+    }
+
+    $step = $count >= 200 ? 100 : 10;
+
+    return number_format((int)(floor($count / $step) * $step)) . '+';
+}

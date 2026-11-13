@@ -5,6 +5,7 @@ require_once __DIR__ . '/includes/auth.php';
 $pageTitle = 'Free Classroom Tools — Random Name Picker & Timer';
 $pageDescription = 'Free, no-login classroom tools for teachers: a random student name picker and a simple countdown timer, ready to use on any lesson.';
 $hideAds = true; // shown to the class on the projector
+$showConversionBanner = true; // sticky upgrade banner (includes/conversion-banner.php)
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container py-5">
