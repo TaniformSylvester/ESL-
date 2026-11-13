@@ -951,12 +951,19 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         return _item(gen, {"start": start, "turn": turn, "way": way},
                      f"Face {start}. Make a {turn} turn {way}. Now you face ________")
     if gen == "capacity_cups":
-        x, y = rng.sample(["jug", "bottle", "bucket", "bowl", "mug", "teapot", "vase", "watering can", "glass", "pan"], 2)
-        a, b = rng.sample(range(max(2, lo), max(hi, lo + 3) + 1), 2)
+        # Plausible sizes in cups, smallest container first, so a glass never
+        # "holds" more than a bucket.
+        sizes = {"glass": (1, 2), "mug": (1, 3), "bowl": (2, 4), "bottle": (3, 6), "teapot": (4, 6),
+                 "vase": (4, 8), "jug": (6, 10), "pan": (6, 12), "watering can": (10, 16), "bucket": (12, 20)}
+        while True:
+            x, y = rng.sample(list(sizes), 2)
+            a, b = rng.randint(*sizes[x]), rng.randint(*sizes[y])
+            if a != b and (a < b) == (list(sizes).index(x) < list(sizes).index(y)):
+                break
         ask = rng.choice(list(kw_ask)) if (kw_ask := _.get("ask")) else rng.choice(["more", "less", "diff"])
         q = {"more": "Which holds more? ____", "less": "Which holds less? ____",
              "diff": "How many more cups does the bigger one hold? ____"}[ask]
-        return _item(gen, {"x": x, "y": y, "a": a, "b": b, "ask": ask}, f"The {x} holds {a} cups. The {y} holds {b} cups. {q}")
+        return _item(gen, {"x": x, "y": y, "a": a, "b": b, "ask": ask}, f"The {x} holds {a} cup{'s' * (a != 1)}. The {y} holds {b} cup{'s' * (b != 1)}. {q}")
     if gen == "prime_factor":
         while True:
             n = rng.randint(max(lo, 6), max(hi, 12))
