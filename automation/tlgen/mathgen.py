@@ -93,6 +93,11 @@ def picto_data(theme, seed):
             return counts
 
 
+def _clock12(minutes: int) -> str:
+    h, m = divmod(minutes, 60)
+    return f"{(h - 1) % 12 + 1}:{m:02d} {'a.m.' if h < 12 else 'p.m.'}"
+
+
 def num(n) -> str:
     """Integer with a real minus sign (−5), for printing."""
     return str(n).replace("-", "−")
@@ -345,6 +350,8 @@ def solve(gen, p):
         return {"heavier": heavy, "lighter": light, "diff": abs(p["a"] - p["b"])}[p["ask"]]
     if gen == "estimate":
         r = lambda n: (n + p["place"] // 2) // p["place"] * p["place"]
+        if p["op"] == "×":
+            return _c(r(p["a"]) * r(p["b"]))
         return r(p["a"]) + r(p["b"]) if p["op"] == "+" else r(p["a"]) - r(p["b"])
     if gen == "improper_to_mixed":
         w, r = divmod(p["n"], p["d"])
@@ -379,6 +386,8 @@ def solve(gen, p):
         return " × ".join(str(x) for x in f)
     if gen == "area_trap":
         return (p["a"] + p["b"]) * p["h"] // 2
+    if gen == "time_zone":
+        return _clock12((p["h"] + (p["d"] if p["way"] == "ahead" else -p["d"])) * 60 + p["m"])
     if gen == "ten_more_less":
         return p["n"] + 10 if p["dir"] == "more" else p["n"] - 10
     if gen == "prime_check":
@@ -403,6 +412,8 @@ def solve(gen, p):
             return _dnorm(2 * r)
         if p["ask"] == "radius":
             return _dnorm(r)
+        if p["ask"] == "area":
+            return _dnorm(Decimal("3.14") * r * r)
         return _dnorm(Decimal("3.14") * 2 * r)
     if gen in ("compensate", "bridge_ten"):
         return p["a"] + p["b"]
@@ -914,7 +925,7 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
                 break
         word = "hundred" if place == 100 else "ten"
         return _item(gen, {"a": a, "b": b, "op": op, "place": place},
-                     f"Round to the nearest {word}, then estimate: {_c(a)} {'+' if op == '+' else '−'} {_c(b)} ≈ ____")
+                     f"Round to the nearest {word}, then estimate: {_c(a)} {dict([('+', '+'), ('-', '−'), ('×', '×')])[op]} {_c(b)} ≈ ____")
     if gen == "improper_to_mixed":
         d = rng.choice(list(denominators))
         while True:
@@ -976,6 +987,16 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
             if (a + b) * h % 2 == 0:
                 return _item(gen, {"a": a, "b": b, "h": h},
                              f"A trapezoid has parallel sides of {a} cm and {b} cm and a height of {h} cm. What is its area? ____ cm²")
+    if gen == "time_zone":
+        towns = ["Alvara", "Brenhill", "Coralport", "Dunvale", "Eastmere", "Fernbay", "Glenrock", "Harlow Point"]
+        while True:
+            x, y = rng.sample(towns, 2)
+            h, m = rng.randint(1, 22), rng.choice([0, 0, 15, 30, 45])
+            d, way = rng.randint(1, 9), rng.choice(["ahead", "behind"])
+            if 0 <= h + (d if way == "ahead" else -d) <= 23:
+                break
+        return _item(gen, {"x": x, "y": y, "h": h, "m": m, "d": d, "way": way},
+                     f"It is {_clock12(h * 60 + m)} in {x}. {y} is {d} hour{'s' * (d != 1)} {'ahead of' if way == 'ahead' else 'behind'} {x}. What time is it in {y}? ________")
     if gen == "ten_more_less":
         n = rng.randint(max(lo, 11), min(hi, 89)); d = rng.choice(list(_.get("dirs") or ["more", "less"]))
         return _item(gen, {"n": n, "dir": d}, f"10 {d} than {n} is ____")
@@ -1013,6 +1034,8 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
             return _item(gen, {"r": r, "ask": ask}, f"A circle has a diameter of {2 * r} cm. What is its radius? ____ cm")
         given = rng.choice(["radius", "diameter"])
         v = r if given == "radius" else 2 * r
+        if ask == "area":
+            return _item(gen, {"r": r, "ask": ask, "given": given}, f"A circle has a {given} of {v} cm. Use π ≈ 3.14. Area = ____ cm²")
         return _item(gen, {"r": r, "ask": ask, "given": given}, f"A circle has a {given} of {v} cm. Use π ≈ 3.14. Circumference = ____ cm")
     if gen == "compensate":
         a = rng.randint(max(lo, 11), min(hi, 79)); b = rng.choice(list(_.get("adds") or [9, 19, 11, 21]))
