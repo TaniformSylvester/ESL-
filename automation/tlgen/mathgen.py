@@ -904,7 +904,7 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         return _item(gen, {"b": b, "h": h}, f"A {shape} has a base of {b} cm and a height of {h} cm. What is its area? ____ cm²")
     if gen == "power":
         base = rng.randint(2, 10)
-        exp = rng.randint(2, 3 if base > 5 else 4)
+        exp = rng.randint(2, min(int(_.get("max_exp", 4)), 3 if base > 5 else 4))
         return _item(gen, {"base": base, "exp": exp}, f"{base}{str(exp).translate(SUPERSCRIPT)} = ____")
     if gen == "mass_cubes":
         x, y = rng.sample(["apple", "book", "shoe", "banana", "cup", "orange", "toy car", "potato", "brush", "lemon"], 2)
