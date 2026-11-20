@@ -1012,13 +1012,13 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
     if gen == "fdp_convert":
         to = rng.choice(list(_.get("convert_to") or ["percent", "decimal", "fraction"]))
         den = rng.choice([2, 4, 5, 10, 20, 25])
-        num = rng.choice([k for k in range(1, den) if gcd(k, den) == 1])
-        v = Fraction(num, den)
+        nm = rng.choice([k for k in range(1, den) if gcd(k, den) == 1])
+        v = Fraction(nm, den)
         if to == "fraction":
             src = rng.choice(["percent", "decimal"])
-            shown = f"{_dnorm(Decimal(num) * 100 / Decimal(den))}%" if src == "percent" else _dnorm(Decimal(num) / Decimal(den))
-            return _item(gen, {"num": num, "den": den, "to": to, "from": src}, f"Write {shown} as a fraction in simplest form. ____")
-        return _item(gen, {"num": num, "den": den, "to": to}, f"Write {num}/{den} as a {to}. ____")
+            shown = f"{_dnorm(Decimal(nm) * 100 / Decimal(den))}%" if src == "percent" else _dnorm(Decimal(nm) / Decimal(den))
+            return _item(gen, {"num": nm, "den": den, "to": to, "from": src}, f"Write {shown} as a fraction in simplest form. ____")
+        return _item(gen, {"num": nm, "den": den, "to": to}, f"Write {nm}/{den} as a {to}. ____")
     if gen == "two_step_eq":
         a, x = rng.randint(2, 9), rng.randint(1, 12); b = rng.randint(1, 20); sign = rng.choice(["+", "-"])
         if sign == "-" and a * x - b < 0:
