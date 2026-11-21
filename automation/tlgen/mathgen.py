@@ -1256,7 +1256,7 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         return _item(gen, {"day": day, "n": n}, f"Today is {day}. What day will it be in {n} {'day' if n == 1 else 'days'}? ________")
     if gen == "frac_of":
         d = rng.choice([2, 3, 4, 5, 6, 8, 10]) if not _.get("denoms") else rng.choice(list(_.get("denoms")))
-        n = 1 if _.get("unit") else rng.choice([k for k in range(2 if _.get("nonunit") else 1, d) if gcd(k, d) == 1] or [1])
+        n = 1 if (unit is True or _.get("unit")) else rng.choice([k for k in range(2 if _.get("nonunit") else 1, d) if gcd(k, d) == 1] or [1])
         total = d * rng.randint(2, 12)
         one, many = rng.choice(_things(_))
         return _item(gen, {"n": n, "d": d, "total": total}, f"What is {n}/{d} of {total} {many}? ____ {many}")
