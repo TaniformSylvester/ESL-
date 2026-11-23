@@ -95,3 +95,26 @@ Turn the limit on in **Admin → Settings → Free downloads** (e.g. 2 per month
 - [ ] Switch the currency to USD → prices on the card, the nudge and the cap box all change to dollars
 - [ ] Phone width (≈390px) → the comparison table fits without sideways scrolling
 
+## Welcome Drip Emails & Unsubscribe
+
+Run `migrations/add_email_drip.sql` first. To test timing without waiting days, adjust a test account's `created_at` (and `drip_stepN_sent_at`) in phpMyAdmin, then run `php cron/send-drip-emails.php` by hand.
+
+- [ ] New Free-plan account, `created_at` 25 hours ago → cron sends the Day 1 email (3 popular free resources, classroom games link); Admin → Users → that user shows "Day 1 … sent"
+- [ ] Run the cron again straight away → nothing new is sent to that account
+- [ ] `created_at` 4 days ago and Day 1 sent over 24 hours ago → the Day 3 email arrives ("How to save 5 hours of lesson prep this week")
+- [ ] `created_at` 8 days ago and Day 3 sent over 24 hours ago → the Day 7 email arrives with prices: Country "Thailand" shows ฿199/฿999, another country shows $5.99/$29, and an empty country shows both
+- [ ] Day 3 sent less than 24 hours ago → the Day 7 email waits for the next run after the gap
+- [ ] Not sent to: an active or pending Teacher Pro member, an admin, a deactivated account, a bundle buyer (while `DRIP_SKIP_BUNDLE_BUYERS` is true), an account older than 14 days, or an account created less than 24 hours ago
+- [ ] A Pro membership that expired yesterday → treated as Free plan again
+- [ ] Every drip email's footer has an "Unsubscribe" link; Gmail/Outlook also show their own "Unsubscribe" button (List-Unsubscribe header)
+- [ ] Click the unsubscribe link → "You're unsubscribed" page without logging in; Admin shows "Unsubscribed" with the time; later drip steps are no longer sent
+- [ ] "Keep sending me teaching tips" on that page → subscribed again
+- [ ] Altered or old link (`/unsubscribe.php?token=abc`) → "This unsubscribe link isn't valid", nothing changes
+- [ ] Unsubscribed account requests a password reset → the reset email still arrives (same for payment and membership emails)
+- [ ] My Profile → Email Preferences switch off/on → the same opt-out flag changes; Admin → Users → a user → "Unsubscribe from tips & offers" works and is written to the admin log
+- [ ] Admin → Users shows the drip summary (Day 1/3/7 sent, unsubscribed)
+- [ ] `DRIP_EMAILS_ENABLED` set to false → the cron prints "switched off" and sends nothing
+- [ ] Start two cron runs at the same time → the second prints "another run is still in progress"
+- [ ] More due accounts than `DRIP_BATCH_SIZE` (40) → one run sends 40, the next run sends the rest
+- [ ] Opening `/cron/send-drip-emails.php` in a browser without the token → 403 Forbidden
+

@@ -14,8 +14,13 @@
  * $bodyText is optional: when given, the message is sent as
  * multipart/alternative (HTML plus plain text), which reads better in
  * text-only clients and helps deliverability.
+ *
+ * $extraHeaders is optional and only accepts the List-Unsubscribe headers
+ * (used by promotional email, see includes/drip-functions.php), as
+ * 'Name' => 'value'. Anything else, or any value containing a line
+ * break, is dropped, so a caller can never inject headers.
  */
-function send_email(string $to, string $subject, string $bodyHtml, ?string $bodyText = null): bool
+function send_email(string $to, string $subject, string $bodyHtml, ?string $bodyText = null, array $extraHeaders = []): bool
 {
     // Extension point: when SMTP_ENABLED is turned on in config.php, wire a
     // real SMTP client here (e.g. PHPMailer). For now, and for most cPanel
@@ -37,6 +42,13 @@ function send_email(string $to, string $subject, string $bodyHtml, ?string $body
         'MIME-Version: 1.0',
         'From: ' . SMTP_FROM_NAME . ' <' . SMTP_FROM_EMAIL . '>',
     ];
+
+    foreach ($extraHeaders as $name => $value) {
+        if (in_array($name, ['List-Unsubscribe', 'List-Unsubscribe-Post'], true)
+            && is_string($value) && $value !== '' && !preg_match('/[\r\n]/', $value)) {
+            $headers[] = $name . ': ' . $value;
+        }
+    }
 
     if ($bodyText !== null) {
         $boundary = 'tl_' . bin2hex(random_bytes(12));

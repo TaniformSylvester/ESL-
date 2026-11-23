@@ -4,6 +4,7 @@ require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/admin-functions.php';
 require_once __DIR__ . '/../includes/membership.php';
 require_once __DIR__ . '/../includes/download-functions.php';
+require_once __DIR__ . '/../includes/drip-functions.php';
 
 require_admin();
 $admin = current_user();
@@ -61,6 +62,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         log_admin_action($admin['id'], 'reset_membership', "Reset user #{$userId} membership");
         flash_set('success', 'Membership reset to inactive.');
         redirect('admin/user.php?id=' . $userId);
+    } elseif ($action === 'set_marketing_opt_out') {
+        // For support requests ("please stop the emails"); transactional
+        // email (password resets, receipts) is unaffected either way.
+        $optOut = ($_POST['opt_out'] ?? '') === '1';
+        set_marketing_opt_out($userId, $optOut);
+        log_admin_action($admin['id'], $optOut ? 'marketing_opt_out' : 'marketing_opt_in', "User #{$userId}");
+        flash_set('success', $optOut ? 'Unsubscribed from tips and offers.' : 'Subscribed to tips and offers again.');
+        redirect('admin/user.php?id=' . $userId);
     } elseif ($action === 'cancel_membership') {
         cancel_membership($userId);
         log_admin_action($admin['id'], 'cancel_membership', "Cancelled user #{$userId} membership");
@@ -73,6 +82,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $membership = ['status' => $user['membership_status'] ?? 'inactive', 'expiry_date' => $user['membership_expiry'] ?? null];
 $downloadHistory = get_user_downloads($userId, 1, 10);
+// Welcome drip / marketing status (null until migrations/add_email_drip.sql has been run).
+$dripReady = array_key_exists('drip_stage', $user);
+$dripSteps = [1 => 'Day 1 — free lessons & games', 2 => 'Day 3 — save hours of prep', 3 => 'Day 7 — Teacher Pro invitation'];
 
 $pageTitle = 'User: ' . $user['first_name'] . ' ' . $user['last_name'];
 require_once __DIR__ . '/../includes/admin-header.php';
@@ -198,6 +210,43 @@ require_once __DIR__ . '/../includes/admin-header.php';
                     <input type="hidden" name="action" value="reset_membership">
                     <button type="submit" class="btn btn-sm btn-outline-danger">Reset Membership</button>
                 </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-body">
+                <h2 class="h5 fw-bold mb-3">Marketing Emails</h2>
+                <?php if (!$dripReady): ?>
+                    <p class="text-secondary small mb-0">Run <code>migrations/add_email_drip.sql</code> to enable the welcome drip and unsubscribe tracking.</p>
+                <?php else: ?>
+                    <p class="mb-2">Tips &amp; offers:
+                        <?php if ($user['marketing_opt_out']): ?>
+                            <span class="badge bg-secondary">Unsubscribed</span>
+                            <?php if (!empty($user['marketing_opt_out_at'])): ?><span class="small text-secondary">since <?= e(format_date($user['marketing_opt_out_at'], 'd M Y, g:i a')) ?></span><?php endif; ?>
+                        <?php else: ?>
+                            <span class="badge bg-success">Subscribed</span>
+                        <?php endif; ?>
+                    </p>
+                    <p class="small text-secondary mb-2">Welcome drip: <?= (int)$user['drip_stage'] ?> of 3 sent<?= DRIP_EMAILS_ENABLED ? '' : ' &middot; <strong>drip switched off in config</strong>' ?></p>
+                    <ul class="list-unstyled small mb-3">
+                        <?php foreach ($dripSteps as $step => $label): ?>
+                            <?php $sentAt = $user['drip_step' . $step . '_sent_at'] ?? null; ?>
+                            <li class="mb-1 d-flex justify-content-between border-bottom pb-1">
+                                <span><?= e($label) ?></span>
+                                <span class="<?= $sentAt ? '' : 'text-secondary' ?>"><?= $sentAt ? e(format_date($sentAt, 'd M Y, g:i a')) : 'Not sent' ?></span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                    <form method="post" action="<?= e(base_url('admin/user.php?id=' . $userId)) ?>">
+                        <?php csrf_field(); ?>
+                        <input type="hidden" name="action" value="set_marketing_opt_out">
+                        <input type="hidden" name="opt_out" value="<?= $user['marketing_opt_out'] ? '0' : '1' ?>">
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">
+                            <?= $user['marketing_opt_out'] ? 'Resubscribe to tips & offers' : 'Unsubscribe from tips & offers' ?>
+                        </button>
+                    </form>
+                    <p class="small text-secondary mt-2 mb-0">Account emails (password resets, receipts, membership notices) are always sent.</p>
+                <?php endif; ?>
             </div>
         </div>
 

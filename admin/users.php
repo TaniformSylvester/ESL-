@@ -3,6 +3,7 @@ require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/admin-functions.php';
 require_once __DIR__ . '/../includes/membership.php';
+require_once __DIR__ . '/../includes/drip-functions.php';
 
 require_admin();
 
@@ -14,9 +15,32 @@ $filters = [
 $page = max(1, (int)($_GET['page'] ?? 1));
 $result = get_users_paginated($filters, $page, ADMIN_ROWS_PER_PAGE);
 
+try {
+    $dripStats = get_drip_stats();
+} catch (Throwable $e) {
+    $dripStats = null; // migrations/add_email_drip.sql not run yet
+}
+
 $pageTitle = 'Users';
 require_once __DIR__ . '/../includes/admin-header.php';
 ?>
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body py-3">
+        <div class="d-flex flex-wrap align-items-center gap-3 small">
+            <strong>Welcome drip emails</strong>
+            <?php if ($dripStats === null): ?>
+                <span class="text-secondary">Run <code>migrations/add_email_drip.sql</code> to turn them on.</span>
+            <?php else: ?>
+                <span class="badge <?= DRIP_EMAILS_ENABLED ? 'bg-success' : 'bg-secondary' ?>"><?= DRIP_EMAILS_ENABLED ? 'On' : 'Off (config)' ?></span>
+                <span>Day 1 sent: <strong><?= (int)$dripStats['step1'] ?></strong></span>
+                <span>Day 3 sent: <strong><?= (int)$dripStats['step2'] ?></strong></span>
+                <span>Day 7 sent: <strong><?= (int)$dripStats['step3'] ?></strong></span>
+                <span>Unsubscribed: <strong><?= (int)$dripStats['opted_out'] ?></strong></span>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
 <form method="get" action="<?= e(base_url('admin/users.php')) ?>" class="row g-2 mb-4">
     <div class="col-md-4">
         <input type="text" name="search" class="form-control" placeholder="Search name, email, school&hellip;" value="<?= e($filters['search']) ?>">

@@ -36,12 +36,24 @@ CREATE TABLE IF NOT EXISTS users (
     -- may still download (1 credit = 1 resource). See pro_trial_unlocks and
     -- try_unlock_with_pro_trial() in includes/download-functions.php.
     pro_trial_credits INT NOT NULL DEFAULT 3,
+    -- Welcome drip (cron/send-drip-emails.php): last step sent (0-3) and when.
+    drip_stage TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    drip_step1_sent_at DATETIME NULL,
+    drip_step2_sent_at DATETIME NULL,
+    drip_step3_sent_at DATETIME NULL,
+    -- Promotional email opt-out (drip etc.). Transactional email is unaffected.
+    -- email_unsubscribe_token is the secret in /unsubscribe.php?token=... links.
+    marketing_opt_out TINYINT(1) NOT NULL DEFAULT 0,
+    marketing_opt_out_at DATETIME NULL,
+    email_unsubscribe_token CHAR(64) NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY uq_users_email (email),
     UNIQUE KEY uq_users_google_id (google_id),
-    KEY idx_users_role (role)
+    UNIQUE KEY uq_users_unsubscribe_token (email_unsubscribe_token),
+    KEY idx_users_role (role),
+    KEY idx_users_drip (drip_stage, marketing_opt_out, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------------------------

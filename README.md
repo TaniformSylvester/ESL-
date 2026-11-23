@@ -162,6 +162,20 @@ https://www.yourdomain.com/cron/expire-memberships.php?token=YOUR_RANDOM_SECRET
 ```
 Without a matching token, that URL returns `403 Forbidden` to anyone else who requests it.
 
+### Welcome drip emails (hourly)
+
+`cron/send-drip-emails.php` sends three promotional emails to **Free-plan** teachers: Day 1 (free lessons and classroom games), Day 3 (worksheet vs. Complete Lesson Pack) and Day 7 (Teacher Pro invitation). Active or pending Pro members, admins, deactivated accounts, bundle buyers (configurable) and anyone who unsubscribed are skipped. Every email has a one-click unsubscribe link (`/unsubscribe.php?token=...`); unsubscribing never stops password resets, receipts or membership emails.
+
+1. Run `migrations/add_email_drip.sql` in phpMyAdmin first.
+2. In cPanel **Cron Jobs**, add (once per hour):
+   ```
+   0 * * * * /usr/local/bin/php /home/YOUR_CPANEL_USERNAME/public_html/cron/send-drip-emails.php >/dev/null 2>&1
+   ```
+   Use the PHP path your host recommends if `/usr/local/bin/php` is not right (e.g. `/usr/local/bin/ea-php83`). URL-based cron works the same way as above: `https://www.yourdomain.com/cron/send-drip-emails.php?token=YOUR_RANDOM_SECRET`.
+3. Switches and limits are the `DRIP_*` settings in `config/config.php`: `DRIP_EMAILS_ENABLED` (on/off), `DRIP_BATCH_SIZE` (max emails per run, default 40) and `DRIP_SEND_PAUSE_MS`, the step delays, `DRIP_MAX_SIGNUP_AGE_DAYS` and `DRIP_SKIP_BUNDLE_BUYERS`.
+
+Overlapping runs exit immediately (a lock file in `logs/`), and each step is claimed in the database before sending, so no teacher ever gets the same step twice. Send counts and each teacher's status are under **Admin → Users**.
+
 ---
 
 ## 8. Sample Data

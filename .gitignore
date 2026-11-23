@@ -1,5 +1,6 @@
-# Runtime logs
+# Runtime logs and cron lock files
 /logs/*.log
+/logs/*.lock
 
 # User-uploaded content — directory structure (.gitkeep, .htaccess) is
 # tracked, but files uploaded through the app at runtime are not.

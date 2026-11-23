@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/drip-functions.php';
 
 require_login();
 $user = current_user();
@@ -45,6 +46,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form'] ?? '') === 'passwor
 
     $passwordErrors = $result['errors'];
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['form'] ?? '') === 'email_prefs') {
+    require_csrf();
+    // Promotional email only; account emails are always sent.
+    set_marketing_opt_out((int)$user['id'], empty($_POST['marketing_emails']));
+    flash_set('success', 'Your email preferences have been saved.');
+    redirect('member/profile.php');
+}
+
+$marketingOptOut = get_marketing_opt_out((int)$user['id']);
 
 $pageTitle = 'My Profile';
 require_once __DIR__ . '/../includes/header.php';
@@ -143,6 +154,24 @@ require_once __DIR__ . '/../includes/header.php';
                     </form>
                 </div>
             </div>
+
+            <?php if ($marketingOptOut !== null): ?>
+            <div class="card shadow-sm border-0 mt-4">
+                <div class="card-body">
+                    <h2 class="h5 fw-bold mb-3">Email Preferences</h2>
+                    <form method="post" action="<?= e(base_url('member/profile.php')) ?>">
+                        <?php csrf_field(); ?>
+                        <input type="hidden" name="form" value="email_prefs">
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" role="switch" id="marketing_emails" name="marketing_emails" value="1" <?= $marketingOptOut ? '' : 'checked' ?>>
+                            <label class="form-check-label" for="marketing_emails">Teaching tips, new resources and offers</label>
+                        </div>
+                        <p class="form-text mt-0 mb-3">Account emails such as password resets, payment receipts and membership notices are always sent.</p>
+                        <button type="submit" class="btn btn-outline-primary btn-sm">Save Preferences</button>
+                    </form>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

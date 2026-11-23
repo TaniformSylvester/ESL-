@@ -77,6 +77,25 @@ define('FREE_DOWNLOAD_MONTHLY_LIMIT', 5);
 define('MEMBERSHIP_EXPIRY_REMINDER_DAYS', 3); // how many days before expiry_date to send the renewal reminder
 
 // -----------------------------------------------------------------------
+// WELCOME DRIP EMAILS (cron/send-drip-emails.php, run hourly)
+// -----------------------------------------------------------------------
+// Three promotional emails for Free-plan teachers: Day 1, Day 3 and Day 7
+// after sign-up. Never sent to active or pending Teacher Pro members,
+// admins, deactivated accounts or anyone who unsubscribed. Every email has
+// a one-click unsubscribe link. Needs migrations/add_email_drip.sql.
+define('DRIP_EMAILS_ENABLED', true);           // false = the cron sends nothing
+define('DRIP_STEP_DELAY_HOURS', [1 => 24, 2 => 72, 3 => 168]); // hours after sign-up
+define('DRIP_MIN_GAP_HOURS', 24);              // never two drip emails to one teacher within this many hours
+define('DRIP_MAX_SIGNUP_AGE_DAYS', 14);        // accounts older than this are never sent a drip email
+define('DRIP_SKIP_BUNDLE_BUYERS', true);       // true = no drip for anyone who bought a bundle
+// Shared-hosting mail limits: at most DRIP_BATCH_SIZE emails per cron run
+// (so per hour when run hourly), with a pause between sends. Many cPanel
+// hosts allow 100-500 emails/hour in total; keep room for receipts,
+// password resets and other site email.
+define('DRIP_BATCH_SIZE', 40);
+define('DRIP_SEND_PAUSE_MS', 300);
+
+// -----------------------------------------------------------------------
 // SESSION
 // -----------------------------------------------------------------------
 define('SESSION_NAME', 'esl_teacher_hub_session');
