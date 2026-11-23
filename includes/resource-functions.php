@@ -1241,3 +1241,35 @@ function marketing_count(int $count): string
 
     return number_format((int)(floor($count / $step) * $step)) . '+';
 }
+
+/**
+ * A published members-only Complete Lesson Pack for the same subject and
+ * grade (same topic preferred), to suggest as the fuller Pro version of a
+ * free resource on resource.php's Free vs. Pro card. Returns null when
+ * nothing suitable exists, in which case the card just links to pricing.
+ */
+function get_pro_pack_suggestion(array $resource): ?array
+{
+    if (empty($resource['subject_id']) || empty($resource['grade_level'])) {
+        return null;
+    }
+
+    $stmt = getDB()->prepare(
+        "SELECT r.id, r.title, r.slug
+         FROM resources r
+         WHERE r.is_published = 1 AND r.status = 'active' AND r.is_free = 0
+           AND r.resource_type = 'Complete Lesson Pack'
+           AND r.subject_id = ? AND r.grade_level = ? AND r.id != ?
+         ORDER BY (CASE WHEN r.topic IS NOT NULL AND r.topic = ? THEN 1 ELSE 0 END) DESC,
+                  r.download_count DESC, r.created_at DESC
+         LIMIT 1"
+    );
+    $stmt->execute([
+        (int)$resource['subject_id'],
+        (string)$resource['grade_level'],
+        (int)$resource['id'],
+        (string)($resource['topic'] ?? ''),
+    ]);
+
+    return $stmt->fetch() ?: null;
+}

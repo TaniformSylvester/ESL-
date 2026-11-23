@@ -74,7 +74,7 @@ require_once __DIR__ . '/includes/header.php';
                     <p class="text-secondary mb-<?= str_starts_with($redirectPath, 'resource.php') ? '3' : '4' ?>">Join <?= e(SITE_NAME) ?> to browse and download teaching resources.</p>
                     <?php if (str_starts_with($redirectPath, 'resource.php')): ?>
                         <div class="alert alert-info small mb-4">
-                            <i class="fa-solid fa-gift me-1"></i>A free account downloads every free resource, unlimited, and includes
+                            <i class="fa-solid fa-gift me-1"></i>A free account downloads free resources (<?= e(free_download_allowance_inline()) ?>) and includes
                             <strong><?= (int)PRO_TRIAL_CREDITS_TOTAL ?> Free Pro Previews</strong> of members-only resources. You'll go straight back to your resource afterwards.
                         </div>
                     <?php endif; ?>

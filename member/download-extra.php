@@ -34,6 +34,14 @@ if (!can_download_resource($resource)) {
     $useProTrial = true;
 }
 
+// Free-plan soft monthly limit: an additional file belongs to its resource,
+// so it is covered by the same monthly download (see member/download.php).
+$freeQuota = free_download_quota_state($resource);
+if ($freeQuota !== null && !$freeQuota['allowed']) {
+    flash_set('warning', $freeQuota['message']);
+    redirect('resource.php?slug=' . urlencode($resource['slug']) . '&limit=1');
+}
+
 $filePath = UPLOAD_PROTECTED_PATH . '/' . $file['file_path'];
 
 if (!is_file($filePath)) {
@@ -52,6 +60,21 @@ if ($useProTrial) {
     // spends a credit is, so the credit always shows in download history.
     if ($spentCredit) {
         record_download((int)$_SESSION['user_id'], (int)$resource['id'], true);
+    }
+}
+
+if (!$useProTrial) {
+    $countedFree = false;
+    if (!try_claim_free_download($resource, $countedFree)) {
+        flash_set('warning', free_download_usage_message(get_free_download_usage((int)$_SESSION['user_id'])));
+        redirect('resource.php?slug=' . urlencode($resource['slug']) . '&limit=1');
+    }
+    // As with a Free Pro Preview credit, the download that uses up one of
+    // the month's free downloads is logged, so the resource then counts as
+    // downloaded this month (re-downloads and the main file stay free) and
+    // shows in download history.
+    if ($countedFree) {
+        record_download((int)$_SESSION['user_id'], (int)$resource['id']);
     }
 }
 

@@ -126,7 +126,12 @@ require_once __DIR__ . '/../includes/header.php';
                     <?php if ($membership['status'] === 'pending'): ?>
                         <p class="mb-0">Your payment is awaiting approval. This usually takes less than a day.</p>
                     <?php else: ?>
-                        <p class="mb-1">You're on the Free plan. You can download every free resource, unlimited, no restrictions.</p>
+                        <?php if (free_download_limit_enabled()): ?>
+                            <?php $freeUsage = get_free_download_usage((int)$_SESSION['user_id']); ?>
+                            <p class="mb-1">You're on the Free plan. You can download up to <?= (int)$freeUsage['limit'] ?> free resources a month (<?= (int)$freeUsage['used'] ?> used so far this month).</p>
+                        <?php else: ?>
+                            <p class="mb-1">You're on the Free plan. You can download every free resource, unlimited, no restrictions.</p>
+                        <?php endif; ?>
                         <p class="mb-0 text-secondary small">Upgrade to Teacher Pro below to also unlock members-only resources.</p>
                     <?php endif; ?>
                 <?php endif; ?>

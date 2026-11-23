@@ -41,7 +41,12 @@ require_once __DIR__ . '/includes/header.php';
                         <p class="small mb-0">Unlimited downloads. Expires <?= e(format_date($membership['expiry_date'])) ?></p>
                     <?php else: ?>
                         <span class="badge bg-secondary mb-2">Free Plan</span>
-                        <p class="small mb-1">Unlimited downloads of every free resource.</p>
+                        <?php if (free_download_limit_enabled()): ?>
+                            <?php $freeUsage = get_free_download_usage((int)$_SESSION['user_id']); ?>
+                            <p class="small mb-1">Free downloads this month: <strong><?= (int)$freeUsage['used'] ?> of <?= (int)$freeUsage['limit'] ?></strong> used.</p>
+                        <?php else: ?>
+                            <p class="small mb-1">Unlimited downloads of every free resource.</p>
+                        <?php endif; ?>
                         <p class="mb-1">
                             <span class="badge rounded-pill bg-warning text-dark"><i class="fa-solid fa-gift me-1"></i><?= e(pro_trial_credits_label($proTrialCredits)) ?></span>
                         </p>

@@ -6,6 +6,9 @@ require_once __DIR__ . '/../includes/settings-functions.php';
 require_once __DIR__ . '/../includes/upload-functions.php';
 require_once __DIR__ . '/../includes/promptpay-functions.php';
 require_once __DIR__ . '/../includes/payment-functions.php';
+require_once __DIR__ . '/../includes/membership.php';
+require_once __DIR__ . '/../includes/bundle-functions.php';
+require_once __DIR__ . '/../includes/download-functions.php';
 
 require_admin();
 $admin = current_user();
@@ -26,7 +29,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'receipt_business_address' => clean_input($_POST['receipt_business_address'] ?? ''),
         'receipt_tax_id'           => clean_input($_POST['receipt_tax_id'] ?? ''),
         'receipt_note'             => clean_input($_POST['receipt_note'] ?? ''),
+        // Free-plan soft monthly download limit (see includes/download-functions.php).
+        'free_download_limit_enabled' => !empty($_POST['free_download_limit_enabled']) ? '1' : '0',
+        'free_download_monthly_limit' => trim((string)($_POST['free_download_monthly_limit'] ?? '')),
     ];
+
+    if (!ctype_digit($values['free_download_monthly_limit'])
+        || (int)$values['free_download_monthly_limit'] < 1
+        || (int)$values['free_download_monthly_limit'] > 1000) {
+        $errors['free_download_monthly_limit'] = 'Enter a whole number from 1 to 1000.';
+    }
 
     if ($values['promptpay_number'] !== '' && promptpay_target($values['promptpay_number']) === null) {
         $errors['promptpay_number'] = 'Enter a 10-digit mobile number (e.g. 081 234 5678) or a 13-digit ID card / tax ID number.';
@@ -48,7 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         update_settings($values);
-        log_admin_action($admin['id'], 'update_settings', 'Updated payment settings');
+        log_admin_action($admin['id'], 'update_settings', 'Updated payment, receipt and free download settings'
+            . ' (free download limit ' . ($values['free_download_limit_enabled'] === '1' ? 'on, ' . (int)$values['free_download_monthly_limit'] . '/month' : 'off') . ')');
         flash_set('success', 'Settings updated.');
         redirect('admin/settings.php');
     }
@@ -65,6 +78,8 @@ $receiptBusinessAddress = get_setting('receipt_business_address');
 $receiptTaxId = get_setting('receipt_tax_id');
 $receiptNote = get_setting('receipt_note');
 $scanToPay = $errors ? null : scan_to_pay_config();
+$freeLimitEnabled = $errors ? ($values['free_download_limit_enabled'] === '1') : free_download_limit_enabled();
+$freeLimitValue = $errors ? $values['free_download_monthly_limit'] : (string)free_download_monthly_limit();
 
 $pageTitle = 'Settings';
 require_once __DIR__ . '/../includes/admin-header.php';
@@ -148,6 +163,28 @@ require_once __DIR__ . '/../includes/admin-header.php';
                             <label class="form-label" for="receipt_note">Note on every receipt <span class="text-secondary">(optional)</span></label>
                             <div class="form-text mt-0 mb-2">For example your tax wording, such as whether prices include VAT. Nothing about tax is printed unless you add it here.</div>
                             <textarea class="form-control" id="receipt_note" name="receipt_note" rows="2"><?= e($receiptNote) ?></textarea>
+                        </div>
+                    </div>
+
+                    <h3 class="h6 fw-bold mt-5 mb-1">Free downloads</h3>
+                    <p class="text-secondary small mb-3">
+                        A soft monthly limit on <strong>free</strong> resources for Free-plan accounts. Every download already needs an account.
+                        Teacher Pro members, admins, bundle buyers (for their bundle's resources) and Free Pro Preview unlocks are never limited,
+                        and re-downloading a resource already downloaded this month is never counted again. Counts reset on the 1st of each month.
+                    </p>
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="free_download_limit_enabled" name="free_download_limit_enabled" value="1" <?= $freeLimitEnabled ? 'checked' : '' ?>>
+                                <label class="form-check-label" for="free_download_limit_enabled">Limit free downloads per month</label>
+                            </div>
+                            <div class="form-text">Off = free resources are unlimited for every account.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="free_download_monthly_limit">Free downloads per month</label>
+                            <input type="number" class="form-control <?= isset($errors['free_download_monthly_limit']) ? 'is-invalid' : '' ?>" id="free_download_monthly_limit" name="free_download_monthly_limit"
+                                   value="<?= e($freeLimitValue) ?>" min="1" max="1000" step="1" inputmode="numeric">
+                            <?php if (isset($errors['free_download_monthly_limit'])): ?><div class="invalid-feedback d-block"><?= e($errors['free_download_monthly_limit']) ?></div><?php endif; ?>
                         </div>
                     </div>
 

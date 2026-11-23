@@ -35,6 +35,16 @@ if (!can_download_resource($resource)) {
     $useProTrial = true;
 }
 
+// Free-plan soft monthly limit (only when switched on; see
+// free_download_quota_state()). Checked before anything else so a blocked
+// visitor gets a clear explanation; the download is only counted further
+// down, once the file is confirmed to exist.
+$freeQuota = free_download_quota_state($resource);
+if ($freeQuota !== null && !$freeQuota['allowed']) {
+    flash_set('warning', $freeQuota['message']);
+    redirect('resource.php?slug=' . urlencode($resource['slug']) . '&limit=1');
+}
+
 if (empty($resource['file_path'])) {
     error_log("Download error: resource #{$id} has no file_path set");
     flash_set('error', 'This resource is not currently available for download.');
@@ -55,6 +65,13 @@ $spentCredit = false;
 if ($useProTrial && !try_unlock_with_pro_trial($userId, $id, $spentCredit)) {
     flash_set('warning', "You've used all your Free Pro Preview credits. Upgrade to Teacher Pro to download this resource.");
     redirect('resource.php?slug=' . urlencode($resource['slug']));
+}
+
+// try_claim_free_download() re-checks the limit atomically, so two
+// simultaneous requests can't both use the last download of the month.
+if (!$useProTrial && !try_claim_free_download($resource)) {
+    flash_set('warning', free_download_usage_message(get_free_download_usage($userId)));
+    redirect('resource.php?slug=' . urlencode($resource['slug']) . '&limit=1');
 }
 
 record_download($userId, $id, $spentCredit);

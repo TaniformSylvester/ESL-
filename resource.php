@@ -93,6 +93,17 @@ $proTrialCredits = $showProTrial ? get_pro_trial_credits((int)$_SESSION['user_id
 $canUseProTrial = $showProTrial && !$canDownload && $proTrialCredits > 0;
 $proTrialUnlocked = $showProTrial && has_pro_trial_unlock((int)$_SESSION['user_id'], (int)$resource['id']);
 $gaAccountState = !$isLoggedIn ? 'guest' : (is_admin() ? 'admin' : ($isPro ? 'pro' : 'free'));
+
+// Free-plan soft monthly limit (null when it doesn't apply: switched off,
+// logged out, Pro, admin, bundle, or a members-only resource).
+$freeQuota = $isLoggedIn ? free_download_quota_state($resource) : null;
+$freeQuotaBlocked = $freeQuota !== null && !$freeQuota['allowed'];
+// Whether the download buttons should be live links right now.
+$canFetchFiles = ($canDownload && !$freeQuotaBlocked) || $canUseProTrial;
+// Upgrade prompts (comparison card, post-download nudge) are for guests and
+// Free-plan accounts only; never shown to Pro members or admins.
+$showUpgradePrompts = !$isPro && !is_admin();
+$proPackSuggestion = ($showUpgradePrompts && $resource['is_free']) ? get_pro_pack_suggestion($resource) : null;
 $isFavorited = $isLoggedIn && is_favorited((int)$_SESSION['user_id'], (int)$resource['id']);
 $previewUrl = !empty($resource['preview_image']) ? UPLOAD_PREVIEW_URL . '/' . rawurlencode($resource['preview_image']) : null;
 $thumbUrl = !empty($resource['thumbnail']) ? UPLOAD_THUMBNAIL_URL . '/' . rawurlencode($resource['thumbnail']) : null;
@@ -135,8 +146,6 @@ $pageTitle = generate_resource_seo_title($resource);
 $pageDescription = generate_resource_seo_description($resource);
 $pageImage = $displayImage ?? asset_url('images/og-image-icon.png');
 
-// quota_blocked no longer applies (free downloads are unlimited) and is
-// intentionally not emitted here anymore — see includes/download-functions.php.
 $gaCustomEvents = [[
     'name'   => 'resource_view',
     'params' => [
@@ -147,6 +156,10 @@ $gaCustomEvents = [[
         'is_free'        => (bool)$resource['is_free'],
     ],
 ]];
+if ($freeQuotaBlocked && isset($_GET['limit'])) {
+    // Arrived here because a download was refused by the monthly limit.
+    $gaCustomEvents[] = ['name' => 'quota_blocked', 'params' => ['resource_id' => (int)$resource['id']]];
+}
 
 $breadcrumbItems = [['name' => 'Resources', 'url' => base_url('resources.php')]];
 if (!empty($resource['subject_name'])) {
@@ -336,7 +349,7 @@ require_once __DIR__ . '/includes/header.php';
                     </p>
                 <?php endif; ?>
 
-                <?php if ($canDownload || $canUseProTrial): ?>
+                <?php if ($canFetchFiles): ?>
                     <a href="<?= e(base_url('member/download.php?id=' . (int)$resource['id'])) ?>" class="btn btn-primary btn-lg px-4 js-download-link"
                        data-resource-id="<?= (int)$resource['id'] ?>"
                        data-resource-title="<?= e($resource['title']) ?>"
@@ -357,14 +370,36 @@ require_once __DIR__ . '/includes/header.php';
                         <p class="small text-secondary mt-2 mb-0">
                             <i class="fa-solid fa-circle-check text-success me-1"></i>Unlocked with a Free Pro Preview &mdash; download it again any time.
                         </p>
+                    <?php elseif ($freeQuota !== null): ?>
+                        <p class="small text-secondary mt-2 mb-0 js-free-quota-note">
+                            <i class="fa-solid fa-circle-info me-1"></i><?= e($freeQuota['message']) ?>
+                        </p>
                     <?php elseif ($resource['is_free']): ?>
                         <p class="small text-secondary mt-2 mb-0">
-                            <i class="fa-solid fa-circle-check text-success me-1"></i>Free download &mdash; unlimited with your free account.
+                            <i class="fa-solid fa-circle-check text-success me-1"></i>Free download &mdash; <?= ($isPro || is_admin() || free_download_limit_enabled()) ? 'included with your account' : 'unlimited with your free account' ?>.
                         </p>
+                    <?php endif; ?>
+                    <?php if ($showUpgradePrompts): ?>
+                        <?php require __DIR__ . '/includes/post-download-upsell.php'; ?>
                     <?php endif; ?>
                     <p class="small text-secondary mt-2 mb-0">
                         <i class="fa-solid fa-shuffle me-1"></i>Teaching this in class? Try our free <a href="<?= e(base_url('teacher-tools.php')) ?>">Random Name Picker &amp; Timer</a>.
                     </p>
+                <?php elseif ($freeQuotaBlocked): ?>
+                    <!-- Free resource, Free-plan account, monthly limit used up. -->
+                    <div class="alert alert-warning">
+                        <p class="fw-bold mb-1"><i class="fa-solid fa-hourglass-half me-1"></i> Monthly free downloads used</p>
+                        <p class="mb-3"><?= e($freeQuota['message']) ?></p>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="<?= e(base_url('member/subscription.php?plan=monthly')) ?>" class="btn btn-primary"
+                               data-ga-event="upgrade_click"
+                               data-ga-params="<?= e(json_encode(['location' => 'resource_quota_blocked', 'resource_id' => (int)$resource['id'], 'plan' => 'monthly'])) ?>">Go Pro &mdash; <?= plan_price_tag('monthly') ?>/month</a>
+                            <a href="<?= e(base_url('member/subscription.php?plan=annual')) ?>" class="btn btn-outline-primary"
+                               data-ga-event="upgrade_click"
+                               data-ga-params="<?= e(json_encode(['location' => 'resource_quota_blocked', 'resource_id' => (int)$resource['id'], 'plan' => 'annual'])) ?>">Annual &mdash; <?= plan_price_tag('annual') ?>/year</a>
+                            <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-link px-0">Compare plans</a>
+                        </div>
+                    </div>
                 <?php elseif (!$isLoggedIn && $resource['is_free']): ?>
                     <a href="<?= e($signupUrl) ?>" class="btn btn-primary btn-lg px-4"
                        data-bs-toggle="modal" data-bs-target="#downloadSignupModal"
@@ -491,7 +526,7 @@ require_once __DIR__ . '/includes/header.php';
                 <ul class="list-unstyled mb-0">
                     <?php foreach ($additionalFiles as $extraFile): ?>
                         <li class="mb-2">
-                            <?php if ($canDownload || $canUseProTrial): ?>
+                            <?php if ($canFetchFiles): ?>
                                 <a href="<?= e(base_url('member/download-extra.php?id=' . (int)$extraFile['id'])) ?>" class="btn btn-sm btn-outline-primary">
                                     <i class="fa-solid <?= e(file_type_icon($extraFile['file_type'])) ?> me-1"></i><?= e($extraFile['label'] ?: $extraFile['file_name']) ?>
                                     <span class="text-secondary">(<?= e(strtoupper($extraFile['file_type'])) ?>)</span>
@@ -515,6 +550,14 @@ require_once __DIR__ . '/includes/header.php';
     </div>
     <?php endif; ?>
 
+    <?php if ($showUpgradePrompts): ?>
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <?php require __DIR__ . '/includes/pro-comparison-card.php'; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <?php if (!$isLoggedIn): ?>
     <div class="modal fade" id="downloadSignupModal" tabindex="-1" aria-labelledby="downloadSignupModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -526,7 +569,7 @@ require_once __DIR__ . '/includes/header.php';
                 <div class="modal-body">
                     <p class="text-secondary">Your free <?= e(SITE_NAME) ?> account gives you:</p>
                     <ul class="list-unstyled mb-0">
-                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Unlimited downloads of every free resource</li>
+                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><?= e(free_download_allowance_phrase()) ?></li>
                         <li class="mb-2"><i class="fa-solid fa-gift text-warning me-2"></i><strong><?= (int)PRO_TRIAL_CREDITS_TOTAL ?> Free Pro Previews</strong> of members-only resources</li>
                         <li class="mb-2"><i class="fa-solid fa-heart text-danger me-2"></i>Favorites and your download history</li>
                     </ul>

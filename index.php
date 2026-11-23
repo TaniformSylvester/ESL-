@@ -9,6 +9,7 @@ require_once __DIR__ . '/includes/video-functions.php';
 require_once __DIR__ . '/includes/games-functions.php';
 require_once __DIR__ . '/includes/bundle-functions.php';
 require_once __DIR__ . '/includes/guide-functions.php';
+require_once __DIR__ . '/includes/download-functions.php';
 
 $featuredVideos = get_featured_videos(3);
 $featuredGames = get_featured_games(4);
@@ -73,7 +74,7 @@ $pageDescription = 'Free ESL, Math and Science worksheets, lesson plans, PowerPo
 $faqItems = [
     [
         'question' => 'How many resources can I download for free?',
-        'answer'   => 'Free resources are unlimited with a free TeachLuma account, and every free account also gets 3 Free Pro Previews of members-only resources. Beyond that, members-only resources need a Teacher Pro membership.',
+        'answer'   => 'Free resources are ' . free_download_allowance_inline() . ' with a free TeachLuma account, and every free account also gets 3 Free Pro Previews of members-only resources. Beyond that, members-only resources need a Teacher Pro membership.',
     ],
     [
         'question' => 'What do I get with TeachLuma Pro?',
@@ -89,7 +90,7 @@ $faqItems = [
     ],
     [
         'question' => 'Can I cancel anytime?',
-        'answer'   => "Yes. Membership renews manually, not automatically — if you don't submit another payment before your expiry date, your account simply reverts to the Free plan (still unlimited downloads of free resources) rather than being charged or locked out.",
+        'answer'   => "Yes. Membership renews manually, not automatically — if you don't submit another payment before your expiry date, your account simply reverts to the Free plan (free resources stay " . free_download_allowance_inline() . ") rather than being charged or locked out.",
     ],
 ];
 $faqSchema = [
@@ -462,7 +463,7 @@ require_once __DIR__ . '/includes/header.php';
                 <div class="cta-card tone-gold">
                     <span class="icon-bubble mb-3" aria-hidden="true"><i class="fa-solid fa-crown"></i></span>
                     <h2>Free to start. Affordable to grow.</h2>
-                    <p class="mb-4">Every free resource is unlimited with a free account, plus 3 Free Pro Previews. When you're ready for the full members-only library, Teacher Pro is <?= plan_price_tag('monthly') ?>/month or <?= plan_price_tag('annual') ?>/year.</p>
+                    <p class="mb-4">Free resources are <?= e(free_download_allowance_inline()) ?> with a free account, plus 3 Free Pro Previews. When you're ready for the full members-only library, Teacher Pro is <?= plan_price_tag('monthly') ?>/month or <?= plan_price_tag('annual') ?>/year.</p>
                     <a href="<?= e(base_url('pricing.php')) ?>" class="btn btn-primary">See Pricing &amp; Plans</a>
                 </div>
             </div>

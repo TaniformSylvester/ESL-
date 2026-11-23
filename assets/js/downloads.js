@@ -18,6 +18,18 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        // Free-plan accounts: show the short upgrade nudge (rendered hidden
+        // by includes/post-download-upsell.php; absent for Pro members). The
+        // file itself still downloads normally.
+        var upsell = document.querySelector('.js-post-download-upsell');
+        if (upsell) {
+            upsell.hidden = false;
+            if (typeof gtag === 'function' && !upsell.dataset.shown) {
+                gtag('event', 'post_download_upsell_view', { resource_id: link.dataset.resourceId });
+            }
+            upsell.dataset.shown = '1';
+        }
+
         var resourceId = link.dataset.resourceId;
         var csrf = link.dataset.csrf;
         var knownCount = parseInt(link.dataset.initialCount, 10) || 0;
@@ -71,6 +83,19 @@ document.addEventListener('DOMContentLoaded', function () {
                             note.textContent = 'Unlocked with a Free Pro Preview \u2014 download it again any time.';
                         }
                         link.dataset.proTrial = '0';
+                    }
+
+                    // Free-plan monthly limit: refresh the "x of y used"
+                    // note with the server's own figures.
+                    if (data.free_quota) {
+                        var quotaNote = document.querySelector('.js-free-quota-note');
+                        if (quotaNote) {
+                            var quotaIcon = quotaNote.querySelector('i');
+                            quotaNote.textContent = ' ' + data.free_quota.message;
+                            if (quotaIcon) {
+                                quotaNote.prepend(quotaIcon);
+                            }
+                        }
                     }
 
                     if (data.download_count > knownCount) {

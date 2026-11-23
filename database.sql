@@ -441,6 +441,7 @@ CREATE TABLE IF NOT EXISTS downloads (
     PRIMARY KEY (id),
     KEY idx_downloads_resource (resource_id),
     KEY idx_downloads_user (user_id),
+    KEY idx_downloads_user_resource_date (user_id, resource_id, downloaded_at),
     CONSTRAINT fk_downloads_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL,
     CONSTRAINT fk_downloads_resource FOREIGN KEY (resource_id) REFERENCES resources (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

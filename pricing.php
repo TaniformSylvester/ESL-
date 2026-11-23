@@ -4,6 +4,7 @@ require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/resource-functions.php';
 require_once __DIR__ . '/includes/promptpay-functions.php';
 require_once __DIR__ . '/includes/seo-functions.php';
+require_once __DIR__ . '/includes/download-functions.php';
 
 $isLoggedIn = is_logged_in();
 $totalResources = get_published_resource_count();
@@ -18,7 +19,7 @@ $yearOfMonthly = ['THB' => PRICE_MONTHLY * 12, 'USD' => round(PRICE_MONTHLY_USD 
 $upgradeParams = fn (string $where, string $plan) => e(json_encode(['location' => $where, 'plan' => $plan]));
 
 $pageTitle = 'Pricing — Free, Teacher Pro & School Plans';
-$pageDescription = 'Free resources are unlimited with a free account, plus 3 Free Pro Previews. Teacher Pro unlocks members-only resources for ' . plan_price_text_both('monthly') . ' a month or ' . plan_price_text_both('annual') . ' a year. School and Department Passes cover whole teams.';
+$pageDescription = 'Free resources are ' . free_download_allowance_inline() . ' with a free account, plus 3 Free Pro Previews. Teacher Pro unlocks members-only resources for ' . plan_price_text_both('monthly') . ' a month or ' . plan_price_text_both('annual') . ' a year. School and Department Passes cover whole teams.';
 require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container py-5">
@@ -58,7 +59,7 @@ require_once __DIR__ . '/includes/header.php';
                     <ul class="list-unstyled small mb-4 flex-grow-1">
                         <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Browse the complete resource library</li>
                         <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Search and filter by subject &amp; grade</li>
-                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>Unlimited</strong> downloads of every free resource</li>
+                        <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><?= e(free_download_allowance_phrase()) ?></li>
                         <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>3 Free Pro Previews</strong> of members-only resources</li>
                         <li class="mb-2 text-secondary"><i class="fa-solid fa-xmark me-2"></i>Full members-only library</li>
                     </ul>
@@ -242,7 +243,7 @@ require_once __DIR__ . '/includes/header.php';
             <h2 class="h4 fw-bold mb-3">How Membership Works</h2>
             <p>Here's how it works:</p>
             <ol>
-                <li class="mb-2">Create a free account and download every free resource, unlimited. Your account also includes 3 Free Pro Previews of members-only resources.</li>
+                <li class="mb-2">Create a free account and download free resources (<?= e(free_download_allowance_inline()) ?>). Your account also includes 3 Free Pro Previews of members-only resources.</li>
                 <li class="mb-2">When you're ready to unlock members-only resources, go to your <strong>Subscription</strong> page and choose Monthly or Annual.</li>
                 <?php if (STRIPE_ENABLED): ?>
                     <li class="mb-2">Pay securely by card &mdash; handled by Stripe. Your membership activates immediately once payment is confirmed, no waiting.</li>
@@ -250,7 +251,7 @@ require_once __DIR__ . '/includes/header.php';
                 <?php if ($scanToPayOn): ?>
                     <li class="mb-2" <?= STRIPE_ENABLED ? currency_only_attrs('THB') : '' ?>><?= STRIPE_ENABLED ? 'Or scan to pay' : 'Scan to pay' ?> with PromptPay from any Thai banking app, then upload your slip. We'll check it and activate your membership, usually within a few hours.</li>
                 <?php endif; ?>
-                <li class="mb-2">Renew before your membership expires to keep access to members-only resources &mdash; if it lapses, your account simply reverts to the Free plan (still unlimited free downloads) rather than being locked out.</li>
+                <li class="mb-2">Renew before your membership expires to keep access to members-only resources &mdash; if it lapses, your account simply reverts to the Free plan (free resources stay <?= e(free_download_allowance_inline()) ?>) rather than being locked out.</li>
             </ol>
         </div>
     </div>

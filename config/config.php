@@ -59,13 +59,19 @@ define('PRICE_ANNUAL', 999);
 define('PLAN_DAYS', ['monthly' => 30, 'annual' => 365]);
 define('PLAN_LABELS', ['monthly' => 'Teacher Pro Monthly', 'annual' => 'Teacher Pro Annual']);
 
-// NOT currently enforced: free resources are unlimited for every logged-in
-// account (see can_download_resource() in
-// includes/download-functions.php). Retained, along with the dormant
-// get_free_download_usage()/try_consume_free_download() functions and the
-// users.free_downloads_* columns, only in case a future quota/rate-limit
-// feature is wanted again — nothing currently reads this constant to
-// block a download.
+// Soft monthly limit on FREE resource downloads for Free-plan accounts.
+// These are the defaults; /admin/settings.php can override both (stored in
+// the settings table as free_download_limit_enabled / free_download_monthly_limit),
+// so the limit can be switched on, off or resized without a deploy.
+//   * Off (false): free resources are unlimited for every logged-in account.
+//   * On: a Free-plan account can download up to FREE_DOWNLOAD_MONTHLY_LIMIT
+//     different free resources per calendar month (TIMEZONE above). Re-downloading
+//     a resource already downloaded this month is never counted again.
+// Never limited: active Teacher Pro members, admins, resources covered by a
+// bundle the user bought, and members-only resources unlocked with a Free Pro
+// Preview (those use their own credits). Counts live in users.free_downloads_used
+// / free_downloads_month and reset lazily on the first download of a new month.
+define('FREE_DOWNLOAD_LIMIT_ENABLED', false);
 define('FREE_DOWNLOAD_MONTHLY_LIMIT', 5);
 
 define('MEMBERSHIP_EXPIRY_REMINDER_DAYS', 3); // how many days before expiry_date to send the renewal reminder

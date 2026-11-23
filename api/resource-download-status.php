@@ -61,6 +61,10 @@ if ($isLoggedIn && !is_admin() && !isMemberActive() && !$resource['is_free']) {
     ];
 }
 
+// Free-plan monthly limit state, so the page can refresh its "x of y free
+// downloads used" note after a download (null when the limit doesn't apply).
+$freeQuota = $isLoggedIn ? free_download_quota_state($resource) : null;
+
 ob_start();
 require __DIR__ . '/../includes/review-box.php';
 $reviewBoxHtml = ob_get_clean();
@@ -71,4 +75,10 @@ echo json_encode([
     'can_review'      => $canWriteReview,
     'review_box_html' => $reviewBoxHtml,
     'pro_trial'       => $proTrial,
+    'free_quota'      => $freeQuota === null ? null : [
+        'used'      => $freeQuota['used'],
+        'limit'     => $freeQuota['limit'],
+        'remaining' => $freeQuota['remaining'],
+        'message'   => $freeQuota['message'],
+    ],
 ]);
