@@ -232,6 +232,21 @@ function build_welcome_drip_email(int $user_id, string $name): array
         email_log_error('Welcome email: popular resources unavailable: ' . $e->getMessage());
     }
 
+    // What a free account includes follows the Free downloads setting
+    // (Admin > Settings): unlimited, or a monthly number when the limit is on.
+    $monthlyLimit = null;
+    try {
+        if (!function_exists('free_download_limit_enabled')) {
+            require_once __DIR__ . '/download-functions.php';
+        }
+        $monthlyLimit = free_download_limit_enabled() ? free_download_monthly_limit() : null;
+    } catch (Throwable $e) {
+        $monthlyLimit = FREE_DOWNLOAD_LIMIT_ENABLED ? max(1, (int)FREE_DOWNLOAD_MONTHLY_LIMIT) : null;
+    }
+    $allowance = $monthlyLimit === null
+        ? 'You can now download every free resource, as often as you like'
+        : 'You can now download up to ' . $monthlyLimit . ' free resource' . ($monthlyLimit === 1 ? '' : 's') . ' every month';
+
     $credits = null;
     try {
         $stmt = getDB()->prepare('SELECT pro_trial_credits FROM users WHERE id = ?');
@@ -312,7 +327,7 @@ function build_welcome_drip_email(int $user_id, string $name): array
         // Welcome
         . '<tr><td class="tl-pad" style="padding:32px 36px 8px;">'
         . '<h1 class="tl-h1" style="margin:0 0 12px;font-family:' . $heading . ';font-size:30px;line-height:1.2;font-weight:700;color:' . $navy . ';">Welcome, ' . e($name) . '! 👋</h1>'
-        . '<p style="margin:0 0 14px;font-family:' . $text . ';font-size:16px;line-height:1.6;color:' . $ink . ';">Your ' . $site . ' account is ready. You can now download every free resource, as often as you like: lesson packs, worksheets, PowerPoints, flashcards and quizzes for ESL, Math and Science.</p>'
+        . '<p style="margin:0 0 14px;font-family:' . $text . ';font-size:16px;line-height:1.6;color:' . $ink . ';">Your ' . $site . ' account is ready. ' . e($allowance) . ': lesson packs, worksheets, PowerPoints, flashcards and quizzes for ESL, Math and Science.</p>'
         . '<p style="margin:0 0 22px;font-family:' . $text . ';font-size:16px;line-height:1.6;color:' . $ink . ';">Not sure where to start? Here is what other teachers download most.</p>'
         . '</td></tr>'
 
@@ -360,7 +375,7 @@ function build_welcome_drip_email(int $user_id, string $name): array
         . '</table></td></tr></table></body></html>';
 
     $plain = "Welcome, {$name}!\n\n"
-        . "Your " . SITE_NAME . " account is ready. You can now download every free resource, as often as you like: lesson packs, worksheets, PowerPoints, flashcards and quizzes for ESL, Math and Science.\n\n"
+        . "Your " . SITE_NAME . " account is ready. {$allowance}: lesson packs, worksheets, PowerPoints, flashcards and quizzes for ESL, Math and Science.\n\n"
         . ($popularText !== '' ? "POPULAR RIGHT NOW\n" . $popularText . "\n" : '')
         . "Browse all resources: {$resourcesUrl}\n\n"
         . ($credits !== null && $credits > 0
