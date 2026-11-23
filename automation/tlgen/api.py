@@ -33,35 +33,49 @@ class Client:
 
     def _call(self, method, action, *, json_body=None, data=None, files=None, retries=3):
         url = f"{self.base}/api/automation.php?action={action}"
-        for attempt in range(retries + 1):
+        # LiteSpeed's bot check ("One moment, please...") is a JavaScript
+        # challenge this client can't solve. It comes and goes, so wait it
+        # out with longer pauses than other transient errors. Uploads are
+        # safe to repeat: the server de-duplicates by idempotency key.
+        challenge_waits = [15, 30, 60, 90, 120]
+        challenges = 0
+        attempt = 0
+        while True:
             try:
                 r = self.session.request(method, url, json=json_body, data=data, files=files, timeout=180)
             except requests.RequestException as exc:
-                if attempt == retries:
+                if attempt >= retries:
                     raise ApiError(0, {"error": f"network error: {exc}"})
-                time.sleep(2 ** (attempt + 1))
+                attempt += 1
+                time.sleep(2 ** attempt)
                 continue
             try:
                 body = r.json()
             except ValueError:
-                # Shared hosts sometimes answer with an HTML page (a security
-                # filter or a busy server). Treat it as transient and retry.
                 body = {"error": f"not a JSON answer (HTTP {r.status_code}): {r.text[:200]}"}
+                if "One moment, please" in r.text and challenges < len(challenge_waits):
+                    time.sleep(challenge_waits[challenges])
+                    challenges += 1
+                    continue
+                # Other HTML pages (a security filter or a busy server):
+                # treat as transient and retry a few times.
                 if attempt < retries:
-                    time.sleep(2 ** (attempt + 1))
+                    attempt += 1
+                    time.sleep(2 ** attempt)
                     continue
                 raise ApiError(r.status_code or 0, body)
             # Retry only transient failures; 4xx answers are final.
             if r.status_code in (502, 503, 504) and attempt < retries:
-                time.sleep(2 ** (attempt + 1))
+                attempt += 1
+                time.sleep(2 ** attempt)
                 continue
             if r.status_code == 429 and attempt < retries:
+                attempt += 1
                 time.sleep(30)
                 continue
             if r.status_code >= 400:
                 raise ApiError(r.status_code, body)
             return body
-        raise ApiError(0, {"error": "unreachable"})
 
     def status(self):
         return self._call("GET", "status")
