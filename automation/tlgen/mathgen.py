@@ -268,6 +268,8 @@ def solve(gen, p):
         return "<" if a < b else (">" if a > b else "=")
     if gen == "equivalent_fraction":
         return p["n"] * p["d2"] // p["d"]
+    if gen == "simplify_fraction":
+        return simplify(f"{p['n']}/{p['d']}")
     if gen == "perimeter_rect":
         return 2 * (p["l"] + p["w"])
     if gen == "area_rect":
@@ -716,6 +718,14 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
         d1, d2 = rng.choice(list(denominators)), rng.choice(list(denominators))
         n1, n2 = rng.randint(1, d1 - 1), rng.randint(1, d2 - 1)
         return _item("fraction_compare", {"n1": n1, "d1": d1, "n2": n2, "d2": d2}, f"{n1}/{d1}  ◯  {n2}/{d2}")
+    if gen == "simplify_fraction":
+        # A fraction in simplest form (a/b), scaled up by k; the answer is a/b.
+        dens = list(_.get("denoms") or [2, 3, 4, 5, 6, 8, 10, 12])
+        while True:
+            b = rng.choice(dens); a = rng.randint(1, b - 1)
+            if gcd(a, b) == 1:
+                k = rng.randint(2, int(_.get("max_factor", 5)))
+                return _item(gen, {"n": a * k, "d": b * k}, f"Write {a * k}/{b * k} in simplest form. ____")
     if gen == "equivalent_fraction":
         d = rng.choice([2, 3, 4, 5])
         n = rng.randint(1, d - 1)
@@ -1055,7 +1065,8 @@ def _one(gen, rng, lo=1, hi=20, regroup=None, factors=(2, 5, 10), max_other=10, 
                 nums = list(nums); rng.shuffle(nums)
                 return _item(gen, {"nums": nums}, f"Order from smallest to largest: {',  '.join(nums)}   ____")
     if gen == "tens_ones":
-        t, o = rng.randint(1, 9), rng.randint(0, 9)
+        # tens=1 keeps every item in the teens (Grade 1 "ten and some more").
+        t, o = (int(_["tens"]) if _.get("tens") else rng.randint(1, 9)), rng.randint(0, 9)
         if rng.random() < 0.5:
             return _item(gen, {"t": t, "o": o, "show": "blocks"}, "What number do the blocks show? ____", {"base10": [0, t, o]})
         unit = lambda n, word: f"{n} {word}" + ("" if n == 1 else "s")
