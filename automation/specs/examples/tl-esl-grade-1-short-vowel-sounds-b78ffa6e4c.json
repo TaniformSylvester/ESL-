@@ -1,0 +1,606 @@
+{
+  "version": 1,
+  "key": "tl-esl-grade-1-short-vowel-sounds-b78ffa6e4c",
+  "meta": {
+    "subject": "esl",
+    "grade": "Grade 1",
+    "category": "phonics",
+    "topic": "Short Vowel Sounds",
+    "tier": "pro",
+    "resource_type": "Lesson Plan",
+    "title": "Short Vowel Sounds: a, e, i, o, u with CVC Words",
+    "description": "A complete Grade 1 phonics pack for the five short vowel sounds with picture-supported CVC words (cat, bed, pig, dog, sun). Includes a lesson plan, worksheet, quiz, homework, picture flashcards, a rubric, editable slides and Word files, and answer keys.",
+    "overview": "Young English learners hear, say, read and write the five short vowel sounds in simple consonant-vowel-consonant (CVC) words. Each sound has a picture keyword (a as in cat, e as in bed, i as in pig, o as in dog, u as in sun). Students blend sounds to read words, choose the word that matches a picture, write missing vowels and sort words by their vowel sound.",
+    "learning_objectives": [
+      "Hear and say the short vowel sounds a, e, i, o and u in CVC words.",
+      "Read CVC words by blending the sounds, and match each word to its picture.",
+      "Write the missing short vowel in CVC words and sort words by their vowel sound."
+    ],
+    "how_to_use": [
+      "Teach the five sounds with the slides and the picture flashcards (say each word slowly: c-a-t, cat).",
+      "Do worksheet activities 1 and 2 together, then let students finish activities 3–5.",
+      "Use the quiz to check each student and the rubric to record progress.",
+      "Send the homework page home and use the flashcards for daily review games."
+    ],
+    "suggested_duration": "45 minutes",
+    "recommended_level": "Grade 1 / beginner English learners (ages 6–7)",
+    "skills_practiced": "Phonemic awareness, blending, decoding CVC words, spelling, listening",
+    "activity_ideas": [
+      "Vowel hands: give each vowel a hand sign and have students show the sign when they hear the sound in a word.",
+      "Flashcard sort: spread the picture cards on the floor and ask teams to sort them into five vowel groups.",
+      "Change one letter: write cat on the board, change the vowel (cot, cut) and ask students to read each new word."
+    ],
+    "teacher_tips": "Stretch each word slowly and point to each letter as you say its sound, then say the whole word fast. Keep the five keyword pictures (cat, bed, pig, dog, sun) on the wall all week.",
+    "differentiation_notes": "Support: work on two vowels at a time (a and o first) and let students point to pictures instead of writing. Challenge: ask students to make new words by changing the vowel, such as bag, beg, big, bog and bug.",
+    "assessment_notes": "The quiz (13 points) checks hearing, reading and writing short vowels. The rubric gives four levels for hearing sounds, reading words, writing words and sorting by vowel."
+  },
+  "cover_emoji": [
+    "🐱",
+    "🛏️",
+    "🐷",
+    "☀️"
+  ],
+  "vocabulary": [
+    {
+      "word": "cat",
+      "emoji": "🐱",
+      "definition": "short a: a small furry pet",
+      "example": "The cat is on the mat."
+    },
+    {
+      "word": "bed",
+      "emoji": "🛏️",
+      "definition": "short e: we sleep in it",
+      "example": "I go to bed at night."
+    },
+    {
+      "word": "pig",
+      "emoji": "🐷",
+      "definition": "short i: a pink farm animal",
+      "example": "The pig is big."
+    },
+    {
+      "word": "dog",
+      "emoji": "🐶",
+      "definition": "short o: a pet that barks",
+      "example": "My dog can run."
+    },
+    {
+      "word": "sun",
+      "emoji": "☀️",
+      "definition": "short u: it is hot and bright in the sky",
+      "example": "The sun is hot."
+    },
+    {
+      "word": "hat",
+      "emoji": "🎩",
+      "definition": "short a: we wear it on our head",
+      "example": "I have a red hat."
+    },
+    {
+      "word": "hen",
+      "emoji": "🐔",
+      "definition": "short e: a farm bird that lays eggs",
+      "example": "The hen has ten eggs."
+    },
+    {
+      "word": "six",
+      "emoji": "6️⃣",
+      "definition": "short i: the number after five",
+      "example": "I have six pens."
+    },
+    {
+      "word": "fox",
+      "emoji": "🦊",
+      "definition": "short o: a wild animal with a long tail",
+      "example": "The fox is in the box."
+    },
+    {
+      "word": "bus",
+      "emoji": "🚌",
+      "definition": "short u: a big car for many people",
+      "example": "We go to school on the bus."
+    }
+  ],
+  "lesson_plan": {
+    "materials": [
+      "Lesson slides (PowerPoint)",
+      "Picture flashcards (cut out before the lesson)",
+      "Worksheet, quiz and homework pages",
+      "Board, markers and five vowel cards (a, e, i, o, u)"
+    ],
+    "stages": [
+      {
+        "name": "Warm-up",
+        "minutes": 5,
+        "steps": [
+          "Hold up the five vowel cards. Say each letter name and its short sound: a /a/, e /e/, i /i/, o /o/, u /u/.",
+          "Students repeat each sound and copy your hand sign for it."
+        ]
+      },
+      {
+        "name": "Presentation",
+        "minutes": 12,
+        "steps": [
+          "Show the slides. For each picture, stretch the word (c-a-t), point to each letter, then say the whole word (cat).",
+          "Ask: \"What sound is in the middle?\" Students answer with the sound and the hand sign.",
+          "Put the five keyword cards on the wall: cat, bed, pig, dog, sun."
+        ]
+      },
+      {
+        "name": "Guided practice",
+        "minutes": 10,
+        "steps": [
+          "Do worksheet activity 1 together: name each picture, then find the word in the word bank.",
+          "Do activity 2 in pairs: one student says the picture, the other circles the word. Check answers aloud."
+        ]
+      },
+      {
+        "name": "Independent practice",
+        "minutes": 13,
+        "steps": [
+          "Students complete activities 3, 4 and 5 on their own.",
+          "Walk around and ask students to read two words from their sort aloud."
+        ]
+      },
+      {
+        "name": "Wrap-up",
+        "minutes": 5,
+        "steps": [
+          "Flashcard game: show a picture card; students show the hand sign for its vowel sound.",
+          "Exit task: each student reads one CVC word from the board to you before leaving."
+        ]
+      }
+    ],
+    "differentiation": {
+      "support": [
+        "Practise two vowels at a time (a and o first, then i, then e and u).",
+        "Let students point to the picture or say the answer instead of writing it."
+      ],
+      "challenge": [
+        "Change the vowel to make new words: bag, beg, big, bog, bug. Which ones are real words?",
+        "Write a short sentence with three CVC words, such as \"The cat sat on a mat.\""
+      ]
+    },
+    "assessment": "Listen to each student read four CVC words during the exit task. Use the quiz (13 points) the next day; 11 or more shows the student is ready for blends such as stop and frog."
+  },
+  "worksheet": {
+    "title": "Short Vowel Sounds",
+    "sections": [
+      {
+        "type": "label",
+        "title": "Name the pictures",
+        "instructions": "Look at the picture. Write the word.",
+        "items": [
+          {
+            "emoji": "🐱",
+            "answer": "cat"
+          },
+          {
+            "emoji": "🛏️",
+            "answer": "bed"
+          },
+          {
+            "emoji": "🐷",
+            "answer": "pig"
+          },
+          {
+            "emoji": "🐶",
+            "answer": "dog"
+          },
+          {
+            "emoji": "☀️",
+            "answer": "sun"
+          },
+          {
+            "emoji": "🎩",
+            "answer": "hat"
+          },
+          {
+            "emoji": "🦊",
+            "answer": "fox"
+          },
+          {
+            "emoji": "🚌",
+            "answer": "bus"
+          }
+        ]
+      },
+      {
+        "type": "multiple_choice",
+        "title": "Circle the word",
+        "instructions": "Look at the picture. Circle the right word.",
+        "items": [
+          {
+            "q": "🐔",
+            "options": [
+              "hat",
+              "hen",
+              "hot"
+            ],
+            "answer": "hen"
+          },
+          {
+            "q": "🐛",
+            "options": [
+              "bag",
+              "big",
+              "bug"
+            ],
+            "answer": "bug"
+          },
+          {
+            "q": "📌",
+            "options": [
+              "pin",
+              "pan",
+              "pen"
+            ],
+            "answer": "pin"
+          },
+          {
+            "q": "🗺️",
+            "options": [
+              "mop",
+              "map",
+              "mug"
+            ],
+            "answer": "map"
+          },
+          {
+            "q": "☕",
+            "options": [
+              "cap",
+              "cop",
+              "cup"
+            ],
+            "answer": "cup"
+          },
+          {
+            "q": "📦",
+            "options": [
+              "box",
+              "bus",
+              "bed"
+            ],
+            "answer": "box"
+          }
+        ]
+      },
+      {
+        "type": "fill_blank",
+        "title": "Missing vowels",
+        "instructions": "Say the word. Write the missing vowel.",
+        "word_bank": true,
+        "items": [
+          {
+            "text": "🐷  p ____ g",
+            "answer": "i"
+          },
+          {
+            "text": "🛏️  b ____ d",
+            "answer": "e"
+          },
+          {
+            "text": "☀️  s ____ n",
+            "answer": "u"
+          },
+          {
+            "text": "🐶  d ____ g",
+            "answer": "o"
+          },
+          {
+            "text": "🐱  c ____ t",
+            "answer": "a"
+          },
+          {
+            "text": "🐛  b ____ g",
+            "answer": "u"
+          }
+        ]
+      },
+      {
+        "type": "sort",
+        "title": "Sort the words",
+        "instructions": "Read each word. Write it under its vowel sound.",
+        "groups": {
+          "a (cat)": [
+            "bag",
+            "jam",
+            "van"
+          ],
+          "e (bed)": [
+            "ten",
+            "red",
+            "web"
+          ],
+          "i (pig)": [
+            "lip",
+            "sit",
+            "win"
+          ],
+          "o (dog)": [
+            "hop",
+            "pot",
+            "top"
+          ],
+          "u (sun)": [
+            "cub",
+            "run",
+            "mud"
+          ]
+        }
+      },
+      {
+        "type": "draw_write",
+        "title": "Draw and write",
+        "instructions": "Show what you know.",
+        "items": [
+          {
+            "prompt": "Draw a thing with a short vowel sound. Write its name.",
+            "lines": 1,
+            "guidance": "Any picture of a CVC word with a short vowel (for example a cat, a pen or a cup), with the word written underneath."
+          }
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "title": "Short Vowels Quiz",
+    "sections": [
+      {
+        "type": "multiple_choice",
+        "title": "Which word?",
+        "instructions": "Circle the word with the sound.",
+        "items": [
+          {
+            "q": "Short a, like in cat:",
+            "options": [
+              "fan",
+              "fin",
+              "fun"
+            ],
+            "answer": "fan"
+          },
+          {
+            "q": "Short e, like in bed:",
+            "options": [
+              "pig",
+              "ten",
+              "sun"
+            ],
+            "answer": "ten"
+          },
+          {
+            "q": "Short i, like in pig:",
+            "options": [
+              "six",
+              "box",
+              "hat"
+            ],
+            "answer": "six"
+          },
+          {
+            "q": "Short o, like in dog:",
+            "options": [
+              "cup",
+              "hen",
+              "pot"
+            ],
+            "answer": "pot"
+          },
+          {
+            "q": "Short u, like in sun:",
+            "options": [
+              "bus",
+              "bed",
+              "map"
+            ],
+            "answer": "bus"
+          }
+        ]
+      },
+      {
+        "type": "label",
+        "title": "Write the word",
+        "instructions": "Look at the picture. Write the word.",
+        "items": [
+          {
+            "emoji": "🦊",
+            "answer": "fox"
+          },
+          {
+            "emoji": "🐔",
+            "answer": "hen"
+          },
+          {
+            "emoji": "🐛",
+            "answer": "bug"
+          },
+          {
+            "emoji": "🗺️",
+            "answer": "map"
+          }
+        ]
+      },
+      {
+        "type": "true_false",
+        "title": "Yes or no?",
+        "instructions": "Read. Circle True or False.",
+        "items": [
+          {
+            "statement": "Cat has the short a sound.",
+            "answer": true
+          },
+          {
+            "statement": "Sun has the short o sound.",
+            "answer": false
+          },
+          {
+            "statement": "Pin has the short i sound.",
+            "answer": true
+          },
+          {
+            "statement": "Bed has the short u sound.",
+            "answer": false
+          }
+        ]
+      }
+    ]
+  },
+  "homework": {
+    "title": "Short Vowels at Home",
+    "sections": [
+      {
+        "type": "match",
+        "title": "Match",
+        "instructions": "Draw a line from the picture to the word.",
+        "items": [
+          {
+            "left": "🐷",
+            "right": "pig"
+          },
+          {
+            "left": "☀️",
+            "right": "sun"
+          },
+          {
+            "left": "🦊",
+            "right": "fox"
+          },
+          {
+            "left": "🎩",
+            "right": "hat"
+          },
+          {
+            "left": "🛏️",
+            "right": "bed"
+          }
+        ]
+      },
+      {
+        "type": "fill_blank",
+        "title": "Missing vowels",
+        "instructions": "Say the word. Write the missing vowel.",
+        "word_bank": true,
+        "items": [
+          {
+            "text": "🚌  b ____ s",
+            "answer": "u"
+          },
+          {
+            "text": "📌  p ____ n",
+            "answer": "i"
+          },
+          {
+            "text": "🐔  h ____ n",
+            "answer": "e"
+          },
+          {
+            "text": "📦  b ____ x",
+            "answer": "o"
+          },
+          {
+            "text": "🦇  b ____ t",
+            "answer": "a"
+          }
+        ]
+      },
+      {
+        "type": "draw_write",
+        "title": "At home",
+        "instructions": "Look around your home.",
+        "items": [
+          {
+            "prompt": "Find two things with a short vowel sound. Draw them and write their names.",
+            "lines": 1,
+            "guidance": "Any two CVC things from home (for example cup, pen, bed, rug or mug), drawn and named."
+          }
+        ]
+      }
+    ]
+  },
+  "rubric": {
+    "criteria": [
+      {
+        "name": "Hearing short vowels",
+        "levels": [
+          "Hears the vowel sound in every CVC word.",
+          "Hears most vowel sounds; mixes up one pair (such as e and i).",
+          "Hears some vowel sounds with help.",
+          "Cannot yet hear the vowel sound in a word."
+        ]
+      },
+      {
+        "name": "Reading CVC words",
+        "levels": [
+          "Blends and reads all CVC words quickly.",
+          "Reads most CVC words by sounding them out.",
+          "Says the sounds but needs help to blend them.",
+          "Cannot yet blend sounds into words."
+        ]
+      },
+      {
+        "name": "Writing CVC words",
+        "levels": [
+          "Writes all CVC words with the correct vowel.",
+          "Writes most words correctly; one or two vowel mistakes.",
+          "Writes the first and last letters but often misses the vowel.",
+          "Cannot yet write CVC words."
+        ]
+      },
+      {
+        "name": "Sorting by vowel",
+        "levels": [
+          "Sorts every word into the correct vowel group.",
+          "Sorts most words correctly.",
+          "Sorts some words with help.",
+          "Cannot yet sort words by vowel sound."
+        ]
+      }
+    ]
+  },
+  "slides": [
+    {
+      "title": "Meet the short vowels",
+      "emoji": "🔤",
+      "bullets": [
+        "a as in cat",
+        "e as in bed",
+        "i as in pig",
+        "o as in dog",
+        "u as in sun"
+      ]
+    },
+    {
+      "title": "Blend the sounds",
+      "emoji": "🐱",
+      "bullets": [
+        "c - a - t → cat",
+        "b - e - d → bed",
+        "p - i - g → pig"
+      ]
+    }
+  ],
+  "social": {
+    "facebook_post": "🐱🛏️🐷🐶☀️ New PRO phonics pack for Grade 1: Short Vowel Sounds!\n\nHelp young English learners hear, read and write a, e, i, o and u in CVC words with picture support on every page. Includes a lesson plan, worksheet, quiz, homework, 10 picture flashcards, a rubric, editable slides and Word files, and full answer keys.\n\nFind it on TeachLuma 👉 teachluma.com",
+    "pinterest_title": "Short Vowel Sounds Phonics Pack for Grade 1 ESL",
+    "pinterest_description": "Grade 1 phonics pack for the five short vowels with picture-supported CVC words. Lesson plan, worksheet, quiz, homework, picture flashcards, rubric, editable PowerPoint slides and answer keys for ESL and early readers.",
+    "hashtags": [
+      "#TeachLuma",
+      "#Phonics",
+      "#ShortVowels",
+      "#CVCWords",
+      "#ESL",
+      "#Grade1",
+      "#TeachingEnglish"
+    ],
+    "visual_suggestions": [
+      "Flat lay of the cut-out picture flashcards sorted into five vowel groups.",
+      "Short video: a hand points to the cat card while the caption reads c - a - t, cat."
+    ]
+  },
+  "spelling_allow": [
+    "CVC"
+  ]
+}

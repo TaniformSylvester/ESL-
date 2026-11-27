@@ -1,0 +1,555 @@
+{
+  "version": 1,
+  "key": "tl-esl-grade-1-following-two-step-instructions-ee3d884e29",
+  "meta": {
+    "subject": "esl",
+    "grade": "Grade 1",
+    "category": "listening",
+    "topic": "Following Two-Step Instructions",
+    "tier": "pro",
+    "resource_type": "Lesson Plan",
+    "title": "Listen and Do: Following Two-Step Instructions",
+    "description": "A complete Grade 1 ESL listening pack: classroom action words (stand up, sit down, clap, wave, point, open, draw, color) and two-step instructions with first and then. Includes a lesson plan with teacher scripts, worksheet, quiz, homework, picture flashcards, a rubric, editable slides and Word files, and answer keys.",
+    "overview": "Young English learners learn eight classroom action words with pictures and gestures, then practise listening to two-step instructions such as \"Stand up, then clap your hands.\" They hear the order words first and then, do the actions in the right order, match pictures to instructions, and finally give simple instructions to a partner. Teacher scripts for every listening activity are printed in the answer key.",
+    "learning_objectives": [
+      "Understand and act out classroom action words: stand up, sit down, clap, wave, point, open, draw and color.",
+      "Listen to two-step instructions and do the two actions in the right order, using first and then.",
+      "Read simple instructions and give a two-step instruction to a partner."
+    ],
+    "how_to_use": [
+      "Teach the action words with the slides and the picture flashcards; do every action with the students.",
+      "Read the teacher scripts (in the answer key) aloud for the listening activities on the worksheet and quiz.",
+      "Let students finish the reading activities on their own, then play the partner game in the wrap-up.",
+      "Use the quiz and rubric to check progress, and send the homework page home."
+    ],
+    "suggested_duration": "45 minutes",
+    "recommended_level": "Grade 1 / beginner English learners (ages 6–7)",
+    "skills_practiced": "Listening for detail, following instructions, sequencing with first and then, action vocabulary, speaking",
+    "activity_ideas": [
+      "Teacher says: give one-step, then two-step instructions; students only move when you start with \"Teacher says\".",
+      "Flashcard chains: show two action cards in a row; students do the actions in that order.",
+      "Robot partner: one student gives two instructions, the partner acts them out like a robot."
+    ],
+    "teacher_tips": "Say each instruction once at normal speed, pause, then repeat it. Hold up one finger for \"first\" and two fingers for \"then\" so learners can see the order as well as hear it.",
+    "differentiation_notes": "Support: practise one-step instructions until students are confident, and show the flashcards while you speak. Challenge: give three-step instructions (first, then, last) or let students give the instructions.",
+    "assessment_notes": "The quiz (12 points) checks listening, picture words and reading. The rubric gives four levels for one-step instructions, two-step instructions, reading action words and giving instructions."
+  },
+  "cover_emoji": [
+    "🧍",
+    "👏",
+    "👋",
+    "📖"
+  ],
+  "vocabulary": [
+    {
+      "word": "stand up",
+      "emoji": "🧍",
+      "definition": "get up on your feet",
+      "example": "Stand up, please."
+    },
+    {
+      "word": "sit down",
+      "emoji": "🪑",
+      "definition": "sit on your chair",
+      "example": "Sit down, please."
+    },
+    {
+      "word": "clap",
+      "emoji": "👏",
+      "definition": "hit your hands together",
+      "example": "Clap your hands."
+    },
+    {
+      "word": "wave",
+      "emoji": "👋",
+      "definition": "move your hand to say hello or goodbye",
+      "example": "Wave to your friend."
+    },
+    {
+      "word": "point",
+      "emoji": "👉",
+      "definition": "show something with your finger",
+      "example": "Point to the door."
+    },
+    {
+      "word": "open",
+      "emoji": "📖",
+      "definition": "make something not closed",
+      "example": "Open your book."
+    },
+    {
+      "word": "draw",
+      "emoji": "✏️",
+      "definition": "make a picture with a pencil",
+      "example": "Draw a cat."
+    },
+    {
+      "word": "color",
+      "emoji": "🖍️",
+      "definition": "fill in a picture with crayons",
+      "example": "Color the sun yellow."
+    },
+    {
+      "word": "first",
+      "emoji": "1️⃣",
+      "definition": "the thing you do before the others",
+      "example": "First, stand up."
+    },
+    {
+      "word": "then",
+      "emoji": "2️⃣",
+      "definition": "the thing you do next",
+      "example": "Then, clap your hands."
+    }
+  ],
+  "lesson_plan": {
+    "materials": [
+      "Lesson slides (PowerPoint)",
+      "Picture flashcards (cut out before the lesson)",
+      "Worksheet, quiz and homework pages",
+      "Crayons and pencils"
+    ],
+    "stages": [
+      {
+        "name": "Warm-up",
+        "minutes": 5,
+        "steps": [
+          "Play \"Teacher says\" with one-step instructions: \"Teacher says stand up. Teacher says sit down.\"",
+          "Do each action with the students so everyone can follow."
+        ]
+      },
+      {
+        "name": "Presentation",
+        "minutes": 10,
+        "steps": [
+          "Show the slides. Say each action word, do the action, and have students copy you.",
+          "Hold up one finger and say \"First, stand up.\" Hold up two fingers and say \"Then, clap your hands.\" Do both actions in order.",
+          "Give three more two-step instructions. Students do the actions; check that they keep the right order."
+        ]
+      },
+      {
+        "name": "Guided practice",
+        "minutes": 12,
+        "steps": [
+          "Do worksheet activity 1 together: say each picture word, then match it.",
+          "Activity 2: read the teacher script from the answer key. Say each instruction twice. Students circle the pictures in the right order."
+        ]
+      },
+      {
+        "name": "Independent practice",
+        "minutes": 13,
+        "steps": [
+          "Activity 3: read the drawing instructions from the answer key. Students listen, draw and color.",
+          "Students complete activities 4 and 5 on their own. Walk around and ask students to read one sentence to you."
+        ]
+      },
+      {
+        "name": "Wrap-up",
+        "minutes": 5,
+        "steps": [
+          "Robot partner game: in pairs, one student gives a two-step instruction and the partner does it.",
+          "Finish with one more two-step instruction for the whole class: \"First, wave goodbye. Then, sit down.\""
+        ]
+      }
+    ],
+    "differentiation": {
+      "support": [
+        "Practise one-step instructions first and show the flashcard as you speak.",
+        "Say each two-step instruction slowly and do the actions with the students."
+      ],
+      "challenge": [
+        "Give three-step instructions with first, then and last.",
+        "Let students take the teacher's place and give instructions to the class."
+      ]
+    },
+    "assessment": "Watch students during the presentation and the robot partner game: can they do both actions in the right order? Use the quiz (12 points) the next day; 10 or more shows the student is ready for three-step instructions."
+  },
+  "worksheet": {
+    "title": "Listen and Do",
+    "sections": [
+      {
+        "type": "match",
+        "title": "Match",
+        "instructions": "Draw a line from the picture to the words.",
+        "items": [
+          {
+            "left": "👏",
+            "right": "clap your hands"
+          },
+          {
+            "left": "👋",
+            "right": "wave"
+          },
+          {
+            "left": "🪑",
+            "right": "sit down"
+          },
+          {
+            "left": "🧍",
+            "right": "stand up"
+          },
+          {
+            "left": "📖",
+            "right": "open your book"
+          },
+          {
+            "left": "✏️",
+            "right": "draw"
+          }
+        ]
+      },
+      {
+        "type": "multiple_choice",
+        "title": "Listen and circle",
+        "instructions": "Listen. Circle the pictures in the right order (first ➡️ then).",
+        "teacher_script": [
+          "Number 1. Stand up, then clap your hands.",
+          "Number 2. Open your book, then draw.",
+          "Number 3. Sit down, then wave.",
+          "Number 4. Point to the door, then clap your hands."
+        ],
+        "items": [
+          {
+            "q": "Number 1",
+            "options": [
+              "👏➡️🧍",
+              "🧍➡️👏",
+              "🪑➡️👋"
+            ],
+            "answer": "🧍➡️👏"
+          },
+          {
+            "q": "Number 2",
+            "options": [
+              "👋➡️🧍",
+              "📖➡️✏️",
+              "✏️➡️📖"
+            ],
+            "answer": "📖➡️✏️"
+          },
+          {
+            "q": "Number 3",
+            "options": [
+              "🪑➡️👋",
+              "👋➡️🪑",
+              "🧍➡️👉"
+            ],
+            "answer": "🪑➡️👋"
+          },
+          {
+            "q": "Number 4",
+            "options": [
+              "👏➡️👉",
+              "👉➡️👏",
+              "👋➡️📖"
+            ],
+            "answer": "👉➡️👏"
+          }
+        ]
+      },
+      {
+        "type": "draw_write",
+        "title": "Listen and draw",
+        "instructions": "Listen to your teacher. Draw and color.",
+        "teacher_script": [
+          "Picture 1. Draw a big sun. Then color it yellow.",
+          "Picture 2. Draw a ball. Then color it red."
+        ],
+        "items": [
+          {
+            "prompt": "Picture 1",
+            "lines": 0,
+            "guidance": "A big sun colored yellow."
+          },
+          {
+            "prompt": "Picture 2",
+            "lines": 0,
+            "guidance": "A ball colored red."
+          }
+        ]
+      },
+      {
+        "type": "fill_blank",
+        "title": "Read and write",
+        "instructions": "Read. Write the missing word.",
+        "word_bank": true,
+        "items": [
+          {
+            "text": "Stand ____ and clap your hands.",
+            "answer": "up"
+          },
+          {
+            "text": "Sit ____ and close your eyes.",
+            "answer": "down"
+          },
+          {
+            "text": "Open your book, then ____ a cat.",
+            "answer": "draw"
+          },
+          {
+            "text": "Pick up your pencil, then write your ____.",
+            "answer": "name"
+          },
+          {
+            "text": "____, touch your nose. Then wave.",
+            "answer": "First"
+          }
+        ]
+      },
+      {
+        "type": "sequence",
+        "title": "First, then",
+        "instructions": "Read. Write 1 to 4 to show the order.",
+        "items": [
+          "First, open your bag.",
+          "Then, take out your book.",
+          "Next, put the book on your desk.",
+          "Last, sit down."
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "title": "Listen and Do Quiz",
+    "sections": [
+      {
+        "type": "multiple_choice",
+        "title": "Listen and circle",
+        "instructions": "Listen. Circle the pictures in the right order (first ➡️ then).",
+        "teacher_script": [
+          "Number 1. Wave, then sit down.",
+          "Number 2. Stand up, then point to the window.",
+          "Number 3. Clap your hands, then open your book.",
+          "Number 4. Draw a flower, then color it."
+        ],
+        "items": [
+          {
+            "q": "Number 1",
+            "options": [
+              "👋➡️🪑",
+              "🪑➡️👋",
+              "👏➡️📖"
+            ],
+            "answer": "👋➡️🪑"
+          },
+          {
+            "q": "Number 2",
+            "options": [
+              "👉➡️🧍",
+              "🪑➡️✏️",
+              "🧍➡️👉"
+            ],
+            "answer": "🧍➡️👉"
+          },
+          {
+            "q": "Number 3",
+            "options": [
+              "👏➡️📖",
+              "📖➡️👏",
+              "👋➡️🧍"
+            ],
+            "answer": "👏➡️📖"
+          },
+          {
+            "q": "Number 4",
+            "options": [
+              "🖍️➡️✏️",
+              "✏️➡️🖍️",
+              "🪑➡️👏"
+            ],
+            "answer": "✏️➡️🖍️"
+          }
+        ]
+      },
+      {
+        "type": "label",
+        "title": "Write the word",
+        "instructions": "Look at the picture. Write the word.",
+        "items": [
+          {
+            "emoji": "👏",
+            "answer": "clap"
+          },
+          {
+            "emoji": "👋",
+            "answer": "wave"
+          },
+          {
+            "emoji": "👉",
+            "answer": "point"
+          },
+          {
+            "emoji": "✏️",
+            "answer": "draw"
+          }
+        ]
+      },
+      {
+        "type": "true_false",
+        "title": "Yes or no?",
+        "instructions": "Read. Circle True or False.",
+        "items": [
+          {
+            "statement": "👏 means clap.",
+            "answer": true
+          },
+          {
+            "statement": "🪑 means stand up.",
+            "answer": false
+          },
+          {
+            "statement": "👋 means wave.",
+            "answer": true
+          },
+          {
+            "statement": "✏️ means sit down.",
+            "answer": false
+          }
+        ]
+      }
+    ]
+  },
+  "homework": {
+    "title": "Listen and Do at Home",
+    "sections": [
+      {
+        "type": "match",
+        "title": "Match",
+        "instructions": "Draw a line from the picture to the words.",
+        "items": [
+          {
+            "left": "🧍",
+            "right": "stand up"
+          },
+          {
+            "left": "🪑",
+            "right": "sit down"
+          },
+          {
+            "left": "👉",
+            "right": "point"
+          },
+          {
+            "left": "🖍️",
+            "right": "color"
+          },
+          {
+            "left": "👋",
+            "right": "wave"
+          }
+        ]
+      },
+      {
+        "type": "fill_blank",
+        "title": "Read and write",
+        "instructions": "Read. Write the missing word.",
+        "word_bank": true,
+        "items": [
+          {
+            "text": "First, ____ up. Then, sit down.",
+            "answer": "stand"
+          },
+          {
+            "text": "____ your hands, then wave.",
+            "answer": "Clap"
+          },
+          {
+            "text": "Open your book, then ____ a picture.",
+            "answer": "draw"
+          }
+        ]
+      },
+      {
+        "type": "draw_write",
+        "title": "At home",
+        "instructions": "Play with someone at home.",
+        "items": [
+          {
+            "prompt": "Ask someone at home to give you two instructions. Do them! Draw what you did.",
+            "lines": 1,
+            "guidance": "A drawing of two actions done at home (for example standing up and clapping), with a word or two if the student can."
+          }
+        ]
+      }
+    ]
+  },
+  "rubric": {
+    "criteria": [
+      {
+        "name": "One-step instructions",
+        "levels": [
+          "Follows every one-step instruction quickly.",
+          "Follows most one-step instructions.",
+          "Follows some instructions when the teacher shows the action.",
+          "Does not yet follow one-step instructions."
+        ]
+      },
+      {
+        "name": "Two-step instructions",
+        "levels": [
+          "Does both actions in the right order every time.",
+          "Does both actions; sometimes mixes up the order.",
+          "Does only one of the two actions.",
+          "Does not yet follow two-step instructions."
+        ]
+      },
+      {
+        "name": "Reading action words",
+        "levels": [
+          "Reads and matches all action words.",
+          "Reads most action words.",
+          "Reads a few action words with picture help.",
+          "Does not yet read action words."
+        ]
+      },
+      {
+        "name": "Giving instructions",
+        "levels": [
+          "Gives clear two-step instructions using first and then.",
+          "Gives two-step instructions with a little help.",
+          "Gives one-step instructions.",
+          "Does not yet give instructions."
+        ]
+      }
+    ]
+  },
+  "slides": [
+    {
+      "title": "First… then…",
+      "emoji": "1️⃣",
+      "bullets": [
+        "First, stand up.",
+        "Then, clap your hands.",
+        "First, open your book.",
+        "Then, draw a cat."
+      ]
+    },
+    {
+      "title": "Listen and do!",
+      "emoji": "👂",
+      "bullets": [
+        "Listen to the whole instruction.",
+        "Do the first action.",
+        "Then do the second action."
+      ]
+    }
+  ],
+  "social": {
+    "facebook_post": "👂 New PRO listening pack for Grade 1 ESL: Listen and Do!\n\nYoung learners practise classroom action words (stand up, sit down, clap, wave, point, open, draw, color) and follow two-step instructions with first and then. Includes a lesson plan with teacher scripts, worksheet, quiz, homework, 10 picture flashcards, a rubric, editable slides and Word files, and answer keys.\n\nFind it on TeachLuma 👉 teachluma.com",
+    "pinterest_title": "Following Two-Step Instructions: Grade 1 ESL Listening Pack",
+    "pinterest_description": "Grade 1 ESL listening pack for classroom action words and two-step instructions (first, then). Lesson plan with teacher scripts, worksheet, quiz, homework, picture flashcards, rubric, editable slides and answer keys.",
+    "hashtags": [
+      "#TeachLuma",
+      "#ESL",
+      "#Listening",
+      "#Grade1",
+      "#TeachingEnglish",
+      "#ClassroomEnglish"
+    ],
+    "visual_suggestions": [
+      "Short video: children standing up, then clapping, with the caption First, stand up. Then, clap!",
+      "Flat lay of the action flashcards with two cards highlighted as a first/then pair."
+    ]
+  },
+  "spelling_allow": []
+}

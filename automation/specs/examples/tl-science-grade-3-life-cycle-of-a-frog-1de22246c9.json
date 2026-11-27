@@ -1,0 +1,580 @@
+{
+  "version": 1,
+  "key": "tl-science-grade-3-life-cycle-of-a-frog-1de22246c9",
+  "meta": {
+    "subject": "science",
+    "grade": "Grade 3",
+    "category": "living-things",
+    "topic": "Life Cycle of a Frog",
+    "tier": "pro",
+    "resource_type": "Lesson Plan",
+    "title": "From Frogspawn to Frog: The Life Cycle of a Frog",
+    "description": "A complete Grade 3 science pack on the frog life cycle and metamorphosis: frogspawn, tadpole, tadpole with legs, froglet and adult frog. Includes a lesson plan, worksheet, quiz, homework, picture flashcards, a rubric, editable slides and Word files, and answer keys.",
+    "overview": "Students follow a frog through its life cycle: eggs (frogspawn) laid in water, a tadpole that swims with its tail and breathes with gills, back legs and then front legs growing, a froglet whose tail gets shorter, and an adult frog that breathes with lungs and can live on land. They learn that this big change in body shape is called metamorphosis and that frogs are amphibians, living part of their life in water and part on land.",
+    "learning_objectives": [
+      "Name and order the stages of a frog's life cycle: frogspawn, tadpole, tadpole with legs, froglet and adult frog.",
+      "Describe how a tadpole changes as it grows (legs, tail, gills and lungs) and explain the word metamorphosis.",
+      "Explain why frogs are amphibians and why the frog life cycle starts again."
+    ],
+    "how_to_use": [
+      "Teach the lesson with the slides and the lesson plan; show the stage pictures as you tell the frog's story.",
+      "Use the worksheet for guided and independent practice.",
+      "Give the quiz at the end of the lesson or the next day, and use the rubric for the written answers.",
+      "Send the homework page home and use the picture flashcards to review the stages."
+    ],
+    "suggested_duration": "50 minutes",
+    "recommended_level": "Grade 3 (ages 8–9)",
+    "skills_practiced": "Sequencing, comparing, scientific vocabulary, explaining changes, labelling diagrams",
+    "activity_ideas": [
+      "Life cycle wheel: students cut out the stage flashcards and glue them in a circle with arrows.",
+      "Act it out: students crouch as eggs, wiggle as tadpoles, add legs, then hop as frogs.",
+      "Compare cycles: draw the plant life cycle next to the frog life cycle and find what is the same."
+    ],
+    "teacher_tips": "Use the word metamorphosis often and point to what changes each time: legs grow, the tail gets shorter, and gills are replaced by lungs. If you can, show a short video of real tadpoles at different stages.",
+    "differentiation_notes": "Support: give students the stage flashcards to hold while they do the worksheet. Challenge: ask students to explain why a tadpole cannot live on land but an adult frog can.",
+    "assessment_notes": "The quiz (15 points) checks stages, order and changes. The rubric gives four levels for naming the stages, ordering them, explaining the changes and using science words."
+  },
+  "cover_emoji": [
+    "pic:frogspawn",
+    "pic:tadpole",
+    "pic:tadpole_legs",
+    "pic:frog"
+  ],
+  "vocabulary": [
+    {
+      "word": "amphibian",
+      "emoji": "🐸",
+      "definition": "an animal that lives part of its life in water and part on land",
+      "example": "A frog is an amphibian."
+    },
+    {
+      "word": "frogspawn",
+      "emoji": "pic:frogspawn",
+      "definition": "a clump of frog eggs covered in jelly",
+      "example": "We saw frogspawn in the pond."
+    },
+    {
+      "word": "tadpole",
+      "emoji": "pic:tadpole",
+      "definition": "a young frog that lives in water and has a tail",
+      "example": "The tadpole swims with its tail."
+    },
+    {
+      "word": "gills",
+      "emoji": "🐟",
+      "definition": "body parts that take in air from water, like a fish's gills",
+      "example": "A tadpole breathes with gills."
+    },
+    {
+      "word": "lungs",
+      "emoji": "🫁",
+      "definition": "body parts that take in air",
+      "example": "An adult frog breathes with lungs."
+    },
+    {
+      "word": "froglet",
+      "emoji": "pic:froglet",
+      "definition": "a young frog with legs and a short tail",
+      "example": "The froglet climbed out of the water."
+    },
+    {
+      "word": "metamorphosis",
+      "emoji": "pic:tadpole_legs",
+      "definition": "a big change in an animal's body shape as it grows",
+      "example": "A tadpole goes through metamorphosis."
+    },
+    {
+      "word": "life cycle",
+      "emoji": "🔄",
+      "definition": "the stages a living thing goes through during its life",
+      "example": "The frog's life cycle starts with an egg."
+    }
+  ],
+  "lesson_plan": {
+    "materials": [
+      "Lesson slides (PowerPoint)",
+      "Picture flashcards (cut out before the lesson)",
+      "Worksheet, quiz and homework pages",
+      "Scissors and glue (optional, for a life cycle wheel)"
+    ],
+    "stages": [
+      {
+        "name": "Warm-up",
+        "minutes": 5,
+        "steps": [
+          "Show the picture of an adult frog and the picture of a tadpole. Ask: \"Are these the same animal?\"",
+          "Let students guess, then tell them that today they will find out how one turns into the other."
+        ]
+      },
+      {
+        "name": "Presentation",
+        "minutes": 12,
+        "steps": [
+          "Tell the frog's story with the slides: frogspawn in a pond → tadpole → tadpole with back legs, then front legs → froglet → adult frog.",
+          "At each stage ask: \"What changed?\" Write the changes on the board: legs grow, the tail gets shorter, gills are replaced by lungs.",
+          "Introduce the words amphibian and metamorphosis with the vocabulary list."
+        ]
+      },
+      {
+        "name": "Guided practice",
+        "minutes": 12,
+        "steps": [
+          "Do worksheet activity 1 together: name each stage picture.",
+          "In pairs, students put the six steps in order (activity 2). Ask one pair to read their order aloud.",
+          "Complete activity 3 (word match) together and check the answers."
+        ]
+      },
+      {
+        "name": "Independent practice",
+        "minutes": 15,
+        "steps": [
+          "Students complete activities 4, 5 and 6 on their own.",
+          "Walk around and ask: \"Why can a frog live on land but a tadpole cannot?\""
+        ]
+      },
+      {
+        "name": "Wrap-up",
+        "minutes": 6,
+        "steps": [
+          "Students begin activity 7: draw the frog life cycle as a circle with arrows (finish for homework if needed).",
+          "Exit question: \"Why does the frog life cycle start again?\" (The adult frog lays eggs.)"
+        ]
+      }
+    ],
+    "differentiation": {
+      "support": [
+        "Keep the stage flashcards on the desk during the worksheet.",
+        "Do activity 2 with a partner and read the steps aloud together."
+      ],
+      "challenge": [
+        "Explain in two sentences why a tadpole cannot live on land but an adult frog can.",
+        "Compare the frog life cycle with the life cycle of a flowering plant: what is the same, and what is different?"
+      ]
+    },
+    "assessment": "Use the quiz (15 points) at the end of the lesson or the next day. Score the short answers with the rubric. A score of 12 or more shows a secure understanding of the frog life cycle."
+  },
+  "worksheet": {
+    "title": "The Life Cycle of a Frog",
+    "sections": [
+      {
+        "type": "label",
+        "title": "Name the stages",
+        "instructions": "Write the name of each stage under its picture.",
+        "items": [
+          {
+            "emoji": "pic:frogspawn",
+            "answer": "frogspawn"
+          },
+          {
+            "emoji": "pic:tadpole",
+            "answer": "tadpole"
+          },
+          {
+            "emoji": "pic:tadpole_legs",
+            "answer": "tadpole with legs"
+          },
+          {
+            "emoji": "pic:froglet",
+            "answer": "froglet"
+          },
+          {
+            "emoji": "pic:frog",
+            "answer": "adult frog"
+          }
+        ]
+      },
+      {
+        "type": "sequence",
+        "title": "Put the stages in order",
+        "instructions": "The steps are mixed up. Write 1 to 6 in the boxes to show the right order.",
+        "items": [
+          "A frog lays frogspawn in a pond.",
+          "A tadpole hatches from an egg.",
+          "The tadpole grows back legs.",
+          "The tadpole grows front legs.",
+          "It becomes a froglet with a short tail.",
+          "The froglet grows into an adult frog."
+        ]
+      },
+      {
+        "type": "match",
+        "title": "Word match",
+        "instructions": "Draw a line from each word to its meaning.",
+        "items": [
+          {
+            "left": "amphibian",
+            "right": "lives part of its life in water and part on land"
+          },
+          {
+            "left": "gills",
+            "right": "take in air from water"
+          },
+          {
+            "left": "lungs",
+            "right": "take in air on land"
+          },
+          {
+            "left": "metamorphosis",
+            "right": "a big change in body shape"
+          },
+          {
+            "left": "frogspawn",
+            "right": "a clump of frog eggs in jelly"
+          }
+        ]
+      },
+      {
+        "type": "true_false",
+        "title": "True or false?",
+        "instructions": "Read each sentence. Circle True or False.",
+        "items": [
+          {
+            "statement": "A tadpole breathes with gills.",
+            "answer": true
+          },
+          {
+            "statement": "Tadpoles live on land.",
+            "answer": false
+          },
+          {
+            "statement": "Back legs grow before front legs.",
+            "answer": true
+          },
+          {
+            "statement": "An adult frog has a long tail.",
+            "answer": false
+          },
+          {
+            "statement": "Frogs are amphibians.",
+            "answer": true
+          }
+        ]
+      },
+      {
+        "type": "multiple_choice",
+        "title": "Choose the best answer",
+        "instructions": "Circle the best answer.",
+        "items": [
+          {
+            "q": "What does a tadpole use to swim?",
+            "options": [
+              "its front legs",
+              "its tail",
+              "its lungs"
+            ],
+            "answer": "its tail"
+          },
+          {
+            "q": "Which stage comes after the tadpole grows legs?",
+            "options": [
+              "frogspawn",
+              "egg",
+              "froglet"
+            ],
+            "answer": "froglet"
+          },
+          {
+            "q": "What do adult frogs usually eat?",
+            "options": [
+              "insects",
+              "leaves",
+              "sand"
+            ],
+            "answer": "insects"
+          },
+          {
+            "q": "Why do frogs lay their eggs in water?",
+            "options": [
+              "so birds can find them",
+              "so the tadpoles can swim and breathe",
+              "so the eggs stay dry"
+            ],
+            "answer": "so the tadpoles can swim and breathe"
+          }
+        ]
+      },
+      {
+        "type": "short_answer",
+        "title": "Think and write",
+        "instructions": "Write your answers in full sentences.",
+        "lines": 2,
+        "items": [
+          {
+            "q": "Write two ways a tadpole is different from an adult frog.",
+            "answer": "Any two: a tadpole lives in water but a frog can live on land; a tadpole breathes with gills but a frog breathes with lungs; a tadpole has a tail and no legs but a frog has four legs and no tail; a tadpole eats plants but a frog eats insects."
+          },
+          {
+            "q": "What is metamorphosis? Use the frog to explain.",
+            "answer": "Metamorphosis is a big change in body shape. A tadpole changes into a frog: it grows legs, loses its tail and gets lungs."
+          }
+        ]
+      },
+      {
+        "type": "draw_write",
+        "title": "Draw the life cycle",
+        "instructions": "Show the whole cycle in a picture.",
+        "items": [
+          {
+            "prompt": "Draw the frog life cycle in a circle. Use arrows and label each stage.",
+            "lines": 1,
+            "guidance": "Look for at least four stages in order (frogspawn → tadpole → froglet → adult frog) joined by arrows in a circle, with the adult frog leading back to frogspawn, and each stage labelled."
+          }
+        ]
+      }
+    ]
+  },
+  "quiz": {
+    "title": "Frog Life Cycle Quiz",
+    "sections": [
+      {
+        "type": "multiple_choice",
+        "title": "Choose the answer",
+        "instructions": "Circle the best answer.",
+        "items": [
+          {
+            "q": "What is a clump of frog eggs called?",
+            "options": [
+              "frogspawn",
+              "a froglet",
+              "a tadpole"
+            ],
+            "answer": "frogspawn"
+          },
+          {
+            "q": "What does a tadpole breathe with?",
+            "options": [
+              "lungs",
+              "gills",
+              "its tail"
+            ],
+            "answer": "gills"
+          },
+          {
+            "q": "Which legs grow first?",
+            "options": [
+              "front legs",
+              "all legs at once",
+              "back legs"
+            ],
+            "answer": "back legs"
+          },
+          {
+            "q": "A froglet is…",
+            "options": [
+              "a young frog with a short tail",
+              "a frog egg",
+              "a kind of fish"
+            ],
+            "answer": "a young frog with a short tail"
+          },
+          {
+            "q": "Frogs are amphibians. This means they…",
+            "options": [
+              "can fly",
+              "live in water and on land",
+              "only live in trees"
+            ],
+            "answer": "live in water and on land"
+          }
+        ]
+      },
+      {
+        "type": "true_false",
+        "title": "True or false?",
+        "instructions": "Circle True or False.",
+        "items": [
+          {
+            "statement": "A tadpole has gills.",
+            "answer": true
+          },
+          {
+            "statement": "Frogspawn is laid on dry sand.",
+            "answer": false
+          },
+          {
+            "statement": "An adult frog breathes with lungs.",
+            "answer": true
+          },
+          {
+            "statement": "A frog's life cycle ends with the tadpole.",
+            "answer": false
+          }
+        ]
+      },
+      {
+        "type": "sequence",
+        "title": "Order the stages",
+        "instructions": "Write 1 to 4 to show the order.",
+        "items": [
+          "Frogspawn",
+          "Tadpole",
+          "Froglet",
+          "Adult frog"
+        ]
+      },
+      {
+        "type": "short_answer",
+        "title": "Explain",
+        "instructions": "Write a full sentence.",
+        "lines": 2,
+        "items": [
+          {
+            "q": "Name one way a tadpole changes as it grows.",
+            "answer": "Any one: it grows back legs and then front legs; its tail gets shorter; it grows lungs and can breathe air."
+          },
+          {
+            "q": "Why does the frog life cycle start again?",
+            "answer": "The adult frog lays eggs (frogspawn), and new tadpoles hatch from them."
+          }
+        ]
+      }
+    ]
+  },
+  "homework": {
+    "title": "Frog Life Cycle at Home",
+    "sections": [
+      {
+        "type": "label",
+        "title": "Name the stages",
+        "instructions": "Write the name of each stage.",
+        "items": [
+          {
+            "emoji": "pic:tadpole",
+            "answer": "tadpole"
+          },
+          {
+            "emoji": "pic:frog",
+            "answer": "adult frog"
+          },
+          {
+            "emoji": "pic:frogspawn",
+            "answer": "frogspawn"
+          },
+          {
+            "emoji": "pic:froglet",
+            "answer": "froglet"
+          }
+        ]
+      },
+      {
+        "type": "fill_blank",
+        "title": "Complete the sentences",
+        "instructions": "Use the word bank to complete each sentence.",
+        "word_bank": true,
+        "items": [
+          {
+            "text": "A frog starts life as an ____.",
+            "answer": "egg"
+          },
+          {
+            "text": "A tadpole swims with its ____.",
+            "answer": "tail"
+          },
+          {
+            "text": "Tadpoles breathe with ____.",
+            "answer": "gills"
+          },
+          {
+            "text": "A young frog with a short tail is a ____.",
+            "answer": "froglet"
+          },
+          {
+            "text": "Adult frogs breathe with ____.",
+            "answer": "lungs"
+          }
+        ]
+      },
+      {
+        "type": "draw_write",
+        "title": "Pond picture",
+        "instructions": "Draw and label.",
+        "items": [
+          {
+            "prompt": "Draw a pond with frogspawn, tadpoles and a frog. Label each one.",
+            "lines": 1,
+            "guidance": "A pond picture showing frogspawn and tadpoles in the water and a frog in or near the pond, each labelled."
+          }
+        ]
+      }
+    ]
+  },
+  "rubric": {
+    "criteria": [
+      {
+        "name": "Naming the stages",
+        "levels": [
+          "Names all five stages correctly.",
+          "Names four stages correctly.",
+          "Names two or three stages.",
+          "Names one stage or none."
+        ]
+      },
+      {
+        "name": "Ordering the stages",
+        "levels": [
+          "Puts every stage in the right order and shows the cycle starting again.",
+          "Puts the stages in order with one small mistake.",
+          "Knows the first and last stages but mixes up the middle.",
+          "Cannot yet put the stages in order."
+        ]
+      },
+      {
+        "name": "Explaining the changes",
+        "levels": [
+          "Explains legs, tail and gills to lungs clearly.",
+          "Explains two of the changes.",
+          "Explains one change.",
+          "Does not yet explain how the tadpole changes."
+        ]
+      },
+      {
+        "name": "Using science words",
+        "levels": [
+          "Uses amphibian, metamorphosis, gills and lungs correctly.",
+          "Uses most science words correctly.",
+          "Uses a few science words, sometimes wrongly.",
+          "Does not yet use science words."
+        ]
+      }
+    ]
+  },
+  "slides": [
+    {
+      "title": "Frogs are amphibians",
+      "emoji": "🐸",
+      "bullets": [
+        "They live part of their life in water.",
+        "They live part of their life on land.",
+        "Young frogs (tadpoles) live in water."
+      ]
+    },
+    {
+      "title": "What changes?",
+      "emoji": "pic:tadpole_legs",
+      "bullets": [
+        "Back legs grow, then front legs.",
+        "The tail gets shorter and disappears.",
+        "Gills are replaced by lungs.",
+        "This big change is called metamorphosis."
+      ]
+    }
+  ],
+  "social": {
+    "facebook_post": "🐸 New PRO science pack for Grade 3: From Frogspawn to Frog!\n\nTeach the frog life cycle and metamorphosis with clear stage pictures: frogspawn, tadpole, tadpole with legs, froglet and adult frog. Includes a lesson plan, worksheet, quiz, homework, picture flashcards, a 4-level rubric, editable PowerPoint slides and Word files, and full answer keys.\n\nGet it on TeachLuma 👉 teachluma.com",
+    "pinterest_title": "Frog Life Cycle Lesson Pack for Grade 3 Science",
+    "pinterest_description": "A complete Grade 3 frog life cycle pack: frogspawn, tadpole, froglet and adult frog, plus metamorphosis and amphibians. Lesson plan, worksheet, quiz, homework, flashcards, rubric, editable slides and answer keys.",
+    "hashtags": [
+      "#TeachLuma",
+      "#FrogLifeCycle",
+      "#Grade3Science",
+      "#ScienceForKids",
+      "#LifeCycles",
+      "#TeacherResources"
+    ],
+    "visual_suggestions": [
+      "Square post: the five stage pictures in a circle with arrows and the words From Frogspawn to Frog.",
+      "Pinterest pin: cover page on top, the 'Name the stages' worksheet below."
+    ]
+  },
+  "spelling_allow": []
+}

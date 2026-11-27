@@ -1,0 +1,454 @@
+/*
+ * TeachLuma Games — shared brand theme.
+ * Loaded by every game AFTER its own inline <style>, so these rules win on
+ * equal specificity. Games are built on the same variable names
+ * (--brand-*, --ink*, --border, --subject-math*); remapping them here
+ * re-themes every game in one place, and the component rules below add
+ * the brand's fonts, gold CTAs, rounded answer tiles and cream backdrop.
+ * If this file fails to load, each game still renders with its own colors.
+ */
+
+@font-face { font-family: 'Fredoka'; font-style: normal; font-weight: 600; font-display: swap; src: url('../../fonts/fredoka-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Fredoka'; font-style: normal; font-weight: 700; font-display: swap; src: url('../../fonts/fredoka-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 400; font-display: swap; src: url('../../fonts/nunito-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 700; font-display: swap; src: url('../../fonts/nunito-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 800; font-display: swap; src: url('../../fonts/nunito-latin-800-normal.woff2') format('woff2'); }
+
+:root {
+    --tl-navy: #172A6E;
+    --tl-navy-dark: #0F1D52;
+    --tl-navy-soft: #E8ECF8;
+    --tl-yellow: #FBB829;
+    --tl-yellow-hover: #FFC444;
+    --tl-yellow-dark: #EDA412;
+    --tl-teal: #1FB5A8;
+    --tl-orange-ink: #B4530F;
+    --tl-cream: #FFF8EC;
+    --tl-border: #EEE6D6;
+    --tl-font-display: 'Fredoka', 'Nunito', system-ui, sans-serif;
+    --tl-font-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+
+    /* Remap each game's own variables onto the brand palette */
+    --brand-primary: var(--tl-navy);
+    --brand-primary-dark: var(--tl-navy-dark);
+    --brand-secondary: var(--tl-yellow);
+    --brand-success: #1B7A40;
+    --brand-danger: #D23A3A;
+    --brand-bg-soft: var(--tl-cream);
+    --ink: #1C2541;
+    --ink-soft: #5B6478;
+    --border: var(--tl-border);
+    --subject-math: var(--tl-navy);
+    --subject-math-dark: var(--tl-navy-dark);
+    --tlfx-accent: var(--tl-navy);
+}
+
+html,
+body {
+    background: var(--tl-cream);
+}
+
+/* Pinch-zoom stays available (WCAG 1.4.4); this only removes the
+   double-tap zoom delay that made quick answer taps feel laggy. */
+html {
+    touch-action: manipulation;
+}
+
+button,
+input,
+select {
+    font-family: inherit;
+}
+
+body {
+    font-family: var(--tl-font-body);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Brand corner shapes, echoing the site hero. Behind everything, never
+   interactive, and small enough not to compete with gameplay. */
+body::before,
+body::after {
+    content: '';
+    position: fixed;
+    z-index: 0;
+    pointer-events: none;
+}
+
+body::before {
+    width: 190px;
+    height: 160px;
+    left: -110px;
+    top: -60px;
+    background: var(--tl-yellow);
+    border-radius: 42% 58% 62% 38% / 45% 42% 58% 55%;
+    transform: rotate(-12deg);
+    opacity: 0.9;
+}
+
+body::after {
+    width: 360px;
+    height: 170px;
+    left: -170px;
+    bottom: -120px;
+    background: var(--tl-teal);
+    border-radius: 50%;
+    opacity: 0.85;
+}
+
+#app {
+    position: relative;
+    z-index: 1;
+}
+
+#app:fullscreen,
+#app:-webkit-full-screen {
+    background: var(--tl-cream);
+}
+
+/* Some games paint #app/.game-body with their own gradients; keep them transparent so the brand cream shows through. */
+
+/* ---------------------------------------------------------------- Type */
+h1, h2, h3,
+.start-hero h1,
+.results-score,
+.final-score,
+.question,
+.target-letter,
+.title,
+.completion-text,
+.completion-score,
+.stat-value {
+    font-family: var(--tl-font-display);
+    letter-spacing: -0.005em;
+}
+
+.start-hero h1,
+.title {
+    font-weight: 700;
+    color: var(--tl-navy);
+}
+
+.start-hero p,
+.subtitle {
+    color: var(--ink-soft);
+}
+
+/* ---------------------------------------------------------------- Top bar */
+.topbar {
+    background: #fff;
+    border-bottom: 1px solid var(--tl-border);
+    box-shadow: 0 6px 18px -16px rgba(23, 42, 110, 0.5);
+}
+
+.topbar-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-family: var(--tl-font-display);
+    font-weight: 700;
+    color: var(--tl-navy);
+    min-width: 0;
+}
+
+.topbar-home {
+    display: inline-flex;
+    flex-shrink: 0;
+    border-radius: 0.6rem;
+    padding: 0.1rem;
+}
+
+.topbar-home img {
+    display: block;
+    width: 32px;
+    height: 30px;
+}
+
+.topbar-home:focus-visible {
+    outline: 3px solid var(--tl-navy);
+    outline-offset: 2px;
+}
+
+.topbar-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.icon-btn {
+    border-radius: 999px;
+    border-color: var(--tl-border);
+    color: var(--tl-navy);
+    font-family: var(--tl-font-body);
+    font-weight: 800;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.icon-btn:hover {
+    border-color: var(--tl-navy);
+    color: var(--tl-navy);
+    background: var(--tl-cream);
+}
+
+/* ---------------------------------------------------------------- Setup screens */
+.option-group-label {
+    color: var(--tl-orange-ink);
+    letter-spacing: 0.12em;
+}
+
+.option-btn,
+.level-btn,
+.players-btn,
+.tab-button {
+    font-family: var(--tl-font-body);
+    border-radius: 0.9rem;
+    border-color: var(--tl-border);
+    background-color: #fff;
+    color: var(--tl-navy);
+    box-shadow: 0 3px 0 #EDE3D0;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.option-btn:hover,
+.level-btn:hover,
+.players-btn:hover,
+.tab-button:hover {
+    border-color: var(--tl-navy);
+}
+
+.option-btn[aria-pressed="true"],
+.players-btn[aria-pressed="true"],
+.tab-button.active {
+    background-color: var(--tl-navy);
+    border-color: var(--tl-navy);
+    color: #fff;
+    box-shadow: 0 3px 0 var(--tl-navy-dark);
+}
+
+.players-btn {
+    border-radius: 999px;
+}
+
+/* The primary action in every game is the brand CTA: gold, navy text (7.5:1). */
+.start-btn,
+.start-button,
+.btn-primary-lg,
+.play-again-button,
+.next-btn,
+.check-button {
+    background: var(--tl-yellow);
+    border-color: var(--tl-yellow);
+    color: var(--tl-navy);
+    border-radius: 999px;
+    font-family: var(--tl-font-display);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    box-shadow: 0 5px 0 var(--tl-yellow-dark);
+}
+
+.start-btn:hover,
+.start-button:hover,
+.btn-primary-lg:hover,
+.play-again-button:hover,
+.next-btn:hover,
+.check-button:hover {
+    background: var(--tl-yellow-hover);
+    color: var(--tl-navy);
+}
+
+.start-btn:active,
+.start-button:active,
+.btn-primary-lg:active,
+.play-again-button:active,
+.next-btn:active,
+.check-button:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 var(--tl-yellow-dark);
+}
+
+.start-btn:focus-visible,
+.start-button:focus-visible,
+.btn-primary-lg:focus-visible,
+.next-btn:focus-visible {
+    outline: 3px solid var(--tl-navy);
+    outline-offset: 3px;
+}
+
+.btn-secondary,
+.back-btn,
+.control-button,
+.try-again-button {
+    border-radius: 999px;
+    border-color: var(--tl-navy);
+    color: var(--tl-navy);
+    background-color: #fff;
+    font-family: var(--tl-font-body);
+    font-weight: 800;
+}
+
+.btn-secondary:hover,
+.back-btn:hover,
+.try-again-button:hover {
+    background-color: var(--tl-cream);
+}
+
+/* ---------------------------------------------------------------- Gameplay */
+.hud-stat strong {
+    color: var(--tl-navy);
+}
+
+.hud-streak {
+    color: var(--tl-orange-ink);
+}
+
+.progress-track,
+.timer-track {
+    background: #EFE7D8;
+}
+
+.progress-fill {
+    background: var(--tl-yellow);
+}
+
+.hear-button {
+    background: var(--tl-yellow);
+    color: var(--tl-navy);
+}
+
+.hear-button:hover {
+    background: var(--tl-yellow-hover);
+}
+
+.timer-fill {
+    background: var(--tl-teal);
+}
+
+.timer-fill.urgent {
+    background: var(--brand-danger);
+}
+
+.question {
+    color: var(--tl-navy);
+}
+
+/* Answer tiles: white, rounded, with a chunky "press" edge. */
+.answer-btn {
+    font-family: var(--tl-font-display);
+    font-weight: 700;
+}
+
+.answer-btn,
+.answer-card {
+    border-radius: 1.1rem;
+    border: 3px solid var(--tl-navy);
+    background-color: #fff;
+    color: var(--tl-navy);
+    box-shadow: 0 5px 0 var(--tl-navy);
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.12s ease, color 0.12s ease;
+}
+
+.answer-btn:hover:not(:disabled),
+.answer-card:hover:not(:disabled) {
+    background-color: var(--tl-navy);
+    color: #fff;
+}
+
+.answer-btn:active:not(:disabled),
+.answer-card:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 var(--tl-navy);
+}
+
+.answer-btn.correct,
+.answer-card.correct {
+    background-color: var(--brand-success);
+    border-color: var(--brand-success);
+    color: #fff;
+    box-shadow: 0 5px 0 #125A2E;
+}
+
+.answer-btn.incorrect,
+.answer-card.incorrect {
+    background-color: var(--brand-danger);
+    border-color: var(--brand-danger);
+    color: #fff;
+    box-shadow: 0 5px 0 #9E2323;
+}
+
+.feedback.correct,
+.feedback-correct {
+    color: var(--brand-success);
+}
+
+.feedback.incorrect,
+.feedback-incorrect {
+    color: var(--brand-danger);
+}
+
+/* Visual tiles in the Math games (place value, skip counting, fractions) */
+.pv-tile,
+.sc-tile {
+    border-color: var(--tl-border);
+    box-shadow: 0 4px 0 #EDE3D0;
+}
+
+.pv-tile-digit,
+.sc-tile {
+    font-family: var(--tl-font-display);
+}
+
+.frac-bar {
+    border-color: var(--tl-navy);
+}
+
+.frac-bar-segment {
+    border-right-color: var(--tl-navy);
+}
+
+.frac-bar-segment.filled {
+    background: var(--tl-yellow);
+}
+
+.frac-bar-label {
+    font-family: var(--tl-font-display);
+    color: var(--tl-navy);
+}
+
+/* Shared FX layer (game-fx.js) injects its styles at runtime, after this
+   file, so these overrides carry a "body" prefix to win. */
+body .tlfx-pop,
+body .tlfx-best {
+    font-family: var(--tl-font-display);
+}
+
+body .tlfx-best {
+    color: var(--ink-soft);
+}
+
+body .tlfx-best.new {
+    color: var(--tl-orange-ink);
+    background: #FFF1D0;
+    border-color: var(--tl-yellow);
+}
+
+body .tlfx-team-0 { background: var(--tl-orange-ink); }
+body .tlfx-team-1 { background: var(--tl-navy); }
+
+/* ---------------------------------------------------------------- Results */
+.results-score,
+.final-score,
+.completion-score {
+    color: var(--tl-navy);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .option-btn, .answer-btn, .answer-card, .start-btn, .start-button, .btn-primary-lg { transition: none; }
+    .answer-btn:active, .answer-card:active, .start-btn:active { transform: none; }
+}
+
+/* Short landscape phones: keep the corner shapes out of the way. */
+@media (max-height: 480px) {
+    body::before { width: 120px; height: 100px; left: -80px; top: -50px; }
+    body::after { display: none; }
+}

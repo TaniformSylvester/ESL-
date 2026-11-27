@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" role="img" aria-label="Phonics Sound Match">
+  <defs>
+    <linearGradient id="psmBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="225" fill="url(#psmBg)"/>
+
+  <!-- soft background texture -->
+  <circle cx="35" cy="30" r="60" fill="#ffffff" opacity="0.06"/>
+  <circle cx="370" cy="195" r="65" fill="#ffffff" opacity="0.06"/>
+
+  <!-- faint floating letters -->
+  <text x="48" y="185" font-family="Arial, sans-serif" font-size="30" font-weight="800" fill="#ffffff" opacity="0.28">a</text>
+  <text x="335" y="60" font-family="Arial, sans-serif" font-size="30" font-weight="800" fill="#ffffff" opacity="0.28">t</text>
+
+  <!-- sound waves, left of the card -->
+  <g stroke="#f59e0b" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M 68 100 Q 58 112.5 68 125"/>
+    <path d="M 82 90 Q 64 112.5 82 135"/>
+  </g>
+
+  <!-- flashcard with the target letter -->
+  <g transform="translate(198,116) rotate(-4)">
+    <rect x="-70" y="-56" width="140" height="112" rx="16" fill="#ffffff"/>
+    <text x="0" y="30" font-family="Arial, sans-serif" font-size="72" font-weight="800" fill="#2563eb" text-anchor="middle">Bb</text>
+  </g>
+
+  <!-- match checkmark badge -->
+  <g transform="translate(276,74)">
+    <circle r="20" fill="#16a34a"/>
+    <path d="M -9 0 L -3 7 L 10 -8" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- sparkle accents -->
+  <g fill="#f59e0b">
+    <polygon points="330,150 333,158 341,161 333,164 330,172 327,164 319,161 327,158"/>
+    <polygon points="120,55 122,60 127,62 122,64 120,69 118,64 113,62 118,60"/>
+  </g>
+</svg>

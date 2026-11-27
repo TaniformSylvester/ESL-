@@ -1,0 +1,10 @@
+# Deny ALL direct web access to payment proof screenshots — these may
+# contain banking details and must only ever be viewed by an authenticated
+# admin through a protected PHP viewer, never as a direct static URL.
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>
