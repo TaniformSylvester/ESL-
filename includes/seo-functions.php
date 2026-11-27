@@ -40,26 +40,116 @@ function pluralize_resource_type(string $type): string
     return $type . 's';
 }
 
-/** "[Title] | Grade [X] [Subject] Resource" — SITE_NAME is appended separately by includes/header.php's <title> tag, matching every other page. */
+/**
+ * Builds "[Title] – Grade [X] [Subject] [Type]" for search results, kept
+ * short enough that Google shows it whole (~60 characters before
+ * includes/header.php appends " | SITE_NAME"). The context is added only
+ * when it isn't already in the title ("Grade 7 ESL Reading Activity: ..."
+ * stays as it is) and is dropped piece by piece when the title is long.
+ */
+function build_seo_title(string $title, ?string $grade, ?string $subject, ?string $type): string
+{
+    $title = trim($title);
+    $grade = trim((string)$grade);
+    $subject = trim((string)$subject);
+    $type = trim((string)$type);
+    $subjectWord = strcasecmp($subject, 'ESL') === 0 ? 'English' : $subject;
+
+    if ($grade === '' || stripos($title, $grade) !== false) {
+        return $title;
+    }
+
+    // [suffix, longest title it may produce]: the resource type ("Worksheet")
+    // only while the whole title still fits; grade and subject a little longer,
+    // since Google may cut the " | SITE_NAME" ending but keeps the keywords.
+    $candidates = [];
+    if ($subjectWord !== '' && $type !== '' && stripos($title, $type) === false) {
+        $candidates[] = [$grade . ' ' . $subjectWord . ' ' . $type, 60];
+    }
+    if ($subjectWord !== '') {
+        $candidates[] = [$grade . ' ' . $subjectWord, 66];
+    }
+
+    foreach ($candidates as [$suffix, $maxLength]) {
+        if (mb_strlen($title . ' – ' . $suffix) <= $maxLength) {
+            return $title . ' – ' . $suffix;
+        }
+    }
+
+    // A long title still says which grade it is for; that's what teachers search.
+    return $title . ' – ' . $grade;
+}
+
+/** Search-result description lead: "Grade 3 (ages 8–9) English (ESL/EFL) worksheet". */
+function seo_context_phrase(?string $grade, ?string $subject, ?string $type): string
+{
+    $parts = array_filter([
+        grade_label($grade),
+        subject_label_with_uk(subject_search_label($subject)),
+        $type !== null && $type !== '' ? strtolower($type) : '',
+    ], static fn ($part) => $part !== '');
+
+    return implode(' ', $parts);
+}
+
+/**
+ * The resource's own description, which is unique to it, comes first so
+ * it isn't cut off. A short "Grade 3 (ages 8–9) English (ESL/EFL)
+ * worksheet:" lead is added only when the description doesn't already
+ * name the grade, and "Free" only when it doesn't already say so.
+ */
+function build_seo_description(string $body, ?string $grade, ?string $subject, ?string $type, bool $isFree, string $fallback): string
+{
+    $body = trim(preg_replace('/\s+/', ' ', $body) ?? $body);
+    $grade = trim((string)$grade);
+    $context = seo_context_phrase($grade, $subject, $type);
+
+    if ($body === '') {
+        $body = $fallback;
+    }
+
+    $lead = '';
+    if ($grade !== '' && stripos($body, $grade) === false && $context !== '') {
+        $lead = $context . ': ';
+    }
+    if ($isFree && stripos($body, 'free') === false) {
+        $lead = 'Free ' . ($lead !== '' ? $lead : '');
+    }
+    if ($lead !== '') {
+        $lead = mb_strtoupper(mb_substr($lead, 0, 1)) . mb_substr($lead, 1);
+    }
+    $text = $lead . $body;
+
+    // When the description named the grade itself, the ages (and, for
+    // English, "ESL/EFL") weren't added in the lead; add them at the end
+    // when there's room, since teachers abroad search by age and "EFL".
+    $ages = ages_for_grade($grade);
+    if ($lead === '' || stripos($lead, 'ages') === false) {
+        $isEnglish = strcasecmp(trim((string)$subject), 'ESL') === 0 && stripos($text, 'EFL') === false;
+        $tail = $ages
+            ? ($isEnglish ? 'For ESL/EFL classes, ages ' : 'Ages ') . $ages[0] . '–' . $ages[1] . '.'
+            : ($isEnglish ? 'For ESL/EFL classes.' : '');
+        if ($tail !== '' && mb_strlen($text . ' ' . $tail) <= 160) {
+            $text .= (preg_match('/[.!?]$/', $text) ? ' ' : '. ') . $tail;
+        }
+    }
+
+    return seo_truncate_at_word($text, 160);
+}
+
+/** Short, keyword-led title — SITE_NAME is appended separately by includes/header.php's <title> tag, matching every other page. */
 function generate_resource_seo_title(array $resource): string
 {
     if (!empty($resource['seo_title'])) {
         return $resource['seo_title'];
     }
 
-    $context = [];
-    if (!empty($resource['grade_level'])) {
-        $context[] = grade_label($resource['grade_level']); // "Grade 3 (Year 4)" for UK-curriculum searches
-    }
-    if (!empty($resource['subject_name'])) {
-        $context[] = $resource['subject_name'];
-    }
-
-    if (empty($context)) {
-        return $resource['title'];
-    }
-
-    return $resource['title'] . ' | ' . implode(' ', $context) . ' Resource';
+    return build_seo_title(
+        (string)$resource['title'],
+        $resource['grade_level'] ?? null,
+        $resource['subject_name'] ?? null,
+        $resource['resource_type'] ?? null
+    );
 }
 
 /** Unique, ~150-160 character meta description built from real resource fields — never the same generic sentence for every resource. */
@@ -69,25 +159,17 @@ function generate_resource_seo_description(array $resource): string
         return $resource['meta_description'];
     }
 
-    $type = !empty($resource['resource_type']) ? strtolower($resource['resource_type']) : 'resource';
-    $subjectGrade = trim(grade_label($resource['grade_level'] ?? '') . ' ' . subject_label_with_uk($resource['subject_name'] ?? ''));
     $focus = $resource['topic'] ?? ($resource['category_name'] ?? '');
+    $fallback = ($focus !== '' ? 'Topic: ' . $focus . '. ' : '') . 'Ready to print and teach.';
 
-    $lead = 'Download this ' . $type;
-    if ($focus !== '') {
-        $lead .= ' on ' . $focus;
-    }
-    if ($subjectGrade !== '') {
-        $lead .= ' for ' . $subjectGrade;
-    }
-    $lead .= ' — ready to use in your classroom.';
-
-    $body = trim((string)($resource['description'] ?? ''));
-    if ($body === '') {
-        return seo_truncate_at_word($lead, 160);
-    }
-
-    return seo_truncate_at_word($lead . ' ' . $body, 160);
+    return build_seo_description(
+        (string)($resource['description'] ?? ''),
+        $resource['grade_level'] ?? null,
+        $resource['subject_name'] ?? null,
+        $resource['resource_type'] ?? null,
+        !empty($resource['is_free']),
+        $fallback
+    );
 }
 
 /** Truncates at the last whole word within $maxLength, appending an ellipsis only when actually truncated. */
@@ -143,19 +225,7 @@ function generate_video_seo_title(array $video): string
         return $video['seo_title'];
     }
 
-    $context = [];
-    if (!empty($video['grade_level'])) {
-        $context[] = grade_label($video['grade_level']);
-    }
-    if (!empty($video['subject_name'])) {
-        $context[] = $video['subject_name'];
-    }
-
-    if (empty($context)) {
-        return $video['title'];
-    }
-
-    return $video['title'] . ' | ' . implode(' ', $context) . ' Video';
+    return build_seo_title((string)$video['title'], $video['grade_level'] ?? null, $video['subject_name'] ?? null, 'Video');
 }
 
 /** Unique, ~150-160 character meta description built from real video fields — mirrors generate_resource_seo_description(). */
@@ -165,24 +235,17 @@ function generate_video_seo_description(array $video): string
         return $video['meta_description'];
     }
 
-    $subjectGrade = trim(grade_label($video['grade_level'] ?? '') . ' ' . subject_label_with_uk($video['subject_name'] ?? ''));
     $focus = $video['topic'] ?? '';
+    $fallback = 'A short classroom video' . ($focus !== '' ? ' on ' . $focus : '') . ' from ' . SITE_NAME . '.';
 
-    $lead = 'Watch this educational video';
-    if ($focus !== '') {
-        $lead .= ' on ' . $focus;
-    }
-    if ($subjectGrade !== '') {
-        $lead .= ' for ' . $subjectGrade;
-    }
-    $lead .= ' from ' . SITE_NAME . '.';
-
-    $body = trim((string)($video['description'] ?? ''));
-    if ($body === '') {
-        return seo_truncate_at_word($lead, 160);
-    }
-
-    return seo_truncate_at_word($lead . ' ' . $body, 160);
+    return build_seo_description(
+        (string)($video['description'] ?? ''),
+        $video['grade_level'] ?? null,
+        $video['subject_name'] ?? null,
+        'video',
+        false,
+        $fallback
+    );
 }
 
 /**
@@ -195,10 +258,10 @@ function generate_videos_listing_seo(array $filters, ?array $subject, int $resul
     $labelParts = [];
 
     if (!empty($filters['grade'])) {
-        $labelParts[] = grade_label($filters['grade']);
+        $labelParts[] = $filters['grade'];
     }
     if ($subject) {
-        $labelParts[] = $subject['name'];
+        $labelParts[] = subject_search_label($subject['name']);
     }
 
     $isSearch = trim((string)($filters['search'] ?? '')) !== '';
@@ -217,7 +280,7 @@ function generate_videos_listing_seo(array $filters, ?array $subject, int $resul
     if ($label === '') {
         return [
             'title'       => 'Educational Videos',
-            'description' => 'Browse ' . SITE_NAME . '\'s library of educational videos — English/ESL, Math and Science lessons for classrooms around the world.',
+            'description' => 'Browse ' . SITE_NAME . '\'s library of educational videos — English (ESL/EFL), Math and Science lessons for classrooms around the world.',
             'h1'          => 'Educational Videos',
             'noindex'     => $resultCount === 0,
         ];
@@ -245,16 +308,17 @@ function generate_resources_listing_seo(array $filters, ?array $subject, ?array 
 {
     $labelParts = [];
 
+    // Titles stay short ("Grade 3 English (ESL/EFL) Worksheets"); the meta
+    // description adds the ages and British spelling ("Grade 3 (ages 8–9)
+    // Math (Maths)"), which teachers outside the US also search with.
+    $descriptionLabelParts = [];
     if (!empty($filters['grade'])) {
-        $labelParts[] = grade_label($filters['grade']);
+        $labelParts[] = $filters['grade'];
+        $descriptionLabelParts[] = grade_label($filters['grade']);
     }
     if ($subject) {
-        $labelParts[] = $subject['name'];
-    }
-    // Same label with British spellings ("Math (Maths)") for the meta description.
-    $descriptionLabelParts = $labelParts;
-    if ($subject) {
-        $descriptionLabelParts[array_key_last($descriptionLabelParts)] = subject_label_with_uk($subject['name']);
+        $labelParts[] = subject_search_label($subject['name']);
+        $descriptionLabelParts[] = subject_label_with_uk(subject_search_label($subject['name']));
     }
     if ($category) {
         $labelParts[] = $category['name'];
@@ -284,7 +348,7 @@ function generate_resources_listing_seo(array $filters, ?array $subject, ?array 
     if ($label === '' && $isFree) {
         return [
             'title'       => 'Free Teaching Resources — Worksheets & Lesson Plans',
-            'description' => 'Free ESL, Math and Science worksheets, lesson plans, PowerPoints and classroom activities. Unlimited downloads with a free teacher account.',
+            'description' => 'Free printable English (ESL/EFL), Math and Science worksheets, lesson plans, PowerPoints and classroom activities for ages 5–16. Unlimited downloads with a free teacher account.',
             'h1'          => 'Free Teaching Resources',
             'intro'       => 'Every resource on this page is free to download with a free account, as many times as you like.',
             'noindex'     => $resultCount === 0,
@@ -294,7 +358,7 @@ function generate_resources_listing_seo(array $filters, ?array $subject, ?array 
     if ($label === '') {
         return [
             'title'       => 'Teaching Resources: Worksheets & Lesson Plans',
-            'description' => 'Browse the complete ' . SITE_NAME . ' resource library — English/ESL, Math and Science lesson plans, worksheets, PowerPoints, games and more.',
+            'description' => 'Browse the complete ' . SITE_NAME . ' resource library — English (ESL/EFL), Math and Science lesson plans, worksheets, PowerPoints, games and more for ages 5–16.',
             'h1'          => 'Teaching Resources',
             'intro'       => null,
             'noindex'     => $resultCount === 0,
@@ -307,7 +371,7 @@ function generate_resources_listing_seo(array $filters, ?array $subject, ?array 
     $title = ($isFree ? 'Free ' : '') . ($typeLabel !== '' ? $label : $label . ' Resources');
     if ($label === $typeLabel) {
         // Type on its own ("Worksheets") is too vague to rank; say what it covers.
-        $title .= ' for ESL, Math & Science';
+        $title .= ' for English, Math & Science';
     }
     $intro = 'Browse ready-to-use ' . ($isFree ? 'free ' : '') . $label . ($typeLabel !== '' ? '' : ' resources') . ' for your classroom.';
     $description = seo_truncate_at_word(

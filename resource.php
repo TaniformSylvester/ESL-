@@ -145,6 +145,7 @@ $whatsIncludedList = !empty($resource['whats_included']) ? array_filter(array_ma
 $pageTitle = generate_resource_seo_title($resource);
 $pageDescription = generate_resource_seo_description($resource);
 $pageImage = $displayImage ?? asset_url('images/og-image-icon.png');
+$canonicalUrl = base_url('resource.php?slug=' . rawurlencode($resource['slug']));
 
 $gaCustomEvents = [[
     'name'   => 'resource_view',
@@ -189,6 +190,8 @@ $resourceSchema = [
     'datePublished'         => date('c', strtotime($resource['created_at'])),
     'dateModified'          => date('c', strtotime($resource['updated_at'])),
     'publisher'             => ['@type' => 'Organization', 'name' => SITE_NAME, 'url' => base_url()],
+    'inLanguage'            => 'en',
+    'audience'              => ['@type' => 'EducationalAudience', 'educationalRole' => 'teacher'],
 ];
 if (!empty($resource['grade_level'])) {
     $resourceSchema['educationalLevel'] = $resource['grade_level'];

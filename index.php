@@ -65,8 +65,8 @@ $gradeRangeLabel = static function (array $subject): string {
 $typeCounts = array_slice(get_resource_counts_by_type(), 0, 8, true);
 $typeTones = ['gold', 'teal', 'esl', 'math', 'science', 'games', 'videos', 'gold'];
 
-$pageTitle = 'Free ESL, Math & Science Teaching Resources';
-$pageDescription = 'Free ESL, Math and Science worksheets, lesson plans, PowerPoints and interactive classroom games for teachers everywhere. Download and teach today.';
+$pageTitle = 'Free English (ESL/EFL), Math & Science Worksheets';
+$pageDescription = 'Free printable English (ESL/EFL), Math and Science worksheets, lesson plans, PowerPoints and classroom games for kindergarten to grade 10 (ages 5–16), for teachers around the world.';
 
 // Single source of truth for the FAQ accordion below — also drives the
 // FAQPage schema, so the structured data can never drift from what a
@@ -82,7 +82,7 @@ $faqItems = [
     ],
     [
         'question' => 'What subjects does TeachLuma cover?',
-        'answer'   => 'TeachLuma provides English and ESL resources from Kindergarten to Grade 10 (UK Years 1–11), plus Mathematics (Maths) and Science resources for Grades 1–6 (UK Years 2–7).',
+        'answer'   => 'TeachLuma provides English (ESL/EFL) resources from Kindergarten to Grade 10 (ages 5–16), plus Mathematics (Maths) and Science resources for Grades 1–6 (ages 6–12).',
     ],
     [
         'question' => 'How do I pay?',
@@ -115,7 +115,7 @@ require_once __DIR__ . '/includes/header.php';
             <div class="col-lg-6 hero-copy">
                 <p class="hero-eyebrow"><span>Teach better</span><span>Save time</span><span>Engage learners</span></p>
                 <h1 id="hero-title">Quality Teaching Resources for <span class="text-highlight text-highlight-swoosh">Every Classroom</span></h1>
-                <p class="hero-lead">Ready-to-use lesson plans, worksheets, games and videos for ESL, Math and Science &mdash; made for classrooms around the world.</p>
+                <p class="hero-lead">Ready-to-use lesson plans, worksheets, games and videos for English (ESL/EFL), Math and Science &mdash; made for classrooms around the world.</p>
                 <div class="hero-ctas">
                     <a href="<?= e(base_url('resources.php')) ?>" class="btn btn-accent btn-lg">
                         <i class="fa-solid fa-magnifying-glass me-2" aria-hidden="true"></i>Browse Resources
@@ -242,8 +242,8 @@ require_once __DIR__ . '/includes/header.php';
                         <div class="subject-card-top d-flex align-items-center justify-content-between">
                             <span class="icon-bubble" aria-hidden="true"><i class="fa-solid <?= e($subjectIcons[$subject['slug']] ?? 'fa-book') ?>"></i></span>
                             <?php if ($range !== ''): ?>
-                                <?php $ukRange = uk_year_range($subject['min_grade'] ?? null, $subject['max_grade'] ?? null); ?>
-                                <span class="badge badge-subject-<?= e($tone) ?> bg-white"><?= e($range) ?><?= $ukRange !== '' ? ' (' . e($ukRange) . ')' : '' ?></span>
+                                <?php $ageRange = age_range_label($subject['min_grade'] ?? null, $subject['max_grade'] ?? null); ?>
+                                <span class="badge badge-subject-<?= e($tone) ?> bg-white"><?= e($range) ?><?= $ageRange !== '' ? ' (' . e($ageRange) . ')' : '' ?></span>
                             <?php endif; ?>
                         </div>
                         <div class="subject-card-body">

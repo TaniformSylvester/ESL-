@@ -14,6 +14,15 @@ $filters = [
     'category_id'   => (int)($_GET['category_id'] ?? 0),
     'access'        => trim((string)($_GET['access'] ?? '')),
 ];
+// Unknown values are ignored by the query anyway; dropping them here keeps
+// a link like ?grade=3 from becoming an indexable "3 Resources" copy of
+// the full library.
+if (!in_array($filters['grade'], GRADE_LEVELS, true)) {
+    $filters['grade'] = '';
+}
+if (!in_array($filters['resource_type'], RESOURCE_TYPES, true)) {
+    $filters['resource_type'] = '';
+}
 
 $page = max(1, (int)($_GET['page'] ?? 1));
 $result = get_published_resources($filters, $page, RESOURCES_PER_PAGE);
@@ -27,6 +36,15 @@ $listingSeo = generate_resources_listing_seo($filters, $activeSubject, $activeCa
 $pageTitle = $listingSeo['title'];
 $pageDescription = $listingSeo['description'];
 $pageRobots = $listingSeo['noindex'] ? 'noindex, follow' : 'index, follow';
+$canonicalParams = array_filter([
+    'subject_id'    => $filters['subject_id'] ?: null,
+    'category_id'   => $filters['category_id'] ?: null,
+    'grade'         => $filters['grade'] ?: null,
+    'resource_type' => $filters['resource_type'] ?: null,
+    'access'        => $filters['access'] === 'free' ? 'free' : null,
+    'page'          => $page > 1 ? $page : null,
+], static fn ($value) => $value !== null);
+$canonicalUrl = base_url('resources.php') . ($canonicalParams ? '?' . http_build_query($canonicalParams) : '');
 
 $gaCustomEvents = [];
 if ($filters['search'] !== '') {

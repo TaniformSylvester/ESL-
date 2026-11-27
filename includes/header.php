@@ -15,7 +15,10 @@ $userRole = $_SESSION['user_role'] ?? null;
 // A page sets $hideAds = true when it's shown to a class on the projector
 // (games, classroom tools): children see that screen, so no ads there.
 $showAds = should_show_ads() && empty($hideAds);
-$canonicalUrl = rtrim(SITE_URL, '/') . strip_tracking_params($_SERVER['REQUEST_URI'] ?? '/');
+// A page with query-string filters sets its own $canonicalUrl from the
+// parameters it actually uses, so an unknown or reordered parameter
+// (resources.php?sort=x) can't create a second indexable copy of the page.
+$canonicalUrl = $canonicalUrl ?? rtrim(SITE_URL, '/') . strip_tracking_params($_SERVER['REQUEST_URI'] ?? '/');
 $organizationSchema = [
     '@context' => 'https://schema.org',
     '@type'    => 'Organization',

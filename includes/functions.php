@@ -134,47 +134,62 @@ function format_currency($amount): string
  * Kept here rather than in config/config.php so wording changes reach the
  * live site with a normal deployment, which never overwrites the config.
  */
-const SITE_SUMMARY = 'Ready-to-teach English/ESL, Math and Science resources, plus practical teaching guidance, for teachers everywhere.';
+const SITE_SUMMARY = 'Ready-to-teach English (ESL/EFL), Math and Science resources, plus practical teaching guidance, for teachers around the world.';
 
 /**
- * British-curriculum equivalents for the site's US-style grades, so teachers
- * who search with UK terms ("Year 4 maths worksheet") — common in the UK
- * and in British-curriculum international schools — still find the right
- * resources. US Kindergarten = Year 1, Grade 1 = Year 2 ... Grade 10 = Year 11.
- * The grades stored in the database never change; this is display only.
+ * Student ages for the site's US-style grades. Most of TeachLuma's audience
+ * teaches in countries whose first language isn't English, where every
+ * school system names its grades differently (Prathom, lớp, Primaria,
+ * Primary 3...) — but an age range means the same thing everywhere.
+ * Kindergarten = 5–6, Grade 1 = 6–7 ... Grade 10 = 15–16. The grades
+ * stored in the database never change; this is display only.
+ *
+ * @return array{0:int,1:int}|null
  */
-function uk_year_for_grade(?string $grade): ?string
+function ages_for_grade(?string $grade): ?array
 {
     $grade = trim((string)$grade);
     if ($grade === 'Kindergarten') {
-        return 'Year 1';
+        return [5, 6];
     }
     if (preg_match('/^Grade (\d{1,2})$/', $grade, $m)) {
-        return 'Year ' . ((int)$m[1] + 1);
+        return [(int)$m[1] + 5, (int)$m[1] + 6];
     }
 
     return null;
 }
 
-/** "Grade 3 (Year 4)", "Kindergarten (Year 1)"; any other value unchanged. */
+/** "Grade 3 (ages 8–9)", "Kindergarten (ages 5–6)"; any other value unchanged. */
 function grade_label(?string $grade): string
 {
     $grade = trim((string)$grade);
-    $year = uk_year_for_grade($grade);
+    $ages = ages_for_grade($grade);
 
-    return $year ? $grade . ' (' . $year . ')' : $grade;
+    return $ages ? $grade . ' (ages ' . $ages[0] . '–' . $ages[1] . ')' : $grade;
 }
 
-/** "Years 2–7" for a grade range, or '' if either end has no equivalent. */
-function uk_year_range(?string $minGrade, ?string $maxGrade): string
+/** "ages 5–16" for a grade range, or '' if either end has no age equivalent. */
+function age_range_label(?string $minGrade, ?string $maxGrade): string
 {
-    $from = uk_year_for_grade($minGrade);
-    $to = uk_year_for_grade($maxGrade);
+    $from = ages_for_grade($minGrade);
+    $to = ages_for_grade($maxGrade);
     if (!$from || !$to) {
         return '';
     }
 
-    return 'Years ' . substr($from, 5) . '–' . substr($to, 5);
+    return 'ages ' . $from[0] . '–' . $to[1];
+}
+
+/**
+ * How a subject is named in search titles and descriptions. Teachers outside
+ * English-speaking countries mostly search for "English" or "EFL" worksheets,
+ * rarely "ESL", so the ESL subject is labelled with all three.
+ */
+function subject_search_label(?string $subject): string
+{
+    $subject = trim((string)$subject);
+
+    return strcasecmp($subject, 'ESL') === 0 ? 'English (ESL/EFL)' : $subject;
 }
 
 /** A subject name with its British spelling where it differs: "Math" → "Math (Maths)". */

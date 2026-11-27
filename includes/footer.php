@@ -45,7 +45,7 @@
         </div>
         <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between gap-2">
             <p class="mb-0">&copy; <?= date('Y') ?> <?= e(SITE_NAME) ?>. All rights reserved.</p>
-            <p class="mb-0">ESL &middot; Math &middot; Science resources for classrooms around the world</p>
+            <p class="mb-0">English (ESL/EFL) &middot; Math &middot; Science resources for classrooms around the world</p>
         </div>
     </div>
 </footer>
